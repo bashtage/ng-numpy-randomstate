@@ -5,6 +5,9 @@ cimport numpy as np
 import cython
 from libc.stdint cimport uint32_t, uint64_t
 
+cdef extern from "inttypes.h":
+    ctypedef unsigned long long __uint128_t
+
 cdef extern from "pcg_variants.h":
     # struct pcg_state_setseq_64 {
     #     uint64_t state;
@@ -29,6 +32,19 @@ cdef extern from "pcg_variants.h":
 
     cdef void pcg32_advance_r(pcg32_random_t *rng, uint64_t delta)
 
+    # PCG-64
+    ctypedef __uint128_t pcg128_t;
+
+    cdef struct pcg_state_setseq_128:
+        pcg128_t state;
+        pcg128_t inc;
+
+    ctypedef pcg_state_setseq_128 pcg64_random_t
+
+    cdef void pcg_setseq_128_srandom_r(pcg64_random_t *rng, pcg128_t initstate, pcg128_t initseq)
+
+
+
 
 cdef extern from "pcg_helper.c":
     cdef double pcg_random_double(pcg32_random_t *rng)
@@ -39,6 +55,9 @@ cdef extern from "pcg_helper.c":
 
     cdef double pcg_standard_gamma(pcg32_random_t *rng, double shape, bint *has_gauss, double *gauss)
 
+    cdef double pcg_random_double_64(pcg64_random_t *rng)
+
+    cdef double pcg_random_gauss_64(pcg64_random_t *rng, bint *has_gauss, double *gauss)
 
 
 cdef class PCGRandomState:
@@ -48,14 +67,21 @@ cdef class PCGRandomState:
     cdef bint has_gauss
     cdef double gauss
 
+    cdef pcg64_random_t rng64
+    cdef pcg128_t state64, inc64
+
     def __init__(self, state=None, inc=None):
         if state is not None and inc is not None:
             self.state = state
             self.inc = inc
+            self.state64 = state
+            self.inc64 = inc
         else:
-            # TODO: Add other method to get state and inc
+            # TODO: Add entropy method to get state and inc
             self.state = 42
             self.inc = 52
+            self.state64 = 42
+            self.inc64 = 52
 
         self.seed(self.state, self.inc)
         self.has_gauss = 0
@@ -63,6 +89,7 @@ cdef class PCGRandomState:
 
     def seed(self, uint64_t state, uint64_t inc):
         pcg_setseq_64_srandom_r(&self.rng, state, inc)
+        pcg_setseq_128_srandom_r(&self.rng64, self.state64, self.inc64)
 
     def get_state(self):
         return 'pcg32', (self.rng.state, self.rng.inc), self.has_gauss, self.gauss
@@ -95,11 +122,28 @@ cdef class PCGRandomState:
 
         return np.asanyarray(randoms)
 
+    def random_sample_64(self, Py_ssize_t n):
+        cdef Py_ssize_t i
+        cdef double [:] randoms = np.empty(n, dtype=np.double)
+        cdef double temp
+        for i in range(n):
+            randoms[i] = pcg_random_double_64(&self.rng64)
+
+        return np.asanyarray(randoms)
+
     def standard_normal(self, Py_ssize_t n):
         cdef Py_ssize_t i
         cdef double [:] randoms = np.empty(n, dtype=np.double)
         for i in range(n):
             randoms[i] = pcg_random_gauss(&self.rng, &self.has_gauss, &self.gauss)
+
+        return np.asanyarray(randoms)
+
+    def standard_normal_64(self, Py_ssize_t n):
+        cdef Py_ssize_t i
+        cdef double [:] randoms = np.empty(n, dtype=np.double)
+        for i in range(n):
+            randoms[i] = pcg_random_gauss_64(&self.rng64, &self.has_gauss, &self.gauss)
 
         return np.asanyarray(randoms)
 

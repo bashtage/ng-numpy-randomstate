@@ -7,12 +7,16 @@ import glob
 
 pwd = getcwd()
 
-sources = [join(pwd, 'pcg.pyx')] + ['pcg-advance-32.c', 'pcg-advance-64.c','pcg-output-32.c','pcg-rngs-32.c']
+sources = [join(pwd, 'pcg.pyx')] + ['pcg-advance-32.c', 'pcg-advance-64.c', 'pcg-advance-128.c',
+                                    'pcg-output-32.c','pcg-rngs-32.c','pcg-rngs-128.c']
 
+defs = [('PCG_HAS_128BIT_OPS', '1'),
+        ('__SIZEOF_INT128__','16')]
 setup(
     ext_modules = cythonize([Extension("pcg",
                              sources=sources,
                              include_dirs=[pwd],
+                             define_macros=defs,
                              extra_compile_args=['-std=c99'])])
 )
 
