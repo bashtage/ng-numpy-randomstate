@@ -2,14 +2,7 @@
 #include <stdbool.h>
 #include "pcg_variants.h"
 
-extern inline double pcg_random_double(pcg32_random_t* rng){
-    uint32_t a, b;
-    a = pcg32_random_r(rng) >> 5;
-    b = pcg32_random_r(rng) >> 6;
-    return (a * 67108864.0 + b) / 9007199254740992.0;
-}
-
-extern inline double pcg_random_double_64(pcg64_random_t* rng)
+extern inline double pcg_random_double(pcg64_random_t* rng)
 {
     uint64_t rn, a, b;
     rn = pcg64_random_r(rng);
@@ -18,7 +11,7 @@ extern inline double pcg_random_double_64(pcg64_random_t* rng)
     return (a * 67108864.0 + b) / 9007199254740992.0;
 }
 
-extern inline double pcg_random_gauss(pcg32_random_t* rng, int *has_gauss, double *gauss){
+extern inline double pcg_random_gauss(pcg64_random_t* rng, int *has_gauss, double *gauss){
     if (*has_gauss)
     {
         const double temp = *gauss;
@@ -46,43 +39,15 @@ extern inline double pcg_random_gauss(pcg32_random_t* rng, int *has_gauss, doubl
     }
 }
 
-extern inline double pcg_random_gauss_64(pcg64_random_t* rng, int *has_gauss, double *gauss){
-    if (*has_gauss)
-    {
-        const double temp = *gauss;
-        *has_gauss = false;
-        *gauss = 0.0;
-        return temp;
-    }
-    else
-    {
-        double f, x1, x2, r2;
 
-        do {
-            x1 = 2.0*pcg_random_double_64(rng) - 1.0;
-            x2 = 2.0*pcg_random_double_64(rng) - 1.0;
-            r2 = x1*x1 + x2*x2;
-        }
-        while (r2 >= 1.0 || r2 == 0.0);
-
-        /* Box-Muller transform */
-        f = sqrt(-2.0*log(r2)/r2);
-        /* Keep for next call */
-        *gauss = f*x1;
-        *has_gauss = true;
-        return f*x2;
-    }
-}
-
-
-extern inline double pcg_standard_exponential(pcg32_random_t* rng)
+extern inline double pcg_standard_exponential(pcg64_random_t* rng)
 {
     /* We use -log(1-U) since U is [0, 1) */
     return -log(1.0 - pcg_random_double(rng));
 }
 
 
-extern inline double pcg_standard_gamma(pcg32_random_t* rng, double shape, int *has_gauss, double *gauss)
+extern inline double pcg_standard_gamma(pcg64_random_t* rng, double shape, int *has_gauss, double *gauss)
 {
     double b, c;
     double U, V, X, Y;
@@ -145,7 +110,7 @@ extern inline double pcg_standard_gamma(pcg32_random_t* rng, double shape, int *
 #define ZIGNOR_R  3.442619855899  /* start of the right tail */
 #define ZIGNOR_V  9.91256303526217e-3
 
-static inline double zig_NormalTail(pcg32_random_t* rng, int iNegative)
+static inline double zig_NormalTail(pcg64_random_t* rng, int iNegative)
 {
     double x, y;
     for (;;) {
@@ -176,9 +141,9 @@ static void zig_NorInit(void)
 }
 
 
-extern inline double pcg_random_gauss_zig(pcg32_random_t* rng,
+extern inline double pcg_random_gauss_zig(pcg64_random_t* rng,
                                           int *shift_zig_random_int,
-                                          uint32_t *zig_random_int)
+                                          uint64_t *zig_random_int)
 {
     static int initalized = 0;
     unsigned int i;
@@ -190,8 +155,8 @@ extern inline double pcg_random_gauss_zig(pcg32_random_t* rng,
     for (;;) {
         u = 2.0 * pcg_random_double(rng) - 1.0;
         /* Here we create an integer, i, which is between 0 and 127.
-        Instead of calling to rk_random() each time, we only do a call
-        every 4th time, as the rk_random() will return at least 32-bits.
+        Instead of calling to pcg64_random_r each time, we only do a call
+        every 8th time, as the pcg64_random_r  will return 64-bits.
         state->shift_zig_random_int is a counter, which tells if the
         integer state->zig_random_int has to be shifted in the next call,
         or if state->zig_random_int needs to be re-generated.
@@ -200,9 +165,9 @@ extern inline double pcg_random_gauss_zig(pcg32_random_t* rng,
             *zig_random_int >>= 8;
         }
         else{
-            *zig_random_int = pcg32_random_r(rng);
+            *zig_random_int = pcg64_random_r(rng);
         }
-        *shift_zig_random_int = (*shift_zig_random_int + 1) % 4;
+        *shift_zig_random_int = (*shift_zig_random_int + 1) % 8;
         i = *zig_random_int & 0x7F;
         /* first try the rectangular boxes */
         if (fabs(u) < s_adZigR[i]){

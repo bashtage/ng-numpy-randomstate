@@ -1,3 +1,4 @@
 *.xml
 *.so
 pcg.c
+*.html

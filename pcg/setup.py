@@ -3,12 +3,10 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 from os.path import join
 from os import getcwd
-import glob
 
 pwd = getcwd()
 
-sources = [join(pwd, 'pcg.pyx')] + ['pcg-advance-32.c', 'pcg-advance-64.c', 'pcg-advance-128.c',
-                                    'pcg-output-32.c','pcg-rngs-32.c','pcg-rngs-128.c']
+sources = [join(pwd, 'pcg.pyx')] + ['pcg-advance-128.c','pcg-rngs-128.c']
 
 defs = [('PCG_HAS_128BIT_OPS', '1'),
         ('__SIZEOF_INT128__','16')]
