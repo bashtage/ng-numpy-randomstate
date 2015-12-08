@@ -59,6 +59,10 @@ cdef extern from "pcg_helper.c":
 
     cdef double pcg_random_gauss_64(pcg64_random_t *rng, bint *has_gauss, double *gauss)
 
+    cdef double pcg_random_gauss_zig(pcg32_random_t *rng,
+                                     int *shift_zig_random_int,
+                                     uint32_t *zig_random_int)
+
 
 cdef class PCGRandomState:
     '''Test class'''
@@ -69,6 +73,9 @@ cdef class PCGRandomState:
 
     cdef pcg64_random_t rng64
     cdef pcg128_t state64, inc64
+
+    cdef int shift_zig_random_int
+    cdef uint32_t zig_random_int
 
     def __init__(self, state=None, inc=None):
         if state is not None and inc is not None:
@@ -82,6 +89,9 @@ cdef class PCGRandomState:
             self.inc = 52
             self.state64 = 42
             self.inc64 = 52
+
+        self.shift_zig_random_int = 0
+        self.zig_random_int = 0
 
         self.seed(self.state, self.inc)
         self.has_gauss = 0
@@ -136,6 +146,16 @@ cdef class PCGRandomState:
         cdef double [:] randoms = np.empty(n, dtype=np.double)
         for i in range(n):
             randoms[i] = pcg_random_gauss(&self.rng, &self.has_gauss, &self.gauss)
+
+        return np.asanyarray(randoms)
+
+    def standard_normal_zig(self, Py_ssize_t n):
+        cdef Py_ssize_t i
+        cdef double [:] randoms = np.empty(n, dtype=np.double)
+        for i in range(n):
+            randoms[i] = pcg_random_gauss_zig(&self.rng,
+                                              &self.shift_zig_random_int,
+                                              &self.zig_random_int)
 
         return np.asanyarray(randoms)
 
