@@ -35,6 +35,11 @@ cdef extern from "pcg_helper.c":
 
     cdef double pcg_random_gauss(pcg32_random_t *rng, bint *has_gauss, double *gauss)
 
+    cdef double pcg_standard_exponential(pcg32_random_t *rng)
+
+    cdef double pcg_standard_gamma(pcg32_random_t *rng, double shape, bint *has_gauss, double *gauss)
+
+
 
 cdef class PCGRandomState:
     '''Test class'''
@@ -93,9 +98,24 @@ cdef class PCGRandomState:
     def standard_normal(self, Py_ssize_t n):
         cdef Py_ssize_t i
         cdef double [:] randoms = np.empty(n, dtype=np.double)
-        cdef double temp
         for i in range(n):
             randoms[i] = pcg_random_gauss(&self.rng, &self.has_gauss, &self.gauss)
+
+        return np.asanyarray(randoms)
+
+    def standard_gamma(self, double shape, Py_ssize_t n):
+        cdef Py_ssize_t i
+        cdef double [:] randoms = np.empty(n, dtype=np.double)
+        for i in range(n):
+            randoms[i] = pcg_standard_gamma(&self.rng, shape, &self.has_gauss, &self.gauss)
+
+        return np.asanyarray(randoms)
+
+    def standard_exponential(self, Py_ssize_t n):
+        cdef Py_ssize_t i
+        cdef double [:] randoms = np.empty(n, dtype=np.double)
+        for i in range(n):
+            randoms[i] = pcg_standard_exponential(&self.rng)
 
         return np.asanyarray(randoms)
 

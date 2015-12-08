@@ -7,8 +7,8 @@ for use in Python and Numpy. It uses source from
 [randomkit](https://github.com/numpy/numpy/blob/master/numpy/random/mtrand/).
 
 ## Status
-Currently only some basic RNGs are available for uniform (0,1), standard normal
-and 32-bit unsigned integers.
+Currently only some core RNGs are available: uniform [0,1), standard normal,
+standard gamma, standard exponential and 32-bit unsigned integers.
 
 The generators all return 1-d arrays.
 
@@ -24,7 +24,7 @@ There are still many improvements needed before this is really usable.
 
 At a minimum this needs to support:
 
-  * More critical RNGs, such as gamma
+  * More critical RNGs
   * Ability to return other shapes
   * Default arguments
   * Entropy based initialization
