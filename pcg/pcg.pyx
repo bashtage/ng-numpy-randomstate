@@ -2,7 +2,6 @@
 #cython: wraparound=False, nonecheck=False, boundscheck=False, cdivision=True
 import numpy as np
 cimport numpy as np
-import cython
 from libc.stdint cimport uint64_t
 
 cdef extern from "inttypes.h":
@@ -27,9 +26,6 @@ cdef extern from "pcg_variants.h":
     cdef uint64_t pcg64_random_r(pcg64_random_t *rng)
 
     cdef uint64_t pcg64_boundedrand_r(pcg64_random_t *rng, uint64_t i)
-
-
-
 
 cdef extern from "pcg_helper.c":
     cdef double pcg_random_double(pcg64_random_t *rng)

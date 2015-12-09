@@ -2,3 +2,4 @@
 *.so
 pcg.c
 *.html
+pcg-c-0.94/*
