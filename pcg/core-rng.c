@@ -4,7 +4,11 @@
     #ifdef PCG_64_RNG
         #include "pcg-64-shim.h"
     #else
-        #error Unkown RNG!!!
+        #ifdef DUMMY_RNG
+            #include "dummy-shim.h"
+        #else
+            #error Unknown RNG!!!  Unknown RNG!!!  Unknown RNG!!!
+        #endif
     #endif
 #endif
 

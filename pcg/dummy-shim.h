@@ -1,9 +1,8 @@
 #include <stdint.h>
-#include "pcg_variants.h"
+#include "dummy.h"
 
 typedef struct s_aug_state {
-    pcg32_random_t *rng;
-    uint64_t state, inc;
+    uint32_t *rng;
 
     int has_gauss, shift_zig_random_int;
     double gauss;
@@ -12,10 +11,10 @@ typedef struct s_aug_state {
 
 inline uint32_t random_uint32(aug_state* state)
 {
-    return pcg32_random_r(state->rng);
+    return (uint32_t)(dummy_rng(state->rng) & 0xFFFFFFFFLL);
 }
 
 inline uint64_t random_uint64(aug_state* state)
 {
-    return (((uint64_t) pcg32_random_r((*state).rng) << 32) | pcg32_random_r((*state).rng));
+    return dummy_rng(state->rng);
 }
