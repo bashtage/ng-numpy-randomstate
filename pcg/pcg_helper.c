@@ -1,6 +1,16 @@
 #include <math.h>
 #include <stdbool.h>
 #include "pcg_variants.h"
+#include "pcg-64.h"
+
+extern inline double pcg_random_double_2(aug_state* state)
+{
+    uint64_t rn, a, b;
+    rn = pcg64_random_r((*state).rng);
+    a = rn >> 37;
+    b = (rn & 0xFFFFFFFFLL) >> 6;
+    return (a * 67108864.0 + b) / 9007199254740992.0;
+}
 
 extern inline double pcg_random_double(pcg64_random_t* rng)
 {

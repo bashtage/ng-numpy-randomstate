@@ -3,3 +3,4 @@
 pcg.c
 *.html
 pcg-c-0.94/*
+*.o

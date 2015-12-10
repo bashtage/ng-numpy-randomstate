@@ -7,39 +7,10 @@ from libc.stdint cimport uint64_t
 cdef extern from "inttypes.h":
     ctypedef unsigned long long __uint128_t
 
-cdef extern from "pcg_variants.h":
-    # PCG-64
-    ctypedef __uint128_t pcg128_t;
+include "config.pxi"
 
-    cdef struct pcg_state_setseq_128:
-        pcg128_t state;
-        pcg128_t inc;
-
-    ctypedef pcg_state_setseq_128 pcg64_random_t
-
-    cdef void pcg_setseq_128_srandom_r(pcg64_random_t *rng, pcg128_t initstate, pcg128_t initseq)
-
-    cdef void pcg64_advance_r(pcg64_random_t *rng, pcg128_t delta)
-
-    cdef void pcg64_srandom_r(pcg64_random_t *rng, pcg128_t initstate, pcg128_t initseq)
-
-    cdef uint64_t pcg64_random_r(pcg64_random_t *rng)
-
-    cdef uint64_t pcg64_boundedrand_r(pcg64_random_t *rng, uint64_t i)
-
-cdef extern from "pcg_helper.c":
-    cdef double pcg_random_double(pcg64_random_t *rng)
-
-    cdef double pcg_random_gauss(pcg64_random_t *rng, bint *has_gauss, double *gauss)
-
-    cdef double pcg_standard_exponential(pcg64_random_t *rng)
-
-    cdef double pcg_standard_gamma(pcg64_random_t *rng, double shape, bint *has_gauss, double *gauss)
-
-    cdef double pcg_random_gauss_zig(pcg64_random_t *rng,
-                                     int *shift_zig_random_int,
-                                     uint64_t *zig_random_int)
-
+IF RNG_PCG64:
+    include "pcg-64.pxi"
 
 cdef class PCGRandomState:
     '''Test class'''
@@ -53,27 +24,44 @@ cdef class PCGRandomState:
     cdef int shift_zig_random_int
     cdef uint64_t zig_random_int
 
+    cdef aug_state big_state
+
     def __init__(self, state=None, inc=None):
+        self.big_state.rng = &self.rng
         if state is not None and inc is not None:
             self.state = state
             self.inc = inc
+            self.big_state.state = state
+            self.big_state.inc = inc
         else:
             # TODO: Add entropy method to get state and inc
             self.state = 42
             self.inc = 52
+            self.big_state.state = 42
+            self.big_state.inc = 52
 
         self.shift_zig_random_int = 0
         self.zig_random_int = 0
-
-        self.seed(self.state, self.inc)
         self.has_gauss = 0
         self.gauss = 0.0
+
+        self.big_state.shift_zig_random_int = 0
+        self.big_state.zig_random_int = 0
+        self.big_state.has_gauss = 0
+        self.big_state.gauss = 0.0
+
+        self.seed(self.state, self.inc)
+
+
 
     def seed(self, pcg128_t state, pcg128_t inc):
         pcg_setseq_128_srandom_r(&self.rng, self.state, self.inc)
 
     def get_state(self):
         return 'pcg64', (self.rng.state, self.rng.inc), self.has_gauss, self.gauss
+
+    def get_big_state(self):
+        return 'pcg64', (self.big_state.rng.state, self.big_state.rng.inc), self.big_state.has_gauss, self.big_state.gauss
 
     def advance(self, pcg128_t delta):
         pcg64_advance_r(&self.rng, delta)
@@ -102,6 +90,13 @@ cdef class PCGRandomState:
 
         return np.asanyarray(randoms)
 
+    def random_sample_2(self, Py_ssize_t n):
+        cdef Py_ssize_t i
+        cdef double [:] randoms = np.empty(n, dtype=np.double)
+        for i in range(n):
+            randoms[i] = pcg_random_double_2(&self.big_state)
+
+        return np.asanyarray(randoms)
 
     def standard_normal_zig(self, Py_ssize_t n):
         cdef Py_ssize_t i
