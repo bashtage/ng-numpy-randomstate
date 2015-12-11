@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "dummy.h"
+#include "../../src/dummy/dummy.h"
 
 typedef struct s_aug_state {
     uint32_t *rng;
@@ -17,4 +17,13 @@ inline uint32_t random_uint32(aug_state* state)
 inline uint64_t random_uint64(aug_state* state)
 {
     return dummy_rng(state->rng);
+}
+
+inline void seed(aug_state* state, uint32_t seed)
+{
+    if(seed >= 20)
+    {
+        seed = 0;
+    }
+    *(state->rng) = seed;
 }

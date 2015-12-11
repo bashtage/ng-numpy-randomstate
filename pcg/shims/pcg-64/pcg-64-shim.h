@@ -1,8 +1,7 @@
 #define __SIZEOF_INT128__ 16
-
+#define RNG_TYPE pcg64_random_t
 #include <stdint.h>
-#include "pcg_variants.h"
-
+#include "../../src/pcg/pcg_variants.h"
 
 typedef struct s_aug_state {
     pcg64_random_t *rng;
@@ -31,4 +30,9 @@ inline uint32_t random_uint32(aug_state* state)
 inline uint64_t random_uint64(aug_state* state)
 {
     return pcg64_random_r(state->rng);
+}
+
+inline void seed(aug_state* state, pcg128_t seed, pcg128_t inc)
+{
+    pcg_setseq_128_srandom_r(state->rng, seed, inc);
 }
