@@ -3,18 +3,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef PCG_32_RNG
+#if  defined(PCG_32_RNG)
     #include "shims/pcg-32/pcg-32-shim.h"
+#elif defined(PCG_64_RNG)
+    #include "shims/pcg-64/pcg-64-shim.h"
+#elif defined(RANDOMKIT_RNG)
+    #include "shims/random-kit/random-kit-shim.h"
+#elif defined(DUMMY_RNG)
+    #include "shims/dummy/dummy-shim.h"
 #else
-    #ifdef PCG_64_RNG
-        #include "shims/pcg-64/pcg-64-shim.h"
-    #else
-        #ifdef DUMMY_RNG
-            #include "shims/dummy/dummy-shim.h"
-        #else
-            #error Unknown RNG!!!  Unknown RNG!!!  Unknown RNG!!!
-        #endif
-    #endif
+    #error Unknown RNG!!!  Unknown RNG!!!  Unknown RNG!!!
 #endif
 
 inline double random_double(aug_state* state)

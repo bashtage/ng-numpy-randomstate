@@ -1,10 +1,10 @@
-extern inline double random_double(aug_state* state)
+extern inline double random_double(aug_state* state);
 
-extern inline double random_standard_exponential(aug_state* state)
+extern inline double random_standard_exponential(aug_state* state);
 
-extern inline double random_gauss(aug_state* state){
+extern inline double random_gauss(aug_state* state);
 
-extern inline double random_standard_gamma(aug_state* state, double shape)
+extern inline double random_standard_gamma(aug_state* state, double shape);
 
 int main(void)
 {
