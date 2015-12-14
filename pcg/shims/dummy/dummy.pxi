@@ -1,3 +1,7 @@
+DEF RNG_ADVANCEABLE = 1
+
+DEF RNG_SEED = 1
+
 cdef extern from "core-rng.h":
 
     cdef struct s_aug_state:
@@ -11,6 +15,8 @@ cdef extern from "core-rng.h":
     ctypedef s_aug_state aug_state
 
     cdef void seed(aug_state* state, uint32_t seed)
+
+    cdef void advance(aug_state* state, uint32_t delta)
 
 ctypedef uint32_t rng_t
 

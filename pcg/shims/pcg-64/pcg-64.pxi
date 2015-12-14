@@ -1,3 +1,7 @@
+DEF RNG_ADVANCEABLE = 1
+
+DEF RNG_SEED = 2
+
 cdef extern from "inttypes.h":
     ctypedef unsigned long long __uint128_t
 
@@ -20,7 +24,9 @@ cdef extern from "core-rng.h":
 
     ctypedef s_aug_state aug_state
 
-    cdef void seed(aug_state* state, uint64_t seed, uint64_t inc)
+    cdef void seed(aug_state* state, pcg128_t seed, pcg128_t inc)
+
+    cdef void advance(aug_state* state, pcg128_t delta)
 
 ctypedef pcg128_t rng_state_t
 

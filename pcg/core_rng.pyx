@@ -3,6 +3,7 @@
 import numpy as np
 cimport numpy as np
 from libc.stdint cimport uint32_t, uint64_t
+from libc.string cimport memcpy
 
 include "config.pxi"
 
@@ -22,7 +23,7 @@ cdef extern from "core-rng.h":
     cdef double random_double(aug_state* state)
 
 
-cdef class PCGRandomState:
+cdef class RandomState:
     '''Test class'''
 
     cdef rng_t rng
@@ -41,12 +42,75 @@ cdef class PCGRandomState:
         ELIF RNG_DUMMY or RNG_RANDOMKIT:
             self.seed(0)
 
-    IF RNG_PCG_32 or RNG_PCG_64:
+
+    IF RNG_SEED == 1:
+        def seed(self, rng_state_t val):
+            seed(&self.rng_state, val)
+    ELIF RNG_SEED == 2:
         def seed(self, rng_state_t state, rng_state_t inc):
             seed(&self.rng_state, state, inc)
-    ELIF RNG_DUMMY or RNG_RANDOMKIT:
-        def seed(self, rng_state_t inc):
-            seed(&self.rng_state, inc)
+
+    if RNG_ADVANCEABLE:
+        def advance(self, rng_state_t delta):
+            advance(&self.rng_state, delta)
+            return None
+
+    IF RNG_DUMMY:
+        def get_state(self):
+            return ('dummy',
+                    self.rng_state.rng[0],
+                    self.rng_state.has_gauss,
+                    self.rng_state.gauss)
+
+        def set_state(self, state):
+            if state[0] != 'dummy' or len(state) != 4:
+                raise ValueError('Not a dummy RNG state')
+            cdef uint32_t val = state[1]
+            memcpy(self.rng_state.rng, &val, sizeof(val))
+            self.rng_state.has_gauss = state[2]
+            self.rng_state.gauss = state[3]
+
+    ELIF RNG_PCG_32 or RNG_PCG_64:
+        def get_state(self):
+            return ('pcg',
+                    (self.rng_state.rng.state, self.rng_state.rng.inc),
+                    self.rng_state.has_gauss,
+                    self.rng_state.gauss)
+
+        def set_state(self, state):
+            if state[0] != 'pcg' or len(state) != 4:
+                raise ValueError('Not a PCG RNG state')
+            self.rng_state.state = state[1][0]
+            self.rng_state.inc = state[1][1]
+            self.seed(self.rng_state.state, self.rng_state.inc)
+            self.rng_state.has_gauss = state[2]
+            self.rng_state.gauss = state[3]
+    ELIF RNG_RANDOMKIT:
+
+        def get_state(self):
+            cdef uint32_t [:] key = np.zeros(RK_STATE_LEN, dtype=np.uint32)
+            cdef Py_ssize_t i
+            for i in range(RK_STATE_LEN):
+                key[i] = self.rng_state.rng.key[i]
+            return ('mt19937',
+                    (np.asanyarray(key), self.rng_state.rng.pos),
+                    self.rng_state.has_gauss,
+                    self.rng_state.gauss)
+
+        def set_state(self, state):
+            if state[0] != 'mt19937' or len(state) != 4:
+                raise ValueError('Not a mt19937 RNG state')
+
+            cdef uint32_t [:] key = state[1][0]
+            cdef Py_ssize_t i
+            for i in range(RK_STATE_LEN):
+                 self.rng_state.rng.key[i] = key[i]
+            self.rng_state.rng.pos = state[1][1]
+            self.rng_state.has_gauss = state[2]
+            self.rng_state.gauss = state[3]
+
+
+
 
     def random_sample(self, Py_ssize_t n=1):
         if n == 1:

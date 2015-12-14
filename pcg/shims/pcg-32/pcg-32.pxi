@@ -1,3 +1,7 @@
+DEF RNG_ADVANCEABLE = 1
+
+DEF RNG_SEED = 2
+
 ctypedef uint64_t rng_state_t
 
 cdef extern from "core-rng.h":
@@ -18,5 +22,7 @@ cdef extern from "core-rng.h":
     ctypedef s_aug_state aug_state
 
     cdef void seed(aug_state* state, uint64_t seed, uint64_t inc)
+
+    cdef void advance(aug_state* state, uint64_t delta)
 
 ctypedef pcg32_random_t rng_t

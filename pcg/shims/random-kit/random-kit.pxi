@@ -1,3 +1,6 @@
+DEF RNG_ADVANCEABLE = 0
+DEF RNG_SEED = 1
+
 DEF RK_STATE_LEN = 624
 
 ctypedef uint32_t rng_state_t

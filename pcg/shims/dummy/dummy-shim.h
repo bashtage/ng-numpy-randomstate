@@ -21,9 +21,11 @@ inline uint64_t random_uint64(aug_state* state)
 
 inline void seed(aug_state* state, uint32_t seed)
 {
-    if(seed >= 20)
-    {
-        seed = 0;
-    }
-    *(state->rng) = seed;
+    *(state->rng) = seed % 20;
 }
+
+inline void advance(aug_state* state, uint32_t delta)
+{
+    *(state->rng) = (*(state->rng) + (delta % 20 )) % 20;
+}
+

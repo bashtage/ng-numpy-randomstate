@@ -1,6 +1,6 @@
 from distutils.core import setup
 from distutils.extension import Extension
-from os import getcwd
+from os import getcwd, unlink
 from os.path import join
 
 from Cython.Build import cythonize
@@ -8,8 +8,7 @@ from Cython.Build import cythonize
 pwd = getcwd()
 configs = []
 
-flags = {'RNG_DUMMY': False, 'RNG_PCG_32': False,
-         'RNG_PCG_64': False, 'RNG_RANDOMKIT': True}
+rngs = ['RNG_DUMMY', 'RNG_PCG_32', 'RNG_PCG_64', 'RNG_RANDOMKIT']
 
 
 def write_config(config):
@@ -21,8 +20,12 @@ def write_config(config):
             config.write('DEF ' + key + ' = ' + val + '\n')
 
 
-for key in flags:
-    sources = [join(pwd, 'core_rng.pyx')]
+for rng in rngs:
+    flags = {k: False for k in rngs}
+    flags[rng] = True
+
+    file_name = rng.lower().replace('rng','').replace('_', '')
+    sources = [join(pwd, file_name + '.pyx')]
     include_dirs = [pwd]
 
     if flags['RNG_PCG_32']:
@@ -57,23 +60,26 @@ for key in flags:
 
         include_dirs += [join(pwd, 'src', 'random-kit')]
 
-    config = {'file_name': key.replace('_', '').lower()[4:] + '.pxy',
+    config = {'file_name': file_name,
               'sources': sources,
               'include_dirs': include_dirs,
-              'defs': defs}
+              'defs': defs,
+              'flags': {k: v for k, v in flags.iteritems()}}
 
     configs.append(config)
 
 for config in configs:
     write_config(config)
 
-    with open('core_rng.pxy', 'r') as original:
-        with open(config['file_name'], 'w') as mod:
+    with open('core_rng.pyx', 'r') as original:
+        with open(config['file_name'] + '.pyx', 'w') as mod:
             mod.writelines(original.read())
 
-    # setup(ext_modules=cythonize([Extension(config['file_name'],
-    #                                        sources=config['sources'],
-    #                                        include_dirs=config['include_dirs'],
-    #                                        define_macros=config['defs'],
-    #                                        extra_compile_args=['-std=c99']
-    #                                        )]))
+    setup(ext_modules=cythonize([Extension(config['file_name'],
+                                           sources=config['sources'],
+                                           include_dirs=config['include_dirs'],
+                                           define_macros=config['defs'],
+                                           extra_compile_args=['-std=c99']
+                                           )]))
+    unlink(join(pwd, config['file_name'] + '.pyx'))
+
