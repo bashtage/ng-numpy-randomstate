@@ -20,43 +20,51 @@
  *
  *       http://www.pcg-random.org
  */
-
-/*
+ 
+/* 
  * This code is derived from the canonical C++ PCG implementation, which
  * has many additional features and is preferable if you can use C++ in
  * your project.
  *
- * Repetative C code is derived using C preprocessor metaprogramming
- * techniques.
+ * The contents of this file were mechanically derived from pcg_variants.h
+ * (every inline function defined there gets an exern declaration here).
  */
 
 #include "pcg_variants.h"
 
-/* Multi-step advance functions (jump-ahead, jump-back)
- *
- * The method used here is based on Brown, "Random Number Generation
- * with Arbitrary Stride,", Transactions of the American Nuclear
- * Society (Nov. 1994).  The algorithm is very similar to fast
- * exponentiation.
- *
- * Even though delta is an unsigned integer, we can pass a
- * signed integer to go backwards, it just goes "the long way round".
+/*
+ * Rotate helper functions.
  */
 
-uint32_t pcg_advance_lcg_32(uint32_t state, uint32_t delta, uint32_t cur_mult,
-                            uint32_t cur_plus)
-{
-    uint32_t acc_mult = 1u;
-    uint32_t acc_plus = 0u;
-    while (delta > 0) {
-        if (delta & 1) {
-            acc_mult *= cur_mult;
-            acc_plus = acc_plus * cur_mult + cur_plus;
-        }
-        cur_plus = (cur_mult + 1) * cur_plus;
-        cur_mult *= cur_mult;
-        delta /= 2;
-    }
-    return acc_mult * state + acc_plus;
-}
+extern inline uint64_t pcg_rotr_64(uint64_t value, unsigned int rot);
+
+/*
+ * Output functions.  These are the core of the PCG generation scheme.
+ */
+
+// XSH RS
+
+#if PCG_HAS_128BIT_OPS
+extern inline uint64_t pcg_output_xsh_rs_128_64(pcg128_t state);
+#endif
+
+// XSH RR
+
+#if PCG_HAS_128BIT_OPS
+extern inline uint64_t pcg_output_xsh_rr_128_64(pcg128_t state);
+#endif
+
+// RXS M XS
+
+extern inline uint64_t pcg_output_rxs_m_xs_64_64(uint64_t state);
+
+// XSL RR (only defined for >= 64 bits)
+
+#if PCG_HAS_128BIT_OPS
+extern inline uint64_t pcg_output_xsl_rr_128_64(pcg128_t state);
+#endif
+
+// XSL RR RR (only defined for >= 64 bits)
+
+extern inline uint64_t pcg_output_xsl_rr_rr_64_64(uint64_t state);
 

@@ -1,3 +1,7 @@
 *.xml
 *.so
 pcg.c
+*.html
+pcg-c-0.94/*
+*.o
+pcg/core-rng
