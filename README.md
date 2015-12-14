@@ -14,7 +14,8 @@ It uses source from
 ## Status
 
 * There is no documentation.  
-* Only double and integer RNGs are available. 
+* Only a small number of rngs are available: standard normal, standard gamma, 
+standard exponential, standard uniform and random 64-bit integers. 
 * Setting and restoring state works
 
 ## Plans
@@ -23,8 +24,6 @@ There are still many improvements needed before this is really usable.
 At a minimum this needs to support:
 
   * More critical RNGs
-  * Ability to return other shapes
-  * Default arguments
   * Entropy based initialization
 
 ## Requirements
@@ -53,12 +52,28 @@ python setup-2.py build_ext --inplace
 ```
 
 ## Using
+If you use `setup.py`, 
 
 ```python
 import core_rng
 
-rs = core_rng.PCGRandomState()
-rs.random_double(100)
+rs = core_rng.RandomState()
+rs.random_sample(100)
+```
+
+If you use `setup-2.py`, 
+
+```python
+import randomkit, pcg32, pcg64
+
+rs = randomkit.RandomState()
+rs.random_sample(100)
+
+rs = pcg32.RandomState()
+rs.random_sample(100)
+
+rs = pcg64.RandomState()
+rs.random_sample(100)
 ```
 
 ## License
