@@ -12,13 +12,26 @@ def print_legend(legend):
 
 
 setup = '''
-import pcg
+import pcg32
 
-prs = pcg.PCGRandomState()
+rs = pcg32.RandomState()
 '''
 
-pcg_normal = timer('prs.standard_normal(1000000)', setup)
-pcg_normal_zig = timer('prs.standard_normal_zig(1000000)', setup)
+pcg32_normal = timer('rs.standard_normal(1000000)', setup)
+
+setup = '''
+import pcg64
+
+rs = pcg64.RandomState()
+'''
+pcg64_normal = timer('rs.standard_normal(1000000)', setup)
+
+setup = '''
+import randomkit
+
+rs = randomkit.RandomState()
+'''
+randomkit_normal = timer('rs.standard_normal(1000000)', setup)
 
 np_setup = '''
 import numpy as np
@@ -27,8 +40,9 @@ rs = np.random.RandomState()
 '''
 np_normal = timer('rs.standard_normal(1000000)', np_setup)
 
-s = pd.Series({'pcg zig-based normal': pcg_normal_zig,
-               'pcg normal': pcg_normal,
+s = pd.Series({'randomkit normal': randomkit_normal,
+               'pcg64 normal': pcg64_normal,
+               'pcg32 normal': pcg32_normal,
                'NumPy normal': np_normal})
 t = s.apply(lambda x: '{0:0.2f} ms'.format(x))
 print_legend('Time to produce 1,000,000 normals')
