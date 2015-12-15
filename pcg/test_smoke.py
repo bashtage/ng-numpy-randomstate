@@ -45,10 +45,10 @@ class RNG(object):
         assert len(self.rs.random_sample(10)) == 10
 
     def test_standard_normal_zig(self):
-        assert len(self.rs.random_sample(10)) == 10
+        assert len(self.rs.standard_normal(10, method='zig')) == 10
 
     def test_standard_normal(self):
-        assert len(self.rs.random_sample(10)) == 10
+        assert len(self.rs.standard_normal(10)) == 10
 
     def test_standard_gamma(self):
         assert len(self.rs.standard_gamma(10, 10)) == 10
@@ -56,12 +56,21 @@ class RNG(object):
     def test_standard_exponential(self):
         assert len(self.rs.standard_exponential(10)) == 10
 
+    def test_standard_cauchy(self):
+        assert len(self.rs.standard_cauchy(10)) == 10
+
     def test_reset_state(self):
         state = self.rs.get_state()
         int_1 = self.rs.random_integers(1)
         self.rs.set_state(state)
         int_2 = self.rs.random_integers(1)
         assert int_1 == int_2
+
+    def test_entropy_init(self):
+        rs = self.mod.RandomState()
+        rs2 = self.mod.RandomState()
+        assert not comp_state(rs.get_state(), rs2.get_state())
+
 
 
 class TestRandomKit(RNG):

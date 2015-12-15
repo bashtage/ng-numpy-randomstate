@@ -1,6 +1,8 @@
 #define __SIZEOF_INT128__ 16
 #define RNG_TYPE pcg64_random_t
 #include <stdint.h>
+
+#include "../../src/entropy/entropy.h"
 #include "../../src/pcg/pcg_variants.h"
 
 typedef struct s_aug_state {
@@ -40,4 +42,11 @@ inline void seed(aug_state* state, pcg128_t seed, pcg128_t inc)
 inline void advance(aug_state* state, pcg128_t delta)
 {
     pcg64_advance_r(state->rng, delta);
+}
+
+inline void entropy_init(aug_state* state)
+{
+    pcg128_t seeds[2];
+    entropy_fill((void*) seeds, sizeof(seeds));
+    seed(state, seeds[0], seeds[1]);
 }

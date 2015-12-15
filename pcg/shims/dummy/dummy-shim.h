@@ -1,4 +1,6 @@
 #include <stdint.h>
+
+#include "../../src/entropy/entropy.h"
 #include "../../src/dummy/dummy.h"
 
 typedef struct s_aug_state {
@@ -29,3 +31,9 @@ inline void advance(aug_state* state, uint32_t delta)
     *(state->rng) = (*(state->rng) + (delta % 20 )) % 20;
 }
 
+inline void entropy_init(aug_state* state)
+{
+    uint32_t seeds[1];
+    entropy_fill((void*) seeds, sizeof(seeds));
+    seed(state, seeds[0]);
+}

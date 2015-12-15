@@ -25,7 +25,9 @@ for rng in rngs:
     flags[rng] = True
 
     file_name = rng.lower().replace('rng','').replace('_', '')
-    sources = [join(pwd, file_name + '.pyx')]
+    sources = [join(pwd, file_name + '.pyx'),
+               join(pwd, 'src', 'entropy', 'entropy.c'),
+               join(pwd, 'core-rng.c')]
     include_dirs = [pwd]
 
     if flags['RNG_PCG_32']:
@@ -79,7 +81,8 @@ for config in configs:
                                            sources=config['sources'],
                                            include_dirs=config['include_dirs'],
                                            define_macros=config['defs'],
-                                           extra_compile_args=['-std=c99']
+                                           extra_compile_args=['-std=c99','-O3','-funroll-loops']
                                            )]))
     unlink(join(pwd, config['file_name'] + '.pyx'))
+    unlink(join(pwd, config['file_name'] + '.c'))
 
