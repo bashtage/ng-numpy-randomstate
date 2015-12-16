@@ -3,6 +3,8 @@ from distutils.extension import Extension
 from os import getcwd, unlink
 from os.path import join
 
+import numpy
+
 from Cython.Build import cythonize
 
 pwd = getcwd()
@@ -28,7 +30,7 @@ for rng in rngs:
     sources = [join(pwd, file_name + '.pyx'),
                join(pwd, 'src', 'entropy', 'entropy.c'),
                join(pwd, 'core-rng.c')]
-    include_dirs = [pwd]
+    include_dirs = [pwd] + [numpy.get_include()]
 
     if flags['RNG_PCG_32']:
         sources += [join(pwd, 'src', 'pcg', p) for p in ('pcg-rngs-64.c', 'pcg-advance-64.c',
@@ -66,7 +68,7 @@ for rng in rngs:
               'sources': sources,
               'include_dirs': include_dirs,
               'defs': defs,
-              'flags': {k: v for k, v in flags.iteritems()}}
+              'flags': {k: v for k, v in flags.items()}}
 
     configs.append(config)
 
