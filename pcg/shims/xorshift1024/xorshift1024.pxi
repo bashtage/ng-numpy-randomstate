@@ -1,3 +1,4 @@
+DEF RNG_NAME = "xorshift-1024*"
 DEF RNG_ADVANCEABLE = 0
 DEF RNG_SEED = 0
 
@@ -24,3 +25,10 @@ cdef extern from "core-rng.h":
 ctypedef object rng_state_t
 
 ctypedef xorshift1024_state rng_t
+
+cdef object _get_state(aug_state state):
+    cdef uint64_t [:] key = np.zeros(16, dtype=np.uint64)
+    for i in range(16):
+        key[i] = state.rng.s[i]
+    return (np.asanyarray(key), state.rng.p)
+

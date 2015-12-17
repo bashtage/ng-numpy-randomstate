@@ -1,3 +1,4 @@
+DEF RNG_NAME = 'mt19337'
 DEF RNG_ADVANCEABLE = 0
 DEF RNG_SEED = 1
 
@@ -26,3 +27,10 @@ cdef extern from "core-rng.h":
     cdef void seed(aug_state* state, uint32_t seed)
 
 ctypedef rk_state rng_t
+
+cdef object _get_state(aug_state state):
+    cdef uint32_t [:] key = np.zeros(RK_STATE_LEN, dtype=np.uint32)
+    cdef Py_ssize_t i
+    for i in range(RK_STATE_LEN):
+        key[i] = state.rng.key[i]
+    return (np.asanyarray(key), state.rng.pos)

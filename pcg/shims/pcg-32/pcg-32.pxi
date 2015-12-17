@@ -1,3 +1,4 @@
+DEF RNG_NAME = 'pcg32'
 DEF RNG_ADVANCEABLE = 1
 
 DEF RNG_SEED = 2
@@ -13,7 +14,6 @@ cdef extern from "core-rng.h":
 
     cdef struct s_aug_state:
         pcg32_random_t *rng
-        uint64_t state, inc
 
         int has_gauss, shift_zig_random_int
         double gauss
@@ -26,3 +26,6 @@ cdef extern from "core-rng.h":
     cdef void advance(aug_state* state, uint64_t delta)
 
 ctypedef pcg32_random_t rng_t
+
+cdef object _get_state(aug_state state):
+    return (state.rng.state, state.rng.inc)

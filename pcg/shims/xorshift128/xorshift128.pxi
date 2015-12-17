@@ -1,3 +1,4 @@
+DEF RNG_NAME = "xorshift-128+"
 DEF RNG_ADVANCEABLE = 0
 DEF RNG_SEED = 2
 
@@ -23,3 +24,7 @@ cdef extern from "core-rng.h":
 ctypedef uint64_t rng_state_t
 
 ctypedef xorshift128_state rng_t
+
+cdef object _get_state(aug_state state):
+    return (state.rng.s[0], state.rng.s[1])
+

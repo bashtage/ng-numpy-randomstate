@@ -6,7 +6,6 @@
 
 typedef struct s_aug_state {
     pcg32_random_t *rng;
-    uint64_t state, inc;
 
     int has_gauss, shift_zig_random_int;
     double gauss;
