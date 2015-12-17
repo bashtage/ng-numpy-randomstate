@@ -3,7 +3,7 @@ import pcg32
 import pcg64
 import randomkit
 from nose import SkipTest
-
+import xorshift128
 
 def comp_state(state1, state2):
     identical = True
@@ -71,6 +71,47 @@ class RNG(object):
         rs2 = self.mod.RandomState()
         assert not comp_state(rs.get_state(), rs2.get_state())
 
+    def test_pareto(self):
+        assert len(self.rs.pareto(2.0, 10)) == 10
+
+    def test_weibull(self):
+        assert len(self.rs.weibull(1, 10)) == 10
+
+    def test_power(self):
+        assert len(self.rs.power(2.0, 10)) == 10
+
+    def test_rayleigh(self):
+        assert len(self.rs.rayleigh(0.5, 10)) == 10
+
+    def test_standard_t(self):
+        assert len(self.rs.standard_t(4, 10)) == 10
+
+    def test_chisquare(self):
+        assert len(self.rs.chisquare(1, 10)) == 10
+
+    def test_normal(self):
+        assert len(self.rs.normal(0, 1, 10)) == 10
+
+    def test_uniform(self):
+        assert len(self.rs.uniform(1, 2, 10)) == 10
+
+    def test_gamma(self):
+        assert len(self.rs.gamma(2, 5, 10)) == 10
+
+    def test_beta(self):
+        assert len(self.rs.beta(0.5, 1.5, 10)) == 10
+
+    def test_f(self):
+        assert len(self.rs.beta(3, 373, 10)) == 10
+
+    def test_laplace(self):
+        assert len(self.rs.laplace(2, 4, 10)) == 10
+
+    def test_gumbel(self):
+        assert len(self.rs.gumbel(3.0, 5.0, 10)) == 10
+
+    def test_lognormal(self):
+        assert len(self.rs.lognormal(3.0, 5.0, 10)) == 10
 
 
 class TestRandomKit(RNG):
@@ -82,10 +123,6 @@ class TestRandomKit(RNG):
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
 
-    @classmethod
-    def teardown_class(cls):
-        pass
-
 
 class TestDummy(RNG):
     @classmethod
@@ -96,10 +133,6 @@ class TestDummy(RNG):
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
 
-    @classmethod
-    def teardown_class(cls):
-        pass
-
 
 class TestPCG32(RNG):
     @classmethod
@@ -109,10 +142,6 @@ class TestPCG32(RNG):
         cls.seed = [2 ** 48 + 2 ** 21 + 2 ** 16 + 2 ** 5 + 1, 2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
-
-    @classmethod
-    def teardown_class(cls):
-        pass
 
 
 class TestPCG64(RNG):
@@ -125,6 +154,13 @@ class TestPCG64(RNG):
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
 
+
+class TestXorShift128(RNG):
     @classmethod
-    def teardown_class(cls):
-        pass
+    def setup_class(cls):
+        cls.mod = xorshift128
+        cls.advance = None
+        cls.seed = [2 ** 48 + 2 ** 21 + 2 ** 16 + 2 ** 5 + 1,
+                    2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
+        cls.rs = cls.mod.RandomState(*cls.seed)
+        cls.initial_state = cls.rs.get_state()

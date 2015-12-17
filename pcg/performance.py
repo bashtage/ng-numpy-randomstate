@@ -28,7 +28,8 @@ rs.{dist}(1000000)
 
 dist = 'standard_normal'
 res = {}
-for rng in ('dummy', 'pcg32', 'pcg64', 'randomkit', 'numpy.random'):
+for rng in ('dummy', 'pcg32', 'pcg64', 'randomkit', 'xorshift128', 'xorshift1024',
+            'mrg32k3a','numpy.random'):
     for method in ('"inv"', '"zig"'):
         key = '_'.join((rng, method, dist)).replace('"','')
         command = COMMAND if 'numpy' not in rng else COMMAND_NUMPY

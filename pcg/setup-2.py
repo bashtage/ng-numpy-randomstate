@@ -10,8 +10,9 @@ from Cython.Build import cythonize
 pwd = getcwd()
 configs = []
 
-rngs = ['RNG_DUMMY', 'RNG_PCG_32', 'RNG_PCG_64', 'RNG_RANDOMKIT']
+rngs = ['RNG_DUMMY', 'RNG_PCG_32', 'RNG_PCG_64', 'RNG_RANDOMKIT', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
 
+compile_rngs = rngs # ['RNG_MRG32K3A']
 
 def write_config(config):
     flags = config['flags']
@@ -23,6 +24,8 @@ def write_config(config):
 
 
 for rng in rngs:
+    if rng not in compile_rngs:
+        continue
     flags = {k: False for k in rngs}
     flags[rng] = True
 
@@ -63,6 +66,28 @@ for rng in rngs:
         defs = [('RANDOMKIT_RNG', '1')]
 
         include_dirs += [join(pwd, 'src', 'random-kit')]
+
+    elif flags['RNG_XORSHIFT128']:
+        sources += [join(pwd, 'src', 'xorshift128', p) for p in ('xorshift128.c',)]
+        sources += [join(pwd, 'shims', 'xorshift128', 'xorshift128-shim.c')]
+
+        defs = [('XORSHIFT128_RNG', '1')]
+
+        include_dirs += [join(pwd, 'src', 'xorshift128')]
+    elif flags['RNG_XORSHIFT1024']:
+        sources += [join(pwd, 'src', 'xorshift1024', p) for p in ('xorshift1024.c',)]
+        sources += [join(pwd, 'shims', 'xorshift1024', 'xorshift1024-shim.c')]
+
+        defs = [('XORSHIFT1024_RNG', '1')]
+
+        include_dirs += [join(pwd, 'src', 'xorshift1024')]
+    elif flags['RNG_MRG32K3A']:
+        sources += [join(pwd, 'src', 'mrg32k3a', p) for p in ('mrg32k3a.c',)]
+        sources += [join(pwd, 'shims', 'mrg32k3a', 'mrg32k3a-shim.c')]
+
+        defs = [('MRG32K3A_RNG', '1')]
+
+        include_dirs += [join(pwd, 'src', 'mrg32k3a')]
 
     config = {'file_name': file_name,
               'sources': sources,

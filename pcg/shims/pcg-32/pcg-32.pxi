@@ -6,8 +6,8 @@ ctypedef uint64_t rng_state_t
 
 cdef extern from "core-rng.h":
     cdef struct pcg_state_setseq_64:
-        uint64_t state;
-        uint64_t inc;
+        uint64_t state
+        uint64_t inc
 
     ctypedef pcg_state_setseq_64 pcg32_random_t
 

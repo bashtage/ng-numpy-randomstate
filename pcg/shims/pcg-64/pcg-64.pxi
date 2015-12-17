@@ -6,11 +6,11 @@ cdef extern from "inttypes.h":
     ctypedef unsigned long long __uint128_t
 
 cdef extern from "core-rng.h":
-    ctypedef __uint128_t pcg128_t;
+    ctypedef __uint128_t pcg128_t
 
     cdef struct pcg_state_setseq_128:
-        pcg128_t state;
-        pcg128_t inc;
+        pcg128_t state
+        pcg128_t inc
 
     ctypedef pcg_state_setseq_128 pcg64_random_t
 

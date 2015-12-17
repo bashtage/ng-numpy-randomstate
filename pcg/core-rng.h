@@ -20,6 +20,12 @@
 #include "shims/random-kit/random-kit-shim.h"
 #elif defined(DUMMY_RNG)
 #include "shims/dummy/dummy-shim.h"
+#elif defined(XORSHIFT128_RNG)
+#include "shims/xorshift128/xorshift128-shim.h"
+#elif defined(XORSHIFT1024_RNG)
+#include "shims/xorshift1024/xorshift1024-shim.h"
+#elif defined(MRG32K3A_RNG)
+#include "shims/mrg32k3a/mrg32k3a-shim.h"
 #else
 #error Unknown RNG!!!  Unknown RNG!!!  Unknown RNG!!!
 #endif

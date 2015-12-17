@@ -2,7 +2,7 @@
 #cython: wraparound=False, nonecheck=False, boundscheck=False, cdivision=True
 import numpy as np
 cimport numpy as np
-from libc.stdint cimport uint32_t, uint64_t
+from libc.stdint cimport uint32_t, uint64_t, int64_t
 from libc.string cimport memcpy
 
 include "config.pxi"
@@ -15,6 +15,12 @@ IF RNG_DUMMY:
     include "shims/dummy/dummy.pxi"
 IF RNG_RANDOMKIT:
     include "shims/random-kit/random-kit.pxi"
+IF RNG_XORSHIFT128:
+    include "shims/xorshift128/xorshift128.pxi"
+IF RNG_XORSHIFT1024:
+    include "shims/xorshift1024/xorshift1024.pxi"
+IF RNG_MRG32K3A:
+    include "shims/mrg32k3a/mrg32k3a.pxi"
 
 cdef extern from "core-rng.h":
 
@@ -59,42 +65,7 @@ ctypedef uint64_t (* random_uint_0)(aug_state* state)
 ctypedef uint64_t (* random_uint_1)(aug_state* state, double a)
 ctypedef uint64_t (* random_uint_2)(aug_state* state, double a, double b)
 
-cdef object cont0(aug_state* state, random_double_0 func, size):
-    if size is None:
-        return func(state)
-    cdef Py_ssize_t n = compute_numel(size)
-    cdef double [:] randoms = np.empty(n, np.double)
-    for i in range(n):
-        randoms[i] = func(state)
-    return np.asanyarray(randoms).reshape(size)
-
-cdef object cont1(aug_state* state, random_double_1 func, double a, size):
-    if size is None:
-        return func(state, a)
-    cdef Py_ssize_t n = compute_numel(size)
-    cdef double [:] randoms = np.empty(n, np.double)
-    for i in range(n):
-        randoms[i] = func(state, a)
-    return np.asanyarray(randoms).reshape(size)
-
-cdef object uint0(aug_state* state, random_uint_0 func, size):
-    if size is None:
-        return func(state)
-    cdef Py_ssize_t n = compute_numel(size)
-    cdef uint64_t [:] randoms = np.empty(n, np.uint64)
-    for i in range(n):
-        randoms[i] = func(state)
-    return np.asanyarray(randoms).reshape(size)
-
-cdef Py_ssize_t compute_numel(size):
-    cdef Py_ssize_t i, n = 1
-    if isinstance(size, tuple):
-        for i in range(len(size)):
-            n *= size[i]
-    else:
-        n = size
-    return n
-
+include "wrappers.pxi"
 
 cdef class RandomState:
     '''Test class'''
@@ -113,7 +84,7 @@ cdef class RandomState:
         if state is None:
             entropy_init(&self.rng_state)
         else:
-            IF RNG_PCG_32 or RNG_PCG_64:
+            IF RNG_PCG_32 or RNG_PCG_64 or RNG_XORSHIFT128:
                 self.seed(state, inc)
             ELIF RNG_DUMMY or RNG_RANDOMKIT:
                 self.seed(state)
@@ -184,6 +155,21 @@ cdef class RandomState:
             self.rng_state.has_gauss = state[2]
             self.rng_state.gauss = state[3]
 
+    ELIF RNG_XORSHIFT128:
+        def get_state(self):
+            return ('xorshift128',
+                    (self.rng_state.rng.s[0], self.rng_state.rng.s[1]),
+                    self.rng_state.has_gauss,
+                    self.rng_state.gauss)
+
+        def set_state(self, state):
+            if state[0] != 'xorshift128' or len(state) != 4:
+                raise ValueError('Not a XorShift128 RNG state')
+            self.rng_state.rng.s[0] = state[1][0]
+            self.rng_state.rng.s[1] = state[1][1]
+            self.rng_state.has_gauss = state[2]
+            self.rng_state.gauss = state[3]
+
 
     def random_sample(self, size=None):
         return cont0(&self.rng_state, &random_double, size)
@@ -233,3 +219,27 @@ cdef class RandomState:
 
     def chisquare(self, shape, size=None):
         return cont1(&self.rng_state, &random_chisquare, shape, size)
+
+    def normal(self, loc, scale, size=None):
+        return cont2(&self.rng_state, &random_normal, loc, scale, size)
+
+    def uniform(self, loc, scale, size=None):
+        return cont2(&self.rng_state, &random_uniform, loc, scale, size)
+
+    def gamma(self, loc, scale, size=None):
+        return cont2(&self.rng_state, &random_gamma, loc, scale, size)
+
+    def beta(self, loc, scale, size=None):
+        return cont2(&self.rng_state, &random_beta, loc, scale, size)
+
+    def f(self, loc, scale, size=None):
+        return cont2(&self.rng_state, &random_f, loc, scale, size)
+
+    def laplace(self, loc, scale, size=None):
+        return cont2(&self.rng_state, &random_laplace, loc, scale, size)
+
+    def gumbel(self, loc, scale, size=None):
+        return cont2(&self.rng_state, &random_gumbel, loc, scale, size)
+
+    def lognormal(self, loc, scale, size=None):
+        return cont2(&self.rng_state, &random_lognormal, loc, scale, size)

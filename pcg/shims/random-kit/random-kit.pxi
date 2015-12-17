@@ -8,8 +8,8 @@ ctypedef uint32_t rng_state_t
 cdef extern from "core-rng.h":
 
     cdef struct s_rk_state:
-      uint32_t key[RK_STATE_LEN];
-      int pos;
+      uint32_t key[RK_STATE_LEN]
+      int pos
 
     ctypedef s_rk_state rk_state
 
