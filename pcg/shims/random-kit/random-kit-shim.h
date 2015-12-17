@@ -8,8 +8,9 @@
 typedef struct s_aug_state {
     rk_state *rng;
 
-    int has_gauss, shift_zig_random_int;
+    int has_gauss, shift_zig_random_int, has_uint32;
     double gauss;
+    uint32_t uinteger;
     uint64_t zig_random_int;
 } aug_state;
 

@@ -1,6 +1,8 @@
 DEF RNG_NAME = "xorshift-128+"
 DEF RNG_ADVANCEABLE = 0
-DEF RNG_SEED = 2
+DEF RNG_JUMPABLE = 1
+DEF RNG_STATE_LEN = 4
+DEF RNG_SEED=1
 
 cdef extern from "core-rng.h":
 
@@ -19,7 +21,12 @@ cdef extern from "core-rng.h":
 
     ctypedef s_aug_state aug_state
 
-    cdef void seed(aug_state* state, uint64_t seed, uint64_t inc)
+    cdef void seed(aug_state* state, uint64_t seed)
+
+    cdef void jump(aug_state* state)
+
+    cdef void init_state(aug_state* state, uint64_t* state_vals)
+
 
 ctypedef uint64_t rng_state_t
 
@@ -28,3 +35,6 @@ ctypedef xorshift128_state rng_t
 cdef object _get_state(aug_state state):
     return (state.rng.s[0], state.rng.s[1])
 
+cdef object _set_state(aug_state state, object state_info):
+    state.rng.s[0] = state_info[0]
+    state.rng.s[1] = state_info[1]

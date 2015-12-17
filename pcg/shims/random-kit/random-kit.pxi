@@ -1,6 +1,8 @@
-DEF RNG_NAME = 'mt19337'
+DEF RNG_NAME = 'mt19937'
 DEF RNG_ADVANCEABLE = 0
 DEF RNG_SEED = 1
+DEF RNG_JUMPABLE = 0
+DEF RNG_STATE_LEN = 4
 
 DEF RK_STATE_LEN = 624
 
@@ -18,9 +20,10 @@ cdef extern from "core-rng.h":
         rk_state *rng
         uint64_t state, inc
 
-        int has_gauss, shift_zig_random_int
+        int has_gauss, shift_zig_random_int, has_uint32
         double gauss
         uint64_t zig_random_int
+        uint32_t uinteger
 
     ctypedef s_aug_state aug_state
 
@@ -34,3 +37,10 @@ cdef object _get_state(aug_state state):
     for i in range(RK_STATE_LEN):
         key[i] = state.rng.key[i]
     return (np.asanyarray(key), state.rng.pos)
+
+cdef object _set_state(aug_state state, object state_info):
+    cdef uint32_t [:] key = state_info[0]
+    cdef Py_ssize_t i
+    for i in range(RK_STATE_LEN):
+        state.rng.key[i] = key[i]
+    state.rng.pos = state_info[1]

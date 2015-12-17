@@ -1,9 +1,11 @@
-import dummy
+import mt19937
 import pcg32
-import pcg64
-import randomkit
-from nose import SkipTest
+import xorshift1024
 import xorshift128
+from nose import SkipTest
+
+import pcg64
+
 
 def comp_state(state1, state2):
     identical = True
@@ -26,15 +28,21 @@ class RNG(object):
         rs.random_integers(1)
         rs.set_state(state)
         new_state = rs.get_state()
-        identical = True
-        comp_state(state, new_state)
-        assert identical
+        assert comp_state(state, new_state)
 
     def test_advance(self):
         state = self.rs.get_state()
         if hasattr(self.rs, 'advance'):
             self.rs.advance(self.advance)
-            assert self.rs.get_state() != state
+            assert not comp_state(state, self.rs.get_state())
+        else:
+            raise SkipTest
+
+    def test_jump(self):
+        state = self.rs.get_state()
+        if hasattr(self.rs, 'jump'):
+            self.rs.jump()
+            assert not comp_state(state, self.rs.get_state())
         else:
             raise SkipTest
 
@@ -71,64 +79,18 @@ class RNG(object):
         rs2 = self.mod.RandomState()
         assert not comp_state(rs.get_state(), rs2.get_state())
 
-    def test_pareto(self):
-        assert len(self.rs.pareto(2.0, 10)) == 10
-
-    def test_weibull(self):
-        assert len(self.rs.weibull(1, 10)) == 10
-
-    def test_power(self):
-        assert len(self.rs.power(2.0, 10)) == 10
-
-    def test_rayleigh(self):
-        assert len(self.rs.rayleigh(0.5, 10)) == 10
-
-    def test_standard_t(self):
-        assert len(self.rs.standard_t(4, 10)) == 10
-
-    def test_chisquare(self):
-        assert len(self.rs.chisquare(1, 10)) == 10
-
-    def test_normal(self):
-        assert len(self.rs.normal(0, 1, 10)) == 10
-
-    def test_uniform(self):
-        assert len(self.rs.uniform(1, 2, 10)) == 10
-
-    def test_gamma(self):
-        assert len(self.rs.gamma(2, 5, 10)) == 10
-
-    def test_beta(self):
-        assert len(self.rs.beta(0.5, 1.5, 10)) == 10
-
-    def test_f(self):
-        assert len(self.rs.beta(3, 373, 10)) == 10
-
-    def test_laplace(self):
-        assert len(self.rs.laplace(2, 4, 10)) == 10
-
-    def test_gumbel(self):
-        assert len(self.rs.gumbel(3.0, 5.0, 10)) == 10
-
-    def test_lognormal(self):
-        assert len(self.rs.lognormal(3.0, 5.0, 10)) == 10
+    def test_seed(self):
+        rs = self.mod.RandomState(*self.seed)
+        rs2 = self.mod.RandomState(*self.seed)
+        assert comp_state(rs.get_state(), rs2.get_state())
 
 
-class TestRandomKit(RNG):
+
+class TestMT19937(RNG):
     @classmethod
     def setup_class(cls):
-        cls.mod = randomkit
+        cls.mod = mt19937
         cls.advance = None
-        cls.seed = [2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
-        cls.rs = cls.mod.RandomState(*cls.seed)
-        cls.initial_state = cls.rs.get_state()
-
-
-class TestDummy(RNG):
-    @classmethod
-    def setup_class(cls):
-        cls.mod = dummy
-        cls.advance = 2 ** 21 + 2 ** 16 + 2 ** 5 + 1
         cls.seed = [2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
@@ -150,7 +112,7 @@ class TestPCG64(RNG):
         cls.mod = pcg64
         cls.advance = 2 ** 96 + 2 ** 48 + 2 ** 21 + 2 ** 16 + 2 ** 5 + 1
         cls.seed = [2 ** 96 + 2 ** 48 + 2 ** 21 + 2 ** 16 + 2 ** 5 + 1,
-                    2 ** 48 + 2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
+                    2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
 
@@ -160,7 +122,16 @@ class TestXorShift128(RNG):
     def setup_class(cls):
         cls.mod = xorshift128
         cls.advance = None
-        cls.seed = [2 ** 48 + 2 ** 21 + 2 ** 16 + 2 ** 5 + 1,
-                    2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
+        cls.seed = [12345]
+        cls.rs = cls.mod.RandomState(*cls.seed)
+        cls.initial_state = cls.rs.get_state()
+
+
+class TestXorShift1024(RNG):
+    @classmethod
+    def setup_class(cls):
+        cls.mod = xorshift1024
+        cls.advance = None
+        cls.seed = [12345]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()

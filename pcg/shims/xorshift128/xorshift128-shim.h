@@ -32,19 +32,24 @@ inline uint64_t random_uint64(aug_state* state)
     return xorshift128_next(state->rng);
 }
 
-inline void seed(aug_state* state, uint64_t seed, uint64_t inc)
+inline void seed(aug_state* state, uint64_t seed)
 {
-    xorshift128_seed(state->rng, seed, inc);
+    xorshift128_seed(state->rng, seed);
 }
 
 inline void entropy_init(aug_state* state)
 {
     uint64_t seeds[2];
     entropy_fill((void*) seeds, sizeof(seeds));
-    xorshift128_seed(state->rng,  seeds[0], seeds[1]);
+    xorshift128_init_state(state->rng,  seeds[0], seeds[1]);
 }
 
 inline void jump(aug_state* state)
 {
     xorshift128_jump(state->rng);
+}
+
+inline void init_state(aug_state* state, uint64_t* state_vals)
+{
+    xorshift128_init_state(state->rng, *(state_vals), *(state_vals + 1));
 }

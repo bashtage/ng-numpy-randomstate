@@ -8,9 +8,10 @@ cdef extern from "core-rng.h":
         uint32_t *rng
         uint64_t state, inc
 
-        int has_gauss, shift_zig_random_int
+        int has_gauss, shift_zig_random_int, has_uint32
         double gauss
         uint64_t zig_random_int
+        uint32_t uinteger
 
     ctypedef s_aug_state aug_state
 

@@ -10,9 +10,9 @@ from Cython.Build import cythonize
 pwd = getcwd()
 configs = []
 
-rngs = ['RNG_DUMMY', 'RNG_PCG_32', 'RNG_PCG_64', 'RNG_MT19337', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
+rngs = ['RNG_DUMMY', 'RNG_PCG_32', 'RNG_PCG_64', 'RNG_MT19937', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
 
-compile_rngs = ['RNG_PCG_32', 'RNG_MT19337', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024']
+compile_rngs = ['RNG_MRG32K3A', 'RNG_PCG_32', 'RNG_PCG_64', 'RNG_MT19937', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
 
 def write_config(config):
     flags = config['flags']
@@ -44,7 +44,15 @@ for rng in rngs:
 
         include_dirs += [join(pwd, 'src', 'pcg')]
 
-    elif flags['RNG_MT19337']:
+    elif flags['RNG_PCG_64']:
+        sources += [join(pwd, 'src', 'pcg', p) for p in ('pcg-advance-128.c', 'pcg-rngs-128.c')]
+        sources += [join(pwd, 'shims/pcg-64', 'pcg-64-shim.c')]
+
+        defs = [('PCG_64_RNG', '1'), ('PCG_HAS_128BIT_OPS', '1'), ('__SIZEOF_INT128__', '16')]
+
+        include_dirs += [join(pwd, 'src', 'pcg')]
+
+    elif flags['RNG_MT19937']:
         sources += [join(pwd, 'src', 'random-kit', p) for p in ('random-kit.c',)]
         sources += [join(pwd, 'shims', 'random-kit', 'random-kit-shim.c')]
 
@@ -66,6 +74,13 @@ for rng in rngs:
         defs = [('XORSHIFT1024_RNG', '1')]
 
         include_dirs += [join(pwd, 'src', 'xorshift1024')]
+    elif flags['RNG_MRG32K3A']:
+        sources += [join(pwd, 'src', 'mrg32k3a', p) for p in ('mrg32k3a.c',)]
+        sources += [join(pwd, 'shims', 'mrg32k3a', 'mrg32k3a-shim.c')]
+
+        defs = [('MRG32K3A_RNG', '1')]
+
+        include_dirs += [join(pwd, 'src', 'mrg32k3a')]
 
     config = {'file_name': file_name,
               'sources': sources,
@@ -86,8 +101,7 @@ for config in configs:
                                            sources=config['sources'],
                                            include_dirs=config['include_dirs'],
                                            define_macros=config['defs'],
-                                           extra_compile_args=['-std=c99','-O3','-funroll-loops']
+                                           extra_compile_args=['-std=c99', '-funroll-loops']
                                            )]))
     unlink(join(pwd, config['file_name'] + '.pyx'))
     unlink(join(pwd, config['file_name'] + '.c'))
-

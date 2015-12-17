@@ -33,6 +33,7 @@ before_install:
   - PKGS="python=${PYTHON}"
   - PKGS="${PKGS} numpy"; if [ ${NUMPY} ]; then PKGS="${PKGS}=${NUMPY}"; fi
   - PKGS="${PKGS} Cython"; if [ ${CYTHON} ]; then PKGS="${PKGS}=${CYTHON}"; fi
+  - PKGS="${PKGS} pandas"; if [ ${PANDAS} ]; then PKGS="${PKGS}=${PANDAS}"; fi
 
 # Install packages
 install:
@@ -43,3 +44,4 @@ install:
 
 script:
   - nosetests
+  - python performance.py

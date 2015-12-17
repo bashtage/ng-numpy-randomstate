@@ -2,23 +2,33 @@
 #cython: wraparound=False, nonecheck=False, boundscheck=False, cdivision=True
 import numpy as np
 cimport numpy as np
-from libc.stdint cimport uint32_t, uint64_t, int64_t
+from libc.stdint cimport uint32_t, uint64_t, int64_t, int32_t
 from libc.string cimport memcpy
 
 include "config.pxi"
 
 IF RNG_PCG_32:
     include "shims/pcg-32/pcg-32.pxi"
-IF RNG_MT19337:
+IF RNG_PCG_64:
+    include "shims/pcg-64/pcg-64.pxi"
+IF RNG_MT19937:
     include "shims/random-kit/random-kit.pxi"
 IF RNG_XORSHIFT128:
     include "shims/xorshift128/xorshift128.pxi"
 IF RNG_XORSHIFT1024:
     include "shims/xorshift1024/xorshift1024.pxi"
+IF RNG_MRG32K3A:
+    include "shims/mrg32k3a/mrg32k3a.pxi"
 
 cdef extern from "core-rng.h":
 
     cdef uint64_t random_uint64(aug_state* state)
+    cdef uint32_t random_uint32(aug_state* state)
+    cdef uint64_t random_bounded_uint64(aug_state* state, uint64_t bound)
+    cdef uint32_t random_bounded_uint32(aug_state* state, uint32_t bound)
+    cdef int64_t random_bounded_int64(aug_state* state, int64_t low, int64_t high)
+    cdef int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high)
+
     cdef void entropy_init(aug_state* state)
 
     cdef double random_double(aug_state* state)
@@ -49,16 +59,6 @@ cdef extern from "core-rng.h":
     cdef long random_poisson(aug_state *state, double lam)
     cdef long rk_negative_binomial(aug_state *state, double n, double p)
 
-
-ctypedef double (* random_double_0)(aug_state* state)
-ctypedef double (* random_double_1)(aug_state* state, double a)
-ctypedef double (* random_double_2)(aug_state* state, double a, double b)
-ctypedef double (* random_double_3)(aug_state* state, double a, double b, double c)
-
-ctypedef uint64_t (* random_uint_0)(aug_state* state)
-ctypedef uint64_t (* random_uint_1)(aug_state* state, double a)
-ctypedef uint64_t (* random_uint_2)(aug_state* state, double a, double b)
-
 include "wrappers.pxi"
 
 cdef class RandomState:
@@ -67,67 +67,80 @@ cdef class RandomState:
     cdef rng_t rng
     cdef aug_state rng_state
 
-    def __init__(self, state=None, inc=None):
-        self.rng_state.rng = &self.rng
-        self.rng_state.has_gauss = 0
-        self.rng_state.gauss = 0.0
-        if state is None:
-            entropy_init(&self.rng_state)
-        else:
-            IF RNG_PCG_32 or RNG_PCG_64 or RNG_XORSHIFT128:
-                self.seed(state, inc)
-            ELIF RNG_DUMMY or RNG_MT19337:
-                self.seed(state)
+    IF RNG_SEED==1:
+        def __init__(self, seed=None):
+            self.rng_state.rng = &self.rng
+            self.rng_state.has_gauss = 0
+            self.rng_state.gauss = 0.0
+            if seed is not None:
+                self.seed(seed)
+            else:
+                entropy_init(&self.rng_state)
+    ELSE:
+        def __init__(self, seed=None, inc=None):
+            self.rng_state.rng = &self.rng
+            self.rng_state.has_gauss = 0
+            self.rng_state.gauss = 0.0
+            if seed is not None and inc is not None:
+                self.seed(seed, inc)
+            else:
+                entropy_init(&self.rng_state)
 
-    IF RNG_SEED == 1:
+    IF RNG_SEED==1:
         def seed(self, rng_state_t val):
             seed(&self.rng_state, val)
-    ELIF RNG_SEED == 2:
-        def seed(self, rng_state_t state, rng_state_t inc):
-            seed(&self.rng_state, state, inc)
+    ELSE:
+        def seed(self, rng_state_t val, rng_state_t inc):
+            seed(&self.rng_state, val, inc)
 
     if RNG_ADVANCEABLE:
         def advance(self, rng_state_t delta):
             advance(&self.rng_state, delta)
+            self.rng_state.has_gauss = 0
+            self.rng_state.gauss = 0.0
+            return None
+
+    if RNG_JUMPABLE:
+        def jump(self, uint32_t iter = 1):
+            """
+            jump(iter = 1)
+
+            Jumps the random number generator by a pre-specified skip.  The size of the jump is
+            rng-specific.
+
+            Parameters
+            ----------
+            iter : integer, positive
+                Number of times to jump the state of the rng.
+
+            Notes
+            -----
+            Jumping the rng state resets any pre-computed random numbers. This is required to ensure
+            exact reproducibility.
+            """
+            cdef Py_ssize_t i;
+            for i in range(iter):
+                jump(&self.rng_state)
+            self.rng_state.has_gauss = 0
+            self.rng_state.gauss = 0.0
             return None
 
     def get_state(self):
         return (RNG_NAME,
                 _get_state(self.rng_state),
-                self.rng_state.has_gauss,
-                self.rng_state.gauss)
+                (self.rng_state.has_gauss, self.rng_state.gauss),
+                (self.rng_state.has_uint32, self.rng_state.uinteger)
+                )
 
-    IF RNG_PCG_32:
-        def set_state(self, state):
-            if state[0] != 'pcg' or len(state) != 4:
-                raise ValueError('Not a PCG RNG state')
-            self.rng_state.rng.state = state[1][0]
-            self.rng_state.rng.inc = state[1][1]
-            self.rng_state.has_gauss = state[2]
-            self.rng_state.gauss = state[3]
-
-    IF RNG_MT19337:
-        def set_state(self, state):
-            if state[0] != 'mt19937' or len(state) != 4:
-                raise ValueError('Not a mt19937 RNG state')
-
-            cdef uint32_t [:] key = state[1][0]
-            cdef Py_ssize_t i
-            for i in range(RK_STATE_LEN):
-                 self.rng_state.rng.key[i] = key[i]
-            self.rng_state.rng.pos = state[1][1]
-            self.rng_state.has_gauss = state[2]
-            self.rng_state.gauss = state[3]
-
-    ELIF RNG_XORSHIFT128:
-        def set_state(self, state):
-            if state[0] != 'xorshift128' or len(state) != 4:
-                raise ValueError('Not a XorShift128 RNG state')
-            self.rng_state.rng.s[0] = state[1][0]
-            self.rng_state.rng.s[1] = state[1][1]
-            self.rng_state.has_gauss = state[2]
-            self.rng_state.gauss = state[3]
-
+    def set_state(self, state):
+        rng_name = RNG_NAME
+        if state[0] != rng_name or len(state) != RNG_STATE_LEN:
+            raise ValueError('Not a ' + rng_name + ' RNG state')
+        _set_state(self.rng_state, state[1])
+        self.rng_state.has_gauss = state[2][0]
+        self.rng_state.gauss = state[2][1]
+        self.rng_state.has_uint32 = state[3][0]
+        self.rng_state.uinteger = state[3][1]
 
     def random_sample(self, size=None):
         """
@@ -173,8 +186,33 @@ cdef class RandomState:
         """
         return cont0(&self.rng_state, &random_double, size)
 
-    def random_integers(self, size=None):
-        return uint0(&self.rng_state, &random_uint64, size)
+    def random_integers(self, size=None, int bits=64):
+
+        if bits == 64:
+            return uint0(&self.rng_state, &random_uint64, size)
+        elif bits == 32:
+            return uint0_32(&self.rng_state, &random_uint32, size)
+        else:
+            raise ValueError('Unknown value of bits.  Must be either 32 or 64.')
+
+    def random_bounded_uintegers(self, high, size=None):
+        if high < 4294967295:
+            return uint1_i_32(&self.rng_state, &random_bounded_uint32, <uint32_t>range, size)
+        else:
+            return uint1_i(&self.rng_state, &random_bounded_uint64, range, size)
+
+    def random_bounded_integers(self, int64_t low, high=None, size=None):
+        cdef int64_t _high
+        if high is None:
+            _high = low
+            low = 0
+        else:
+            _high = high
+        if _high < 4294967295:
+            return int2_i_32(&self.rng_state, &random_bounded_int32, <int32_t>low, <int32_t>high, size)
+        else:
+            return int2_i(&self.rng_state, &random_bounded_int64, low, high, size)
+
 
     def standard_normal(self, size=None, method='inv'):
         """
