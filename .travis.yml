@@ -33,13 +33,15 @@ before_install:
   - PKGS="python=${PYTHON}"
   - PKGS="${PKGS} numpy"; if [ ${NUMPY} ]; then PKGS="${PKGS}=${NUMPY}"; fi
   - PKGS="${PKGS} Cython"; if [ ${CYTHON} ]; then PKGS="${PKGS}=${CYTHON}"; fi
+  - PKGS="${PKGS} pandas"; if [ ${PANDAS} ]; then PKGS="${PKGS}=${PANDAS}"; fi
 
 # Install packages
 install:
   - conda create --yes --quiet -n rng-test ${PKGS} nose pip setuptools
   - source activate rng-test
-  - cd pcg
+  - cd random
   - python setup-2.py build_ext --inplace -f
 
 script:
   - nosetests
+  - python performance.py
