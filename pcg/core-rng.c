@@ -42,10 +42,15 @@ int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high)
 
 double random_double(aug_state* state)
 {
-    uint64_t rn, a, b;
+#ifdef RNG_32BIT
+    int32_t a = random_uint32(state) >> 5, b = random_uint32(state) >> 6;
+#else
+    uint64_t rn;
+    int32_t a, b;
     rn = random_uint64(state);
     a = rn >> 37;
     b = (rn & 0xFFFFFFFFLL) >> 6;
+#endif
     return (a * 67108864.0 + b) / 9007199254740992.0;
 }
 
