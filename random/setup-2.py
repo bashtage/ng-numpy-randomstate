@@ -1,3 +1,4 @@
+import sys
 from distutils.core import setup
 from distutils.extension import Extension
 from os import getcwd, unlink
@@ -13,6 +14,11 @@ configs = []
 rngs = ['RNG_DUMMY', 'RNG_PCG_32', 'RNG_PCG_64', 'RNG_MT19937', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
 
 compile_rngs = ['RNG_MRG32K3A', 'RNG_PCG_32', 'RNG_PCG_64', 'RNG_MT19937', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
+
+extra_defs = []
+if sys.maxsize < 2**33:
+    compile_rngs.remove('RNG_PCG_64')
+    extra_defs = [('RNG_32BIT', '1')]
 
 def write_config(config):
     flags = config['flags']
@@ -56,7 +62,7 @@ for rng in rngs:
         sources += [join(pwd, 'src', 'random-kit', p) for p in ('random-kit.c',)]
         sources += [join(pwd, 'shims', 'random-kit', 'random-kit-shim.c')]
 
-        defs = [('RANDOMKIT_RNG', '1')]
+        defs = [('RANDOMKIT_RNG', '1'), ('RNG_32BIT', '1')]
 
         include_dirs += [join(pwd, 'src', 'random-kit')]
 
@@ -78,7 +84,7 @@ for rng in rngs:
         sources += [join(pwd, 'src', 'mrg32k3a', p) for p in ('mrg32k3a.c',)]
         sources += [join(pwd, 'shims', 'mrg32k3a', 'mrg32k3a-shim.c')]
 
-        defs = [('MRG32K3A_RNG', '1')]
+        defs = [('MRG32K3A_RNG', '1'), ('RNG_32BIT', '1')]
 
         include_dirs += [join(pwd, 'src', 'mrg32k3a')]
 
@@ -100,7 +106,7 @@ for config in configs:
     setup(ext_modules=cythonize([Extension(config['file_name'],
                                            sources=config['sources'],
                                            include_dirs=config['include_dirs'],
-                                           define_macros=config['defs'],
+                                           define_macros=config['defs'] + extra_defs,
                                            extra_compile_args=['-std=c99', '-funroll-loops']
                                            )]))
     unlink(join(pwd, config['file_name'] + '.pyx'))

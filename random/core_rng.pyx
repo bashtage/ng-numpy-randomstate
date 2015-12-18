@@ -3,7 +3,6 @@
 import numpy as np
 cimport numpy as np
 from libc.stdint cimport uint32_t, uint64_t, int64_t, int32_t
-from libc.string cimport memcpy
 
 include "config.pxi"
 
@@ -87,14 +86,84 @@ cdef class RandomState:
                 entropy_init(&self.rng_state)
 
     IF RNG_SEED==1:
-        def seed(self, rng_state_t val):
-            seed(&self.rng_state, val)
+        def seed(self, val=None):
+            """
+            seed(seed=None)
+
+            Seed the generator.
+
+            This method is called when `RandomState` is initialized. It can be
+            called again to re-seed the generator. For details, see `RandomState`.
+
+            Parameters
+            ----------
+            val : int, optional
+                Seed for `RandomState`.
+
+            Notes
+            -----
+            Acceptable range for seed depends on specifics of PRNG.  See
+            class documentation for details.
+
+            Seeds are hashed to produce the required number of bits.
+
+            See Also
+            --------
+            RandomState
+
+            """
+            if val is not None:
+                seed(&self.rng_state, val)
+            else:
+                entropy_init(&self.rng_state)
     ELSE:
-        def seed(self, rng_state_t val, rng_state_t inc):
-            seed(&self.rng_state, val, inc)
+        def seed(self, val=None, inc=None):
+            """
+            seed(val=None, inc=None)
+
+            Seed the generator.
+
+            This method is called when `RandomState` is initialized. It can be
+            called again to re-seed the generator. For details, see `RandomState`.
+
+            Parameters
+            ----------
+            val : int, optional
+                Seed for `RandomState`.
+            inc : int, optional
+                Increment to use for producing multiple streams
+
+            See Also
+            --------
+            RandomState
+            """
+            if val is not None and inc is not None:
+                seed(&self.rng_state, val, inc)
+            else:
+                entropy_init(&self.rng_state)
 
     if RNG_ADVANCEABLE:
         def advance(self, rng_state_t delta):
+            """
+            advance(delta)
+
+            Advance the PRNG as-if delta drawn have occurred.
+
+            Parameters
+            ----------
+            delta : integer, positive
+                Number of draws to advance the PRNG.
+
+            Returns
+            -------
+            out : None
+                Returns 'None' on success.
+
+            Notes
+            -----
+            Advancing the prng state resets any pre-computed random numbers.
+            This is required to ensure exact reproducibility.
+            """
             advance(&self.rng_state, delta)
             self.rng_state.has_gauss = 0
             self.rng_state.gauss = 0.0
@@ -113,6 +182,11 @@ cdef class RandomState:
             iter : integer, positive
                 Number of times to jump the state of the rng.
 
+            Returns
+            -------
+            out : None
+                Returns 'None' on success.
+
             Notes
             -----
             Jumping the rng state resets any pre-computed random numbers. This is required to ensure
@@ -126,13 +200,78 @@ cdef class RandomState:
             return None
 
     def get_state(self):
+        """
+        get_state()
+
+        Return a tuple representing the internal state of the generator.
+
+        For more details, see `set_state`.
+
+        Returns
+        -------
+        out : tuple(str, tuple, tuple, tuple)
+            The returned tuple has the following items:
+
+            1. the string containing the PRNG type.
+            2. a tuple containing the PRNG-specific state
+            3. a tuple containing two values :``has_gauss`` and ``cached_gaussian``
+            4. a tuple containing two values :``has_uint32`` and ``cached_uint32``
+
+        See Also
+        --------
+        set_state
+
+        Notes
+        -----
+        `set_state` and `get_state` are not needed to work with any of the
+        random distributions in NumPy. If the internal state is manually altered,
+        the user should know exactly what he/she is doing.
+
+        For information about the specific structure of the PRNG-specific
+        component, see the class documentation.
+        """
         return (RNG_NAME,
                 _get_state(self.rng_state),
                 (self.rng_state.has_gauss, self.rng_state.gauss),
-                (self.rng_state.has_uint32, self.rng_state.uinteger)
-                )
+                (self.rng_state.has_uint32, self.rng_state.uinteger))
 
     def set_state(self, state):
+        """
+        set_state(state)
+
+        Set the internal state of the generator from a tuple.
+
+        For use if one has reason to manually (re-)set the internal state of the
+        pseudo-random number generating algorithm.
+
+        Parameters
+        ----------
+        state : tuple(str, tuple, tuple, tuple)
+            The returned tuple has the following items:
+
+            1. the string containing the PRNG type.
+            2. a tuple containing the PRNG-specific state
+            3. a tuple containing two values :``has_gauss`` and ``cached_gaussian``
+            4. a tuple containing two values :``has_uint32`` and ``cached_uint32``
+
+        Returns
+        -------
+        out : None
+            Returns 'None' on success.
+
+        See Also
+        --------
+        get_state
+
+        Notes
+        -----
+        `set_state` and `get_state` are not needed to work with any of the
+        random distributions in NumPy. If the internal state is manually altered,
+        the user should know exactly what he/she is doing.
+
+        For information about the specific structure of the PRNG-specific
+        component, see the class documentation.
+        """
         rng_name = RNG_NAME
         if state[0] != rng_name or len(state) != RNG_STATE_LEN:
             raise ValueError('Not a ' + rng_name + ' RNG state')
@@ -186,8 +325,36 @@ cdef class RandomState:
         """
         return cont0(&self.rng_state, &random_double, size)
 
-    def random_integers(self, size=None, int bits=64):
+    def random_uintegers(self, size=None, int bits=64):
+        """
+        random_uintegers(size=None, bits=64)
 
+        Return random unsigned integers
+
+        Parameters
+        ----------
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+        bits : int {32, 64}
+            Size of the unsigned integer to return, either 32 bit or 64 bit.
+
+        Returns
+        -------
+        out : uint or ndarray
+            Drawn samples.
+
+        Notes
+        -----
+        This method effectively exposes access to the raw underlying
+        pseudo-random number generator since these all produce unsigned
+        integers. In practice these are most useful for generating other
+        random numbers.
+
+        These should not be used to produce bounded random numbers by
+        simple truncation.  Instead see ``random_bounded_integers``.
+        """
         if bits == 64:
             return uint0(&self.rng_state, &random_uint64, size)
         elif bits == 32:
@@ -202,16 +369,19 @@ cdef class RandomState:
             return uint1_i(&self.rng_state, &random_bounded_uint64, range, size)
 
     def random_bounded_integers(self, int64_t low, high=None, size=None):
-        cdef int64_t _high
+        cdef int64_t _low, _high
         if high is None:
             _high = low
-            low = 0
+            _low = 0
         else:
             _high = high
-        if _high < 4294967295:
-            return int2_i_32(&self.rng_state, &random_bounded_int32, <int32_t>low, <int32_t>high, size)
+            _low = low
+
+        if _low >= -2147483648 and _high <= 2147483647:
+            return int2_i_32(&self.rng_state, &random_bounded_int32,
+                             <int32_t>_low, <int32_t>_high, size)
         else:
-            return int2_i(&self.rng_state, &random_bounded_int64, low, high, size)
+            return int2_i(&self.rng_state, &random_bounded_int64, _low, high, size)
 
 
     def standard_normal(self, size=None, method='inv'):
@@ -254,6 +424,33 @@ cdef class RandomState:
             return cont0(&self.rng_state, &random_gauss_zig, size)
 
     def standard_exponential(self, size=None):
+        """
+        standard_exponential(size=None)
+
+        Draw samples from the standard exponential distribution.
+
+        `standard_exponential` is identical to the exponential distribution
+        with a scale parameter of 1.
+
+        Parameters
+        ----------
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : float or ndarray
+            Drawn samples.
+
+        Examples
+        --------
+        Output a 3x8000 array:
+
+        >>> n = np.random.standard_exponential((3, 8000))
+
+        """
         return cont0(&self.rng_state, &random_standard_exponential, size)
 
     def standard_cauchy(self, size=None):
@@ -320,4 +517,71 @@ cdef class RandomState:
         return cont0(&self.rng_state, &random_standard_cauchy, size)
 
     def standard_gamma(self, double shape, size=None):
+        """
+        standard_gamma(shape, size=None)
+
+        Draw samples from a standard Gamma distribution.
+
+        Samples are drawn from a Gamma distribution with specified parameters,
+        shape (sometimes designated "k") and scale=1.
+
+        Parameters
+        ----------
+        shape : float
+            Parameter, should be > 0.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+            The drawn samples.
+
+        See Also
+        --------
+        scipy.stats.distributions.gamma : probability density function,
+            distribution or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the Gamma distribution is
+
+        .. math:: p(x) = x^{k-1}\\frac{e^{-x/\\theta}}{\\theta^k\\Gamma(k)},
+
+        where :math:`k` is the shape and :math:`\\theta` the scale,
+        and :math:`\\Gamma` is the Gamma function.
+
+        The Gamma distribution is often used to model the times to failure of
+        electronic components, and arises naturally in processes for which the
+        waiting times between Poisson distributed events are relevant.
+
+        References
+        ----------
+        .. [1] Weisstein, Eric W. "Gamma Distribution." From MathWorld--A
+               Wolfram Web Resource.
+               http://mathworld.wolfram.com/GammaDistribution.html
+        .. [2] Wikipedia, "Gamma-distribution",
+               http://en.wikipedia.org/wiki/Gamma-distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> shape, scale = 2., 1. # mean and width
+        >>> s = np.random.standard_gamma(shape, 1000000)
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> import scipy.special as sps
+        >>> count, bins, ignored = plt.hist(s, 50, normed=True)
+        >>> y = bins**(shape-1) * ((np.exp(-bins/scale))/ \\
+        ...                       (sps.gamma(shape) * scale**shape))
+        >>> plt.plot(bins, y, linewidth=2, color='r')
+        >>> plt.show()
+
+        """
         return cont1(&self.rng_state, &random_standard_gamma, shape, size)

@@ -110,7 +110,7 @@ COMMAND_NUMPY = '''
 rs.tomaxint({scale} * 1000000)
 '''.format(scale=scale_32)
 
-dist = 'random_integers'
+dist = 'random_uintegers'
 res = {}
 for rng in ('mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024', 'numpy.random'):
     try:
@@ -142,14 +142,14 @@ print(p.sort_index())
 print('\n\n')
 print((('-' * 60) + '\n') * 2)
 COMMAND = '''
-rs.{dist}(1000000)
+rs.{dist}(1000000, bits=64)
 '''
 
 COMMAND_NUMPY = '''
 rs.tomaxint({scale} * 1000000)
 '''.format(scale=scale_64)
 
-dist = 'random_integers'
+dist = 'random_uintegers'
 res = {}
 for rng in ('mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024', 'numpy.random'):
     try:

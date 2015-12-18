@@ -25,7 +25,7 @@ class RNG(object):
     def test_init(self):
         rs = self.mod.RandomState()
         state = rs.get_state()
-        rs.random_integers(1)
+        rs.random_uintegers(1)
         rs.set_state(state)
         new_state = rs.get_state()
         assert comp_state(state, new_state)
@@ -46,8 +46,8 @@ class RNG(object):
         else:
             raise SkipTest
 
-    def test_random_integers(self):
-        assert len(self.rs.random_integers(10)) == 10
+    def test_random_uintegers(self):
+        assert len(self.rs.random_uintegers(10)) == 10
 
     def test_random_sample(self):
         assert len(self.rs.random_sample(10)) == 10
@@ -69,9 +69,9 @@ class RNG(object):
 
     def test_reset_state(self):
         state = self.rs.get_state()
-        int_1 = self.rs.random_integers(1)
+        int_1 = self.rs.random_uintegers(1)
         self.rs.set_state(state)
-        int_2 = self.rs.random_integers(1)
+        int_2 = self.rs.random_uintegers(1)
         assert int_1 == int_2
 
     def test_entropy_init(self):
