@@ -3,6 +3,11 @@
 import numpy as np
 cimport numpy as np
 from libc.stdint cimport uint32_t, uint64_t, int64_t, int32_t
+try:
+    from threading import Lock
+except:
+    from dummy_threading import Lock
+
 
 include "config.pxi"
 
@@ -21,42 +26,42 @@ IF RNG_MRG32K3A:
 
 cdef extern from "core-rng.h":
 
-    cdef uint64_t random_uint64(aug_state* state)
-    cdef uint32_t random_uint32(aug_state* state)
-    cdef uint64_t random_bounded_uint64(aug_state* state, uint64_t bound)
-    cdef uint32_t random_bounded_uint32(aug_state* state, uint32_t bound)
-    cdef int64_t random_bounded_int64(aug_state* state, int64_t low, int64_t high)
-    cdef int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high)
+    cdef uint64_t random_uint64(aug_state* state) nogil
+    cdef uint32_t random_uint32(aug_state* state) nogil
+    cdef uint64_t random_bounded_uint64(aug_state* state, uint64_t bound) nogil
+    cdef uint32_t random_bounded_uint32(aug_state* state, uint32_t bound) nogil
+    cdef int64_t random_bounded_int64(aug_state* state, int64_t low, int64_t high) nogil
+    cdef int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high) nogil
 
-    cdef void entropy_init(aug_state* state)
+    cdef void entropy_init(aug_state* state) nogil
 
-    cdef double random_double(aug_state* state)
-    cdef double random_gauss(aug_state* state)
-    cdef double random_gauss_zig(aug_state* state)
-    cdef double random_standard_exponential(aug_state* state)
-    cdef double random_standard_cauchy(aug_state* state)
+    cdef double random_double(aug_state* state) nogil
+    cdef double random_gauss(aug_state* state) nogil
+    cdef double random_gauss_zig(aug_state* state) nogil
+    cdef double random_standard_exponential(aug_state* state) nogil
+    cdef double random_standard_cauchy(aug_state* state) nogil
 
-    cdef double random_exponential(aug_state *state, double scale)
-    cdef double random_standard_gamma(aug_state* state, double shape)
-    cdef double random_pareto(aug_state *state, double a)
-    cdef double random_weibull(aug_state *state, double a)
-    cdef double random_power(aug_state *state, double a)
-    cdef double random_rayleigh(aug_state *state, double mode)
-    cdef double random_standard_t(aug_state *state, double df)
-    cdef double random_chisquare(aug_state *state, double df)
+    cdef double random_exponential(aug_state *state, double scale) nogil
+    cdef double random_standard_gamma(aug_state* state, double shape) nogil
+    cdef double random_pareto(aug_state *state, double a) nogil
+    cdef double random_weibull(aug_state *state, double a) nogil
+    cdef double random_power(aug_state *state, double a) nogil
+    cdef double random_rayleigh(aug_state *state, double mode) nogil
+    cdef double random_standard_t(aug_state *state, double df) nogil
+    cdef double random_chisquare(aug_state *state, double df) nogil
 
-    cdef double random_normal(aug_state *state, double loc, double scale)
-    cdef double random_uniform(aug_state *state, double loc, double scale)
-    cdef double random_gamma(aug_state *state, double shape, double scale)
-    cdef double random_beta(aug_state *state, double a, double b)
-    cdef double random_f(aug_state *state, double dfnum, double dfden)
-    cdef double random_laplace(aug_state *state, double loc, double scale)
-    cdef double random_gumbel(aug_state *state, double loc, double scale)
-    cdef double random_logistic(aug_state *state, double loc, double scale)
-    cdef double random_lognormal(aug_state *state, double mean, double sigma)
+    cdef double random_normal(aug_state *state, double loc, double scale) nogil
+    cdef double random_uniform(aug_state *state, double loc, double scale) nogil
+    cdef double random_gamma(aug_state *state, double shape, double scale) nogil
+    cdef double random_beta(aug_state *state, double a, double b) nogil
+    cdef double random_f(aug_state *state, double dfnum, double dfden) nogil
+    cdef double random_laplace(aug_state *state, double loc, double scale) nogil
+    cdef double random_gumbel(aug_state *state, double loc, double scale) nogil
+    cdef double random_logistic(aug_state *state, double loc, double scale) nogil
+    cdef double random_lognormal(aug_state *state, double mean, double sigma) nogil
 
-    cdef long random_poisson(aug_state *state, double lam)
-    cdef long rk_negative_binomial(aug_state *state, double n, double p)
+    cdef long random_poisson(aug_state *state, double lam) nogil
+    cdef long rk_negative_binomial(aug_state *state, double n, double p) nogil
 
 include "wrappers.pxi"
 
@@ -71,15 +76,18 @@ cdef class RandomState:
             self.rng_state.rng = &self.rng
             self.rng_state.has_gauss = 0
             self.rng_state.gauss = 0.0
+            self.lock = Lock()
             if seed is not None:
                 self.seed(seed)
             else:
                 entropy_init(&self.rng_state)
+
     ELSE:
         def __init__(self, seed=None, inc=None):
             self.rng_state.rng = &self.rng
             self.rng_state.has_gauss = 0
             self.rng_state.gauss = 0.0
+            self.lock = Lock()
             if seed is not None and inc is not None:
                 self.seed(seed, inc)
             else:
@@ -323,7 +331,7 @@ cdef class RandomState:
                [-1.23204345, -1.75224494]])
 
         """
-        return cont0(&self.rng_state, &random_double, size)
+        return cont0(&self.rng_state, &random_double, size, self.lock)
 
     def random_uintegers(self, size=None, int bits=64):
         """
@@ -356,17 +364,17 @@ cdef class RandomState:
         simple truncation.  Instead see ``random_bounded_integers``.
         """
         if bits == 64:
-            return uint0(&self.rng_state, &random_uint64, size)
+            return uint0(&self.rng_state, &random_uint64, size, self.lock)
         elif bits == 32:
-            return uint0_32(&self.rng_state, &random_uint32, size)
+            return uint0_32(&self.rng_state, &random_uint32, size, self.lock)
         else:
             raise ValueError('Unknown value of bits.  Must be either 32 or 64.')
 
     def random_bounded_uintegers(self, high, size=None):
         if high < 4294967295:
-            return uint1_i_32(&self.rng_state, &random_bounded_uint32, <uint32_t>range, size)
+            return uint1_i_32(&self.rng_state, &random_bounded_uint32, <uint32_t>range, size, self.lock)
         else:
-            return uint1_i(&self.rng_state, &random_bounded_uint64, range, size)
+            return uint1_i(&self.rng_state, &random_bounded_uint64, range, size, self.lock)
 
     def random_bounded_integers(self, int64_t low, high=None, size=None):
         cdef int64_t _low, _high
@@ -379,9 +387,9 @@ cdef class RandomState:
 
         if _low >= -2147483648 and _high <= 2147483647:
             return int2_i_32(&self.rng_state, &random_bounded_int32,
-                             <int32_t>_low, <int32_t>_high, size)
+                             <int32_t>_low, <int32_t>_high, size, self.lock)
         else:
-            return int2_i(&self.rng_state, &random_bounded_int64, _low, high, size)
+            return int2_i(&self.rng_state, &random_bounded_int64, _low, high, size, self.lock)
 
 
     def standard_normal(self, size=None, method='inv'):
@@ -419,9 +427,9 @@ cdef class RandomState:
 
         """
         if method == 'inv':
-            return cont0(&self.rng_state, &random_gauss, size)
+            return cont0(&self.rng_state, &random_gauss, size, self.lock)
         else:
-            return cont0(&self.rng_state, &random_gauss_zig, size)
+            return cont0(&self.rng_state, &random_gauss_zig, size, self.lock)
 
     def standard_exponential(self, size=None):
         """
@@ -451,7 +459,7 @@ cdef class RandomState:
         >>> n = np.random.standard_exponential((3, 8000))
 
         """
-        return cont0(&self.rng_state, &random_standard_exponential, size)
+        return cont0(&self.rng_state, &random_standard_exponential, size, self.lock)
 
     def standard_cauchy(self, size=None):
         """
@@ -514,7 +522,7 @@ cdef class RandomState:
         >>> plt.show()
 
         """
-        return cont0(&self.rng_state, &random_standard_cauchy, size)
+        return cont0(&self.rng_state, &random_standard_cauchy, size, self.lock)
 
     def standard_gamma(self, double shape, size=None):
         """
@@ -584,4 +592,4 @@ cdef class RandomState:
         >>> plt.show()
 
         """
-        return cont1(&self.rng_state, &random_standard_gamma, shape, size)
+        return cont1(&self.rng_state, &random_standard_gamma, shape, size, self.lock)
