@@ -11,9 +11,9 @@ except:
 
 include "config.pxi"
 
-IF RNG_PCG_32:
+IF RNG_PCG32:
     include "shims/pcg-32/pcg-32.pxi"
-IF RNG_PCG_64:
+IF RNG_PCG64:
     include "shims/pcg-64/pcg-64.pxi"
 IF RNG_MT19937:
     include "shims/random-kit/random-kit.pxi"
@@ -23,6 +23,10 @@ IF RNG_XORSHIFT1024:
     include "shims/xorshift1024/xorshift1024.pxi"
 IF RNG_MRG32K3A:
     include "shims/mrg32k3a/mrg32k3a.pxi"
+IF RNG_MLFG_1279_861:
+    include "shims/mlfg-1279-861/mlfg-1279-861.pxi"
+IF RNG_DUMMY:
+    include "shims/dummy/dummy.pxi"
 
 cdef extern from "core-rng.h":
 
@@ -35,7 +39,7 @@ cdef extern from "core-rng.h":
 
     cdef void entropy_init(aug_state* state) nogil
 
-    cdef double random_double(aug_state* state) nogil
+    cdef double random_uniform(aug_state* state) nogil
     cdef double random_gauss(aug_state* state) nogil
     cdef double random_gauss_zig(aug_state* state) nogil
     cdef double random_standard_exponential(aug_state* state) nogil
@@ -51,7 +55,7 @@ cdef extern from "core-rng.h":
     cdef double random_chisquare(aug_state *state, double df) nogil
 
     cdef double random_normal(aug_state *state, double loc, double scale) nogil
-    cdef double random_uniform(aug_state *state, double loc, double scale) nogil
+    cdef double random_scaled_uniform(aug_state *state, double loc, double scale) nogil
     cdef double random_gamma(aug_state *state, double shape, double scale) nogil
     cdef double random_beta(aug_state *state, double a, double b) nogil
     cdef double random_f(aug_state *state, double dfnum, double dfden) nogil
@@ -66,10 +70,11 @@ cdef extern from "core-rng.h":
 include "wrappers.pxi"
 
 cdef class RandomState:
-    '''Test class'''
+    CLASS_DOCSTRING
 
     cdef rng_t rng
     cdef aug_state rng_state
+    cdef object lock
 
     IF RNG_SEED==1:
         def __init__(self, seed=None):
@@ -331,7 +336,7 @@ cdef class RandomState:
                [-1.23204345, -1.75224494]])
 
         """
-        return cont0(&self.rng_state, &random_double, size, self.lock)
+        return cont0(&self.rng_state, &random_uniform, size, self.lock)
 
     def random_uintegers(self, size=None, int bits=64):
         """
@@ -370,11 +375,11 @@ cdef class RandomState:
         else:
             raise ValueError('Unknown value of bits.  Must be either 32 or 64.')
 
-    def random_bounded_uintegers(self, high, size=None):
+    def random_bounded_uintegers(self, uint64_t high, size=None):
         if high < 4294967295:
-            return uint1_i_32(&self.rng_state, &random_bounded_uint32, <uint32_t>range, size, self.lock)
+            return uint1_i_32(&self.rng_state, &random_bounded_uint32, high, size, self.lock)
         else:
-            return uint1_i(&self.rng_state, &random_bounded_uint64, range, size, self.lock)
+            return uint1_i(&self.rng_state, &random_bounded_uint64, high, size, self.lock)
 
     def random_bounded_integers(self, int64_t low, high=None, size=None):
         cdef int64_t _low, _high
@@ -389,7 +394,7 @@ cdef class RandomState:
             return int2_i_32(&self.rng_state, &random_bounded_int32,
                              <int32_t>_low, <int32_t>_high, size, self.lock)
         else:
-            return int2_i(&self.rng_state, &random_bounded_int64, _low, high, size, self.lock)
+            return int2_i(&self.rng_state, &random_bounded_int64, _low, _high, size, self.lock)
 
 
     def standard_normal(self, size=None, method='inv'):

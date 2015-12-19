@@ -11,14 +11,15 @@ from Cython.Build import cythonize
 pwd = getcwd()
 configs = []
 
-rngs = ['RNG_DUMMY', 'RNG_PCG_32', 'RNG_PCG_64', 'RNG_MT19937', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
+rngs = ['RNG_MLFG_1279_861', 'RNG_DUMMY', 'RNG_PCG32', 'RNG_PCG64', 'RNG_MT19937', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024',
+        'RNG_MRG32K3A']
 
-compile_rngs = ['RNG_MRG32K3A', 'RNG_PCG_32', 'RNG_PCG_64', 'RNG_MT19937', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
+compile_rngs = rngs
 
 extra_defs = []
-if sys.maxsize < 2**33:
+if sys.maxsize < 2 ** 33:
     compile_rngs.remove('RNG_PCG_64')
-    extra_defs = [('RNG_32BIT', '1')]
+
 
 def write_config(config):
     flags = config['flags']
@@ -35,13 +36,13 @@ for rng in rngs:
     flags = {k: False for k in rngs}
     flags[rng] = True
 
-    file_name = rng.lower().replace('rng','').replace('_', '')
+    file_name = rng.lower().replace('rng_', '')
     sources = [join(pwd, file_name + '.pyx'),
                join(pwd, 'src', 'entropy', 'entropy.c'),
                join(pwd, 'core-rng.c')]
     include_dirs = [pwd] + [numpy.get_include()]
 
-    if flags['RNG_PCG_32']:
+    if flags['RNG_PCG32']:
         sources += [join(pwd, 'src', 'pcg', p) for p in ('pcg-rngs-64.c', 'pcg-advance-64.c',
                                                          'pcg-output-64.c', 'pcg-output-32.c')]
         sources += [join(pwd, 'shims/pcg-32', 'pcg-32-shim.c')]
@@ -50,7 +51,7 @@ for rng in rngs:
 
         include_dirs += [join(pwd, 'src', 'pcg')]
 
-    elif flags['RNG_PCG_64']:
+    elif flags['RNG_PCG64']:
         sources += [join(pwd, 'src', 'pcg', p) for p in ('pcg-advance-128.c', 'pcg-rngs-128.c')]
         sources += [join(pwd, 'shims/pcg-64', 'pcg-64-shim.c')]
 
@@ -62,31 +63,39 @@ for rng in rngs:
         sources += [join(pwd, 'src', 'random-kit', p) for p in ('random-kit.c',)]
         sources += [join(pwd, 'shims', 'random-kit', 'random-kit-shim.c')]
 
-        defs = [('RANDOMKIT_RNG', '1'), ('RNG_32BIT', '1')]
+        defs = [('RANDOMKIT_RNG', '1')]
 
         include_dirs += [join(pwd, 'src', 'random-kit')]
 
     elif flags['RNG_XORSHIFT128']:
-        sources += [join(pwd, 'src', 'xorshift128', p) for p in ('xorshift128.c',)]
+        sources += [join(pwd, 'src', 'xorshift128', 'xorshift128.c')]
         sources += [join(pwd, 'shims', 'xorshift128', 'xorshift128-shim.c')]
 
         defs = [('XORSHIFT128_RNG', '1')]
 
         include_dirs += [join(pwd, 'src', 'xorshift128')]
     elif flags['RNG_XORSHIFT1024']:
-        sources += [join(pwd, 'src', 'xorshift1024', p) for p in ('xorshift1024.c',)]
+        sources += [join(pwd, 'src', 'xorshift1024', 'xorshift1024.c')]
         sources += [join(pwd, 'shims', 'xorshift1024', 'xorshift1024-shim.c')]
 
         defs = [('XORSHIFT1024_RNG', '1')]
 
         include_dirs += [join(pwd, 'src', 'xorshift1024')]
     elif flags['RNG_MRG32K3A']:
-        sources += [join(pwd, 'src', 'mrg32k3a', p) for p in ('mrg32k3a.c',)]
+        sources += [join(pwd, 'src', 'mrg32k3a', 'mrg32k3a.c')]
         sources += [join(pwd, 'shims', 'mrg32k3a', 'mrg32k3a-shim.c')]
 
-        defs = [('MRG32K3A_RNG', '1'), ('RNG_32BIT', '1')]
+        defs = [('MRG32K3A_RNG', '1')]
 
         include_dirs += [join(pwd, 'src', 'mrg32k3a')]
+
+    elif flags['RNG_MLFG_1279_861']:
+        sources += [join(pwd, 'src', 'mlfg-1279-861', 'mlfg-1279-861.c')]
+        sources += [join(pwd, 'shims', 'mlfg-1279-861', 'mlfg-1279-861-shim.c')]
+
+        defs = [('MLFG_1279_861_RNG', '1')]
+
+        include_dirs += [join(pwd, 'src', 'mlfg_1279_861')]
 
     config = {'file_name': file_name,
               'sources': sources,
@@ -107,7 +116,7 @@ for config in configs:
                                            sources=config['sources'],
                                            include_dirs=config['include_dirs'],
                                            define_macros=config['defs'] + extra_defs,
-                                           extra_compile_args=['-std=c99', '-funroll-loops']
+                                           extra_compile_args=['-std=c99']
                                            )]))
     unlink(join(pwd, config['file_name'] + '.pyx'))
     unlink(join(pwd, config['file_name'] + '.c'))

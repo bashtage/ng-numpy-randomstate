@@ -44,3 +44,7 @@ cdef object _set_state(aug_state state, object state_info):
     for i in range(16):
         state.rng.s[i] = key[i]
     state.rng.p = state_info[1]
+
+DEF CLASS_DOCSTRING = """
+This is the xorshift1024 docstring.
+"""

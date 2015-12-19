@@ -43,3 +43,7 @@ cdef object _set_state(aug_state state, object state_info):
     state.rng.s20 = state_info[3]
     state.rng.s21 = state_info[4]
     state.rng.s22 = state_info[5]
+
+DEF CLASS_DOCSTRING = """
+This is the mrg32k3a docstring.
+"""

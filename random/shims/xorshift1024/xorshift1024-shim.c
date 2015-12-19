@@ -11,3 +11,5 @@ extern inline void jump(aug_state* state);
 extern inline void entropy_init(aug_state* state);
 
 extern inline void init_state(aug_state* state, uint64_t* state_value);
+
+extern inline double random_double(aug_state* state);

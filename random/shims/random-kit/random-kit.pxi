@@ -44,3 +44,7 @@ cdef object _set_state(aug_state state, object state_info):
     for i in range(RK_STATE_LEN):
         state.rng.key[i] = key[i]
     state.rng.pos = state_info[1]
+
+DEF CLASS_DOCSTRING = """
+This is the mt19937 docstring.
+"""

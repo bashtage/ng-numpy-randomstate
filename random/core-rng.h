@@ -26,6 +26,8 @@
 #include "shims/xorshift1024/xorshift1024-shim.h"
 #elif defined(MRG32K3A_RNG)
 #include "shims/mrg32k3a/mrg32k3a-shim.h"
+#elif defined(MLFG_1279_861_RNG)
+#include "shims/mlfg-1279-861/mlfg-1279-861-shim.h"
 #else
 #error Unknown RNG!!!  Unknown RNG!!!  Unknown RNG!!!
 #endif
@@ -38,7 +40,7 @@ extern int64_t random_bounded_int64(aug_state* state, int64_t low, int64_t high)
 
 extern int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high);
 
-extern double random_double(aug_state* state);
+extern double random_uniform(aug_state* state);
 
 extern double random_standard_exponential(aug_state* state);
 
@@ -50,7 +52,7 @@ extern double random_normal(aug_state *state, double loc, double scale);
 
 extern double random_exponential(aug_state *state, double scale);
 
-extern double random_uniform(aug_state *state, double loc, double scale);
+extern double random_scaled_uniform(aug_state *state, double loc, double scale);
 
 extern double random_gamma(aug_state *state, double shape, double scale);
 

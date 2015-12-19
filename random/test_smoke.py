@@ -2,6 +2,8 @@ import mt19937
 import pcg32
 import xorshift1024
 import xorshift128
+import mlfg_1279_861
+
 from nose import SkipTest
 
 import pcg64
@@ -67,6 +69,16 @@ class RNG(object):
     def test_standard_cauchy(self):
         assert len(self.rs.standard_cauchy(10)) == 10
 
+    def test_bounded_uint(self):
+        assert len(self.rs.random_bounded_uintegers(2**24+1, 10)) == 10
+        assert len(self.rs.random_bounded_uintegers(2**48+1, 10)) == 10
+
+    def test_bounded_int(self):
+        assert len(self.rs.random_bounded_integers(2**24+1, size=10)) == 10
+        assert len(self.rs.random_bounded_integers(2**48+1, size=10)) == 10
+        assert len(self.rs.random_bounded_integers(-2**24, 2**24+1, size=10)) == 10
+        assert len(self.rs.random_bounded_integers(-2**48, 2**48+1, size=10)) == 10
+
     def test_reset_state(self):
         state = self.rs.get_state()
         int_1 = self.rs.random_uintegers(1)
@@ -131,6 +143,15 @@ class TestXorShift1024(RNG):
     @classmethod
     def setup_class(cls):
         cls.mod = xorshift1024
+        cls.advance = None
+        cls.seed = [12345]
+        cls.rs = cls.mod.RandomState(*cls.seed)
+        cls.initial_state = cls.rs.get_state()
+
+class TestMLFG(RNG):
+    @classmethod
+    def setup_class(cls):
+        cls.mod = mlfg_1279_861
         cls.advance = None
         cls.seed = [12345]
         cls.rs = cls.mod.RandomState(*cls.seed)

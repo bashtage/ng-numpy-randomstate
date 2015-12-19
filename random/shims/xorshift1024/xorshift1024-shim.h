@@ -55,3 +55,13 @@ inline void init_state(aug_state* state, uint64_t* state_value)
 {
     xorshift1024_init_state(state->rng, state_value);
 }
+
+inline double random_double(aug_state* state)
+{
+    uint64_t rn;
+    int32_t a, b;
+    rn = random_uint64(state);
+    a = rn >> 37;
+    b = (rn & 0xFFFFFFFFLL) >> 6;
+    return (a * 67108864.0 + b) / 9007199254740992.0;
+}

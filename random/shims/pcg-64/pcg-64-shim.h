@@ -49,3 +49,13 @@ inline void entropy_init(aug_state* state)
     entropy_fill((void*) seeds, sizeof(seeds));
     seed(state, seeds[0], seeds[1]);
 }
+
+inline double random_double(aug_state* state)
+{
+    uint64_t rn;
+    int32_t a, b;
+    rn = random_uint64(state);
+    a = rn >> 37;
+    b = (rn & 0xFFFFFFFFLL) >> 6;
+    return (a * 67108864.0 + b) / 9007199254740992.0;
+}

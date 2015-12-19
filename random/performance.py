@@ -35,7 +35,7 @@ rs.{dist}(1000000)
 
 dist = 'standard_normal'
 res = {}
-for rng in ('dummy', 'pcg32', 'pcg64', 'mt19937', 'xorshift128', 'xorshift1024',
+for rng in ('dummy', 'mlfg_1279_861', 'pcg32', 'pcg64', 'mt19937', 'xorshift128', 'xorshift1024',
             'mrg32k3a', 'numpy.random'):
     for method in ('"inv"', '"zig"'):
         try:
@@ -73,7 +73,7 @@ rs.{dist}(1000000)
 
 dist = 'random_sample'
 res = {}
-for rng in ('mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024', 'numpy.random'):
+for rng in ('mlfg_1279_861', 'mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024', 'numpy.random'):
     try:
         key = '_'.join((rng, dist)).replace('"', '')
         command = COMMAND
@@ -112,7 +112,7 @@ rs.tomaxint({scale} * 1000000)
 
 dist = 'random_uintegers'
 res = {}
-for rng in ('mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024', 'numpy.random'):
+for rng in ('mlfg_1279_861', 'mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024', 'numpy.random'):
     try:
         key = '_'.join((rng, dist)).replace('"', '')
         command = COMMAND if 'numpy' not in rng else COMMAND_NUMPY
@@ -151,7 +151,7 @@ rs.tomaxint({scale} * 1000000)
 
 dist = 'random_uintegers'
 res = {}
-for rng in ('mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024', 'numpy.random'):
+for rng in ('mlfg_1279_861', 'mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024', 'numpy.random'):
     try:
         key = '_'.join((rng, dist)).replace('"', '')
         command = COMMAND if 'numpy' not in rng else COMMAND_NUMPY

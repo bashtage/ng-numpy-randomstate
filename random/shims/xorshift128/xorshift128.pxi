@@ -38,3 +38,8 @@ cdef object _get_state(aug_state state):
 cdef object _set_state(aug_state state, object state_info):
     state.rng.s[0] = state_info[0]
     state.rng.s[1] = state_info[1]
+
+DEF CLASS_DOCSTRING = """
+This is the xorshift128 docstring.
+"""
+
