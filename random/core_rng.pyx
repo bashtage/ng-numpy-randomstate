@@ -10,6 +10,7 @@ except:
 
 
 include "config.pxi"
+include "src/common/binomial.pxi"
 
 IF RNG_PCG32:
     include "shims/pcg-32/pcg-32.pxi"
@@ -39,7 +40,7 @@ cdef extern from "core-rng.h":
 
     cdef void entropy_init(aug_state* state) nogil
 
-    cdef double random_uniform(aug_state* state) nogil
+    cdef double random_sample(aug_state* state) nogil
     cdef double random_gauss(aug_state* state) nogil
     cdef double random_gauss_zig(aug_state* state) nogil
     cdef double random_standard_exponential(aug_state* state) nogil
@@ -55,7 +56,7 @@ cdef extern from "core-rng.h":
     cdef double random_chisquare(aug_state *state, double df) nogil
 
     cdef double random_normal(aug_state *state, double loc, double scale) nogil
-    cdef double random_scaled_uniform(aug_state *state, double loc, double scale) nogil
+    cdef double random_uniform(aug_state *state, double loc, double scale) nogil
     cdef double random_gamma(aug_state *state, double shape, double scale) nogil
     cdef double random_beta(aug_state *state, double a, double b) nogil
     cdef double random_f(aug_state *state, double dfnum, double dfden) nogil
@@ -65,13 +66,15 @@ cdef extern from "core-rng.h":
     cdef double random_lognormal(aug_state *state, double mean, double sigma) nogil
 
     cdef long random_poisson(aug_state *state, double lam) nogil
-    cdef long rk_negative_binomial(aug_state *state, double n, double p) nogil
+    cdef long random_negative_binomial(aug_state *state, double n, double p) nogil
+    cdef long random_binomial(aug_state *state, long n, double p) nogil
 
 include "wrappers.pxi"
 
 cdef class RandomState:
     CLASS_DOCSTRING
 
+    cdef binomial_t binomial_info
     cdef rng_t rng
     cdef aug_state rng_state
     cdef object lock
@@ -79,6 +82,7 @@ cdef class RandomState:
     IF RNG_SEED==1:
         def __init__(self, seed=None):
             self.rng_state.rng = &self.rng
+            self.rng_state.binomial = &self.binomial_info
             self.rng_state.has_gauss = 0
             self.rng_state.gauss = 0.0
             self.lock = Lock()
@@ -90,6 +94,7 @@ cdef class RandomState:
     ELSE:
         def __init__(self, seed=None, inc=None):
             self.rng_state.rng = &self.rng
+            self.rng_state.binomial = &self.binomial_info
             self.rng_state.has_gauss = 0
             self.rng_state.gauss = 0.0
             self.lock = Lock()
@@ -336,7 +341,7 @@ cdef class RandomState:
                [-1.23204345, -1.75224494]])
 
         """
-        return cont0(&self.rng_state, &random_uniform, size, self.lock)
+        return cont0(&self.rng_state, &random_sample, size, self.lock)
 
     def random_uintegers(self, size=None, int bits=64):
         """
@@ -598,3 +603,83 @@ cdef class RandomState:
 
         """
         return cont1(&self.rng_state, &random_standard_gamma, shape, size, self.lock)
+
+
+    def binomial(self, uint64_t n, double p, size=None):
+        """
+        binomial(n, p, size=None)
+        Draw samples from a binomial distribution.
+        Samples are drawn from a binomial distribution with specified
+        parameters, n trials and p probability of success where
+        n an integer >= 0 and p is in the interval [0,1]. (n may be
+        input as a float, but it is truncated to an integer in use)
+        Parameters
+        ----------
+        n : float (but truncated to an integer)
+                parameter, >= 0.
+        p : float
+                parameter, >= 0 and <=1.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+        Returns
+        -------
+        samples : ndarray or scalar
+                  where the values are all integers in  [0, n].
+        See Also
+        --------
+        scipy.stats.distributions.binom : probability density function,
+            distribution or cumulative density function, etc.
+        Notes
+        -----
+        The probability density for the binomial distribution is
+        .. math:: P(N) = \\binom{n}{N}p^N(1-p)^{n-N},
+        where :math:`n` is the number of trials, :math:`p` is the probability
+        of success, and :math:`N` is the number of successes.
+        When estimating the standard error of a proportion in a population by
+        using a random sample, the normal distribution works well unless the
+        product p*n <=5, where p = population proportion estimate, and n =
+        number of samples, in which case the binomial distribution is used
+        instead. For example, a sample of 15 people shows 4 who are left
+        handed, and 11 who are right handed. Then p = 4/15 = 27%. 0.27*15 = 4,
+        so the binomial distribution should be used in this case.
+        References
+        ----------
+        .. [1] Dalgaard, Peter, "Introductory Statistics with R",
+               Springer-Verlag, 2002.
+        .. [2] Glantz, Stanton A. "Primer of Biostatistics.", McGraw-Hill,
+               Fifth Edition, 2002.
+        .. [3] Lentner, Marvin, "Elementary Applied Statistics", Bogden
+               and Quigley, 1972.
+        .. [4] Weisstein, Eric W. "Binomial Distribution." From MathWorld--A
+               Wolfram Web Resource.
+               http://mathworld.wolfram.com/BinomialDistribution.html
+        .. [5] Wikipedia, "Binomial-distribution",
+               http://en.wikipedia.org/wiki/Binomial_distribution
+        Examples
+        --------
+        Draw samples from the distribution:
+        >>> n, p = 10, .5  # number of trials, probability of each trial
+        >>> s = np.random.binomial(n, p, 1000)
+        # result of flipping a coin 10 times, tested 1000 times.
+        A real world example. A company drills 9 wild-cat oil exploration
+        wells, each with an estimated probability of success of 0.1. All nine
+        wells fail. What is the probability of that happening?
+        Let's do 20,000 trials of the model, and count the number that
+        generate zero positive results.
+        >>> sum(np.random.binomial(9, 0.1, 20000) == 0)/20000.
+        # answer = 0.38885, or 38%.
+        """
+
+        if n < 0:
+            raise ValueError("n < 0")
+        if p < 0:
+            raise ValueError("p < 0")
+        elif p > 1:
+            raise ValueError("p > 1")
+        elif np.isnan(p):
+            raise ValueError("p is nan")
+        # return discnp_array_sc(self.internal_state, rk_binomial, size, ln, fp, self.lock)
+        # TODO: this function is incomplete
+        return random_binomial(&self.rng_state, <long>n, p)

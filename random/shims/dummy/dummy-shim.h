@@ -1,14 +1,19 @@
 #include <stdint.h>
 
-#include "../../src/entropy/entropy.h"
+#include "../../src/common/binomial.h"
+#include "../../src/common/entropy.h"
 #include "../../src/dummy/dummy.h"
+
 
 typedef struct s_aug_state {
     uint32_t *rng;
+    binomial_t *binomial;
 
-    int has_gauss, shift_zig_random_int;
+    int has_gauss, shift_zig_random_int, has_uint32;
     double gauss;
+    uint32_t uinteger;
     uint64_t zig_random_int;
+
 } aug_state;
 
 inline uint32_t random_uint32(aug_state* state)
@@ -40,10 +45,6 @@ inline void entropy_init(aug_state* state)
 
 inline double random_double(aug_state* state)
 {
-    uint64_t rn;
-    int32_t a, b;
-    rn = random_uint64(state);
-    a = rn >> 37;
-    b = (rn & 0xFFFFFFFFLL) >> 6;
-    return (a * 67108864.0 + b) / 9007199254740992.0;
+    uint64_t rn = random_uint64(state);
+    return ((rn >> 37) * 67108864.0 + ((rn & 0xFFFFFFFFLL) >> 6)) / 9007199254740992.0;
 }

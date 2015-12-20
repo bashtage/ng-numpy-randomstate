@@ -1,9 +1,12 @@
 #include <stdint.h>
-#include "../../src/entropy/entropy.h"
+
+#include "../../src/common/entropy.h"
+#include "../../src/common/binomial.h"
 #include "../../src/mlfg-1279-861/mlfg-1279-861.h"
 
 typedef struct s_aug_state {
     mlfg_state *rng;
+    binomial_t *binomial;
 
     int has_gauss, shift_zig_random_int, has_uint32;
     double gauss;
@@ -13,11 +16,13 @@ typedef struct s_aug_state {
 
 inline uint32_t random_uint32(aug_state* state)
 {
+    // Two are needed since there is only 31 bits in each
     return mlfg_next(state->rng) | (mlfg_next(state->rng) << 31);
 }
 
 inline uint64_t random_uint64(aug_state* state)
 {
+    // Three are needed since there is only 31 bits in each
     return (((uint64_t)mlfg_next(state->rng)) << 33) | (((uint64_t)mlfg_next(state->rng)) << 2) | (mlfg_next(state->rng) & 0x03);
 }
 
@@ -35,6 +40,7 @@ inline void entropy_init(aug_state* state)
 
 inline double random_double(aug_state* state)
 {
+    // These differ by 1 bit since there are only 31 bits in each
     int32_t a = mlfg_next(state->rng) >> 4, b = mlfg_next(state->rng) >> 5;
     return (a * 67108864.0 + b) / 9007199254740992.0;
 }

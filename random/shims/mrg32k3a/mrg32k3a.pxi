@@ -18,11 +18,12 @@ cdef extern from "core-rng.h":
 
     cdef struct s_aug_state:
         mrg32k3a_state *rng
+        binomial_t *binomial
 
-        int has_gauss, shift_zig_random_int, has_uint32;
-        double gauss;
-        uint32_t uinteger;
-        uint64_t zig_random_int;
+        int has_gauss, shift_zig_random_int, has_uint32
+        double gauss
+        uint32_t uinteger
+        uint64_t zig_random_int
 
     ctypedef s_aug_state aug_state
 

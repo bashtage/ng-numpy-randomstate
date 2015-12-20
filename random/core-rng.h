@@ -40,7 +40,7 @@ extern int64_t random_bounded_int64(aug_state* state, int64_t low, int64_t high)
 
 extern int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high);
 
-extern double random_uniform(aug_state* state);
+extern double random_sample(aug_state* state);
 
 extern double random_standard_exponential(aug_state* state);
 
@@ -52,7 +52,7 @@ extern double random_normal(aug_state *state, double loc, double scale);
 
 extern double random_exponential(aug_state *state, double scale);
 
-extern double random_scaled_uniform(aug_state *state, double loc, double scale);
+extern double random_uniform(aug_state *state, double loc, double scale);
 
 extern double random_gamma(aug_state *state, double shape, double scale);
 
@@ -89,3 +89,5 @@ extern long random_poisson(aug_state *state, double lam);
 extern long rk_negative_binomial(aug_state *state, double n, double p);
 
 extern double random_gauss_zig(aug_state* state);
+
+extern long random_binomial(aug_state *state, long n, double p);

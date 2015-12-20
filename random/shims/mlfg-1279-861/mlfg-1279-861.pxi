@@ -9,13 +9,14 @@ DEF MLFG_STATE_LEN = 1279
 cdef extern from "core-rng.h":
     cdef struct s_mlfg_state:
         uint64_t lags[1279]
-        int pos;
-        int lag_pos;
+        int pos
+        int lag_pos
 
     ctypedef s_mlfg_state mlfg_state
 
     cdef struct s_aug_state:
         mlfg_state *rng
+        binomial_t *binomial
 
         int has_gauss, shift_zig_random_int, has_uint32
         double gauss

@@ -7,12 +7,13 @@ DEF RNG_SEED=1
 cdef extern from "core-rng.h":
 
     cdef struct s_xorshift128_state:
-      uint64_t s[2]
+        uint64_t s[2]
 
     ctypedef s_xorshift128_state xorshift128_state
 
     cdef struct s_aug_state:
         xorshift128_state *rng
+        binomial_t *binomial
 
         int has_gauss, shift_zig_random_int, has_uint32
         double gauss

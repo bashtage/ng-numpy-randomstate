@@ -40,7 +40,7 @@ int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high)
     return (int32_t)r + low;
 }
 
-double random_uniform(aug_state* state)
+double random_sample(aug_state* state)
 {
     return random_double(state);
 }
@@ -192,7 +192,7 @@ double random_exponential(aug_state *state, double scale)
     return scale * random_standard_exponential(state);
 }
 
-double random_scaled_uniform(aug_state *state, double loc, double scale)
+double random_uniform(aug_state *state, double loc, double scale)
 {
     return loc + scale*random_double(state);
 }
@@ -408,7 +408,7 @@ long random_poisson(aug_state *state, double lam)
     }
 }
 
-long rk_negative_binomial(aug_state *state, double n, double p)
+long random_negative_binomial(aug_state *state, double n, double p)
 {
     double Y = random_gamma(state, n, (1-p)/p);
     return random_poisson(state, Y);
@@ -497,4 +497,216 @@ extern double random_gauss_zig(aug_state* state)
             return x;
         }
     }
+}
+
+
+
+long random_binomial_btpe(aug_state *state, long n, double p)
+{
+    double r,q,fm,p1,xm,xl,xr,c,laml,lamr,p2,p3,p4;
+    double a,u,v,s,F,rho,t,A,nrq,x1,x2,f1,f2,z,z2,w,w2,x;
+    long m,y,k,i;
+
+    if (!(state->binomial->has_binomial) ||
+         (state->binomial->nsave != n) ||
+         (state->binomial->psave != p))
+    {
+        /* initialize */
+        state->binomial->nsave = n;
+        state->binomial->psave = p;
+        state->binomial->has_binomial = 1;
+        state->binomial->r = r = min(p, 1.0-p);
+        state->binomial->q = q = 1.0 - r;
+        state->binomial->fm = fm = n*r+r;
+        state->binomial->m = m = (long)floor(state->binomial->fm);
+        state->binomial->p1 = p1 = floor(2.195*sqrt(n*r*q)-4.6*q) + 0.5;
+        state->binomial->xm = xm = m + 0.5;
+        state->binomial->xl = xl = xm - p1;
+        state->binomial->xr = xr = xm + p1;
+        state->binomial->c = c = 0.134 + 20.5/(15.3 + m);
+        a = (fm - xl)/(fm-xl*r);
+        state->binomial->laml = laml = a*(1.0 + a/2.0);
+        a = (xr - fm)/(xr*q);
+        state->binomial->lamr = lamr = a*(1.0 + a/2.0);
+        state->binomial->p2 = p2 = p1*(1.0 + 2.0*c);
+        state->binomial->p3 = p3 = p2 + c/laml;
+        state->binomial->p4 = p4 = p3 + c/lamr;
+    }
+    else
+    {
+        r = state->binomial->r;
+        q = state->binomial->q;
+        fm = state->binomial->fm;
+        m = state->binomial->m;
+        p1 = state->binomial->p1;
+        xm = state->binomial->xm;
+        xl = state->binomial->xl;
+        xr = state->binomial->xr;
+        c = state->binomial->c;
+        laml = state->binomial->laml;
+        lamr = state->binomial->lamr;
+        p2 = state->binomial->p2;
+        p3 = state->binomial->p3;
+        p4 = state->binomial->p4;
+    }
+
+  /* sigh ... */
+  Step10:
+    nrq = n*r*q;
+    u = random_double(state)*p4;
+    v = random_double(state);
+    if (u > p1) goto Step20;
+    y = (long)floor(xm - p1*v + u);
+    goto Step60;
+
+  Step20:
+    if (u > p2) goto Step30;
+    x = xl + (u - p1)/c;
+    v = v*c + 1.0 - fabs(m - x + 0.5)/p1;
+    if (v > 1.0) goto Step10;
+    y = (long)floor(x);
+    goto Step50;
+
+  Step30:
+    if (u > p3) goto Step40;
+    y = (long)floor(xl + log(v)/laml);
+    if (y < 0) goto Step10;
+    v = v*(u-p2)*laml;
+    goto Step50;
+
+  Step40:
+    y = (long)floor(xr - log(v)/lamr);
+    if (y > n) goto Step10;
+    v = v*(u-p3)*lamr;
+
+  Step50:
+    k = labs(y - m);
+    if ((k > 20) && (k < ((nrq)/2.0 - 1))) goto Step52;
+
+    s = r/q;
+    a = s*(n+1);
+    F = 1.0;
+    if (m < y)
+    {
+        for (i=m+1; i<=y; i++)
+        {
+            F *= (a/i - s);
+        }
+    }
+    else if (m > y)
+    {
+        for (i=y+1; i<=m; i++)
+        {
+            F /= (a/i - s);
+        }
+    }
+    if (v > F) goto Step10;
+    goto Step60;
+
+    Step52:
+    rho = (k/(nrq))*((k*(k/3.0 + 0.625) + 0.16666666666666666)/nrq + 0.5);
+    t = -k*k/(2*nrq);
+    A = log(v);
+    if (A < (t - rho)) goto Step60;
+    if (A > (t + rho)) goto Step10;
+
+    x1 = y+1;
+    f1 = m+1;
+    z = n+1-m;
+    w = n-y+1;
+    x2 = x1*x1;
+    f2 = f1*f1;
+    z2 = z*z;
+    w2 = w*w;
+    if (A > (xm*log(f1/x1)
+           + (n-m+0.5)*log(z/w)
+           + (y-m)*log(w*r/(x1*q))
+           + (13680.-(462.-(132.-(99.-140./f2)/f2)/f2)/f2)/f1/166320.
+           + (13680.-(462.-(132.-(99.-140./z2)/z2)/z2)/z2)/z/166320.
+           + (13680.-(462.-(132.-(99.-140./x2)/x2)/x2)/x2)/x1/166320.
+           + (13680.-(462.-(132.-(99.-140./w2)/w2)/w2)/w2)/w/166320.))
+    {
+        goto Step10;
+    }
+
+  Step60:
+    if (p > 0.5)
+    {
+        y = n - y;
+    }
+
+    return y;
+}
+
+long random_binomial_inversion(aug_state *state, long n, double p)
+{
+    double q, qn, np, px, U;
+    long X, bound;
+
+    if (!(state->binomial->has_binomial) ||
+         (state->binomial->nsave != n) ||
+         (state->binomial->psave != p))
+    {
+        state->binomial->nsave = n;
+        state->binomial->psave = p;
+        state->binomial->has_binomial = 1;
+        state->binomial->q = q = 1.0 - p;
+        state->binomial->r = qn = exp(n * log(q));
+        state->binomial->c = np = n*p;
+        state->binomial->m = bound = min(n, np + 10.0*sqrt(np*q + 1));
+    } else
+    {
+        q = state->binomial->q;
+        qn = state->binomial->r;
+        np = state->binomial->c;
+        bound = state->binomial->m;
+    }
+    X = 0;
+    px = qn;
+    U = random_double(state);
+    while (U > px)
+    {
+        X++;
+        if (X > bound)
+        {
+            X = 0;
+            px = qn;
+            U = random_double(state);
+        } else
+        {
+            U -= px;
+            px  = ((n-X+1) * p * px)/(X*q);
+        }
+    }
+    return X;
+}
+
+long random_binomial(aug_state *state, long n, double p)
+{
+    double q;
+
+    if (p <= 0.5)
+    {
+        if (p*n <= 30.0)
+        {
+            return random_binomial_inversion(state, n, p);
+        }
+        else
+        {
+            return random_binomial_btpe(state, n, p);
+        }
+    }
+    else
+    {
+        q = 1.0-p;
+        if (q*n <= 30.0)
+        {
+            return n - random_binomial_inversion(state, n, q);
+        }
+        else
+        {
+            return n - random_binomial_btpe(state, n, q);
+        }
+    }
+
 }

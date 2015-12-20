@@ -18,7 +18,7 @@ cdef extern from "core-rng.h":
 
     cdef struct s_aug_state:
         pcg64_random_t *rng
-        pcg128_t state, inc
+        binomial_t *binomial
 
         int has_gauss, shift_zig_random_int, has_uint32
         double gauss

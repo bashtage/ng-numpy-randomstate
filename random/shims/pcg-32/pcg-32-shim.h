@@ -1,11 +1,14 @@
 #define RNG_TYPE pcg32_random_t
 
 #include <stdint.h>
-#include "../../src/entropy/entropy.h"
+#include "../../src/common/binomial.h"
+#include "../../src/common/entropy.h"
 #include "../../src/pcg/pcg_variants.h"
+
 
 typedef struct s_aug_state {
     pcg32_random_t *rng;
+    binomial_t *binomial;
 
     int has_gauss, shift_zig_random_int, has_uint32;
     double gauss;

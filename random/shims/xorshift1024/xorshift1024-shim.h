@@ -1,10 +1,12 @@
 #include <stdint.h>
 
-#include "../../src/entropy/entropy.h"
+#include "../../src/common/binomial.h"
+#include "../../src/common/entropy.h"
 #include "../../src/xorshift1024/xorshift1024.h"
 
 typedef struct s_aug_state {
     xorshift1024_state *rng;
+    binomial_t *binomial;
 
     int has_gauss, shift_zig_random_int, has_uint32;
     double gauss;

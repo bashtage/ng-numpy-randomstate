@@ -10,4 +10,4 @@ extern inline void advance(aug_state* state, uint32_t delta);
 
 extern inline void entropy_init(aug_state* state);
 
-extern inline double random_double(aug_state* state)
+extern inline double random_double(aug_state* state);

@@ -2,11 +2,13 @@
 
 #include <stdint.h>
 
-#include "../../src/entropy/entropy.h"
+#include "../../src/common/binomial.h"
+#include "../../src/common/entropy.h"
 #include "../../src/random-kit/random-kit.h"
 
 typedef struct s_aug_state {
     rk_state *rng;
+    binomial_t *binomial;
 
     int has_gauss, shift_zig_random_int, has_uint32;
     double gauss;
