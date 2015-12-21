@@ -8,6 +8,14 @@ import numpy
 
 from Cython.Build import cythonize
 
+class WriteConfigExtension(Extension):
+    def __init__(self, **kwargs):
+        self.config_info = kwargs['config_info']
+        del kwargs['config_info']
+        super(Extension, WriteConfigExtension).__init__(**kwargs)
+
+
+
 pwd = getcwd()
 configs = []
 

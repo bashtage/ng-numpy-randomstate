@@ -248,10 +248,11 @@ cdef class RandomState:
         For information about the specific structure of the PRNG-specific
         component, see the class documentation.
         """
-        return (RNG_NAME,
-                _get_state(self.rng_state),
-                (self.rng_state.has_gauss, self.rng_state.gauss),
-                (self.rng_state.has_uint32, self.rng_state.uinteger))
+        return  {'name': RNG_NAME,
+                 'state': _get_state(self.rng_state),
+                 'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
+                 'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger}
+                 }
 
     def set_state(self, state):
         """
@@ -291,13 +292,13 @@ cdef class RandomState:
         component, see the class documentation.
         """
         rng_name = RNG_NAME
-        if state[0] != rng_name or len(state) != RNG_STATE_LEN:
+        if state['name'] != rng_name:
             raise ValueError('Not a ' + rng_name + ' RNG state')
-        _set_state(self.rng_state, state[1])
-        self.rng_state.has_gauss = state[2][0]
-        self.rng_state.gauss = state[2][1]
-        self.rng_state.has_uint32 = state[3][0]
-        self.rng_state.uinteger = state[3][1]
+        _set_state(self.rng_state, state['state'])
+        self.rng_state.has_gauss = state['gauss']['has_gauss']
+        self.rng_state.gauss = state['gauss']['gauss']
+        self.rng_state.has_uint32 = state['uint32']['has_uint32']
+        self.rng_state.uinteger = state['uint32']['uint32']
 
     def random_sample(self, size=None):
         """

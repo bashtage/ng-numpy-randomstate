@@ -6,19 +6,21 @@ import pcg64
 import xorshift1024
 import xorshift128
 
-
 from nose import SkipTest
-
 
 
 def comp_state(state1, state2):
     identical = True
-    try:
-        iter(state1)
-        for s1, s2 in zip(state1, state2):
-            identical &= comp_state(s1, s2)
-    except:
-        identical &= s1 == s2
+    if isinstance(state1, dict):
+        for key in state1:
+            return comp_state(state1[key], state2[key])
+    else:
+        try:
+            iter(state1)
+            for s1, s2 in zip(state1, state2):
+                identical &= comp_state(s1, s2)
+        except:
+            identical &= s1 == s2
     return identical
 
 
@@ -76,14 +78,14 @@ class RNG(object):
         assert self.rs.binomial(1000, .5) >= 0
 
     def test_bounded_uint(self):
-        assert len(self.rs.random_bounded_uintegers(2**24+1, 10)) == 10
-        assert len(self.rs.random_bounded_uintegers(2**48+1, 10)) == 10
+        assert len(self.rs.random_bounded_uintegers(2 ** 24 + 1, 10)) == 10
+        assert len(self.rs.random_bounded_uintegers(2 ** 48 + 1, 10)) == 10
 
     def test_bounded_int(self):
-        assert len(self.rs.random_bounded_integers(2**24+1, size=10)) == 10
-        assert len(self.rs.random_bounded_integers(2**48+1, size=10)) == 10
-        assert len(self.rs.random_bounded_integers(-2**24, 2**24+1, size=10)) == 10
-        assert len(self.rs.random_bounded_integers(-2**48, 2**48+1, size=10)) == 10
+        assert len(self.rs.random_bounded_integers(2 ** 24 + 1, size=10)) == 10
+        assert len(self.rs.random_bounded_integers(2 ** 48 + 1, size=10)) == 10
+        assert len(self.rs.random_bounded_integers(-2 ** 24, 2 ** 24 + 1, size=10)) == 10
+        assert len(self.rs.random_bounded_integers(-2 ** 48, 2 ** 48 + 1, size=10)) == 10
 
     def test_reset_state(self):
         state = self.rs.get_state()
@@ -121,7 +123,6 @@ class RNG(object):
         rs2.set_state(state)
         n2 = rs2.random_uintegers(bits=32, size=10)
         assert (n1 == n2).all()
-
 
 
 class TestMT19937(RNG):
@@ -174,6 +175,7 @@ class TestXorShift1024(RNG):
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
 
+
 class TestMLFG(RNG):
     @classmethod
     def setup_class(cls):
@@ -182,6 +184,7 @@ class TestMLFG(RNG):
         cls.seed = [12345]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+
 
 class TestMRG32k3A(RNG):
     @classmethod
