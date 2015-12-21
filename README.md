@@ -1,15 +1,16 @@
 # ng-numpy-randomstate
 
-This is an early attempt at writing a generic interface that woould allow 
+This is an early attempt at writing a generic interface that would allow 
 alternative random generators in Python and Numpy. The first attempt is 
-to include [pcg random number generator](http://www.pcg-random.org/) 
-in addition to the MT19937 that is included in NumPy (it also includes
-a dummy RNG, which repeats the same sequence of 20 values, which is only
-for testing).
+to include alternative core random number generators in addition to the 
+MT19937 that is included in NumPy. New RNGs include:
 
-It uses source from 
-[pcg](http://www.pcg-random.org/), [numpy](http://www.numpy.org/) and 
-[randomkit](https://github.com/numpy/numpy/blob/master/numpy/random/mtrand/).
+* [MT19937](https://github.com/numpy/numpy/blob/master/numpy/random/mtrand/). - the NumPy rng
+* [xorshift128+](http://xorshift.di.unimi.it/) and [xorshift1024*](http://xorshift.di.unimi.it/)
+* [PCG32](http://www.pcg-random.org/) and [PCG64](http://www.pcg-random.org/)
+* A multiplicative lagged fibonacci generator (LFG(31, 1279, 861, *))
+* [MRG32K3A](http://simul.iro.umontreal.ca/rng)
+* A dummy RNG  - repeats the same sequence of 20 values -- only for testing
 
 ## Rationale
 The main reason for this project is to include other PRNGs 
@@ -29,8 +30,8 @@ There are still many improvements needed before this is really usable.
 
 At a minimum this needs to support:
 
-  * More critical RNGs
-  * Entropy based initialization
+  * More critical distributions
+  * Entropy based initialization is missing for some RNGs
 
 ## Requirements
 Requires (Built Using):
@@ -40,11 +41,18 @@ Requires (Built Using):
  
 So far all development has been on Linux. It has been tested (in a limited 
 manner, mostly against crashes and build failures) on Linux 32 and 64-bit, 
-as well as OSX 10.10 and PC-BSD 10.2 (should alsl work on Free BSD).
+as well as OSX 10.10 and PC-BSD 10.2 (should also work on Free BSD).
 
-Formal tests (unit) have not been implmented.
+Formal tests (unit) have not been implemented.
 
-## Building
+## Installing
+
+```bash
+python setup.py install
+```
+
+## Building for Testing Purposes
+
 There are two options.  The first will build a library for PCG64 called
 `core_rng`.  
 
@@ -57,10 +65,22 @@ The second will build a number files, one for each RNG.
 
 ```bash
 cd randomstate
-python setup-testing.py build_ext --inplace
+python setup-all.py build_ext --inplace
 ```
 
 ## Using
+If you installed,
+
+```python
+import randomstate.xorshift128
+rs = randomstate.xorshift128.RandomState()
+rs.random_sample(100)
+
+import randomstate.xorshift128.pcg32
+rs = randomstate.pcg32.RandomState()
+rs.random_sample(100)
+```
+
 If you use `setup-basic.py`, 
 
 ```python
@@ -70,7 +90,7 @@ rs = core_rng.RandomState()
 rs.random_sample(100)
 ```
 
-If you use `setup-testing.py`, 
+If you use `setup-all.py`, 
 
 ```python
 import mt19937, pcg32, xorshift128
@@ -94,33 +114,35 @@ Performance is promising.  Some early numbers:
 ```
 Time to produce 1,000,000 uniforms
 ************************************************************
-mrg32k3a_random_sample        46.12 ms
-mt19937_random_sample         14.50 ms
-numpy.random_random_sample    15.69 ms
-pcg32_random_sample           11.65 ms
-pcg64_random_sample            8.79 ms
-xorshift1024_random_sample     7.03 ms
-xorshift128_random_sample      6.32 ms
+mlfg_1279_861_random_sample     6.86 ms
+mrg32k3a_random_sample         35.38 ms
+mt19937_random_sample           9.88 ms
+numpy.random_random_sample     11.35 ms
+pcg32_random_sample             6.89 ms
+pcg64_random_sample             5.55 ms
+xorshift1024_random_sample      5.37 ms
+xorshift128_random_sample       5.42 ms
 
 uniforms per second
 ************************************************************
-mrg32k3a_random_sample         21.68 million
-mt19937_random_sample          68.98 million
-numpy.random_random_sample     63.72 million
-pcg32_random_sample            85.81 million
-pcg64_random_sample           113.70 million
-xorshift1024_random_sample    142.19 million
-xorshift128_random_sample     158.11 million
+mlfg_1279_861_random_sample    145.83 million
+mrg32k3a_random_sample          28.27 million
+mt19937_random_sample          101.25 million
+numpy.random_random_sample      88.07 million
+pcg32_random_sample            145.14 million
+pcg64_random_sample            180.17 million
+xorshift1024_random_sample     186.17 million
+xorshift128_random_sample      184.34 million
 
 Speed-up relative to NumPy
 ************************************************************
-mrg32k3a_random_sample        -66.0%
-mt19937_random_sample           8.2%
-pcg32_random_sample            34.7%
-pcg64_random_sample            78.4%
-xorshift1024_random_sample    123.1%
-xorshift128_random_sample     148.1%
-dtype: object
+mlfg_1279_861_random_sample     65.6%
+mrg32k3a_random_sample         -67.9%
+mt19937_random_sample           15.0%
+pcg32_random_sample             64.8%
+pcg64_random_sample            104.6%
+xorshift1024_random_sample     111.4%
+xorshift128_random_sample      109.3%
 ```
 
 ## Differences from `numpy.random.RandomState`

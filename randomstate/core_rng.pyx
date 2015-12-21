@@ -292,6 +292,17 @@ cdef class RandomState:
         component, see the class documentation.
         """
         rng_name = RNG_NAME
+        if RNG_MT19937:
+            if isinstance(state, tuple):
+                if state[0] != 'MT19937':
+                    raise ValueError('Not a ' + rng_name + ' RNG state')
+                _set_state(self.rng_state, (state[1], state[2]))
+                self.rng_state.has_gauss = state[3]
+                self.rng_state.gauss = state[4]
+                self.rng_state.has_uint32 = 0
+                self.rng_state.uinteger = 0
+                return None
+
         if state['name'] != rng_name:
             raise ValueError('Not a ' + rng_name + ' RNG state')
         _set_state(self.rng_state, state['state'])

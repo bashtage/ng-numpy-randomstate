@@ -1,26 +1,27 @@
-import mlfg_1279_861
-import mrg32k3a
-import mt19937
-import pcg32
-import pcg64
-import xorshift1024
-import xorshift128
+import unittest
+import numpy
+import numpy.random
+import randomstate.mlfg_1279_861 as mlfg_1279_861
+import randomstate.mrg32k3a as mrg32k3a
+import randomstate.mt19937 as mt19937
+import randomstate.pcg32 as pcg32
+import randomstate.pcg64 as pcg64
+import randomstate.xorshift1024 as xorshift1024
+import randomstate.xorshift128 as xorshift128
 
 from nose import SkipTest
-
 
 def comp_state(state1, state2):
     identical = True
     if isinstance(state1, dict):
         for key in state1:
-            return comp_state(state1[key], state2[key])
+            identical &= comp_state(state1[key], state2[key])
     else:
-        try:
-            iter(state1)
+        if isinstance(state1, (list, tuple, numpy.ndarray)):
             for s1, s2 in zip(state1, state2):
                 identical &= comp_state(s1, s2)
-        except:
-            identical &= s1 == s2
+        else:
+            identical &= state1 == state2
     return identical
 
 
@@ -97,6 +98,11 @@ class RNG(object):
     def test_entropy_init(self):
         rs = self.mod.RandomState()
         rs2 = self.mod.RandomState()
+        print('\n'*10)
+        print('*'*80)
+        s1 = rs.get_state()
+        s2 = rs2.get_state()
+        print('\n'*10)
         assert not comp_state(rs.get_state(), rs2.get_state())
 
     def test_seed(self):
@@ -134,8 +140,20 @@ class TestMT19937(RNG):
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
 
+    def test_numpy_state(self):
 
-class TestPCG32(RNG):
+        nprs = numpy.random.RandomState()
+        nprs.standard_normal(99)
+        state = nprs.get_state()
+        self.rs.set_state(state)
+        state2 = self.rs.get_state()
+        assert (state[1] == state2['state'][0]).all()
+        assert (state[2] == state2['state'][1])
+        assert (state[3] == state2['gauss']['has_gauss'])
+        assert (state[4] == state2['gauss']['gauss'])
+
+
+class TestPCG32(RNG, unittest.TestCase):
     @classmethod
     def setup_class(cls):
         cls.mod = pcg32
@@ -145,7 +163,7 @@ class TestPCG32(RNG):
         cls.initial_state = cls.rs.get_state()
 
 
-class TestPCG64(RNG):
+class TestPCG64(RNG, unittest.TestCase):
     @classmethod
     def setup_class(cls):
         cls.mod = pcg64
@@ -156,7 +174,7 @@ class TestPCG64(RNG):
         cls.initial_state = cls.rs.get_state()
 
 
-class TestXorShift128(RNG):
+class TestXorShift128(RNG, unittest.TestCase):
     @classmethod
     def setup_class(cls):
         cls.mod = xorshift128
@@ -166,7 +184,7 @@ class TestXorShift128(RNG):
         cls.initial_state = cls.rs.get_state()
 
 
-class TestXorShift1024(RNG):
+class TestXorShift1024(RNG, unittest.TestCase):
     @classmethod
     def setup_class(cls):
         cls.mod = xorshift1024
@@ -176,7 +194,7 @@ class TestXorShift1024(RNG):
         cls.initial_state = cls.rs.get_state()
 
 
-class TestMLFG(RNG):
+class TestMLFG(RNG, unittest.TestCase):
     @classmethod
     def setup_class(cls):
         cls.mod = mlfg_1279_861
@@ -186,7 +204,7 @@ class TestMLFG(RNG):
         cls.initial_state = cls.rs.get_state()
 
 
-class TestMRG32k3A(RNG):
+class TestMRG32k3A(RNG, unittest.TestCase):
     @classmethod
     def setup_class(cls):
         cls.mod = mrg32k3a

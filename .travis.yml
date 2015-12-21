@@ -39,9 +39,11 @@ before_install:
 install:
   - conda create --yes --quiet -n rng-test ${PKGS} nose pip setuptools
   - source activate rng-test
-  - cd random
-  - python setup-2.py build_ext --inplace -f
+  - export BUILD_DIR=$PWD
+  - python setup.py install
 
 script:
-  - nosetests
+  - cd $HOME
+  - nosetests randomstate
+  - cd $BUILD_DIR/randomstate
   - python performance.py
