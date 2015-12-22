@@ -22,11 +22,11 @@ configs = []
 rngs = ['RNG_DUMMY', 'RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64', 'RNG_MT19937', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024',
         'RNG_MRG32K3A']
 
-compile_rngs = rngs
+compile_rngs = rngs[:]
 
 extra_defs = []
 if sys.maxsize < 2 ** 33:
-    compile_rngs.remove('RNG_PCG_64')
+    compile_rngs.remove('RNG_PCG64')
 
 
 def write_config(file_name, config):
