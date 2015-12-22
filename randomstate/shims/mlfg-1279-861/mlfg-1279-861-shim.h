@@ -4,6 +4,10 @@
 #include "../../src/common/binomial.h"
 #include "../../src/mlfg-1279-861/mlfg-1279-861.h"
 
+#define BITMASK_UPPER 0xffff0000
+#define BITMAST_UPPER22 0xfffffc00
+#define BITMAST_UPPER21 0xfffff800
+
 typedef struct s_aug_state {
     mlfg_state *rng;
     binomial_t *binomial;
@@ -17,13 +21,17 @@ typedef struct s_aug_state {
 inline uint32_t random_uint32(aug_state* state)
 {
     // Two are needed since there is only 31 bits in each
-    return mlfg_next(state->rng) | (mlfg_next(state->rng) << 31);
+    return (mlfg_next(state->rng) & BITMASK_UPPER) | (mlfg_next(state->rng) >> 16);
 }
 
 inline uint64_t random_uint64(aug_state* state)
 {
+
+    uint64_t out = ((uint64_t)(mlfg_next(state->rng)) & BITMAST_UPPER22) << 32;
+    out |= ((uint64_t)(mlfg_next(state->rng)) & BITMAST_UPPER21) << 10;
+    out |= ((mlfg_next(state->rng)) & BITMAST_UPPER21) >> 11;
     // Three are needed since there is only 31 bits in each
-    return (((uint64_t)mlfg_next(state->rng)) << 33) | (((uint64_t)mlfg_next(state->rng)) << 2) | (mlfg_next(state->rng) & 0x03);
+    return out;
 }
 
 inline void seed(aug_state* state, uint64_t val)
@@ -41,6 +49,6 @@ inline void entropy_init(aug_state* state)
 inline double random_double(aug_state* state)
 {
     // These differ by 1 bit since there are only 31 bits in each
-    int32_t a = mlfg_next(state->rng) >> 4, b = mlfg_next(state->rng) >> 5;
+    int32_t a = mlfg_next(state->rng) >> 5, b = mlfg_next(state->rng) >> 6;
     return (a * 67108864.0 + b) / 9007199254740992.0;
 }

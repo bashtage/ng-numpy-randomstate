@@ -7,32 +7,26 @@ extern inline uint32_t mlfg_next(mlfg_state* state);
 
 void mlfg_seed(mlfg_state* state, uint64_t seed)
 {
-    uint64_t rn, seed_copy = seed;
-    int any_odd = 0, i;
-    while (!any_odd)
+    uint32_t seeds[K];
+    uint64_t seed_copy = seed;
+    int i;
+    for (i = 0; i < K; i++)
     {
-        for (i = 0; i < K; i++)
-        {
-            rn = splitmix64_next(&seed_copy);
-            if ((rn % 2) != 1)
-                rn++;
-            state->lags[i] = (uint32_t)(rn & 0xffffffff);
-            any_odd = any_odd |  (rn & 0x00000001);
-        }
+        seeds[i] = (uint32_t)(splitmix64_next(&seed_copy) >> 32);
+        if ((seeds[i] % 2) != 1)
+            seeds[i]++;
+    }
+    mlfg_init_state(state, seeds);
+}
+
+void mlfg_init_state(mlfg_state *state, uint32_t seeds[K])
+{
+    int i;
+    for (i = 0; i < K; i++)
+    {
+        state->lags[i] = seeds[i];
     }
     state->pos = 0;
     state->lag_pos = K - J;
 }
 
-int main(void)
-{
-   mlfg_state state;
-   mlfg_seed(&state, 145968214);
-   int i;
-   for (i = 0; i < 100000000; i++)
-   {
-       mlfg_next(&state);
-   }
-   for (i = 0; i < 100; i++)
-       printf("%" PRIu32 "\n", mlfg_next(&state));
-}
