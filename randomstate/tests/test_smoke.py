@@ -56,6 +56,13 @@ class RNG(object):
     def test_random_uintegers(self):
         assert len(self.rs.random_uintegers(10)) == 10
 
+    def test_uniform(self):
+        r = self.rs.uniform(-1.0, 0.0, size=10)
+        assert len(r) == 10
+        print(r)
+        assert (r > -1).all()
+        assert (r <= 0).all()
+
     def test_random_sample(self):
         assert len(self.rs.random_sample(10)) == 10
 

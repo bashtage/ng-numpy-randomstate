@@ -192,9 +192,9 @@ double random_exponential(aug_state *state, double scale)
     return scale * random_standard_exponential(state);
 }
 
-double random_uniform(aug_state *state, double loc, double scale)
+double random_uniform(aug_state *state, double lower, double range)
 {
-    return loc + scale*random_double(state);
+    return lower + range*random_double(state);
 }
 
 double random_gamma(aug_state *state, double shape, double scale)
