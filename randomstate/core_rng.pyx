@@ -684,8 +684,6 @@ cdef class RandomState:
         # answer = 0.38885, or 38%.
         """
 
-        if n < 0:
-            raise ValueError("n < 0")
         if p < 0:
             raise ValueError("p < 0")
         elif p > 1:
@@ -976,4 +974,109 @@ cdef class RandomState:
         """
         return cont2(&self.rng_state, &random_uniform, low, high - low, size, self.lock)
 
+    # Shuffling and permutations:
+    def shuffle(self, object x):
+        """
+        shuffle(x)
+
+        Modify a sequence in-place by shuffling its contents.
+
+        Parameters
+        ----------
+        x : array_like
+            The array or list to be shuffled.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        >>> arr = np.arange(10)
+        >>> np.random.shuffle(arr)
+        >>> arr
+        [1 7 5 2 9 4 3 6 0 8]
+
+        This function only shuffles the array along the first index of a
+        multi-dimensional array:
+
+        >>> arr = np.arange(9).reshape((3, 3))
+        >>> np.random.shuffle(arr)
+        >>> arr
+        array([[3, 4, 5],
+               [6, 7, 8],
+               [0, 1, 2]])
+
+        """
+        cdef uint32_t i, j
+
+        i = len(x) - 1
+
+        # Logic adapted from random.shuffle()
+        if isinstance(x, np.ndarray) and \
+           (x.ndim > 1 or x.dtype.fields is not None):
+            # For a multi-dimensional ndarray, indexing returns a view onto
+            # each row. So we can't just use ordinary assignment to swap the
+            # rows; we need a bounce buffer.
+            buf = np.empty_like(x[0])
+            with self.lock:
+                while i > 0:
+                    j = random_bounded_uint32(&self.rng_state, i)
+                    buf[...] = x[j]
+                    x[j] = x[i]
+                    x[i] = buf
+                    i = i - 1
+        else:
+            # For single-dimensional arrays, lists, and any other Python
+            # sequence types, indexing returns a real object that's
+            # independent of the array contents, so we can just swap directly.
+            with self.lock:
+                while i > 0:
+                    j = random_bounded_uint32(&self.rng_state, i)
+                    x[i], x[j] = x[j], x[i]
+                    i = i - 1
+        return x
+
+    def permutation(self, object x):
+        """
+        permutation(x)
+
+        Randomly permute a sequence, or return a permuted range.
+
+        If `x` is a multi-dimensional array, it is only shuffled along its
+        first index.
+
+        Parameters
+        ----------
+        x : int or array_like
+            If `x` is an integer, randomly permute ``np.arange(x)``.
+            If `x` is an array, make a copy and shuffle the elements
+            randomly.
+
+        Returns
+        -------
+        out : ndarray
+            Permuted sequence or array range.
+
+        Examples
+        --------
+        >>> np.random.permutation(10)
+        array([1, 7, 4, 3, 0, 9, 2, 5, 8, 6])
+
+        >>> np.random.permutation([1, 4, 9, 12, 15])
+        array([15,  1,  9,  4, 12])
+
+        >>> arr = np.arange(9).reshape((3, 3))
+        >>> np.random.permutation(arr)
+        array([[6, 7, 8],
+               [0, 1, 2],
+               [3, 4, 5]])
+
+        """
+        if isinstance(x, (int, long, np.integer)):
+            arr = np.arange(x)
+        else:
+            arr = np.array(x)
+        self.shuffle(arr)
+        return arr
 

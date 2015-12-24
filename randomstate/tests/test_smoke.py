@@ -137,6 +137,16 @@ class RNG(object):
         n2 = rs2.random_uintegers(bits=32, size=10)
         assert (n1 == n2).all()
 
+    def test_shuffle(self):
+        original = numpy.arange(200,0,-1)
+        permuted = self.rs.permutation(original)
+        assert (original != permuted).any()
+
+    def test_permustation(self):
+        original = numpy.arange(200,0,-1)
+        permuted = self.rs.permutation(original)
+        assert (original != permuted).any()
+
 
 class TestMT19937(RNG):
     @classmethod
