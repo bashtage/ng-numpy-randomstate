@@ -1080,3 +1080,52 @@ cdef class RandomState:
         self.shuffle(arr)
         return arr
 
+    def tomaxint(self, size=None):
+        """
+        tomaxint(size=None)
+
+        Random integers between 0 and ``sys.maxint``, inclusive.
+
+        Return a sample of uniformly distributed random integers in the interval
+        [0, ``sys.maxint``].
+
+        Parameters
+        ----------
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : ndarray
+            Drawn samples, with shape `size`.
+
+        See Also
+        --------
+        randint : Uniform sampling over a given half-open interval of integers.
+        random_integers : Uniform sampling over a given closed interval of
+            integers.
+
+        Examples
+        --------
+        >>> RS = np.random.mtrand.RandomState() # need a RandomState object
+        >>> RS.tomaxint((2,2,2))
+        array([[[1170048599, 1600360186],
+                [ 739731006, 1947757578]],
+               [[1871712945,  752307660],
+                [1601631370, 1479324245]]])
+        >>> import sys
+        >>> sys.maxint
+        2147483647
+        >>> RS.tomaxint((2,2,2)) < sys.maxint
+        array([[[ True,  True],
+                [ True,  True]],
+               [[ True,  True],
+                [ True,  True]]], dtype=bool)
+
+        """
+        import sys
+        cdef uint64_t max = <uint64_t>sys.maxint
+
+        return self.random_bounded_uintegers(max, size)

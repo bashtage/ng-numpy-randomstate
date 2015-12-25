@@ -1,3 +1,4 @@
+import sys
 import unittest
 import numpy
 import numpy.random
@@ -142,11 +143,17 @@ class RNG(object):
         permuted = self.rs.permutation(original)
         assert (original != permuted).any()
 
-    def test_permustation(self):
+    def test_permutation(self):
         original = numpy.arange(200,0,-1)
         permuted = self.rs.permutation(original)
         assert (original != permuted).any()
 
+    def test_tomaxint(self):
+        vals = self.rs.tomaxint(size=100000)
+        if sys.maxint < 2**32:
+            assert (vals < sys.maxint).all()
+        else:
+            assert (vals >= 2 ** 32).any()
 
 class TestMT19937(RNG):
     @classmethod
