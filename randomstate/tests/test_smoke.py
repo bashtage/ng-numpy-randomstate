@@ -150,8 +150,8 @@ class RNG(object):
 
     def test_tomaxint(self):
         vals = self.rs.tomaxint(size=100000)
-        if sys.maxint < 2**32:
-            assert (vals < sys.maxint).all()
+        if sys.maxsize < 2**32:
+            assert (vals < sys.maxsize).all()
         else:
             assert (vals >= 2 ** 32).any()
 

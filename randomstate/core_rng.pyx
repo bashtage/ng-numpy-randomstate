@@ -1,5 +1,6 @@
 #!python
 #cython: wraparound=False, nonecheck=False, boundscheck=False, cdivision=True
+import sys
 import numpy as np
 cimport numpy as np
 from libc.stdint cimport uint32_t, uint64_t, int64_t, int32_t
@@ -70,6 +71,79 @@ cdef extern from "core-rng.h":
     cdef long random_binomial(aug_state *state, long n, double p) nogil
 
 include "wrappers.pxi"
+
+cdef enum ConstraintType:
+    CONS_NONE
+    CONS_NON_NEGATIVE
+    CONS_POSITIVE
+    CONS_BOUNDED_0_1
+
+ctypedef ConstraintType constraint_type
+
+cdef int check_constraint(double val, object name, constraint_type cons):
+    if cons == CONS_NON_NEGATIVE:
+        if val < 0:
+            raise ValueError(name + " must be non-negative")
+    elif cons == CONS_POSITIVE:
+        if val <= 0:
+            raise ValueError(name + " must be positive")
+    elif cons == CONS_BOUNDED_0_1:
+        if val < 0 or val > 1:
+            raise ValueError(name + " must be between 0 and 1")
+    return 0
+
+
+cdef object cont(aug_state* state, void* func,
+                 object size, object lock, int narg,
+                 double a, object a_name, constraint_type a_constraint,
+                 double b, object b_name, constraint_type b_constraint,
+                 double c, object c_name, constraint_type c_constraint):
+
+    if narg > 0 and a_constraint != CONS_NONE:
+        check_constraint(a, a_name, a_constraint)
+    if narg > 1 and b_constraint != CONS_NONE:
+        check_constraint(b, b_name, b_constraint)
+    if narg > 2 and c_constraint != CONS_NONE:
+        check_constraint(c, c_name, c_constraint)
+
+    if size is None:
+        if narg == 0:
+            return (<random_double_0>func)(state)
+        elif narg == 1:
+            return (<random_double_1>func)(state, a)
+        elif narg == 2:
+            return (<random_double_2>func)(state, a, b)
+        elif narg == 3:
+            return (<random_double_3>func)(state, a, b, c)
+
+    cdef Py_ssize_t i, n = compute_numel(size)
+    cdef double [:] randoms = np.empty(n, np.double)
+    cdef random_double_0 f0;
+    cdef random_double_1 f1;
+    cdef random_double_2 f2;
+    cdef random_double_3 f3;
+
+    with lock, nogil:
+        if narg == 0:
+            f0 = (<random_double_0>func)
+            for i in range(n):
+                randoms[i] = f0(state)
+        elif narg == 1:
+            f1 = (<random_double_1>func)
+            for i in range(n):
+                randoms[i] = f1(state, a)
+        elif narg == 2:
+            f2 = (<random_double_2>func)
+            for i in range(n):
+                randoms[i] = f2(state, a, b)
+        elif narg == 3:
+            f3 = (<random_double_3>func)
+            for i in range(n):
+                randoms[i] = f3(state, a, b, c)
+
+    return np.asanyarray(randoms).reshape(size)
+
+cdef uint64_t MAXSIZE = <uint64_t>sys.maxsize
 
 cdef class RandomState:
     CLASS_DOCSTRING
@@ -353,7 +427,8 @@ cdef class RandomState:
                [-1.23204345, -1.75224494]])
 
         """
-        return cont0(&self.rng_state, &random_sample, size, self.lock)
+        return cont(&self.rng_state, &random_sample, size, self.lock, 0,
+                 0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
 
     def random_uintegers(self, size=None, int bits=64):
         """
@@ -449,9 +524,11 @@ cdef class RandomState:
 
         """
         if method == 'inv':
-            return cont0(&self.rng_state, &random_gauss, size, self.lock)
+            return cont(&self.rng_state, &random_gauss, size, self.lock, 0,
+                        0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
         else:
-            return cont0(&self.rng_state, &random_gauss_zig, size, self.lock)
+            return cont(&self.rng_state, &random_gauss_zig, size, self.lock, 0,
+                        0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
 
     def standard_exponential(self, size=None):
         """
@@ -481,7 +558,8 @@ cdef class RandomState:
         >>> n = np.random.standard_exponential((3, 8000))
 
         """
-        return cont0(&self.rng_state, &random_standard_exponential, size, self.lock)
+        return cont(&self.rng_state, &random_standard_exponential, size, self.lock, 0,
+                    0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
 
     def standard_cauchy(self, size=None):
         """
@@ -544,7 +622,8 @@ cdef class RandomState:
         >>> plt.show()
 
         """
-        return cont0(&self.rng_state, &random_standard_cauchy, size, self.lock)
+        return cont(&self.rng_state, &random_standard_cauchy, size, self.lock, 0,
+                    0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
 
     def standard_gamma(self, double shape, size=None):
         """
@@ -614,8 +693,10 @@ cdef class RandomState:
         >>> plt.show()
 
         """
-        return cont1(&self.rng_state, &random_standard_gamma, shape, size, self.lock)
-
+        return cont(&self.rng_state, &random_standard_gamma, size, self.lock, 1,
+                    shape, '', CONS_POSITIVE,
+                    0.0, '', CONS_NONE,
+                    0.0, '', CONS_NONE)
 
     def binomial(self, uint64_t n, double p, size=None):
         """
@@ -781,11 +862,10 @@ cdef class RandomState:
         probability of about 99% of being true.
 
         """
-
-        if df <= 0:
-            raise ValueError("df <= 0")
-
-        return cont1(&self.rng_state, &random_standard_t, df, size, self.lock)
+        return cont(&self.rng_state, &random_standard_t, size, self.lock, 1,
+                    df, 'df', CONS_POSITIVE,
+                    0, '', CONS_NONE,
+                    0, '', CONS_NONE)
 
     def bytes(self, Py_ssize_t length):
         """
@@ -972,7 +1052,10 @@ cdef class RandomState:
         >>> plt.plot(bins, np.ones_like(bins), linewidth=2, color='r')
         >>> plt.show()
         """
-        return cont2(&self.rng_state, &random_uniform, low, high - low, size, self.lock)
+        return cont(&self.rng_state, &random_uniform, size, self.lock, 2,
+                    low, '', CONS_NONE,
+                    high - low, 'high - low', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
 
     # Shuffling and permutations:
     def shuffle(self, object x):
@@ -1125,7 +1208,6 @@ cdef class RandomState:
                 [ True,  True]]], dtype=bool)
 
         """
-        import sys
-        cdef uint64_t max = <uint64_t>sys.maxint
-
-        return self.random_bounded_uintegers(max, size)
+        # TODO: Docs do not make sense here.  Is it [,] or [,)?
+        # TODO: Check bounded uinteger implementation for [,] or [,)
+        return self.random_bounded_uintegers(MAXSIZE, size)
