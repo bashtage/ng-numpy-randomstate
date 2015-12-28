@@ -1,6 +1,6 @@
 import sys
 import unittest
-import numpy
+import numpy as np
 import numpy.random
 import randomstate.mlfg_1279_861 as mlfg_1279_861
 import randomstate.mrg32k3a as mrg32k3a
@@ -18,7 +18,7 @@ def comp_state(state1, state2):
         for key in state1:
             identical &= comp_state(state1[key], state2[key])
     else:
-        if isinstance(state1, (list, tuple, numpy.ndarray)):
+        if isinstance(state1, (list, tuple, np.ndarray)):
             for s1, s2 in zip(state1, state2):
                 identical &= comp_state(s1, s2)
         else:
@@ -64,6 +64,20 @@ class RNG(object):
         assert (r > -1).all()
         assert (r <= 0).all()
 
+    def test_uniform_array(self):
+        r = self.rs.uniform(np.array([-1.0]*10), 0.0, size=10)
+        assert len(r) == 10
+        assert (r > -1).all()
+        assert (r <= 0).all()
+        r = self.rs.uniform(np.array([-1.0]*10), np.array([0.0]*10), size=10)
+        assert len(r) == 10
+        assert (r > -1).all()
+        assert (r <= 0).all()
+        r = self.rs.uniform(-1.0, np.array([0.0]*10), size=10)
+        assert len(r) == 10
+        assert (r > -1).all()
+        assert (r <= 0).all()
+        
     def test_random_sample(self):
         assert len(self.rs.random_sample(10)) == 10
 
@@ -76,11 +90,20 @@ class RNG(object):
     def test_standard_gamma(self):
         assert len(self.rs.standard_gamma(10, 10)) == 10
 
+    def test_standard_gamma_array(self):
+        assert len(self.rs.standard_gamma(np.array([10]*10), 10)) == 10
+
     def test_standard_exponential(self):
         assert len(self.rs.standard_exponential(10)) == 10
 
     def test_standard_cauchy(self):
         assert len(self.rs.standard_cauchy(10)) == 10
+
+    def test_standard_t(self):
+        assert len(self.rs.standard_t(10, 10)) == 10
+
+    def test_standard_array(self):
+        assert len(self.rs.standard_t(np.arange(1,11.0), 10)) == 10
 
     def test_binomial(self):
         assert self.rs.binomial(10, .5) >= 0
@@ -139,12 +162,12 @@ class RNG(object):
         assert (n1 == n2).all()
 
     def test_shuffle(self):
-        original = numpy.arange(200,0,-1)
+        original = np.arange(200,0,-1)
         permuted = self.rs.permutation(original)
         assert (original != permuted).any()
 
     def test_permutation(self):
-        original = numpy.arange(200,0,-1)
+        original = np.arange(200,0,-1)
         permuted = self.rs.permutation(original)
         assert (original != permuted).any()
 
@@ -166,7 +189,7 @@ class TestMT19937(RNG):
 
     def test_numpy_state(self):
 
-        nprs = numpy.random.RandomState()
+        nprs = np.random.RandomState()
         nprs.standard_normal(99)
         state = nprs.get_state()
         self.rs.set_state(state)

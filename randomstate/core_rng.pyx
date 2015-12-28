@@ -8,6 +8,13 @@ try:
     from threading import Lock
 except:
     from dummy_threading import Lock
+np.import_array()
+
+cdef extern from "Python.h":
+    double PyFloat_AsDouble(object ob)
+    long PyInt_AsLong(object ob)
+    int PyErr_Occurred()
+    void PyErr_Clear()
 
 
 include "config.pxi"
@@ -80,7 +87,21 @@ cdef enum ConstraintType:
 
 ctypedef ConstraintType constraint_type
 
-cdef int check_constraint(double val, object name, constraint_type cons):
+cdef int check_array_constraint(np.ndarray val, object name, constraint_type cons) except -1:
+    if cons == CONS_NON_NEGATIVE:
+        if np.any(np.less(val, 0)):
+            raise ValueError(name + " < 0")
+    elif cons == CONS_POSITIVE:
+        if np.any(np.less_equal(val, 0)):
+            raise ValueError(name + " <= 0")
+    elif cons == CONS_BOUNDED_0_1:
+        if np.any(np.less_equal(val, 0)) or np.any(np.greater_equal(val, 1)):
+            raise ValueError(name + " <= 0 or " + name + " >= 1")
+    return 0
+
+
+
+cdef int check_constraint(double val, object name, constraint_type cons) except -1:
     if cons == CONS_NON_NEGATIVE:
         if val < 0:
             raise ValueError(name + " must be non-negative")
@@ -92,29 +113,208 @@ cdef int check_constraint(double val, object name, constraint_type cons):
             raise ValueError(name + " must be between 0 and 1")
     return 0
 
+cdef object cont_broadcast_1(aug_state* state, void* func, object size, object lock,
+                             object a, object a_name, constraint_type a_constraint):
 
-cdef object cont(aug_state* state, void* func,
-                 object size, object lock, int narg,
-                 double a, object a_name, constraint_type a_constraint,
-                 double b, object b_name, constraint_type b_constraint,
-                 double c, object c_name, constraint_type c_constraint):
+    cdef np.ndarray a_arr, randoms
+    cdef np.broadcast it
+    cdef random_double_1 f = (<random_double_1>func)
 
-    if narg > 0 and a_constraint != CONS_NONE:
-        check_constraint(a, a_name, a_constraint)
-    if narg > 1 and b_constraint != CONS_NONE:
-        check_constraint(b, b_name, b_constraint)
-    if narg > 2 and c_constraint != CONS_NONE:
-        check_constraint(c, c_name, c_constraint)
+    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if a_constraint != CONS_NONE:
+        check_array_constraint(a_arr, a_name, a_constraint)
+
+    if size is not None:
+        randoms = np.empty(size, np.double)
+    else:
+        #randoms = np.empty(np.shape(a_arr), np.double)
+        randoms = np.PyArray_SimpleNew(np.PyArray_NDIM(a_arr), np.PyArray_DIMS(a_arr), np.NPY_DOUBLE)
+
+
+    it = np.broadcast(randoms, a_arr)
+    with lock, nogil:
+        while np.PyArray_MultiIter_NOTDONE(it):
+            a_val = (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
+            (<double*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val)
+
+            np.PyArray_MultiIter_NEXT(it)
+
+    return randoms
+
+cdef object cont_broadcast_2(aug_state* state, void* func, object size, object lock,
+                 object a, object a_name, constraint_type a_constraint,
+                 object b, object b_name, constraint_type b_constraint):
+    cdef np.ndarray a_arr, b_arr, randoms
+    cdef np.broadcast it
+    cdef random_double_2 f = (<random_double_2>func)
+
+    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if a_constraint != CONS_NONE:
+        check_array_constraint(a_arr, a_name, a_constraint)
+
+    b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if b_constraint != CONS_NONE:
+        check_array_constraint(b_arr, b_name, b_constraint)
+
+    if size is not None:
+        randoms = np.empty(size, np.double)
+    else:
+        # randoms = np.empty(np.broadcast(a_arr, b_arr).shape, np.double)
+        it = np.PyArray_MultiIterNew2(a_arr, b_arr)
+        randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_DOUBLE)
+
+    it = np.PyArray_MultiIterNew3(randoms, a_arr, b_arr)
+    with lock, nogil:
+        while np.PyArray_MultiIter_NOTDONE(it):
+            a_val = (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
+            b_val = (<double*>np.PyArray_MultiIter_DATA(it, 2))[0]
+            (<double*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val, b_val)
+
+            np.PyArray_MultiIter_NEXT(it)
+
+    return randoms
+
+cdef object cont_broadcast_3(aug_state* state, void* func, object size, object lock,
+                 object a, object a_name, constraint_type a_constraint,
+                 object b, object b_name, constraint_type b_constraint,
+                 object c, object c_name, constraint_type c_constraint):
+    cdef np.ndarray a_arr, b_arr, c_arr, randoms
+    cdef np.broadcast it
+    cdef random_double_3 f = (<random_double_3>func)
+
+    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if a_constraint != CONS_NONE:
+        check_array_constraint(a_arr, a_name, a_constraint)
+
+    b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if b_constraint != CONS_NONE:
+        check_array_constraint(b_arr, b_name, b_constraint)
+
+    c_arr = <np.ndarray>np.PyArray_FROM_OTF(c, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if c_constraint != CONS_NONE:
+        check_array_constraint(c_arr, c_name, c_constraint)
+
+    if size is not None:
+        randoms = np.empty(size, np.double)
+    else:
+        it = np.PyArray_MultiIterNew3(a_arr, b_arr, c_arr)
+        randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_DOUBLE)
+        # randoms = np.empty(np.broadcast(a_arr, b_arr, c_arr).shape, np.double)
+
+    it = it = np.PyArray_MultiIterNew4(randoms, a_arr, b_arr, c_arr)
+    # np.broadcast(randoms, a_arr, b_arr, c_arr)
+    with lock, nogil:
+        while np.PyArray_MultiIter_NOTDONE(it):
+            a_val = (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
+            b_val = (<double*>np.PyArray_MultiIter_DATA(it, 2))[0]
+            c_val = (<double*>np.PyArray_MultiIter_DATA(it, 3))[0]
+            (<double*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val, b_val, c_val)
+
+            np.PyArray_MultiIter_NEXT(it)
+
+    return randoms
+
+cdef object cont_broadcast(aug_state* state, void* func, object size, object lock, int narg,
+                 object a, object a_name, constraint_type a_constraint,
+                 object b, object b_name, constraint_type b_constraint,
+                 object c, object c_name, constraint_type c_constraint):
+
+    cdef np.ndarray a_arr, b_arr, c_arr, randoms
+    cdef np.broadcast it
+    cdef random_double_1 f1;
+    cdef random_double_2 f2;
+    cdef random_double_3 f3;
+
+    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if narg > 1:
+        b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if narg == 3:
+        c_arr = <np.ndarray>np.PyArray_FROM_OTF(c, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if size is not None:
+        randoms = np.empty(size, np.double)
+    elif narg == 1:
+        # TODO: This could be improved since broadcast isn't needed
+        randoms = np.empty(np.shape(a_arr), np.double)
+    elif narg == 2:
+        randoms = np.empty(np.broadcast(a_arr, b_arr).shape, np.double)
+    elif narg == 3:
+        randoms = np.empty(np.broadcast(a_arr, b_arr, c_arr).shape, np.double)
+
+    if narg == 1:
+        f1 = (<random_double_1>func)
+        it = np.broadcast(a_arr,  randoms)
+        while np.PyArray_MultiIter_NOTDONE(it):
+            (<double*>np.PyArray_MultiIter_DATA(it, 1))[0] = f1(state, (<double*>np.PyArray_MultiIter_DATA(it, 0))[0])
+            np.PyArray_MultiIter_NEXT(it)
+    if narg == 2:
+        f2 = (<random_double_2>func)
+        it = np.broadcast(a_arr,  b_arr, randoms)
+        while np.PyArray_MultiIter_NOTDONE(it):
+            (<double*>np.PyArray_MultiIter_DATA(it, 2))[0] = f2(state,
+                                                                (<double*>np.PyArray_MultiIter_DATA(it, 0))[0],
+                                                                (<double*>np.PyArray_MultiIter_DATA(it, 1))[0])
+            np.PyArray_MultiIter_NEXT(it)
+    if narg == 3:
+        f3 = (<random_double_3>func)
+        it = np.broadcast(a_arr,  b_arr, c_arr, randoms)
+        while np.PyArray_MultiIter_NOTDONE(it):
+            (<double*>np.PyArray_MultiIter_DATA(it, 3))[0] = f3(state,
+                                                                (<double*>np.PyArray_MultiIter_DATA(it, 0))[0],
+                                                                (<double*>np.PyArray_MultiIter_DATA(it, 1))[0],
+                                                                (<double*>np.PyArray_MultiIter_DATA(it, 2))[0])
+            np.PyArray_MultiIter_NEXT(it)
+
+    return randoms
+
+cdef object cont(aug_state* state, void* func, object size, object lock, int narg,
+                 object a, object a_name, constraint_type a_constraint,
+                 object b, object b_name, constraint_type b_constraint,
+                 object c, object c_name, constraint_type c_constraint):
+
+    cdef double _a, _b, _c
+    cdef bint is_scalar = True
+    if narg > 0:
+        _a = PyFloat_AsDouble(a)
+        if _a == -1.0:
+            if PyErr_Occurred():
+                is_scalar = False
+        elif a_constraint != CONS_NONE:
+            check_constraint(_a, a_name, a_constraint)
+    if narg > 1 and is_scalar:
+        _b = PyFloat_AsDouble(b)
+        if _b == -1.0:
+            if PyErr_Occurred():
+                is_scalar = False
+        elif b_constraint != CONS_NONE:
+            check_constraint(_b, b_name, b_constraint)
+    if narg == 3 and is_scalar:
+        _c = PyFloat_AsDouble(c)
+        if _c == -1.0:
+            if PyErr_Occurred():
+                is_scalar = False
+        elif c_constraint != CONS_NONE:
+            check_constraint(_c, c_name, c_constraint)
+    if not is_scalar:
+        PyErr_Clear()
+        if narg == 1:
+            return cont_broadcast_1(state, func, size, lock, a, a_name, a_constraint)
+        elif narg == 2:
+            return cont_broadcast_2(state, func, size, lock, a, a_name, a_constraint, b, b_name, b_constraint)
+        else:
+            return cont_broadcast_3(state, func, size, lock,
+                                    a, a_name, a_constraint,
+                                    b, b_name, b_constraint,
+                                    c, c_name, c_constraint)
 
     if size is None:
         if narg == 0:
             return (<random_double_0>func)(state)
         elif narg == 1:
-            return (<random_double_1>func)(state, a)
+            return (<random_double_1>func)(state, _a)
         elif narg == 2:
-            return (<random_double_2>func)(state, a, b)
+            return (<random_double_2>func)(state, _a, _b)
         elif narg == 3:
-            return (<random_double_3>func)(state, a, b, c)
+            return (<random_double_3>func)(state, _a, _b, _c)
 
     cdef Py_ssize_t i, n = compute_numel(size)
     cdef double [:] randoms = np.empty(n, np.double)
@@ -131,15 +331,15 @@ cdef object cont(aug_state* state, void* func,
         elif narg == 1:
             f1 = (<random_double_1>func)
             for i in range(n):
-                randoms[i] = f1(state, a)
+                randoms[i] = f1(state, _a)
         elif narg == 2:
             f2 = (<random_double_2>func)
             for i in range(n):
-                randoms[i] = f2(state, a, b)
+                randoms[i] = f2(state, _a, _b)
         elif narg == 3:
             f3 = (<random_double_3>func)
             for i in range(n):
-                randoms[i] = f3(state, a, b, c)
+                randoms[i] = f3(state, _a, _b, _c)
 
     return np.asanyarray(randoms).reshape(size)
 
@@ -625,7 +825,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_standard_cauchy, size, self.lock, 0,
                     0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
 
-    def standard_gamma(self, double shape, size=None):
+    def standard_gamma(self, object shape, size=None):
         """
         standard_gamma(shape, size=None)
 
@@ -694,7 +894,7 @@ cdef class RandomState:
 
         """
         return cont(&self.rng_state, &random_standard_gamma, size, self.lock, 1,
-                    shape, '', CONS_POSITIVE,
+                    shape, 'shape', CONS_POSITIVE,
                     0.0, '', CONS_NONE,
                     0.0, '', CONS_NONE)
 
@@ -983,7 +1183,7 @@ cdef class RandomState:
         """
         return self.random_sample(size=args)
 
-    def uniform(self, double low=0.0, double high=1.0, size=None):
+    def uniform(self, object low=0.0, object high=1.0, size=None):
         """
         uniform(low=0.0, high=1.0, size=None)
 
@@ -1052,6 +1252,7 @@ cdef class RandomState:
         >>> plt.plot(bins, np.ones_like(bins), linewidth=2, color='r')
         >>> plt.show()
         """
+
         return cont(&self.rng_state, &random_uniform, size, self.lock, 2,
                     low, '', CONS_NONE,
                     high - low, 'high - low', CONS_POSITIVE,
