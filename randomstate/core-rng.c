@@ -710,3 +710,199 @@ long random_binomial(aug_state *state, long n, double p)
     }
 
 }
+
+double random_noncentral_chisquare(aug_state *state, double df, double nonc)
+{
+    if (nonc == 0){
+        return random_chisquare(state, df);
+    }
+    if(1 < df)
+    {
+        const double Chi2 = random_chisquare(state, df - 1);
+        const double n = random_gauss(state) + sqrt(nonc);
+        return Chi2 + n*n;
+    }
+    else
+    {
+        const long i = random_poisson(state, nonc / 2.0);
+        return random_chisquare(state, df + 2 * i);
+    }
+}
+
+double random_noncentral_f(aug_state *state, double dfnum, double dfden, double nonc)
+{
+    double t = random_noncentral_chisquare(state, dfnum, nonc) * dfden;
+    return t / (random_chisquare(state, dfden) * dfnum);
+}
+
+
+double random_wald(aug_state *state, double mean, double scale)
+{
+    double U, X, Y;
+    double mu_2l;
+
+    mu_2l = mean / (2*scale);
+    Y = random_gauss(state);
+    Y = mean*Y*Y;
+    X = mean + mu_2l*(Y - sqrt(4*scale*Y + Y*Y));
+    U = random_double(state);
+    if (U <= mean/(mean+X))
+    {
+        return X;
+    } else
+    {
+        return mean*mean/X;
+    }
+}
+
+
+double random_vonmises(aug_state *state, double mu, double kappa)
+{
+    double s;
+    double U, V, W, Y, Z;
+    double result, mod;
+    int neg;
+
+    if (kappa < 1e-8)
+    {
+        return M_PI * (2*random_double(state)-1);
+    }
+    else
+    {
+        /* with double precision rho is zero until 1.4e-8 */
+        if (kappa < 1e-5) {
+            /*
+             * second order taylor expansion around kappa = 0
+             * precise until relatively large kappas as second order is 0
+             */
+            s = (1./kappa + kappa);
+        }
+        else {
+            double r = 1 + sqrt(1 + 4*kappa*kappa);
+            double rho = (r - sqrt(2*r)) / (2*kappa);
+            s = (1 + rho*rho)/(2*rho);
+        }
+
+        while (1)
+        {
+        U = random_double(state);
+            Z = cos(M_PI*U);
+            W = (1 + s*Z)/(s + Z);
+            Y = kappa * (s - W);
+            V = random_double(state);
+            if ((Y*(2-Y) - V >= 0) || (log(Y/V)+1 - Y >= 0))
+            {
+                break;
+            }
+        }
+
+        U = random_double(state);
+
+        result = acos(W);
+        if (U < 0.5)
+        {
+        result = -result;
+        }
+        result += mu;
+        neg = (result < 0);
+        mod = fabs(result);
+        mod = (fmod(mod+M_PI, 2*M_PI)-M_PI);
+        if (neg)
+        {
+            mod *= -1;
+        }
+
+        return mod;
+    }
+}
+
+
+long random_logseries(aug_state *state, double p)
+{
+    double q, r, U, V;
+    long result;
+
+    r = log(1.0 - p);
+
+    while (1) {
+        V = random_double(state);
+        if (V >= p) {
+            return 1;
+        }
+        U = random_double(state);
+        q = 1.0 - exp(r*U);
+        if (V <= q*q) {
+            result = (long)floor(1 + log(V)/log(q));
+            if (result < 1) {
+                continue;
+            }
+            else {
+                return result;
+            }
+        }
+        if (V >= q) {
+            return 1;
+        }
+        return 2;
+    }
+}
+
+
+long random_geometric_search(aug_state *state, double p)
+{
+    double U;
+    long X;
+    double sum, prod, q;
+
+    X = 1;
+    sum = prod = p;
+    q = 1.0 - p;
+    U = random_double(state);
+    while (U > sum)
+    {
+        prod *= q;
+        sum += prod;
+        X++;
+    }
+    return X;
+}
+
+long random_geometric_inversion(aug_state *state, double p)
+{
+    return (long)ceil(log(1.0-random_double(state))/log(1.0-p));
+}
+
+long random_geometric(aug_state *state, double p)
+{
+    if (p >= 0.333333333333333333333333)
+    {
+        return random_geometric_search(state, p);
+    } else
+    {
+        return random_geometric_inversion(state, p);
+    }
+}
+
+long random_zipf(aug_state *state, double a)
+{
+    double T, U, V;
+    long X;
+    double am1, b;
+
+    am1 = a - 1.0;
+    b = pow(2.0, am1);
+    do
+    {
+        U = 1.0-random_double(state);
+        V = random_double(state);
+        X = (long)floor(pow(U, -1.0/am1));
+        /* The real result may be above what can be represented in a signed
+         * long. It will get casted to -sys.maxint-1. Since this is
+         * a straightforward rejection algorithm, we can just reject this value
+         * in the rejection condition below. This function then models a Zipf
+         * distribution truncated to sys.maxint.
+         */
+        T = pow(1.0 + 1.0/X, am1);
+    } while (((V*X*(T-1.0)/(b-1.0)) > (T/b)) || X < 1);
+    return X;
+}

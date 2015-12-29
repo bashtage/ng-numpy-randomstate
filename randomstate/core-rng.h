@@ -84,10 +84,24 @@ extern double random_lognormal(aug_state *state, double mean, double sigma);
 
 extern double random_rayleigh(aug_state *state, double mode);
 
+extern double random_gauss_zig(aug_state* state);
+
+extern double random_noncentral_chisquare(aug_state *state, double df, double nonc);
+
+extern double random_noncentral_f(aug_state *state, double dfnum, double dfden, double nonc);
+
+extern double random_wald(aug_state *state, double mean, double scale);
+
+extern double random_vonmises(aug_state *state, double mu, double kappa);
+
 extern long random_poisson(aug_state *state, double lam);
 
 extern long rk_negative_binomial(aug_state *state, double n, double p);
 
-extern double random_gauss_zig(aug_state* state);
-
 extern long random_binomial(aug_state *state, long n, double p);
+
+extern long random_logseries(aug_state *state, double p);
+
+extern long random_geometric(aug_state *state, double p);
+
+extern long random_zipf(aug_state *state, double a);

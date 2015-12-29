@@ -1,4 +1,5 @@
 import sys
+import sys
 import unittest
 import numpy as np
 import numpy.random
@@ -89,6 +90,7 @@ class RNG(object):
 
     def test_standard_gamma(self):
         assert len(self.rs.standard_gamma(10, 10)) == 10
+        assert len(self.rs.standard_gamma(np.array([10]*10), 10)) == 10
 
     def test_standard_gamma_array(self):
         assert len(self.rs.standard_gamma(np.array([10]*10), 10)) == 10
@@ -177,6 +179,139 @@ class RNG(object):
             assert (vals < sys.maxsize).all()
         else:
             assert (vals >= 2 ** 32).any()
+
+    def test_beta(self):
+        vals = self.rs.beta(2.0,2.0, 10)
+        assert len(vals) == 10
+        vals = self.rs.beta(np.array([2.0]*10),2.0)
+        assert len(vals) == 10
+        vals = self.rs.beta(2.0, np.array([2.0]*10))
+        assert len(vals) == 10
+        vals = self.rs.beta(np.array([2.0]*10), np.array([2.0]*10))
+        assert len(vals) == 10
+
+    def test_bytes(self):
+        vals = self.rs.bytes(10)
+        assert len(vals) == 10
+
+    def test_chisquare(self):
+        vals = self.rs.chisquare(2.0, 10)
+        assert len(vals) == 10
+
+    def test_exponential(self):
+        vals = self.rs.exponential(2.0, 10)
+        assert len(vals) == 10
+
+    def test_f(self):
+        vals = self.rs.f(3, 1000, 10)
+        assert len(vals) == 10
+
+    def test_gamma(self):
+        vals = self.rs.gamma(3, 2, 10)
+        assert len(vals) == 10
+
+    def test_geometric(self):
+        vals = self.rs.geometric(0.5, 10)
+        assert len(vals) == 10
+
+    def test_gumbel(self):
+        vals = self.rs.gumbel(2.0, 2.0, 10)
+        assert len(vals) == 10
+
+    def test_laplace(self):
+        vals = self.rs.laplace(2.0, 2.0, 10)
+        assert len(vals) == 10
+
+    def test_logitic(self):
+        vals = self.rs.logistic(2.0, 2.0, 10)
+        assert len(vals) == 10
+
+    def test_logseries(self):
+        vals = self.rs.logseries(0.5, 10)
+        assert len(vals) == 10
+
+    def test_negative_binomial(self):
+        vals = self.rs.negative_binomial(10, 0.2, 10)
+        assert len(vals) == 10
+
+    def test_rand(self):
+        state = self.rs.get_state()
+        vals = self.rs.rand(10,10,10)
+        self.rs.set_state(state)
+        assert (vals == self.rs.random_sample((10,10,10))).all()
+        assert vals.shape == (10,10,10)
+
+    def test_randn(self):
+        state = self.rs.get_state()
+        vals = self.rs.randn(10,10,10)
+        self.rs.set_state(state)
+        assert (vals == self.rs.standard_normal((10,10,10))).all()
+        assert vals.shape == (10,10,10)
+
+    def test_noncentral_chisquare(self):
+        vals = self.rs.noncentral_chisquare(10, 2, 10)
+        assert len(vals) == 10
+
+    def test_noncentral_f(self):
+        vals = self.rs.noncentral_f(3, 1000, 2, 10)
+        assert len(vals) == 10
+        vals = self.rs.noncentral_f(np.array([3]*10), 1000, 2)
+        assert len(vals) == 10
+        vals = self.rs.noncentral_f(3, np.array([1000]*10), 2)
+        assert len(vals) == 10
+        vals = self.rs.noncentral_f(3, 1000, np.array([2]*10))
+        assert len(vals) == 10
+
+    def test_normal(self):
+        vals = self.rs.normal(10, 0.2, 10)
+        assert len(vals) == 10
+
+    def test_pareto(self):
+        vals = self.rs.pareto(3.0, 10)
+        assert len(vals) == 10
+
+    def test_poisson(self):
+        vals = self.rs.poisson(10, 10)
+        assert len(vals) == 10
+        vals = self.rs.poisson(np.array([10]*10))
+        assert len(vals) == 10
+
+    def test_poisson_lam_max(self):
+        vals = self.rs.poisson_lam_max
+        assert np.abs(vals - (np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10)) < (self.rs.poisson_lam_max * np.finfo('d').eps)
+
+    def test_power(self):
+        vals = self.rs.power(0.2, 10)
+        assert len(vals) == 10
+
+    def test_randint(self):
+        vals = self.rs.randint(10, 0.2, 10)
+        assert len(vals) == 10
+
+    def test_random_integers(self):
+        vals = self.rs.random_integers(10, 20, 10)
+        assert len(vals) == 10
+
+    def test_rayleigh(self):
+        vals = self.rs.rayleigh(0.2, 10)
+        assert len(vals) == 10
+
+    def test_vonmises(self):
+        vals = self.rs.vonmises(10, 0.2, 10)
+        assert len(vals) == 10
+
+    def test_wald(self):
+        vals = self.rs.wald(1.0, 1.0, 10)
+        assert len(vals) == 10
+
+    def test_weibull(self):
+        vals = self.rs.weibull(1.0, 10)
+        assert len(vals) == 10
+
+    def test_zipf(self):
+        vals = self.rs.zipf(10, 10)
+        assert len(vals) == 10
+
 
 class TestMT19937(RNG):
     @classmethod

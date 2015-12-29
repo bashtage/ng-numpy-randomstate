@@ -16,7 +16,6 @@ cdef extern from "Python.h":
     int PyErr_Occurred()
     void PyErr_Clear()
 
-
 include "config.pxi"
 include "src/common/binomial.pxi"
 
@@ -72,10 +71,18 @@ cdef extern from "core-rng.h":
     cdef double random_gumbel(aug_state *state, double loc, double scale) nogil
     cdef double random_logistic(aug_state *state, double loc, double scale) nogil
     cdef double random_lognormal(aug_state *state, double mean, double sigma) nogil
+    cdef double random_noncentral_chisquare(aug_state *state, double df, double nonc) nogil
+    cdef double random_wald(aug_state *state, double mean, double scale) nogil
+    cdef double random_vonmises(aug_state *state, double mu, double kappa) nogil
+
+    cdef double random_noncentral_f(aug_state *state, double dfnum, double dfden, double nonc) nogil
 
     cdef long random_poisson(aug_state *state, double lam) nogil
     cdef long random_negative_binomial(aug_state *state, double n, double p) nogil
     cdef long random_binomial(aug_state *state, double p, long n) nogil
+    cdef long random_logseries(aug_state *state, double p) nogil
+    cdef long random_geometric(aug_state *state, double p) nogil
+    cdef long random_zipf(aug_state *state, double a) nogil
 
 include "wrappers.pxi"
 
@@ -84,8 +91,13 @@ cdef enum ConstraintType:
     CONS_NON_NEGATIVE
     CONS_POSITIVE
     CONS_BOUNDED_0_1
+    CONS_GT_1
+    CONS_POISSON
 
 ctypedef ConstraintType constraint_type
+
+cdef double POISSON_LAM_MAX = <uint64_t>(np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10)
+cdef uint64_t MAXSIZE = <uint64_t>sys.maxsize
 
 cdef int check_array_constraint(np.ndarray val, object name, constraint_type cons) except -1:
     if cons == CONS_NON_NEGATIVE:
@@ -97,6 +109,15 @@ cdef int check_array_constraint(np.ndarray val, object name, constraint_type con
     elif cons == CONS_BOUNDED_0_1:
         if np.any(np.less_equal(val, 0)) or np.any(np.greater_equal(val, 1)):
             raise ValueError(name + " <= 0 or " + name + " >= 1")
+    elif cons == CONS_GT_1:
+        if np.any(np.less_equal(val, 1)):
+            raise ValueError(name + " <= 1")
+    elif cons == CONS_POISSON:
+        if np.any(np.greater(val, POISSON_LAM_MAX)):
+            raise ValueError(name + " value too large")
+        if np.any(np.less(val, 0.0)):
+            raise ValueError(name + " < 0")
+
     return 0
 
 
@@ -111,6 +132,15 @@ cdef int check_constraint(double val, object name, constraint_type cons) except 
     elif cons == CONS_BOUNDED_0_1:
         if val < 0 or val > 1:
             raise ValueError(name + " must be between 0 and 1")
+    elif cons == CONS_GT_1:
+        if val <= 1:
+            raise ValueError(name + " <= 1")
+    elif cons == CONS_POISSON:
+        if val < 0:
+            raise ValueError(name + " < 0")
+        elif val > POISSON_LAM_MAX:
+            raise ValueError(name + "value too large")
+
     return 0
 
 cdef object cont_broadcast_1(aug_state* state, void* func, object size, object lock,
@@ -159,9 +189,9 @@ cdef object cont_broadcast_2(aug_state* state, void* func, object size, object l
     if size is not None:
         randoms = np.empty(size, np.double)
     else:
-        # randoms = np.empty(np.broadcast(a_arr, b_arr).shape, np.double)
         it = np.PyArray_MultiIterNew2(a_arr, b_arr)
-        randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_DOUBLE)
+        randoms = np.empty(it.shape, np.double)
+        #randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_DOUBLE)
 
     it = np.PyArray_MultiIterNew3(randoms, a_arr, b_arr)
     with lock, nogil:
@@ -198,8 +228,8 @@ cdef object cont_broadcast_3(aug_state* state, void* func, object size, object l
         randoms = np.empty(size, np.double)
     else:
         it = np.PyArray_MultiIterNew3(a_arr, b_arr, c_arr)
-        randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_DOUBLE)
-        # randoms = np.empty(np.broadcast(a_arr, b_arr, c_arr).shape, np.double)
+        #randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_DOUBLE)
+        randoms = np.empty(it.shape, np.double)
 
     it = it = np.PyArray_MultiIterNew4(randoms, a_arr, b_arr, c_arr)
     # np.broadcast(randoms, a_arr, b_arr, c_arr)
@@ -218,8 +248,8 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
                  object a, object a_name, constraint_type a_constraint,
                  object b, object b_name, constraint_type b_constraint,
                  object c, object c_name, constraint_type c_constraint):
-
-    cdef double _a, _b, _c
+    # TODO: Remove these - just added to suppress warning noise
+    cdef double _a = 0.0, _b = 0.0, _c = 0.0
     cdef bint is_scalar = True
     if narg > 0:
         _a = PyFloat_AsDouble(a)
@@ -245,9 +275,12 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
     if not is_scalar:
         PyErr_Clear()
         if narg == 1:
-            return cont_broadcast_1(state, func, size, lock, a, a_name, a_constraint)
+            return cont_broadcast_1(state, func, size, lock,
+                                    a, a_name, a_constraint)
         elif narg == 2:
-            return cont_broadcast_2(state, func, size, lock, a, a_name, a_constraint, b, b_name, b_constraint)
+            return cont_broadcast_2(state, func, size, lock,
+                                    a, a_name, a_constraint,
+                                    b, b_name, b_constraint)
         else:
             return cont_broadcast_3(state, func, size, lock,
                                     a, a_name, a_constraint,
@@ -291,15 +324,133 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
 
     return np.asanyarray(randoms).reshape(size)
 
-# Needs double, double-double, double-long, long, long-long-long
-cdef object discrete(aug_state* state, void* func, object size, object lock,
+cdef object discrete_broadcast_d(aug_state* state, void* func, object size, object lock,
+                                 object a, object a_name, constraint_type a_constraint):
+
+    cdef np.ndarray a_arr, randoms
+    cdef np.broadcast it
+    cdef random_uint_d f = <random_uint_d>func
+
+    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if a_constraint != CONS_NONE:
+        check_array_constraint(a_arr, a_name, a_constraint)
+
+    if size is not None:
+        randoms = np.empty(size, np.long)
+    else:
+        #randoms = np.empty(np.shape(a_arr), np.double)
+        randoms = np.PyArray_SimpleNew(np.PyArray_NDIM(a_arr), np.PyArray_DIMS(a_arr), np.NPY_LONG)
+
+    it = np.broadcast(randoms, a_arr)
+    with lock, nogil:
+        while np.PyArray_MultiIter_NOTDONE(it):
+            a_val = (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
+            (<long*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val)
+
+            np.PyArray_MultiIter_NEXT(it)
+
+    return randoms
+
+cdef object discrete_broadcast_dd(aug_state* state, void* func, object size, object lock,
+                                  object a, object a_name, constraint_type a_constraint,
+                                  object b, object b_name, constraint_type b_constraint):
+    cdef np.ndarray a_arr, b_arr, randoms
+    cdef np.broadcast it
+    cdef random_uint_dd f = (<random_uint_dd>func)
+
+    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if a_constraint != CONS_NONE:
+        check_array_constraint(a_arr, a_name, a_constraint)
+    b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if b_constraint != CONS_NONE:
+        check_array_constraint(b_arr, b_name, b_constraint)
+
+    if size is not None:
+        randoms = np.empty(size, np.long)
+    else:
+        it = np.PyArray_MultiIterNew2(a_arr, b_arr)
+        randoms = np.empty(it.shape, np.double)
+        # randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_LONG)
+
+    it = np.PyArray_MultiIterNew3(randoms, a_arr, b_arr)
+    with lock, nogil:
+        while np.PyArray_MultiIter_NOTDONE(it):
+            a_val = (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
+            b_val = (<double*>np.PyArray_MultiIter_DATA(it, 2))[0]
+            (<long*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val, b_val)
+
+            np.PyArray_MultiIter_NEXT(it)
+
+    return randoms
+
+cdef object discrete_broadcast_di(aug_state* state, void* func, object size, object lock,
+                                  object a, object a_name, constraint_type a_constraint,
+                                  object b, object b_name, constraint_type b_constraint):
+    cdef np.ndarray a_arr, b_arr, randoms
+    cdef np.broadcast it
+    cdef random_uint_di f = (<random_uint_di>func)
+
+    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
+    if a_constraint != CONS_NONE:
+        check_array_constraint(a_arr, a_name, a_constraint)
+
+    b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_LONG, np.NPY_ALIGNED)
+    if b_constraint != CONS_NONE:
+        check_array_constraint(b_arr, b_name, b_constraint)
+
+    if size is not None:
+        randoms = np.empty(size, np.long)
+    else:
+        it = np.PyArray_MultiIterNew2(a_arr, b_arr)
+        randoms = np.empty(it.shape, np.double)
+        #randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_LONG)
+
+    it = np.PyArray_MultiIterNew3(randoms, a_arr, b_arr)
+    with lock, nogil:
+        while np.PyArray_MultiIter_NOTDONE(it):
+            a_val = (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
+            b_val = (<long*>np.PyArray_MultiIter_DATA(it, 2))[0]
+            (<long*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val, b_val)
+
+            np.PyArray_MultiIter_NEXT(it)
+
+    return randoms
+
+cdef object discrete_broadcast_i(aug_state* state, void* func, object size, object lock,
+                                  object a, object a_name, constraint_type a_constraint):
+    cdef np.ndarray a_arr, randoms
+    cdef np.broadcast it
+    cdef random_uint_i f = (<random_uint_i>func)
+
+    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_LONG, np.NPY_ALIGNED)
+    if a_constraint != CONS_NONE:
+        check_array_constraint(a_arr, a_name, a_constraint)
+
+    if size is not None:
+        randoms = np.empty(size, np.long)
+    else:
+        #randoms = np.empty(np.shape(a_arr), np.double)
+        randoms = np.PyArray_SimpleNew(np.PyArray_NDIM(a_arr), np.PyArray_DIMS(a_arr), np.NPY_LONG)
+
+    it = np.broadcast(randoms, a_arr)
+    with lock, nogil:
+        while np.PyArray_MultiIter_NOTDONE(it):
+            a_val = (<long*>np.PyArray_MultiIter_DATA(it, 1))[0]
+            (<long*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val)
+
+            np.PyArray_MultiIter_NEXT(it)
+
+    return randoms
+
+# Needs double <vec>, double-double <vec>, double-long<vec>, long <vec>, long-long-long
+cdef object disc(aug_state* state, void* func, object size, object lock,
                      int narg_double, int narg_long,
                      object a, object a_name, constraint_type a_constraint,
                      object b, object b_name, constraint_type b_constraint,
                      object c, object c_name, constraint_type c_constraint):
-
-    cdef double _da, _db
-    cdef long _ia, _ib, _ic
+    # TODO: Remove these - just added to suppress warning noise
+    cdef double _da = 0.0, _db = 0.0
+    cdef long _ia = 0, _ib = 0, _ic = 0
     cdef bint is_scalar = True
     if narg_double > 0:
         _da = PyFloat_AsDouble(a)
@@ -322,7 +473,7 @@ cdef object discrete(aug_state* state, void* func, object size, object lock,
                 if PyErr_Occurred():
                     is_scalar = False
             elif b_constraint != CONS_NONE:
-                check_constraint(_ib, b_name, b_constraint)
+                check_constraint(<double>_ib, b_name, b_constraint)
     else:
         if narg_long > 0:
             _ia = PyInt_AsLong(a)
@@ -330,24 +481,40 @@ cdef object discrete(aug_state* state, void* func, object size, object lock,
                 if PyErr_Occurred():
                     is_scalar = False
             elif a_constraint != CONS_NONE:
-                check_constraint(_ia, a_name, a_constraint)
+                check_constraint(<double>_ia, a_name, a_constraint)
         if narg_long > 1 and is_scalar:
             _ib = PyInt_AsLong(b)
             if _ib == -1:
                 if PyErr_Occurred():
                     is_scalar = False
             elif b_constraint != CONS_NONE:
-                check_constraint(_ib, b_name, b_constraint)
+                check_constraint(<double>_ib, b_name, b_constraint)
         if narg_long > 2 and is_scalar:
             _ic = PyInt_AsLong(c)
             if _ic == -1:
                 if PyErr_Occurred():
                     is_scalar = False
             elif c_constraint != CONS_NONE:
-                check_constraint(_ic, c_name, c_constraint)
+                check_constraint(<double>_ic, c_name, c_constraint)
 
     if not is_scalar:
-        raise NotImplementedError('Vector path not finished')
+        if narg_long == 0:
+            if narg_double == 1:
+                return discrete_broadcast_d(state, func, size, lock,
+                                            a, a_name, a_constraint)
+            elif narg_double == 2:
+                return discrete_broadcast_dd(state, func, size, lock,
+                                             a, a_name, a_constraint,
+                                             b, b_name, b_constraint)
+        elif narg_long == 1:
+            if narg_double == 0:
+                return discrete_broadcast_i(state, func, size, lock, a, a_name, a_constraint)
+            elif narg_double == 1:
+                return discrete_broadcast_di(state, func, size, lock,
+                                             a, a_name, a_constraint,
+                                             b, b_name, b_constraint)
+        else:
+            raise NotImplementedError("No vector path available")
 
     if size is None:
         if narg_long == 0:
@@ -406,7 +573,7 @@ cdef object discrete(aug_state* state, void* func, object size, object lock,
     return np.asanyarray(randoms).reshape(size)
 
 
-cdef uint64_t MAXSIZE = <uint64_t>sys.maxsize
+
 
 cdef class RandomState:
     CLASS_DOCSTRING
@@ -415,6 +582,8 @@ cdef class RandomState:
     cdef rng_t rng
     cdef aug_state rng_state
     cdef object lock
+    poisson_lam_max = POISSON_LAM_MAX
+    __MAXSIZE = <uint64_t>sys.maxsize
 
     IF RNG_SEED==1:
         def __init__(self, seed=None):
@@ -439,6 +608,18 @@ cdef class RandomState:
                 self.seed(seed, inc)
             else:
                 entropy_init(&self.rng_state)
+
+    # Pickling support:
+    def __getstate__(self):
+        return self.get_state()
+
+    def __setstate__(self, state):
+        self.set_state(state)
+
+    def __reduce__(self):
+        # TODO: This probably is wrong
+        # TODO: Removed np.random.__RandomState_ctor - This is needed on a RNG-by-RNG basis
+        return ((), (), self.get_state())
 
     IF RNG_SEED==1:
         def seed(self, val=None):
@@ -724,7 +905,7 @@ cdef class RandomState:
         simple truncation.  Instead see ``random_bounded_integers``.
         """
         if bits == 64:
-            return discrete(&self.rng_state, &random_uint64, size, self.lock, 0, 0,
+            return disc(&self.rng_state, &random_uint64, size, self.lock, 0, 0,
                             0, '', CONS_NONE, 0, '', CONS_NONE, 0, '', CONS_NONE)
         elif bits == 32:
             return uint0_32(&self.rng_state, &random_uint32, size, self.lock)
@@ -735,7 +916,7 @@ cdef class RandomState:
         if high < 4294967295:
             return uint1_i_32(&self.rng_state, &random_bounded_uint32, high, size, self.lock)
         else:
-            return discrete(&self.rng_state, &random_bounded_uint64, size, self.lock, 0, 1,
+            return disc(&self.rng_state, &random_bounded_uint64, size, self.lock, 0, 1,
                             high, '', CONS_NONE, 0, '', CONS_NONE, 0, '', CONS_NONE)
 
     def random_bounded_integers(self, int64_t low, high=None, size=None):
@@ -1477,3 +1658,1938 @@ cdef class RandomState:
         # TODO: Docs do not make sense here.  Is it [,] or [,)?
         # TODO: Check bounded uinteger implementation for [,] or [,)
         return self.random_bounded_uintegers(MAXSIZE, size)
+
+    def normal(self, loc=0.0, scale=1.0, size=None):
+        """
+        normal(loc=0.0, scale=1.0, size=None)
+
+        Draw random samples from a normal (Gaussian) distribution.
+
+        The probability density function of the normal distribution, first
+        derived by De Moivre and 200 years later by both Gauss and Laplace
+        independently [2]_, is often called the bell curve because of
+        its characteristic shape (see the example below).
+
+        The normal distributions occurs often in nature.  For example, it
+        describes the commonly occurring distribution of samples influenced
+        by a large number of tiny, random disturbances, each with its own
+        unique distribution [2]_.
+
+        Parameters
+        ----------
+        loc : float
+            Mean ("centre") of the distribution.
+        scale : float
+            Standard deviation (spread or "width") of the distribution.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        See Also
+        --------
+        scipy.stats.distributions.norm : probability density function,
+            distribution or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the Gaussian distribution is
+
+        .. math:: p(x) = \\frac{1}{\\sqrt{ 2 \\pi \\sigma^2 }}
+                         e^{ - \\frac{ (x - \\mu)^2 } {2 \\sigma^2} },
+
+        where :math:`\\mu` is the mean and :math:`\\sigma` the standard
+        deviation. The square of the standard deviation, :math:`\\sigma^2`,
+        is called the variance.
+
+        The function has its peak at the mean, and its "spread" increases with
+        the standard deviation (the function reaches 0.607 times its maximum at
+        :math:`x + \\sigma` and :math:`x - \\sigma` [2]_).  This implies that
+        `numpy.random.normal` is more likely to return samples lying close to
+        the mean, rather than those far away.
+
+        References
+        ----------
+        .. [1] Wikipedia, "Normal distribution",
+               http://en.wikipedia.org/wiki/Normal_distribution
+        .. [2] P. R. Peebles Jr., "Central Limit Theorem" in "Probability,
+               Random Variables and Random Signal Principles", 4th ed., 2001,
+               pp. 51, 51, 125.
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> mu, sigma = 0, 0.1 # mean and standard deviation
+        >>> s = np.random.normal(mu, sigma, 1000)
+
+        Verify the mean and the variance:
+
+        >>> abs(mu - np.mean(s)) < 0.01
+        True
+
+        >>> abs(sigma - np.std(s, ddof=1)) < 0.01
+        True
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> count, bins, ignored = plt.hist(s, 30, normed=True)
+        >>> plt.plot(bins, 1/(sigma * np.sqrt(2 * np.pi)) *
+        ...                np.exp( - (bins - mu)**2 / (2 * sigma**2) ),
+        ...          linewidth=2, color='r')
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_normal, size, self.lock, 2,
+                    loc, '', CONS_NONE,
+                    scale, 'scale', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
+
+    def beta(self, a, b, size=None):
+        """
+        beta(a, b, size=None)
+
+        Draw samples from a Beta distribution.
+
+        The Beta distribution is a special case of the Dirichlet distribution,
+        and is related to the Gamma distribution.  It has the probability
+        distribution function
+
+        .. math:: f(x; a,b) = \\frac{1}{B(\\alpha, \\beta)} x^{\\alpha - 1}
+                                                         (1 - x)^{\\beta - 1},
+
+        where the normalisation, B, is the beta function,
+
+        .. math:: B(\\alpha, \\beta) = \\int_0^1 t^{\\alpha - 1}
+                                     (1 - t)^{\\beta - 1} dt.
+
+        It is often seen in Bayesian inference and order statistics.
+
+        Parameters
+        ----------
+        a : float
+            Alpha, non-negative.
+        b : float
+            Beta, non-negative.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : ndarray
+            Array of the given shape, containing values drawn from a
+            Beta distribution.
+
+        """
+        return cont(&self.rng_state, &random_beta, size, self.lock, 2,
+                    a, 'a', CONS_POSITIVE,
+                    b, 'b', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
+
+
+    def exponential(self, scale=1.0, size=None):
+        """
+        exponential(scale=1.0, size=None)
+
+        Draw samples from an exponential distribution.
+
+        Its probability density function is
+
+        .. math:: f(x; \\frac{1}{\\beta}) = \\frac{1}{\\beta} \\exp(-\\frac{x}{\\beta}),
+
+        for ``x > 0`` and 0 elsewhere. :math:`\\beta` is the scale parameter,
+        which is the inverse of the rate parameter :math:`\\lambda = 1/\\beta`.
+        The rate parameter is an alternative, widely used parameterization
+        of the exponential distribution [3]_.
+
+        The exponential distribution is a continuous analogue of the
+        geometric distribution.  It describes many common situations, such as
+        the size of raindrops measured over many rainstorms [1]_, or the time
+        between page requests to Wikipedia [2]_.
+
+        Parameters
+        ----------
+        scale : float
+            The scale parameter, :math:`\\beta = 1/\\lambda`.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        References
+        ----------
+        .. [1] Peyton Z. Peebles Jr., "Probability, Random Variables and
+               Random Signal Principles", 4th ed, 2001, p. 57.
+        .. [2] "Poisson Process", Wikipedia,
+               http://en.wikipedia.org/wiki/Poisson_process
+        .. [3] "Exponential Distribution, Wikipedia,
+               http://en.wikipedia.org/wiki/Exponential_distribution
+
+        """
+        return cont(&self.rng_state, &random_exponential, size, self.lock, 1,
+                    scale, 'scale', CONS_POSITIVE,
+                    0.0, '', CONS_NONE,
+                    0.0, '', CONS_NONE)
+
+    def gamma(self, shape, scale=1.0, size=None):
+        """
+        gamma(shape, scale=1.0, size=None)
+
+        Draw samples from a Gamma distribution.
+
+        Samples are drawn from a Gamma distribution with specified parameters,
+        `shape` (sometimes designated "k") and `scale` (sometimes designated
+        "theta"), where both parameters are > 0.
+
+        Parameters
+        ----------
+        shape : scalar > 0
+            The shape of the gamma distribution.
+        scale : scalar > 0, optional
+            The scale of the gamma distribution.  Default is equal to 1.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : ndarray, float
+            Returns one sample unless `size` parameter is specified.
+
+        See Also
+        --------
+        scipy.stats.distributions.gamma : probability density function,
+            distribution or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the Gamma distribution is
+
+        .. math:: p(x) = x^{k-1}\\frac{e^{-x/\\theta}}{\\theta^k\\Gamma(k)},
+
+        where :math:`k` is the shape and :math:`\\theta` the scale,
+        and :math:`\\Gamma` is the Gamma function.
+
+        The Gamma distribution is often used to model the times to failure of
+        electronic components, and arises naturally in processes for which the
+        waiting times between Poisson distributed events are relevant.
+
+        References
+        ----------
+        .. [1] Weisstein, Eric W. "Gamma Distribution." From MathWorld--A
+               Wolfram Web Resource.
+               http://mathworld.wolfram.com/GammaDistribution.html
+        .. [2] Wikipedia, "Gamma-distribution",
+               http://en.wikipedia.org/wiki/Gamma-distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> shape, scale = 2., 2. # mean and dispersion
+        >>> s = np.random.gamma(shape, scale, 1000)
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> import scipy.special as sps
+        >>> count, bins, ignored = plt.hist(s, 50, normed=True)
+        >>> y = bins**(shape-1)*(np.exp(-bins/scale) /
+        ...                      (sps.gamma(shape)*scale**shape))
+        >>> plt.plot(bins, y, linewidth=2, color='r')
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_gamma, size, self.lock, 2,
+                    shape, 'shape', CONS_POSITIVE,
+                    scale, 'scale', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
+
+    def f(self, dfnum, dfden, size=None):
+        """
+        f(dfnum, dfden, size=None)
+
+        Draw samples from an F distribution.
+
+        Samples are drawn from an F distribution with specified parameters,
+        `dfnum` (degrees of freedom in numerator) and `dfden` (degrees of
+        freedom in denominator), where both parameters should be greater than
+        zero.
+
+        The random variate of the F distribution (also known as the
+        Fisher distribution) is a continuous probability distribution
+        that arises in ANOVA tests, and is the ratio of two chi-square
+        variates.
+
+        Parameters
+        ----------
+        dfnum : float
+            Degrees of freedom in numerator. Should be greater than zero.
+        dfden : float
+            Degrees of freedom in denominator. Should be greater than zero.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+            Samples from the Fisher distribution.
+
+        See Also
+        --------
+        scipy.stats.distributions.f : probability density function,
+            distribution or cumulative density function, etc.
+
+        Notes
+        -----
+        The F statistic is used to compare in-group variances to between-group
+        variances. Calculating the distribution depends on the sampling, and
+        so it is a function of the respective degrees of freedom in the
+        problem.  The variable `dfnum` is the number of samples minus one, the
+        between-groups degrees of freedom, while `dfden` is the within-groups
+        degrees of freedom, the sum of the number of samples in each group
+        minus the number of groups.
+
+        References
+        ----------
+        .. [1] Glantz, Stanton A. "Primer of Biostatistics.", McGraw-Hill,
+               Fifth Edition, 2002.
+        .. [2] Wikipedia, "F-distribution",
+               http://en.wikipedia.org/wiki/F-distribution
+
+        Examples
+        --------
+        An example from Glantz[1], pp 47-40:
+
+        Two groups, children of diabetics (25 people) and children from people
+        without diabetes (25 controls). Fasting blood glucose was measured,
+        case group had a mean value of 86.1, controls had a mean value of
+        82.2. Standard deviations were 2.09 and 2.49 respectively. Are these
+        data consistent with the null hypothesis that the parents diabetic
+        status does not affect their children's blood glucose levels?
+        Calculating the F statistic from the data gives a value of 36.01.
+
+        Draw samples from the distribution:
+
+        >>> dfnum = 1. # between group degrees of freedom
+        >>> dfden = 48. # within groups degrees of freedom
+        >>> s = np.random.f(dfnum, dfden, 1000)
+
+        The lower bound for the top 1% of the samples is :
+
+        >>> sort(s)[-10]
+        7.61988120985
+
+        So there is about a 1% chance that the F statistic will exceed 7.62,
+        the measured value is 36, so the null hypothesis is rejected at the 1%
+        level.
+
+        """
+        return cont(&self.rng_state, &random_f, size, self.lock, 2,
+                    dfnum, 'dfnum', CONS_POSITIVE,
+                    dfden, 'dfden', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
+
+    def noncentral_f(self, dfnum, dfden, nonc, size=None):
+        """
+        noncentral_f(dfnum, dfden, nonc, size=None)
+
+        Draw samples from the noncentral F distribution.
+
+        Samples are drawn from an F distribution with specified parameters,
+        `dfnum` (degrees of freedom in numerator) and `dfden` (degrees of
+        freedom in denominator), where both parameters > 1.
+        `nonc` is the non-centrality parameter.
+
+        Parameters
+        ----------
+        dfnum : int
+            Parameter, should be > 1.
+        dfden : int
+            Parameter, should be > 1.
+        nonc : float
+            Parameter, should be >= 0.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : scalar or ndarray
+            Drawn samples.
+
+        Notes
+        -----
+        When calculating the power of an experiment (power = probability of
+        rejecting the null hypothesis when a specific alternative is true) the
+        non-central F statistic becomes important.  When the null hypothesis is
+        true, the F statistic follows a central F distribution. When the null
+        hypothesis is not true, then it follows a non-central F statistic.
+
+        References
+        ----------
+        .. [1] Weisstein, Eric W. "Noncentral F-Distribution."
+               From MathWorld--A Wolfram Web Resource.
+               http://mathworld.wolfram.com/NoncentralF-Distribution.html
+        .. [2] Wikipedia, "Noncentral F distribution",
+               http://en.wikipedia.org/wiki/Noncentral_F-distribution
+
+        Examples
+        --------
+        In a study, testing for a specific alternative to the null hypothesis
+        requires use of the Noncentral F distribution. We need to calculate the
+        area in the tail of the distribution that exceeds the value of the F
+        distribution for the null hypothesis.  We'll plot the two probability
+        distributions for comparison.
+
+        >>> dfnum = 3 # between group deg of freedom
+        >>> dfden = 20 # within groups degrees of freedom
+        >>> nonc = 3.0
+        >>> nc_vals = np.random.noncentral_f(dfnum, dfden, nonc, 1000000)
+        >>> NF = np.histogram(nc_vals, bins=50, normed=True)
+        >>> c_vals = np.random.f(dfnum, dfden, 1000000)
+        >>> F = np.histogram(c_vals, bins=50, normed=True)
+        >>> plt.plot(F[1][1:], F[0])
+        >>> plt.plot(NF[1][1:], NF[0])
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_noncentral_f, size, self.lock, 3,
+                    dfnum, 'dfnum', CONS_POSITIVE,
+                    dfden, 'dfden', CONS_POSITIVE,
+                    nonc, 'nonc', CONS_NON_NEGATIVE)
+
+    def chisquare(self, df, size=None):
+        """
+        chisquare(df, size=None)
+
+        Draw samples from a chi-square distribution.
+
+        When `df` independent random variables, each with standard normal
+        distributions (mean 0, variance 1), are squared and summed, the
+        resulting distribution is chi-square (see Notes).  This distribution
+        is often used in hypothesis testing.
+
+        Parameters
+        ----------
+        df : int
+             Number of degrees of freedom.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        output : ndarray
+            Samples drawn from the distribution, packed in a `size`-shaped
+            array.
+
+        Raises
+        ------
+        ValueError
+            When `df` <= 0 or when an inappropriate `size` (e.g. ``size=-1``)
+            is given.
+
+        Notes
+        -----
+        The variable obtained by summing the squares of `df` independent,
+        standard normally distributed random variables:
+
+        .. math:: Q = \\sum_{i=0}^{\\mathtt{df}} X^2_i
+
+        is chi-square distributed, denoted
+
+        .. math:: Q \\sim \\chi^2_k.
+
+        The probability density function of the chi-squared distribution is
+
+        .. math:: p(x) = \\frac{(1/2)^{k/2}}{\\Gamma(k/2)}
+                         x^{k/2 - 1} e^{-x/2},
+
+        where :math:`\\Gamma` is the gamma function,
+
+        .. math:: \\Gamma(x) = \\int_0^{-\\infty} t^{x - 1} e^{-t} dt.
+
+        References
+        ----------
+        .. [1] NIST "Engineering Statistics Handbook"
+               http://www.itl.nist.gov/div898/handbook/eda/section3/eda3666.htm
+
+        Examples
+        --------
+        >>> np.random.chisquare(2,4)
+        array([ 1.89920014,  9.00867716,  3.13710533,  5.62318272])
+
+        """
+        return cont(&self.rng_state, &random_chisquare, size, self.lock, 1,
+                    df, 'df', CONS_POSITIVE,
+                    0.0, '', CONS_NONE,
+                    0.0, '', CONS_NONE)
+
+    def noncentral_chisquare(self, df, nonc, size=None):
+        """
+        noncentral_chisquare(df, nonc, size=None)
+
+        Draw samples from a noncentral chi-square distribution.
+
+        The noncentral :math:`\\chi^2` distribution is a generalisation of
+        the :math:`\\chi^2` distribution.
+
+        Parameters
+        ----------
+        df : int
+            Degrees of freedom, should be > 0 as of Numpy 1.10,
+            should be > 1 for earlier versions.
+        nonc : float
+            Non-centrality, should be non-negative.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Notes
+        -----
+        The probability density function for the noncentral Chi-square
+        distribution is
+
+        .. math:: P(x;df,nonc) = \\sum^{\\infty}_{i=0}
+                               \\frac{e^{-nonc/2}(nonc/2)^{i}}{i!}
+                               \\P_{Y_{df+2i}}(x),
+
+        where :math:`Y_{q}` is the Chi-square with q degrees of freedom.
+
+        In Delhi (2007), it is noted that the noncentral chi-square is
+        useful in bombing and coverage problems, the probability of
+        killing the point target given by the noncentral chi-squared
+        distribution.
+
+        References
+        ----------
+        .. [1] Delhi, M.S. Holla, "On a noncentral chi-square distribution in
+               the analysis of weapon systems effectiveness", Metrika,
+               Volume 15, Number 1 / December, 1970.
+        .. [2] Wikipedia, "Noncentral chi-square distribution"
+               http://en.wikipedia.org/wiki/Noncentral_chi-square_distribution
+
+        Examples
+        --------
+        Draw values from the distribution and plot the histogram
+
+        >>> import matplotlib.pyplot as plt
+        >>> values = plt.hist(np.random.noncentral_chisquare(3, 20, 100000),
+        ...                   bins=200, normed=True)
+        >>> plt.show()
+
+        Draw values from a noncentral chisquare with very small noncentrality,
+        and compare to a chisquare.
+
+        >>> plt.figure()
+        >>> values = plt.hist(np.random.noncentral_chisquare(3, .0000001, 100000),
+        ...                   bins=np.arange(0., 25, .1), normed=True)
+        >>> values2 = plt.hist(np.random.chisquare(3, 100000),
+        ...                    bins=np.arange(0., 25, .1), normed=True)
+        >>> plt.plot(values[1][0:-1], values[0]-values2[0], 'ob')
+        >>> plt.show()
+
+        Demonstrate how large values of non-centrality lead to a more symmetric
+        distribution.
+
+        >>> plt.figure()
+        >>> values = plt.hist(np.random.noncentral_chisquare(3, 20, 100000),
+        ...                   bins=200, normed=True)
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_noncentral_chisquare, size, self.lock, 2,
+                    df, 'df', CONS_POSITIVE,
+                    nonc, 'nonc', CONS_NON_NEGATIVE,
+                    0.0, '', CONS_NONE)
+
+    def vonmises(self, mu, kappa, size=None):
+        """
+        vonmises(mu, kappa, size=None)
+
+        Draw samples from a von Mises distribution.
+
+        Samples are drawn from a von Mises distribution with specified mode
+        (mu) and dispersion (kappa), on the interval [-pi, pi].
+
+        The von Mises distribution (also known as the circular normal
+        distribution) is a continuous probability distribution on the unit
+        circle.  It may be thought of as the circular analogue of the normal
+        distribution.
+
+        Parameters
+        ----------
+        mu : float
+            Mode ("center") of the distribution.
+        kappa : float
+            Dispersion of the distribution, has to be >=0.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : scalar or ndarray
+            The returned samples, which are in the interval [-pi, pi].
+
+        See Also
+        --------
+        scipy.stats.distributions.vonmises : probability density function,
+            distribution, or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the von Mises distribution is
+
+        .. math:: p(x) = \\frac{e^{\\kappa cos(x-\\mu)}}{2\\pi I_0(\\kappa)},
+
+        where :math:`\\mu` is the mode and :math:`\\kappa` the dispersion,
+        and :math:`I_0(\\kappa)` is the modified Bessel function of order 0.
+
+        The von Mises is named for Richard Edler von Mises, who was born in
+        Austria-Hungary, in what is now the Ukraine.  He fled to the United
+        States in 1939 and became a professor at Harvard.  He worked in
+        probability theory, aerodynamics, fluid mechanics, and philosophy of
+        science.
+
+        References
+        ----------
+        .. [1] Abramowitz, M. and Stegun, I. A. (Eds.). "Handbook of
+               Mathematical Functions with Formulas, Graphs, and Mathematical
+               Tables, 9th printing," New York: Dover, 1972.
+        .. [2] von Mises, R., "Mathematical Theory of Probability
+               and Statistics", New York: Academic Press, 1964.
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> mu, kappa = 0.0, 4.0 # mean and dispersion
+        >>> s = np.random.vonmises(mu, kappa, 1000)
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> from scipy.special import i0
+        >>> plt.hist(s, 50, normed=True)
+        >>> x = np.linspace(-np.pi, np.pi, num=51)
+        >>> y = np.exp(kappa*np.cos(x-mu))/(2*np.pi*i0(kappa))
+        >>> plt.plot(x, y, linewidth=2, color='r')
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_vonmises, size, self.lock, 2,
+                    mu, 'mu', CONS_NONE,
+                    kappa, 'kappa', CONS_NON_NEGATIVE,
+                    0.0, '', CONS_NONE)
+
+
+
+    def pareto(self, a, size=None):
+        """
+        pareto(a, size=None)
+
+        Draw samples from a Pareto II or Lomax distribution with
+        specified shape.
+
+        The Lomax or Pareto II distribution is a shifted Pareto
+        distribution. The classical Pareto distribution can be
+        obtained from the Lomax distribution by adding 1 and
+        multiplying by the scale parameter ``m`` (see Notes).  The
+        smallest value of the Lomax distribution is zero while for the
+        classical Pareto distribution it is ``mu``, where the standard
+        Pareto distribution has location ``mu = 1``.  Lomax can also
+        be considered as a simplified version of the Generalized
+        Pareto distribution (available in SciPy), with the scale set
+        to one and the location set to zero.
+
+        The Pareto distribution must be greater than zero, and is
+        unbounded above.  It is also known as the "80-20 rule".  In
+        this distribution, 80 percent of the weights are in the lowest
+        20 percent of the range, while the other 20 percent fill the
+        remaining 80 percent of the range.
+
+        Parameters
+        ----------
+        shape : float, > 0.
+            Shape of the distribution.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        See Also
+        --------
+        scipy.stats.distributions.lomax.pdf : probability density function,
+            distribution or cumulative density function, etc.
+        scipy.stats.distributions.genpareto.pdf : probability density function,
+            distribution or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the Pareto distribution is
+
+        .. math:: p(x) = \\frac{am^a}{x^{a+1}}
+
+        where :math:`a` is the shape and :math:`m` the scale.
+
+        The Pareto distribution, named after the Italian economist
+        Vilfredo Pareto, is a power law probability distribution
+        useful in many real world problems.  Outside the field of
+        economics it is generally referred to as the Bradford
+        distribution. Pareto developed the distribution to describe
+        the distribution of wealth in an economy.  It has also found
+        use in insurance, web page access statistics, oil field sizes,
+        and many other problems, including the download frequency for
+        projects in Sourceforge [1]_.  It is one of the so-called
+        "fat-tailed" distributions.
+
+
+        References
+        ----------
+        .. [1] Francis Hunt and Paul Johnson, On the Pareto Distribution of
+               Sourceforge projects.
+        .. [2] Pareto, V. (1896). Course of Political Economy. Lausanne.
+        .. [3] Reiss, R.D., Thomas, M.(2001), Statistical Analysis of Extreme
+               Values, Birkhauser Verlag, Basel, pp 23-30.
+        .. [4] Wikipedia, "Pareto distribution",
+               http://en.wikipedia.org/wiki/Pareto_distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> a, m = 3., 2.  # shape and mode
+        >>> s = (np.random.pareto(a, 1000) + 1) * m
+
+        Display the histogram of the samples, along with the probability
+        density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> count, bins, _ = plt.hist(s, 100, normed=True)
+        >>> fit = a*m**a / bins**(a+1)
+        >>> plt.plot(bins, max(count)*fit/max(fit), linewidth=2, color='r')
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_pareto, size, self.lock, 1,
+                    a, 'a', CONS_POSITIVE,
+                    0.0, '', CONS_NONE,
+                    0.0, '', CONS_NONE)
+
+    def weibull(self, a, size=None):
+        """
+        weibull(a, size=None)
+
+        Draw samples from a Weibull distribution.
+
+        Draw samples from a 1-parameter Weibull distribution with the given
+        shape parameter `a`.
+
+        .. math:: X = (-ln(U))^{1/a}
+
+        Here, U is drawn from the uniform distribution over (0,1].
+
+        The more common 2-parameter Weibull, including a scale parameter
+        :math:`\\lambda` is just :math:`X = \\lambda(-ln(U))^{1/a}`.
+
+        Parameters
+        ----------
+        a : float
+            Shape of the distribution.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray
+
+        See Also
+        --------
+        scipy.stats.distributions.weibull_max
+        scipy.stats.distributions.weibull_min
+        scipy.stats.distributions.genextreme
+        gumbel
+
+        Notes
+        -----
+        The Weibull (or Type III asymptotic extreme value distribution
+        for smallest values, SEV Type III, or Rosin-Rammler
+        distribution) is one of a class of Generalized Extreme Value
+        (GEV) distributions used in modeling extreme value problems.
+        This class includes the Gumbel and Frechet distributions.
+
+        The probability density for the Weibull distribution is
+
+        .. math:: p(x) = \\frac{a}
+                         {\\lambda}(\\frac{x}{\\lambda})^{a-1}e^{-(x/\\lambda)^a},
+
+        where :math:`a` is the shape and :math:`\\lambda` the scale.
+
+        The function has its peak (the mode) at
+        :math:`\\lambda(\\frac{a-1}{a})^{1/a}`.
+
+        When ``a = 1``, the Weibull distribution reduces to the exponential
+        distribution.
+
+        References
+        ----------
+        .. [1] Waloddi Weibull, Royal Technical University, Stockholm,
+               1939 "A Statistical Theory Of The Strength Of Materials",
+               Ingeniorsvetenskapsakademiens Handlingar Nr 151, 1939,
+               Generalstabens Litografiska Anstalts Forlag, Stockholm.
+        .. [2] Waloddi Weibull, "A Statistical Distribution Function of
+               Wide Applicability", Journal Of Applied Mechanics ASME Paper
+               1951.
+        .. [3] Wikipedia, "Weibull distribution",
+               http://en.wikipedia.org/wiki/Weibull_distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> a = 5. # shape
+        >>> s = np.random.weibull(a, 1000)
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> x = np.arange(1,100.)/50.
+        >>> def weib(x,n,a):
+        ...     return (a / n) * (x / n)**(a - 1) * np.exp(-(x / n)**a)
+
+        >>> count, bins, ignored = plt.hist(np.random.weibull(5.,1000))
+        >>> x = np.arange(1,100.)/50.
+        >>> scale = count.max()/weib(x, 1., 5.).max()
+        >>> plt.plot(x, weib(x, 1., 5.)*scale)
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_weibull, size, self.lock, 1,
+                    a, 'a', CONS_POSITIVE,
+                    0.0, '', CONS_NONE,
+                    0.0, '', CONS_NONE)
+
+    def power(self, a, size=None):
+        """
+        power(a, size=None)
+
+        Draws samples in [0, 1] from a power distribution with positive
+        exponent a - 1.
+
+        Also known as the power function distribution.
+
+        Parameters
+        ----------
+        a : float
+            parameter, > 0
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+            The returned samples lie in [0, 1].
+
+        Raises
+        ------
+        ValueError
+            If a < 1.
+
+        Notes
+        -----
+        The probability density function is
+
+        .. math:: P(x; a) = ax^{a-1}, 0 \\le x \\le 1, a>0.
+
+        The power function distribution is just the inverse of the Pareto
+        distribution. It may also be seen as a special case of the Beta
+        distribution.
+
+        It is used, for example, in modeling the over-reporting of insurance
+        claims.
+
+        References
+        ----------
+        .. [1] Christian Kleiber, Samuel Kotz, "Statistical size distributions
+               in economics and actuarial sciences", Wiley, 2003.
+        .. [2] Heckert, N. A. and Filliben, James J. "NIST Handbook 148:
+               Dataplot Reference Manual, Volume 2: Let Subcommands and Library
+               Functions", National Institute of Standards and Technology
+               Handbook Series, June 2003.
+               http://www.itl.nist.gov/div898/software/dataplot/refman2/auxillar/powpdf.pdf
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> a = 5. # shape
+        >>> samples = 1000
+        >>> s = np.random.power(a, samples)
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> count, bins, ignored = plt.hist(s, bins=30)
+        >>> x = np.linspace(0, 1, 100)
+        >>> y = a*x**(a-1.)
+        >>> normed_y = samples*np.diff(bins)[0]*y
+        >>> plt.plot(x, normed_y)
+        >>> plt.show()
+
+        Compare the power function distribution to the inverse of the Pareto.
+
+        >>> from scipy import stats
+        >>> rvs = np.random.power(5, 1000000)
+        >>> rvsp = np.random.pareto(5, 1000000)
+        >>> xx = np.linspace(0,1,100)
+        >>> powpdf = stats.powerlaw.pdf(xx,5)
+
+        >>> plt.figure()
+        >>> plt.hist(rvs, bins=50, normed=True)
+        >>> plt.plot(xx,powpdf,'r-')
+        >>> plt.title('np.random.power(5)')
+
+        >>> plt.figure()
+        >>> plt.hist(1./(1.+rvsp), bins=50, normed=True)
+        >>> plt.plot(xx,powpdf,'r-')
+        >>> plt.title('inverse of 1 + np.random.pareto(5)')
+
+        >>> plt.figure()
+        >>> plt.hist(1./(1.+rvsp), bins=50, normed=True)
+        >>> plt.plot(xx,powpdf,'r-')
+        >>> plt.title('inverse of stats.pareto(5)')
+
+        """
+        return cont(&self.rng_state, &random_power, size, self.lock, 1,
+                    a, 'a', CONS_POSITIVE,
+                    0.0, '', CONS_NONE,
+                    0.0, '', CONS_NONE)
+
+    def laplace(self, loc=0.0, scale=1.0, size=None):
+        """
+        laplace(loc=0.0, scale=1.0, size=None)
+
+        Draw samples from the Laplace or double exponential distribution with
+        specified location (or mean) and scale (decay).
+
+        The Laplace distribution is similar to the Gaussian/normal distribution,
+        but is sharper at the peak and has fatter tails. It represents the
+        difference between two independent, identically distributed exponential
+        random variables.
+
+        Parameters
+        ----------
+        loc : float, optional
+            The position, :math:`\\mu`, of the distribution peak.
+        scale : float, optional
+            :math:`\\lambda`, the exponential decay.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or float
+
+        Notes
+        -----
+        It has the probability density function
+
+        .. math:: f(x; \\mu, \\lambda) = \\frac{1}{2\\lambda}
+                                       \\exp\\left(-\\frac{|x - \\mu|}{\\lambda}\\right).
+
+        The first law of Laplace, from 1774, states that the frequency
+        of an error can be expressed as an exponential function of the
+        absolute magnitude of the error, which leads to the Laplace
+        distribution. For many problems in economics and health
+        sciences, this distribution seems to model the data better
+        than the standard Gaussian distribution.
+
+        References
+        ----------
+        .. [1] Abramowitz, M. and Stegun, I. A. (Eds.). "Handbook of
+               Mathematical Functions with Formulas, Graphs, and Mathematical
+               Tables, 9th printing," New York: Dover, 1972.
+        .. [2] Kotz, Samuel, et. al. "The Laplace Distribution and
+               Generalizations, " Birkhauser, 2001.
+        .. [3] Weisstein, Eric W. "Laplace Distribution."
+               From MathWorld--A Wolfram Web Resource.
+               http://mathworld.wolfram.com/LaplaceDistribution.html
+        .. [4] Wikipedia, "Laplace Distribution",
+               http://en.wikipedia.org/wiki/Laplace_distribution
+
+        Examples
+        --------
+        Draw samples from the distribution
+
+        >>> loc, scale = 0., 1.
+        >>> s = np.random.laplace(loc, scale, 1000)
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> count, bins, ignored = plt.hist(s, 30, normed=True)
+        >>> x = np.arange(-8., 8., .01)
+        >>> pdf = np.exp(-abs(x-loc)/scale)/(2.*scale)
+        >>> plt.plot(x, pdf)
+
+        Plot Gaussian for comparison:
+
+        >>> g = (1/(scale * np.sqrt(2 * np.pi)) *
+        ...      np.exp(-(x - loc)**2 / (2 * scale**2)))
+        >>> plt.plot(x,g)
+
+        """
+        return cont(&self.rng_state, &random_laplace, size, self.lock, 2,
+                    loc, 'loc', CONS_NONE,
+                    scale, 'scale', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
+
+    def gumbel(self, loc=0.0, scale=1.0, size=None):
+        """
+        gumbel(loc=0.0, scale=1.0, size=None)
+
+        Draw samples from a Gumbel distribution.
+
+        Draw samples from a Gumbel distribution with specified location and
+        scale.  For more information on the Gumbel distribution, see
+        Notes and References below.
+
+        Parameters
+        ----------
+        loc : float
+            The location of the mode of the distribution.
+        scale : float
+            The scale parameter of the distribution.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+
+        See Also
+        --------
+        scipy.stats.gumbel_l
+        scipy.stats.gumbel_r
+        scipy.stats.genextreme
+        weibull
+
+        Notes
+        -----
+        The Gumbel (or Smallest Extreme Value (SEV) or the Smallest Extreme
+        Value Type I) distribution is one of a class of Generalized Extreme
+        Value (GEV) distributions used in modeling extreme value problems.
+        The Gumbel is a special case of the Extreme Value Type I distribution
+        for maximums from distributions with "exponential-like" tails.
+
+        The probability density for the Gumbel distribution is
+
+        .. math:: p(x) = \\frac{e^{-(x - \\mu)/ \\beta}}{\\beta} e^{ -e^{-(x - \\mu)/
+                  \\beta}},
+
+        where :math:`\\mu` is the mode, a location parameter, and
+        :math:`\\beta` is the scale parameter.
+
+        The Gumbel (named for German mathematician Emil Julius Gumbel) was used
+        very early in the hydrology literature, for modeling the occurrence of
+        flood events. It is also used for modeling maximum wind speed and
+        rainfall rates.  It is a "fat-tailed" distribution - the probability of
+        an event in the tail of the distribution is larger than if one used a
+        Gaussian, hence the surprisingly frequent occurrence of 100-year
+        floods. Floods were initially modeled as a Gaussian process, which
+        underestimated the frequency of extreme events.
+
+        It is one of a class of extreme value distributions, the Generalized
+        Extreme Value (GEV) distributions, which also includes the Weibull and
+        Frechet.
+
+        The function has a mean of :math:`\\mu + 0.57721\\beta` and a variance
+        of :math:`\\frac{\\pi^2}{6}\\beta^2`.
+
+        References
+        ----------
+        .. [1] Gumbel, E. J., "Statistics of Extremes,"
+               New York: Columbia University Press, 1958.
+        .. [2] Reiss, R.-D. and Thomas, M., "Statistical Analysis of Extreme
+               Values from Insurance, Finance, Hydrology and Other Fields,"
+               Basel: Birkhauser Verlag, 2001.
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> mu, beta = 0, 0.1 # location and scale
+        >>> s = np.random.gumbel(mu, beta, 1000)
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> count, bins, ignored = plt.hist(s, 30, normed=True)
+        >>> plt.plot(bins, (1/beta)*np.exp(-(bins - mu)/beta)
+        ...          * np.exp( -np.exp( -(bins - mu) /beta) ),
+        ...          linewidth=2, color='r')
+        >>> plt.show()
+
+        Show how an extreme value distribution can arise from a Gaussian process
+        and compare to a Gaussian:
+
+        >>> means = []
+        >>> maxima = []
+        >>> for i in range(0,1000) :
+        ...    a = np.random.normal(mu, beta, 1000)
+        ...    means.append(a.mean())
+        ...    maxima.append(a.max())
+        >>> count, bins, ignored = plt.hist(maxima, 30, normed=True)
+        >>> beta = np.std(maxima) * np.sqrt(6) / np.pi
+        >>> mu = np.mean(maxima) - 0.57721*beta
+        >>> plt.plot(bins, (1/beta)*np.exp(-(bins - mu)/beta)
+        ...          * np.exp(-np.exp(-(bins - mu)/beta)),
+        ...          linewidth=2, color='r')
+        >>> plt.plot(bins, 1/(beta * np.sqrt(2 * np.pi))
+        ...          * np.exp(-(bins - mu)**2 / (2 * beta**2)),
+        ...          linewidth=2, color='g')
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_gumbel, size, self.lock, 2,
+                    loc, 'loc', CONS_NONE,
+                    scale, 'scale', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
+
+    def logistic(self, loc=0.0, scale=1.0, size=None):
+        """
+        logistic(loc=0.0, scale=1.0, size=None)
+
+        Draw samples from a logistic distribution.
+
+        Samples are drawn from a logistic distribution with specified
+        parameters, loc (location or mean, also median), and scale (>0).
+
+        Parameters
+        ----------
+        loc : float
+
+        scale : float > 0.
+
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+                  where the values are all integers in  [0, n].
+
+        See Also
+        --------
+        scipy.stats.distributions.logistic : probability density function,
+            distribution or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the Logistic distribution is
+
+        .. math:: P(x) = P(x) = \\frac{e^{-(x-\\mu)/s}}{s(1+e^{-(x-\\mu)/s})^2},
+
+        where :math:`\\mu` = location and :math:`s` = scale.
+
+        The Logistic distribution is used in Extreme Value problems where it
+        can act as a mixture of Gumbel distributions, in Epidemiology, and by
+        the World Chess Federation (FIDE) where it is used in the Elo ranking
+        system, assuming the performance of each player is a logistically
+        distributed random variable.
+
+        References
+        ----------
+        .. [1] Reiss, R.-D. and Thomas M. (2001), "Statistical Analysis of
+               Extreme Values, from Insurance, Finance, Hydrology and Other
+               Fields," Birkhauser Verlag, Basel, pp 132-133.
+        .. [2] Weisstein, Eric W. "Logistic Distribution." From
+               MathWorld--A Wolfram Web Resource.
+               http://mathworld.wolfram.com/LogisticDistribution.html
+        .. [3] Wikipedia, "Logistic-distribution",
+               http://en.wikipedia.org/wiki/Logistic_distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> loc, scale = 10, 1
+        >>> s = np.random.logistic(loc, scale, 10000)
+        >>> count, bins, ignored = plt.hist(s, bins=50)
+
+        #   plot against distribution
+
+        >>> def logist(x, loc, scale):
+        ...     return exp((loc-x)/scale)/(scale*(1+exp((loc-x)/scale))**2)
+        >>> plt.plot(bins, logist(bins, loc, scale)*count.max()/\\
+        ... logist(bins, loc, scale).max())
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_logistic, size, self.lock, 2,
+                    loc, 'loc', CONS_NONE,
+                    scale, 'scale', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
+
+
+    def lognormal(self, mean=0.0, sigma=1.0, size=None):
+        """
+        lognormal(mean=0.0, sigma=1.0, size=None)
+
+        Draw samples from a log-normal distribution.
+
+        Draw samples from a log-normal distribution with specified mean,
+        standard deviation, and array shape.  Note that the mean and standard
+        deviation are not the values for the distribution itself, but of the
+        underlying normal distribution it is derived from.
+
+        Parameters
+        ----------
+        mean : float
+            Mean value of the underlying normal distribution
+        sigma : float, > 0.
+            Standard deviation of the underlying normal distribution
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or float
+            The desired samples. An array of the same shape as `size` if given,
+            if `size` is None a float is returned.
+
+        See Also
+        --------
+        scipy.stats.lognorm : probability density function, distribution,
+            cumulative density function, etc.
+
+        Notes
+        -----
+        A variable `x` has a log-normal distribution if `log(x)` is normally
+        distributed.  The probability density function for the log-normal
+        distribution is:
+
+        .. math:: p(x) = \\frac{1}{\\sigma x \\sqrt{2\\pi}}
+                         e^{(-\\frac{(ln(x)-\\mu)^2}{2\\sigma^2})}
+
+        where :math:`\\mu` is the mean and :math:`\\sigma` is the standard
+        deviation of the normally distributed logarithm of the variable.
+        A log-normal distribution results if a random variable is the *product*
+        of a large number of independent, identically-distributed variables in
+        the same way that a normal distribution results if the variable is the
+        *sum* of a large number of independent, identically-distributed
+        variables.
+
+        References
+        ----------
+        .. [1] Limpert, E., Stahel, W. A., and Abbt, M., "Log-normal
+               Distributions across the Sciences: Keys and Clues,"
+               BioScience, Vol. 51, No. 5, May, 2001.
+               http://stat.ethz.ch/~stahel/lognormal/bioscience.pdf
+        .. [2] Reiss, R.D. and Thomas, M., "Statistical Analysis of Extreme
+               Values," Basel: Birkhauser Verlag, 2001, pp. 31-32.
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> mu, sigma = 3., 1. # mean and standard deviation
+        >>> s = np.random.lognormal(mu, sigma, 1000)
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> count, bins, ignored = plt.hist(s, 100, normed=True, align='mid')
+
+        >>> x = np.linspace(min(bins), max(bins), 10000)
+        >>> pdf = (np.exp(-(np.log(x) - mu)**2 / (2 * sigma**2))
+        ...        / (x * sigma * np.sqrt(2 * np.pi)))
+
+        >>> plt.plot(x, pdf, linewidth=2, color='r')
+        >>> plt.axis('tight')
+        >>> plt.show()
+
+        Demonstrate that taking the products of random samples from a uniform
+        distribution can be fit well by a log-normal probability density
+        function.
+
+        >>> # Generate a thousand samples: each is the product of 100 random
+        >>> # values, drawn from a normal distribution.
+        >>> b = []
+        >>> for i in range(1000):
+        ...    a = 10. + np.random.random(100)
+        ...    b.append(np.product(a))
+
+        >>> b = np.array(b) / np.min(b) # scale values to be positive
+        >>> count, bins, ignored = plt.hist(b, 100, normed=True, align='mid')
+        >>> sigma = np.std(np.log(b))
+        >>> mu = np.mean(np.log(b))
+
+        >>> x = np.linspace(min(bins), max(bins), 10000)
+        >>> pdf = (np.exp(-(np.log(x) - mu)**2 / (2 * sigma**2))
+        ...        / (x * sigma * np.sqrt(2 * np.pi)))
+
+        >>> plt.plot(x, pdf, color='r', linewidth=2)
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_logistic, size, self.lock, 2,
+                    mean, 'mean', CONS_NONE,
+                    sigma, 'sigma', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
+
+
+    def rayleigh(self, scale=1.0, size=None):
+        """
+        rayleigh(scale=1.0, size=None)
+
+        Draw samples from a Rayleigh distribution.
+
+        The :math:`\\chi` and Weibull distributions are generalizations of the
+        Rayleigh.
+
+        Parameters
+        ----------
+        scale : scalar
+            Scale, also equals the mode. Should be >= 0.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Notes
+        -----
+        The probability density function for the Rayleigh distribution is
+
+        .. math:: P(x;scale) = \\frac{x}{scale^2}e^{\\frac{-x^2}{2 \\cdotp scale^2}}
+
+        The Rayleigh distribution would arise, for example, if the East
+        and North components of the wind velocity had identical zero-mean
+        Gaussian distributions.  Then the wind speed would have a Rayleigh
+        distribution.
+
+        References
+        ----------
+        .. [1] Brighton Webs Ltd., "Rayleigh Distribution,"
+               http://www.brighton-webs.co.uk/distributions/rayleigh.asp
+        .. [2] Wikipedia, "Rayleigh distribution"
+               http://en.wikipedia.org/wiki/Rayleigh_distribution
+
+        Examples
+        --------
+        Draw values from the distribution and plot the histogram
+
+        >>> values = hist(np.random.rayleigh(3, 100000), bins=200, normed=True)
+
+        Wave heights tend to follow a Rayleigh distribution. If the mean wave
+        height is 1 meter, what fraction of waves are likely to be larger than 3
+        meters?
+
+        >>> meanvalue = 1
+        >>> modevalue = np.sqrt(2 / np.pi) * meanvalue
+        >>> s = np.random.rayleigh(modevalue, 1000000)
+
+        The percentage of waves larger than 3 meters is:
+
+        >>> 100.*sum(s>3)/1000000.
+        0.087300000000000003
+
+        """
+        return cont(&self.rng_state, &random_rayleigh, size, self.lock, 1,
+                    scale, 'scale', CONS_POSITIVE,
+                    0.0, '', CONS_NONE,
+                    0.0, '', CONS_NONE)
+
+    def wald(self, mean, scale, size=None):
+        """
+        wald(mean, scale, size=None)
+
+        Draw samples from a Wald, or inverse Gaussian, distribution.
+
+        As the scale approaches infinity, the distribution becomes more like a
+        Gaussian. Some references claim that the Wald is an inverse Gaussian
+        with mean equal to 1, but this is by no means universal.
+
+        The inverse Gaussian distribution was first studied in relationship to
+        Brownian motion. In 1956 M.C.K. Tweedie used the name inverse Gaussian
+        because there is an inverse relationship between the time to cover a
+        unit distance and distance covered in unit time.
+
+        Parameters
+        ----------
+        mean : scalar
+            Distribution mean, should be > 0.
+        scale : scalar
+            Scale parameter, should be >= 0.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+            Drawn sample, all greater than zero.
+
+        Notes
+        -----
+        The probability density function for the Wald distribution is
+
+        .. math:: P(x;mean,scale) = \\sqrt{\\frac{scale}{2\\pi x^3}}e^
+                                    \\frac{-scale(x-mean)^2}{2\\cdotp mean^2x}
+
+        As noted above the inverse Gaussian distribution first arise
+        from attempts to model Brownian motion. It is also a
+        competitor to the Weibull for use in reliability modeling and
+        modeling stock returns and interest rate processes.
+
+        References
+        ----------
+        .. [1] Brighton Webs Ltd., Wald Distribution,
+               http://www.brighton-webs.co.uk/distributions/wald.asp
+        .. [2] Chhikara, Raj S., and Folks, J. Leroy, "The Inverse Gaussian
+               Distribution: Theory : Methodology, and Applications", CRC Press,
+               1988.
+        .. [3] Wikipedia, "Wald distribution"
+               http://en.wikipedia.org/wiki/Wald_distribution
+
+        Examples
+        --------
+        Draw values from the distribution and plot the histogram:
+
+        >>> import matplotlib.pyplot as plt
+        >>> h = plt.hist(np.random.wald(3, 2, 100000), bins=200, normed=True)
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_wald, size, self.lock, 2,
+                    mean, 'mean', CONS_POSITIVE,
+                    scale, 'scale', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
+
+    def randint(self, low, high=None, size=None):
+        """
+        randint(low, high=None, size=None)
+
+        Return random integers from `low` (inclusive) to `high` (exclusive).
+
+        Return random integers from the "discrete uniform" distribution in the
+        "half-open" interval [`low`, `high`). If `high` is None (the default),
+        then results are from [0, `low`).
+
+        Parameters
+        ----------
+        low : int
+            Lowest (signed) integer to be drawn from the distribution (unless
+            ``high=None``, in which case this parameter is the *highest* such
+            integer).
+        high : int, optional
+            If provided, one above the largest (signed) integer to be drawn
+            from the distribution (see above for behavior if ``high=None``).
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : int or ndarray of ints
+            `size`-shaped array of random integers from the appropriate
+            distribution, or a single such random int if `size` not provided.
+
+        See Also
+        --------
+        random.random_integers : similar to `randint`, only for the closed
+            interval [`low`, `high`], and 1 is the lowest value if `high` is
+            omitted. In particular, this other one is the one to use to generate
+            uniformly distributed discrete non-integers.
+
+        Examples
+        --------
+        >>> np.random.randint(2, size=10)
+        array([1, 0, 0, 0, 1, 1, 0, 0, 1, 0])
+        >>> np.random.randint(1, size=10)
+        array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+        Generate a 2 x 4 array of ints between 0 and 4, inclusive:
+
+        >>> np.random.randint(5, size=(2, 4))
+        array([[4, 0, 2, 1],
+               [3, 2, 2, 0]])
+
+        """
+        return self.random_bounded_integers(low, high, size)
+
+    def negative_binomial(self, n, p, size=None):
+        """
+        negative_binomial(n, p, size=None)
+
+        Draw samples from a negative binomial distribution.
+
+        Samples are drawn from a negative binomial distribution with specified
+        parameters, `n` trials and `p` probability of success where `n` is an
+        integer > 0 and `p` is in the interval [0, 1].
+
+        Parameters
+        ----------
+        n : int
+            Parameter, > 0.
+        p : float
+            Parameter, >= 0 and <=1.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : int or ndarray of ints
+            Drawn samples.
+
+        Notes
+        -----
+        The probability density for the negative binomial distribution is
+
+        .. math:: P(N;n,p) = \\binom{N+n-1}{n-1}p^{n}(1-p)^{N},
+
+        where :math:`n-1` is the number of successes, :math:`p` is the
+        probability of success, and :math:`N+n-1` is the number of trials.
+        The negative binomial distribution gives the probability of n-1
+        successes and N failures in N+n-1 trials, and success on the (N+n)th
+        trial.
+
+        If one throws a die repeatedly until the third time a "1" appears,
+        then the probability distribution of the number of non-"1"s that
+        appear before the third "1" is a negative binomial distribution.
+
+        References
+        ----------
+        .. [1] Weisstein, Eric W. "Negative Binomial Distribution." From
+               MathWorld--A Wolfram Web Resource.
+               http://mathworld.wolfram.com/NegativeBinomialDistribution.html
+        .. [2] Wikipedia, "Negative binomial distribution",
+               http://en.wikipedia.org/wiki/Negative_binomial_distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        A real world example. A company drills wild-cat oil
+        exploration wells, each with an estimated probability of
+        success of 0.1.  What is the probability of having one success
+        for each successive well, that is what is the probability of a
+        single success after drilling 5 wells, after 6 wells, etc.?
+
+        >>> s = np.random.negative_binomial(1, 0.1, 100000)
+        >>> for i in range(1, 11):
+        ...    probability = sum(s<i) / 100000.
+        ...    print i, "wells drilled, probability of one success =", probability
+
+        """
+        return disc(&self.rng_state, &random_negative_binomial, size, self.lock, 2, 0,
+                        n, 'n', CONS_POSITIVE,
+                        p, 'p', CONS_BOUNDED_0_1,
+                        0.0, '', CONS_NONE)
+
+
+
+    def random_integers(self, low, high=None, size=None):
+        """
+        random_integers(low, high=None, size=None)
+
+        Return random integers between `low` and `high`, inclusive.
+
+        Return random integers from the "discrete uniform" distribution in the
+        closed interval [`low`, `high`].  If `high` is None (the default),
+        then results are from [1, `low`].
+
+        Parameters
+        ----------
+        low : int
+            Lowest (signed) integer to be drawn from the distribution (unless
+            ``high=None``, in which case this parameter is the *highest* such
+            integer).
+        high : int, optional
+            If provided, the largest (signed) integer to be drawn from the
+            distribution (see above for behavior if ``high=None``).
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : int or ndarray of ints
+            `size`-shaped array of random integers from the appropriate
+            distribution, or a single such random int if `size` not provided.
+
+        See Also
+        --------
+        random.randint : Similar to `random_integers`, only for the half-open
+            interval [`low`, `high`), and 0 is the lowest value if `high` is
+            omitted.
+
+        Notes
+        -----
+        To sample from N evenly spaced floating-point numbers between a and b,
+        use::
+
+          a + (b - a) * (np.random.random_integers(N) - 1) / (N - 1.)
+
+        Examples
+        --------
+        >>> np.random.random_integers(5)
+        4
+        >>> type(np.random.random_integers(5))
+        <type 'int'>
+        >>> np.random.random_integers(5, size=(3.,2.))
+        array([[5, 4],
+               [3, 3],
+               [4, 5]])
+
+        Choose five random numbers from the set of five evenly-spaced
+        numbers between 0 and 2.5, inclusive (*i.e.*, from the set
+        :math:`{0, 5/8, 10/8, 15/8, 20/8}`):
+
+        >>> 2.5 * (np.random.random_integers(5, size=(5,)) - 1) / 4.
+        array([ 0.625,  1.25 ,  0.625,  0.625,  2.5  ])
+
+        Roll two six sided dice 1000 times and sum the results:
+
+        >>> d1 = np.random.random_integers(1, 6, 1000)
+        >>> d2 = np.random.random_integers(1, 6, 1000)
+        >>> dsums = d1 + d2
+
+        Display results as a histogram:
+
+        >>> import matplotlib.pyplot as plt
+        >>> count, bins, ignored = plt.hist(dsums, 11, normed=True)
+        >>> plt.show()
+
+        """
+        # TODO: This assumes that __add__ can be made to low.
+        # TODO: Might need work if low can be a list
+        if high is None:
+            _low = 1
+            _high = low + 1
+        else:
+            _low = low
+            _high = high
+
+        return self.random_bounded_integers(_low, _high, size)
+
+
+    def logseries(self, p, size=None):
+        """
+        logseries(p, size=None)
+
+        Draw samples from a logarithmic series distribution.
+
+        Samples are drawn from a log series distribution with specified
+        shape parameter, 0 < ``p`` < 1.
+
+        Parameters
+        ----------
+        loc : float
+
+        scale : float > 0.
+
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+                  where the values are all integers in  [0, n].
+
+        See Also
+        --------
+        scipy.stats.distributions.logser : probability density function,
+            distribution or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the Log Series distribution is
+
+        .. math:: P(k) = \\frac{-p^k}{k \\ln(1-p)},
+
+        where p = probability.
+
+        The log series distribution is frequently used to represent species
+        richness and occurrence, first proposed by Fisher, Corbet, and
+        Williams in 1943 [2].  It may also be used to model the numbers of
+        occupants seen in cars [3].
+
+        References
+        ----------
+        .. [1] Buzas, Martin A.; Culver, Stephen J.,  Understanding regional
+               species diversity through the log series distribution of
+               occurrences: BIODIVERSITY RESEARCH Diversity & Distributions,
+               Volume 5, Number 5, September 1999 , pp. 187-195(9).
+        .. [2] Fisher, R.A,, A.S. Corbet, and C.B. Williams. 1943. The
+               relation between the number of species and the number of
+               individuals in a random sample of an animal population.
+               Journal of Animal Ecology, 12:42-58.
+        .. [3] D. J. Hand, F. Daly, D. Lunn, E. Ostrowski, A Handbook of Small
+               Data Sets, CRC Press, 1994.
+        .. [4] Wikipedia, "Logarithmic-distribution",
+               http://en.wikipedia.org/wiki/Logarithmic-distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> a = .6
+        >>> s = np.random.logseries(a, 10000)
+        >>> count, bins, ignored = plt.hist(s)
+
+        #   plot against distribution
+
+        >>> def logseries(k, p):
+        ...     return -p**k/(k*log(1-p))
+        >>> plt.plot(bins, logseries(bins, a)*count.max()/
+                     logseries(bins, a).max(), 'r')
+        >>> plt.show()
+
+        """
+        return disc(&self.rng_state, &random_logseries, size, self.lock, 1, 0,
+                 p, 'p', CONS_BOUNDED_0_1,
+                 0.0, '', CONS_NONE,
+                 0.0, '', CONS_NONE)
+
+
+    def geometric(self, p, size=None):
+        """
+        geometric(p, size=None)
+
+        Draw samples from the geometric distribution.
+
+        Bernoulli trials are experiments with one of two outcomes:
+        success or failure (an example of such an experiment is flipping
+        a coin).  The geometric distribution models the number of trials
+        that must be run in order to achieve success.  It is therefore
+        supported on the positive integers, ``k = 1, 2, ...``.
+
+        The probability mass function of the geometric distribution is
+
+        .. math:: f(k) = (1 - p)^{k - 1} p
+
+        where `p` is the probability of success of an individual trial.
+
+        Parameters
+        ----------
+        p : float
+            The probability of success of an individual trial.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : ndarray
+            Samples from the geometric distribution, shaped according to
+            `size`.
+
+        Examples
+        --------
+        Draw ten thousand values from the geometric distribution,
+        with the probability of an individual success equal to 0.35:
+
+        >>> z = np.random.geometric(p=0.35, size=10000)
+
+        How many trials succeeded after a single run?
+
+        >>> (z == 1).sum() / 10000.
+        0.34889999999999999 #random
+
+        """
+
+        return disc(&self.rng_state, &random_geometric, size, self.lock, 1, 0,
+                        p, 'p', CONS_BOUNDED_0_1,
+                        0.0, '', CONS_NONE,
+                        0.0, '', CONS_NONE)
+
+
+    def zipf(self, a, size=None):
+        """
+        zipf(a, size=None)
+
+        Draw samples from a Zipf distribution.
+
+        Samples are drawn from a Zipf distribution with specified parameter
+        `a` > 1.
+
+        The Zipf distribution (also known as the zeta distribution) is a
+        continuous probability distribution that satisfies Zipf's law: the
+        frequency of an item is inversely proportional to its rank in a
+        frequency table.
+
+        Parameters
+        ----------
+        a : float > 1
+            Distribution parameter.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : scalar or ndarray
+            The returned samples are greater than or equal to one.
+
+        See Also
+        --------
+        scipy.stats.distributions.zipf : probability density function,
+            distribution, or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the Zipf distribution is
+
+        .. math:: p(x) = \\frac{x^{-a}}{\\zeta(a)},
+
+        where :math:`\\zeta` is the Riemann Zeta function.
+
+        It is named for the American linguist George Kingsley Zipf, who noted
+        that the frequency of any word in a sample of a language is inversely
+        proportional to its rank in the frequency table.
+
+        References
+        ----------
+        .. [1] Zipf, G. K., "Selected Studies of the Principle of Relative
+               Frequency in Language," Cambridge, MA: Harvard Univ. Press,
+               1932.
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> a = 2. # parameter
+        >>> s = np.random.zipf(a, 1000)
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> import scipy.special as sps
+        Truncate s values at 50 so plot is interesting
+        >>> count, bins, ignored = plt.hist(s[s<50], 50, normed=True)
+        >>> x = np.arange(1., 50.)
+        >>> y = x**(-a)/sps.zetac(a)
+        >>> plt.plot(x, y/max(y), linewidth=2, color='r')
+        >>> plt.show()
+
+        """
+        return disc(&self.rng_state, &random_zipf, size, self.lock, 1, 0,
+                        a, 'a', CONS_GT_1,
+                        0.0, '', CONS_NONE,
+                        0.0, '', CONS_NONE)
+
+
+    def poisson(self, lam=1.0, size=None):
+        """
+        poisson(lam=1.0, size=None)
+
+        Draw samples from a Poisson distribution.
+
+        The Poisson distribution is the limit of the binomial distribution
+        for large N.
+
+        Parameters
+        ----------
+        lam : float or sequence of float
+            Expectation of interval, should be >= 0. A sequence of expectation
+            intervals must be broadcastable over the requested size.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+            The drawn samples, of shape *size*, if it was provided.
+
+        Notes
+        -----
+        The Poisson distribution
+
+        .. math:: f(k; \\lambda)=\\frac{\\lambda^k e^{-\\lambda}}{k!}
+
+        For events with an expected separation :math:`\\lambda` the Poisson
+        distribution :math:`f(k; \\lambda)` describes the probability of
+        :math:`k` events occurring within the observed
+        interval :math:`\\lambda`.
+
+        Because the output is limited to the range of the C long type, a
+        ValueError is raised when `lam` is within 10 sigma of the maximum
+        representable value.
+
+        References
+        ----------
+        .. [1] Weisstein, Eric W. "Poisson Distribution."
+               From MathWorld--A Wolfram Web Resource.
+               http://mathworld.wolfram.com/PoissonDistribution.html
+        .. [2] Wikipedia, "Poisson distribution",
+               http://en.wikipedia.org/wiki/Poisson_distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> import numpy as np
+        >>> s = np.random.poisson(5, 10000)
+
+        Display histogram of the sample:
+
+        >>> import matplotlib.pyplot as plt
+        >>> count, bins, ignored = plt.hist(s, 14, normed=True)
+        >>> plt.show()
+
+        Draw each 100 values for lambda 100 and 500:
+
+        >>> s = np.random.poisson(lam=(100., 500.), size=(100, 2))
+
+        """
+        return disc(&self.rng_state, &random_poisson, size, self.lock, 1, 0,
+                        lam, 'lam', CONS_POISSON,
+                        0.0, '', CONS_NONE,
+                        0.0, '', CONS_NONE)
+
+
