@@ -4,9 +4,11 @@ ctypedef double (* random_double_2)(aug_state* state, double a, double b) nogil
 ctypedef double (* random_double_3)(aug_state* state, double a, double b, double c) nogil
 
 ctypedef uint64_t (* random_uint_0)(aug_state* state) nogil
-ctypedef uint64_t (* random_uint_1)(aug_state* state, double a) nogil
-ctypedef uint64_t (* random_uint_2)(aug_state* state, double a, double b) nogil
-ctypedef uint64_t (* random_uint_1_i)(aug_state* state, uint64_t a) nogil
+ctypedef uint64_t (* random_uint_d)(aug_state* state, double a) nogil
+ctypedef uint64_t (* random_uint_dd)(aug_state* state, double a, double b) nogil
+ctypedef uint64_t (* random_uint_di)(aug_state* state, double a, uint64_t b) nogil
+ctypedef uint64_t (* random_uint_i)(aug_state* state, uint64_t a) nogil
+ctypedef uint64_t (* random_uint_iii)(aug_state* state, uint64_t a, uint64_t b, uint64_t c) nogil
 
 ctypedef uint32_t (* random_uint_0_32)(aug_state* state) nogil
 ctypedef uint32_t (* random_uint_1_i_32)(aug_state* state, uint32_t a) nogil
@@ -83,7 +85,7 @@ cdef object uint0_32(aug_state* state, random_uint_0_32 func, object size, objec
             randoms[i] = func(state)
     return np.asanyarray(randoms).reshape(size)
 
-cdef object uint1_i(aug_state* state, random_uint_1_i func, uint64_t a, object size, object lock):
+cdef object uint1_i(aug_state* state, random_uint_i func, uint64_t a, object size, object lock):
     if size is None:
         return func(state, a)
     cdef Py_ssize_t i, n = compute_numel(size)

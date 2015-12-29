@@ -75,7 +75,7 @@ cdef extern from "core-rng.h":
 
     cdef long random_poisson(aug_state *state, double lam) nogil
     cdef long random_negative_binomial(aug_state *state, double n, double p) nogil
-    cdef long random_binomial(aug_state *state, long n, double p) nogil
+    cdef long random_binomial(aug_state *state, double p, long n) nogil
 
 include "wrappers.pxi"
 
@@ -214,58 +214,6 @@ cdef object cont_broadcast_3(aug_state* state, void* func, object size, object l
 
     return randoms
 
-cdef object cont_broadcast(aug_state* state, void* func, object size, object lock, int narg,
-                 object a, object a_name, constraint_type a_constraint,
-                 object b, object b_name, constraint_type b_constraint,
-                 object c, object c_name, constraint_type c_constraint):
-
-    cdef np.ndarray a_arr, b_arr, c_arr, randoms
-    cdef np.broadcast it
-    cdef random_double_1 f1;
-    cdef random_double_2 f2;
-    cdef random_double_3 f3;
-
-    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
-    if narg > 1:
-        b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_DOUBLE, np.NPY_ALIGNED)
-    if narg == 3:
-        c_arr = <np.ndarray>np.PyArray_FROM_OTF(c, np.NPY_DOUBLE, np.NPY_ALIGNED)
-    if size is not None:
-        randoms = np.empty(size, np.double)
-    elif narg == 1:
-        # TODO: This could be improved since broadcast isn't needed
-        randoms = np.empty(np.shape(a_arr), np.double)
-    elif narg == 2:
-        randoms = np.empty(np.broadcast(a_arr, b_arr).shape, np.double)
-    elif narg == 3:
-        randoms = np.empty(np.broadcast(a_arr, b_arr, c_arr).shape, np.double)
-
-    if narg == 1:
-        f1 = (<random_double_1>func)
-        it = np.broadcast(a_arr,  randoms)
-        while np.PyArray_MultiIter_NOTDONE(it):
-            (<double*>np.PyArray_MultiIter_DATA(it, 1))[0] = f1(state, (<double*>np.PyArray_MultiIter_DATA(it, 0))[0])
-            np.PyArray_MultiIter_NEXT(it)
-    if narg == 2:
-        f2 = (<random_double_2>func)
-        it = np.broadcast(a_arr,  b_arr, randoms)
-        while np.PyArray_MultiIter_NOTDONE(it):
-            (<double*>np.PyArray_MultiIter_DATA(it, 2))[0] = f2(state,
-                                                                (<double*>np.PyArray_MultiIter_DATA(it, 0))[0],
-                                                                (<double*>np.PyArray_MultiIter_DATA(it, 1))[0])
-            np.PyArray_MultiIter_NEXT(it)
-    if narg == 3:
-        f3 = (<random_double_3>func)
-        it = np.broadcast(a_arr,  b_arr, c_arr, randoms)
-        while np.PyArray_MultiIter_NOTDONE(it):
-            (<double*>np.PyArray_MultiIter_DATA(it, 3))[0] = f3(state,
-                                                                (<double*>np.PyArray_MultiIter_DATA(it, 0))[0],
-                                                                (<double*>np.PyArray_MultiIter_DATA(it, 1))[0],
-                                                                (<double*>np.PyArray_MultiIter_DATA(it, 2))[0])
-            np.PyArray_MultiIter_NEXT(it)
-
-    return randoms
-
 cdef object cont(aug_state* state, void* func, object size, object lock, int narg,
                  object a, object a_name, constraint_type a_constraint,
                  object b, object b_name, constraint_type b_constraint,
@@ -342,6 +290,121 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
                 randoms[i] = f3(state, _a, _b, _c)
 
     return np.asanyarray(randoms).reshape(size)
+
+# Needs double, double-double, double-long, long, long-long-long
+cdef object discrete(aug_state* state, void* func, object size, object lock,
+                     int narg_double, int narg_long,
+                     object a, object a_name, constraint_type a_constraint,
+                     object b, object b_name, constraint_type b_constraint,
+                     object c, object c_name, constraint_type c_constraint):
+
+    cdef double _da, _db
+    cdef long _ia, _ib, _ic
+    cdef bint is_scalar = True
+    if narg_double > 0:
+        _da = PyFloat_AsDouble(a)
+        if _da == -1.0:
+            if PyErr_Occurred():
+                is_scalar = False
+        elif a_constraint != CONS_NONE:
+            check_constraint(_da, a_name, a_constraint)
+
+        if narg_double > 1 and is_scalar:
+            _db = PyFloat_AsDouble(b)
+            if _db == -1.0:
+                if PyErr_Occurred():
+                    is_scalar = False
+            elif b_constraint != CONS_NONE:
+                check_constraint(_db, b_name, b_constraint)
+        if narg_long == 1 and is_scalar:
+            _ib = PyInt_AsLong(b)
+            if _ib == -1:
+                if PyErr_Occurred():
+                    is_scalar = False
+            elif b_constraint != CONS_NONE:
+                check_constraint(_ib, b_name, b_constraint)
+    else:
+        if narg_long > 0:
+            _ia = PyInt_AsLong(a)
+            if _ia == -1:
+                if PyErr_Occurred():
+                    is_scalar = False
+            elif a_constraint != CONS_NONE:
+                check_constraint(_ia, a_name, a_constraint)
+        if narg_long > 1 and is_scalar:
+            _ib = PyInt_AsLong(b)
+            if _ib == -1:
+                if PyErr_Occurred():
+                    is_scalar = False
+            elif b_constraint != CONS_NONE:
+                check_constraint(_ib, b_name, b_constraint)
+        if narg_long > 2 and is_scalar:
+            _ic = PyInt_AsLong(c)
+            if _ic == -1:
+                if PyErr_Occurred():
+                    is_scalar = False
+            elif c_constraint != CONS_NONE:
+                check_constraint(_ic, c_name, c_constraint)
+
+    if not is_scalar:
+        raise NotImplementedError('Vector path not finished')
+
+    if size is None:
+        if narg_long == 0:
+            if narg_double == 0:
+                return (<random_uint_0>func)(state)
+            elif narg_double == 1:
+                return (<random_uint_d>func)(state, _da)
+            elif narg_double == 2:
+                return (<random_uint_dd>func)(state, _da, _db)
+        elif narg_long == 1:
+            if narg_double == 0:
+                return (<random_uint_i>func)(state, _ia)
+            if narg_double == 1:
+                return (<random_uint_di>func)(state, _da, _ib)
+        else:
+            return (<random_uint_iii>func)(state, _ia, _ib, _ic)
+
+    cdef Py_ssize_t i, n = compute_numel(size)
+    cdef uint64_t [:] randoms = np.empty(n, np.uint64)
+    cdef random_uint_0 f0;
+    cdef random_uint_d fd;
+    cdef random_uint_dd fdd;
+    cdef random_uint_di fdi;
+    cdef random_uint_i fi;
+    cdef random_uint_iii fiii;
+
+
+    with lock, nogil:
+        if narg_long == 0:
+            if narg_double == 0:
+                f0 = (<random_uint_0>func)
+                for i in range(n):
+                    randoms[i] = f0(state)
+            elif narg_double == 1:
+                fd = (<random_uint_d>func)
+                for i in range(n):
+                    randoms[i] = fd(state, _da)
+            elif narg_double == 2:
+                fdd = (<random_uint_dd>func)
+                for i in range(n):
+                    randoms[i] = fdd(state, _da, _db)
+        elif narg_long == 1:
+            if narg_double == 0:
+                fi = (<random_uint_i>func)
+                for i in range(n):
+                    randoms[i] = fi(state, _ia)
+            if narg_double == 1:
+                fdi = (<random_uint_di>func)
+                for i in range(n):
+                    randoms[i] = fdi(state, _da, _ib)
+        else:
+            fiii = (<random_uint_iii>func)
+            for i in range(n):
+                randoms[i] = fiii(state, _ia, _ib, _ic)
+
+    return np.asanyarray(randoms).reshape(size)
+
 
 cdef uint64_t MAXSIZE = <uint64_t>sys.maxsize
 
@@ -661,7 +724,8 @@ cdef class RandomState:
         simple truncation.  Instead see ``random_bounded_integers``.
         """
         if bits == 64:
-            return uint0(&self.rng_state, &random_uint64, size, self.lock)
+            return discrete(&self.rng_state, &random_uint64, size, self.lock, 0, 0,
+                            0, '', CONS_NONE, 0, '', CONS_NONE, 0, '', CONS_NONE)
         elif bits == 32:
             return uint0_32(&self.rng_state, &random_uint32, size, self.lock)
         else:
@@ -671,7 +735,8 @@ cdef class RandomState:
         if high < 4294967295:
             return uint1_i_32(&self.rng_state, &random_bounded_uint32, high, size, self.lock)
         else:
-            return uint1_i(&self.rng_state, &random_bounded_uint64, high, size, self.lock)
+            return discrete(&self.rng_state, &random_bounded_uint64, size, self.lock, 0, 1,
+                            high, '', CONS_NONE, 0, '', CONS_NONE, 0, '', CONS_NONE)
 
     def random_bounded_integers(self, int64_t low, high=None, size=None):
         cdef int64_t _low, _high
@@ -973,7 +1038,7 @@ cdef class RandomState:
             raise ValueError("p is nan")
         # return discnp_array_sc(self.internal_state, rk_binomial, size, ln, fp, self.lock)
         # TODO: this function is incomplete
-        return random_binomial(&self.rng_state, <long>n, p)
+        return random_binomial(&self.rng_state, p, <long>n)
 
     def standard_t(self, df, size=None):
         """
