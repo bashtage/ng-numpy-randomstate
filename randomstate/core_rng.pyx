@@ -3,6 +3,8 @@
 import sys
 import numpy as np
 cimport numpy as np
+cimport cython
+import operator
 from libc.stdint cimport uint32_t, uint64_t, int64_t, int32_t
 try:
     from threading import Lock
@@ -76,6 +78,7 @@ cdef extern from "core-rng.h":
     cdef double random_vonmises(aug_state *state, double mu, double kappa) nogil
 
     cdef double random_noncentral_f(aug_state *state, double dfnum, double dfden, double nonc) nogil
+    cdef double random_triangular(aug_state *state, double left, double mode, double right) nogil
 
     cdef long random_poisson(aug_state *state, double lam) nogil
     cdef long random_negative_binomial(aug_state *state, double n, double p) nogil
@@ -83,6 +86,7 @@ cdef extern from "core-rng.h":
     cdef long random_logseries(aug_state *state, double p) nogil
     cdef long random_geometric(aug_state *state, double p) nogil
     cdef long random_zipf(aug_state *state, double a) nogil
+    cdef long random_hypergeometric(aug_state *state, long good, long bad, long sample) nogil
 
 include "wrappers.pxi"
 
@@ -91,7 +95,9 @@ cdef enum ConstraintType:
     CONS_NON_NEGATIVE
     CONS_POSITIVE
     CONS_BOUNDED_0_1
+    CONS_BOUNDED_0_1_NOTNAN
     CONS_GT_1
+    CONS_GTE_1
     CONS_POISSON
 
 ctypedef ConstraintType constraint_type
@@ -106,12 +112,18 @@ cdef int check_array_constraint(np.ndarray val, object name, constraint_type con
     elif cons == CONS_POSITIVE:
         if np.any(np.less_equal(val, 0)):
             raise ValueError(name + " <= 0")
-    elif cons == CONS_BOUNDED_0_1:
+    elif cons == CONS_BOUNDED_0_1 or cons == CONS_BOUNDED_0_1_NOTNAN:
         if np.any(np.less_equal(val, 0)) or np.any(np.greater_equal(val, 1)):
             raise ValueError(name + " <= 0 or " + name + " >= 1")
+        if cons == CONS_BOUNDED_0_1_NOTNAN:
+            if np.any(np.isnan(val)):
+                raise ValueError(name + ' contains NaNs')
     elif cons == CONS_GT_1:
         if np.any(np.less_equal(val, 1)):
             raise ValueError(name + " <= 1")
+    elif cons == CONS_GTE_1:
+        if np.any(np.less(val, 1)):
+            raise ValueError(name + " < 1")
     elif cons == CONS_POISSON:
         if np.any(np.greater(val, POISSON_LAM_MAX)):
             raise ValueError(name + " value too large")
@@ -125,21 +137,27 @@ cdef int check_array_constraint(np.ndarray val, object name, constraint_type con
 cdef int check_constraint(double val, object name, constraint_type cons) except -1:
     if cons == CONS_NON_NEGATIVE:
         if val < 0:
-            raise ValueError(name + " must be non-negative")
+            raise ValueError(name + " < 0")
     elif cons == CONS_POSITIVE:
         if val <= 0:
-            raise ValueError(name + " must be positive")
-    elif cons == CONS_BOUNDED_0_1:
+            raise ValueError(name + " <= 0")
+    elif cons == CONS_BOUNDED_0_1 or cons == CONS_BOUNDED_0_1_NOTNAN:
         if val < 0 or val > 1:
-            raise ValueError(name + " must be between 0 and 1")
+            raise ValueError(name + " <= 0 or " + name + " >= 1")
+        if cons == CONS_BOUNDED_0_1_NOTNAN:
+            if np.isnan(val):
+                raise ValueError(name + ' contains NaNs')
     elif cons == CONS_GT_1:
         if val <= 1:
             raise ValueError(name + " <= 1")
+    elif cons == CONS_GTE_1:
+        if val < 1:
+            raise ValueError(name + " < 1")
     elif cons == CONS_POISSON:
         if val < 0:
             raise ValueError(name + " < 0")
         elif val > POISSON_LAM_MAX:
-            raise ValueError(name + "value too large")
+            raise ValueError(name + " value too large")
 
     return 0
 
@@ -248,7 +266,7 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
                  object a, object a_name, constraint_type a_constraint,
                  object b, object b_name, constraint_type b_constraint,
                  object c, object c_name, constraint_type c_constraint):
-    # TODO: Remove these - just added to suppress warning noise
+
     cdef double _a = 0.0, _b = 0.0, _c = 0.0
     cdef bint is_scalar = True
     if narg > 0:
@@ -329,7 +347,7 @@ cdef object discrete_broadcast_d(aug_state* state, void* func, object size, obje
 
     cdef np.ndarray a_arr, randoms
     cdef np.broadcast it
-    cdef random_uint_d f = <random_uint_d>func
+    cdef random_uint_d f = (<random_uint_d>func)
 
     a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if a_constraint != CONS_NONE:
@@ -369,7 +387,7 @@ cdef object discrete_broadcast_dd(aug_state* state, void* func, object size, obj
         randoms = np.empty(size, np.long)
     else:
         it = np.PyArray_MultiIterNew2(a_arr, b_arr)
-        randoms = np.empty(it.shape, np.double)
+        randoms = np.empty(it.shape, np.long)
         # randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_LONG)
 
     it = np.PyArray_MultiIterNew3(randoms, a_arr, b_arr)
@@ -377,6 +395,7 @@ cdef object discrete_broadcast_dd(aug_state* state, void* func, object size, obj
         while np.PyArray_MultiIter_NOTDONE(it):
             a_val = (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
             b_val = (<double*>np.PyArray_MultiIter_DATA(it, 2))[0]
+
             (<long*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val, b_val)
 
             np.PyArray_MultiIter_NEXT(it)
@@ -402,7 +421,7 @@ cdef object discrete_broadcast_di(aug_state* state, void* func, object size, obj
         randoms = np.empty(size, np.long)
     else:
         it = np.PyArray_MultiIterNew2(a_arr, b_arr)
-        randoms = np.empty(it.shape, np.double)
+        randoms = np.empty(it.shape, np.long)
         #randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_LONG)
 
     it = np.PyArray_MultiIterNew3(randoms, a_arr, b_arr)
@@ -411,6 +430,45 @@ cdef object discrete_broadcast_di(aug_state* state, void* func, object size, obj
             a_val = (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
             b_val = (<long*>np.PyArray_MultiIter_DATA(it, 2))[0]
             (<long*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val, b_val)
+
+            np.PyArray_MultiIter_NEXT(it)
+
+    return randoms
+
+cdef object discrete_broadcast_iii(aug_state* state, void* func, object size, object lock,
+                                  object a, object a_name, constraint_type a_constraint,
+                                  object b, object b_name, constraint_type b_constraint,
+                                  object c, object c_name, constraint_type c_constraint):
+    cdef np.ndarray a_arr, b_arr, c_arr, randoms
+    cdef np.broadcast it
+    cdef random_uint_iii f = (<random_uint_iii>func)
+
+    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_LONG, np.NPY_ALIGNED)
+    if a_constraint != CONS_NONE:
+        check_array_constraint(a_arr, a_name, a_constraint)
+
+    b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_LONG, np.NPY_ALIGNED)
+    if b_constraint != CONS_NONE:
+        check_array_constraint(b_arr, b_name, b_constraint)
+
+    c_arr = <np.ndarray>np.PyArray_FROM_OTF(c, np.NPY_LONG, np.NPY_ALIGNED)
+    if c_constraint != CONS_NONE:
+        check_array_constraint(c_arr, c_name, c_constraint)
+
+    if size is not None:
+        randoms = np.empty(size, np.long)
+    else:
+        it = np.PyArray_MultiIterNew3(a_arr, b_arr, c_arr)
+        randoms = np.empty(it.shape, np.long)
+        #randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_LONG)
+
+    it = np.PyArray_MultiIterNew4(randoms, a_arr, b_arr, c_arr)
+    with lock, nogil:
+        while np.PyArray_MultiIter_NOTDONE(it):
+            a_val = (<long*>np.PyArray_MultiIter_DATA(it, 1))[0]
+            b_val = (<long*>np.PyArray_MultiIter_DATA(it, 2))[0]
+            c_val = (<long*>np.PyArray_MultiIter_DATA(it, 3))[0]
+            (<long*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val, b_val, c_val)
 
             np.PyArray_MultiIter_NEXT(it)
 
@@ -444,13 +502,13 @@ cdef object discrete_broadcast_i(aug_state* state, void* func, object size, obje
 
 # Needs double <vec>, double-double <vec>, double-long<vec>, long <vec>, long-long-long
 cdef object disc(aug_state* state, void* func, object size, object lock,
-                     int narg_double, int narg_long,
-                     object a, object a_name, constraint_type a_constraint,
-                     object b, object b_name, constraint_type b_constraint,
-                     object c, object c_name, constraint_type c_constraint):
-    # TODO: Remove these - just added to suppress warning noise
-    cdef double _da = 0.0, _db = 0.0
-    cdef long _ia = 0, _ib = 0, _ic = 0
+                 int narg_double, int narg_long,
+                 object a, object a_name, constraint_type a_constraint,
+                 object b, object b_name, constraint_type b_constraint,
+                 object c, object c_name, constraint_type c_constraint):
+
+    cdef double _da = 0, _db = 0
+    cdef long _ia = 0, _ib = 0 , _ic = 0
     cdef bint is_scalar = True
     if narg_double > 0:
         _da = PyFloat_AsDouble(a)
@@ -498,6 +556,7 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
                 check_constraint(<double>_ic, c_name, c_constraint)
 
     if not is_scalar:
+        PyErr_Clear()
         if narg_long == 0:
             if narg_double == 1:
                 return discrete_broadcast_d(state, func, size, lock,
@@ -508,7 +567,8 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
                                              b, b_name, b_constraint)
         elif narg_long == 1:
             if narg_double == 0:
-                return discrete_broadcast_i(state, func, size, lock, a, a_name, a_constraint)
+                return discrete_broadcast_i(state, func, size, lock,
+                                            a, a_name, a_constraint)
             elif narg_double == 1:
                 return discrete_broadcast_di(state, func, size, lock,
                                              a, a_name, a_constraint,
@@ -573,6 +633,17 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
     return np.asanyarray(randoms).reshape(size)
 
 
+cdef double kahan_sum(double *darr, np.npy_intp n):
+    cdef double c, y, t, sum
+    cdef np.npy_intp i
+    sum = darr[0]
+    c = 0.0
+    for i in range(n):
+        y = darr[i] - c
+        t = sum + y
+        c = (t-sum) - y
+        sum = t
+    return sum
 
 
 cdef class RandomState:
@@ -913,11 +984,30 @@ cdef class RandomState:
             raise ValueError('Unknown value of bits.  Must be either 32 or 64.')
 
     def random_bounded_uintegers(self, uint64_t high, size=None):
+        cdef Py_ssize_t i, n
+        cdef uint32_t [:] randoms32
+        cdef uint64_t [:] randoms64
         if high < 4294967295:
-            return uint1_i_32(&self.rng_state, &random_bounded_uint32, high, size, self.lock)
+            if size is None:
+                return random_bounded_uint32(&self.rng_state, high)
+            else:
+                n = compute_numel(size)
+                randoms32 = np.empty(n, np.uint32)
+                with self.lock, nogil:
+                    for i in range(n):
+                        randoms32[i] = random_bounded_uint32(&self.rng_state, high)
+                return np.asanyarray(randoms32).reshape(size)
         else:
-            return disc(&self.rng_state, &random_bounded_uint64, size, self.lock, 0, 1,
-                            high, '', CONS_NONE, 0, '', CONS_NONE, 0, '', CONS_NONE)
+            if size is None:
+                return random_bounded_uint64(&self.rng_state, high)
+            else:
+                n = compute_numel(size)
+                randoms64 = np.empty(n, np.uint64)
+                with self.lock, nogil:
+                    for i in range(n):
+                        randoms64[i] = random_bounded_uint64(&self.rng_state, high)
+                return np.asanyarray(randoms64).reshape(size)
+
 
     def random_bounded_integers(self, int64_t low, high=None, size=None):
         cdef int64_t _low, _high
@@ -1209,17 +1299,13 @@ cdef class RandomState:
         generate zero positive results.
         >>> sum(np.random.binomial(9, 0.1, 20000) == 0)/20000.
         # answer = 0.38885, or 38%.
-        """
 
-        if p < 0:
-            raise ValueError("p < 0")
-        elif p > 1:
-            raise ValueError("p > 1")
-        elif np.isnan(p):
-            raise ValueError("p is nan")
-        # return discnp_array_sc(self.internal_state, rk_binomial, size, ln, fp, self.lock)
-        # TODO: this function is incomplete
-        return random_binomial(&self.rng_state, p, <long>n)
+        """
+        return disc(&self.rng_state, &random_binomial, size, self.lock, 1, 1,
+                    p, 'p', CONS_BOUNDED_0_1_NOTNAN,
+                    n, 'n', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
+
 
     def standard_t(self, df, size=None):
         """
@@ -1655,9 +1741,7 @@ cdef class RandomState:
                 [ True,  True]]], dtype=bool)
 
         """
-        # TODO: Docs do not make sense here.  Is it [,] or [,)?
-        # TODO: Check bounded uinteger implementation for [,] or [,)
-        return self.random_bounded_uintegers(MAXSIZE, size)
+        return self.random_bounded_uintegers(MAXSIZE + 1, size)
 
     def normal(self, loc=0.0, scale=1.0, size=None):
         """
@@ -3592,4 +3676,617 @@ cdef class RandomState:
                         0.0, '', CONS_NONE,
                         0.0, '', CONS_NONE)
 
+    def dirichlet(self, object alpha, size=None):
+        """
+        dirichlet(alpha, size=None)
 
+        Draw samples from the Dirichlet distribution.
+
+        Draw `size` samples of dimension k from a Dirichlet distribution. A
+        Dirichlet-distributed random variable can be seen as a multivariate
+        generalization of a Beta distribution. Dirichlet pdf is the conjugate
+        prior of a multinomial in Bayesian inference.
+
+        Parameters
+        ----------
+        alpha : array
+            Parameter of the distribution (k dimension for sample of
+            dimension k).
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray,
+            The drawn samples, of shape (size, alpha.ndim).
+
+        Notes
+        -----
+        .. math:: X \\approx \\prod_{i=1}^{k}{x^{\\alpha_i-1}_i}
+
+        Uses the following property for computation: for each dimension,
+        draw a random sample y_i from a standard gamma generator of shape
+        `alpha_i`, then
+        :math:`X = \\frac{1}{\\sum_{i=1}^k{y_i}} (y_1, \\ldots, y_n)` is
+        Dirichlet distributed.
+
+        References
+        ----------
+        .. [1] David McKay, "Information Theory, Inference and Learning
+               Algorithms," chapter 23,
+               http://www.inference.phy.cam.ac.uk/mackay/
+        .. [2] Wikipedia, "Dirichlet distribution",
+               http://en.wikipedia.org/wiki/Dirichlet_distribution
+
+        Examples
+        --------
+        Taking an example cited in Wikipedia, this distribution can be used if
+        one wanted to cut strings (each of initial length 1.0) into K pieces
+        with different lengths, where each piece had, on average, a designated
+        average length, but allowing some variation in the relative sizes of
+        the pieces.
+
+        >>> s = np.random.dirichlet((10, 5, 3), 20).transpose()
+
+        >>> plt.barh(range(20), s[0])
+        >>> plt.barh(range(20), s[1], left=s[0], color='g')
+        >>> plt.barh(range(20), s[2], left=s[0]+s[1], color='r')
+        >>> plt.title("Lengths of Strings")
+
+        """
+
+        #=================
+        # Pure python algo
+        #=================
+        #alpha   = N.atleast_1d(alpha)
+        #k       = alpha.size
+
+        #if n == 1:
+        #    val = N.zeros(k)
+        #    for i in range(k):
+        #        val[i]   = sgamma(alpha[i], n)
+        #    val /= N.sum(val)
+        #else:
+        #    val = N.zeros((k, n))
+        #    for i in range(k):
+        #        val[i]   = sgamma(alpha[i], n)
+        #    val /= N.sum(val, axis = 0)
+        #    val = val.T
+
+        #return val
+
+        cdef np.npy_intp   k
+        cdef np.npy_intp   totsize
+        cdef np.ndarray    alpha_arr, val_arr
+        cdef double     *alpha_data
+        cdef double     *val_data
+        cdef np.npy_intp   i, j
+        cdef double     acc, invacc
+
+        k           = len(alpha)
+        alpha_arr   = <np.ndarray>np.PyArray_ContiguousFromObject(alpha, np.NPY_DOUBLE, 1, 1)
+        alpha_data  = <double*>np.PyArray_DATA(alpha_arr)
+
+        if size is None:
+            shape = (k,)
+        else:
+            try:
+                shape = (operator.index(size), k)
+            except:
+                shape = tuple(size) + (k,)
+
+        diric   = np.zeros(shape, np.float64)
+        val_arr = <np.ndarray>diric
+        val_data= <double*>np.PyArray_DATA(val_arr)
+
+        i = 0
+        totsize = np.PyArray_SIZE(val_arr)
+        with self.lock, nogil:
+            while i < totsize:
+                acc = 0.0
+                for j in range(k):
+                    val_data[i+j] = random_standard_gamma(&self.rng_state, alpha_data[j])
+                    acc             = acc + val_data[i + j]
+                invacc  = 1/acc
+                for j in range(k):
+                    val_data[i + j]   = val_data[i + j] * invacc
+                i = i + k
+
+        return diric
+
+    def multinomial(self, np.npy_intp n, object pvals, size=None):
+        """
+        multinomial(n, pvals, size=None)
+
+        Draw samples from a multinomial distribution.
+
+        The multinomial distribution is a multivariate generalisation of the
+        binomial distribution.  Take an experiment with one of ``p``
+        possible outcomes.  An example of such an experiment is throwing a dice,
+        where the outcome can be 1 through 6.  Each sample drawn from the
+        distribution represents `n` such experiments.  Its values,
+        ``X_i = [X_0, X_1, ..., X_p]``, represent the number of times the
+        outcome was ``i``.
+
+        Parameters
+        ----------
+        n : int
+            Number of experiments.
+        pvals : sequence of floats, length p
+            Probabilities of each of the ``p`` different outcomes.  These
+            should sum to 1 (however, the last element is always assumed to
+            account for the remaining probability, as long as
+            ``sum(pvals[:-1]) <= 1)``.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : ndarray
+            The drawn samples, of shape *size*, if that was provided.  If not,
+            the shape is ``(N,)``.
+
+            In other words, each entry ``out[i,j,...,:]`` is an N-dimensional
+            value drawn from the distribution.
+
+        Examples
+        --------
+        Throw a dice 20 times:
+
+        >>> np.random.multinomial(20, [1/6.]*6, size=1)
+        array([[4, 1, 7, 5, 2, 1]])
+
+        It landed 4 times on 1, once on 2, etc.
+
+        Now, throw the dice 20 times, and 20 times again:
+
+        >>> np.random.multinomial(20, [1/6.]*6, size=2)
+        array([[3, 4, 3, 3, 4, 3],
+               [2, 4, 3, 4, 0, 7]])
+
+        For the first run, we threw 3 times 1, 4 times 2, etc.  For the second,
+        we threw 2 times 1, 4 times 2, etc.
+
+        A loaded die is more likely to land on number 6:
+
+        >>> np.random.multinomial(100, [1/7.]*5 + [2/7.])
+        array([11, 16, 14, 17, 16, 26])
+
+        The probability inputs should be normalized. As an implementation
+        detail, the value of the last entry is ignored and assumed to take
+        up any leftover probability mass, but this should not be relied on.
+        A biased coin which has twice as much weight on one side as on the
+        other should be sampled like so:
+
+        >>> np.random.multinomial(100, [1.0 / 3, 2.0 / 3])  # RIGHT
+        array([38, 62])
+
+        not like:
+
+        >>> np.random.multinomial(100, [1.0, 2.0])  # WRONG
+        array([100,   0])
+
+        """
+        cdef np.npy_intp d
+        cdef np.ndarray parr "arrayObject_parr", mnarr "arrayObject_mnarr"
+        cdef double *pix
+        cdef long *mnix
+        cdef np.npy_intp i, j, dn, sz
+        cdef double Sum
+
+        d = len(pvals)
+        parr = <np.ndarray>np.PyArray_ContiguousFromObject(pvals, np.NPY_DOUBLE, 1, 1)
+        pix = <double*>np.PyArray_DATA(parr)
+
+        if kahan_sum(pix, d-1) > (1.0 + 1e-12):
+            raise ValueError("sum(pvals[:-1]) > 1.0")
+
+        if size is None:
+            shape = (d,)
+        else:
+            try:
+                shape = (operator.index(size), d)
+            except:
+                shape = tuple(size) + (d,)
+
+        multin = np.zeros(shape, int)
+        mnarr = <np.ndarray>multin
+        mnix = <long*>np.PyArray_DATA(mnarr)
+        sz = np.PyArray_SIZE(mnarr)
+        with self.lock, nogil:
+            i = 0
+            while i < sz:
+                Sum = 1.0
+                dn = n
+                for j in range(d-1):
+                    mnix[i+j] = random_binomial(&self.rng_state, pix[j]/Sum, dn)
+                    dn = dn - mnix[i+j]
+                    if dn <= 0:
+                        break
+                    Sum = Sum - pix[j]
+                if dn > 0:
+                    mnix[i+d-1] = dn
+
+                i = i + d
+
+        return multin
+
+
+    def multivariate_normal(self, mean, cov, size=None):
+        """
+        multivariate_normal(mean, cov[, size])
+
+        Draw random samples from a multivariate normal distribution.
+
+        The multivariate normal, multinormal or Gaussian distribution is a
+        generalization of the one-dimensional normal distribution to higher
+        dimensions.  Such a distribution is specified by its mean and
+        covariance matrix.  These parameters are analogous to the mean
+        (average or "center") and variance (standard deviation, or "width,"
+        squared) of the one-dimensional normal distribution.
+
+        Parameters
+        ----------
+        mean : 1-D array_like, of length N
+            Mean of the N-dimensional distribution.
+        cov : 2-D array_like, of shape (N, N)
+            Covariance matrix of the distribution. It must be symmetric and
+            positive-semidefinite for proper sampling.
+        size : int or tuple of ints, optional
+            Given a shape of, for example, ``(m,n,k)``, ``m*n*k`` samples are
+            generated, and packed in an `m`-by-`n`-by-`k` arrangement.  Because
+            each sample is `N`-dimensional, the output shape is ``(m,n,k,N)``.
+            If no shape is specified, a single (`N`-D) sample is returned.
+
+        Returns
+        -------
+        out : ndarray
+            The drawn samples, of shape *size*, if that was provided.  If not,
+            the shape is ``(N,)``.
+
+            In other words, each entry ``out[i,j,...,:]`` is an N-dimensional
+            value drawn from the distribution.
+
+        Notes
+        -----
+        The mean is a coordinate in N-dimensional space, which represents the
+        location where samples are most likely to be generated.  This is
+        analogous to the peak of the bell curve for the one-dimensional or
+        univariate normal distribution.
+
+        Covariance indicates the level to which two variables vary together.
+        From the multivariate normal distribution, we draw N-dimensional
+        samples, :math:`X = [x_1, x_2, ... x_N]`.  The covariance matrix
+        element :math:`C_{ij}` is the covariance of :math:`x_i` and :math:`x_j`.
+        The element :math:`C_{ii}` is the variance of :math:`x_i` (i.e. its
+        "spread").
+
+        Instead of specifying the full covariance matrix, popular
+        approximations include:
+
+          - Spherical covariance (*cov* is a multiple of the identity matrix)
+          - Diagonal covariance (*cov* has non-negative elements, and only on
+            the diagonal)
+
+        This geometrical property can be seen in two dimensions by plotting
+        generated data-points:
+
+        >>> mean = [0, 0]
+        >>> cov = [[1, 0], [0, 100]]  # diagonal covariance
+
+        Diagonal covariance means that points are oriented along x or y-axis:
+
+        >>> import matplotlib.pyplot as plt
+        >>> x, y = np.random.multivariate_normal(mean, cov, 5000).T
+        >>> plt.plot(x, y, 'x')
+        >>> plt.axis('equal')
+        >>> plt.show()
+
+        Note that the covariance matrix must be positive semidefinite (a.k.a.
+        nonnegative-definite). Otherwise, the behavior of this method is
+        undefined and backwards compatibility is not guaranteed.
+
+        References
+        ----------
+        .. [1] Papoulis, A., "Probability, Random Variables, and Stochastic
+               Processes," 3rd ed., New York: McGraw-Hill, 1991.
+        .. [2] Duda, R. O., Hart, P. E., and Stork, D. G., "Pattern
+               Classification," 2nd ed., New York: Wiley, 2001.
+
+        Examples
+        --------
+        >>> mean = (1, 2)
+        >>> cov = [[1, 0], [0, 1]]
+        >>> x = np.random.multivariate_normal(mean, cov, (3, 3))
+        >>> x.shape
+        (3, 3, 2)
+
+        The following is probably true, given that 0.6 is roughly twice the
+        standard deviation:
+
+        >>> list((x[0,0,:] - mean) < 0.6)
+        [True, True]
+
+        """
+        from numpy.dual import svd
+
+        # Check preconditions on arguments
+        mean = np.array(mean)
+        cov = np.array(cov)
+        if size is None:
+            shape = []
+        elif isinstance(size, (int, long, np.integer)):
+            shape = [size]
+        else:
+            shape = size
+
+        if len(mean.shape) != 1:
+               raise ValueError("mean must be 1 dimensional")
+        if (len(cov.shape) != 2) or (cov.shape[0] != cov.shape[1]):
+               raise ValueError("cov must be 2 dimensional and square")
+        if mean.shape[0] != cov.shape[0]:
+               raise ValueError("mean and cov must have same length")
+
+        # Compute shape of output and create a matrix of independent
+        # standard normally distributed random numbers. The matrix has rows
+        # with the same length as mean and as many rows are necessary to
+        # form a matrix of shape final_shape.
+        final_shape = list(shape[:])
+        final_shape.append(mean.shape[0])
+        x = self.standard_normal(final_shape).reshape(-1, mean.shape[0])
+
+        # Transform matrix of standard normals into matrix where each row
+        # contains multivariate normals with the desired covariance.
+        # Compute A such that dot(transpose(A),A) == cov.
+        # Then the matrix products of the rows of x and A has the desired
+        # covariance. Note that sqrt(s)*v where (u,s,v) is the singular value
+        # decomposition of cov is such an A.
+        #
+        # Also check that cov is positive-semidefinite. If so, the u.T and v
+        # matrices should be equal up to roundoff error if cov is
+        # symmetrical and the singular value of the corresponding row is
+        # not zero. We continue to use the SVD rather than Cholesky in
+        # order to preserve current outputs. Note that symmetry has not
+        # been checked.
+        (u, s, v) = svd(cov)
+        neg = (np.sum(u.T * v, axis=1) < 0) & (s > 0)
+        if np.any(neg):
+            s[neg] = 0.
+            import warnings
+            warnings.warn("covariance is not positive-semidefinite.",
+                          RuntimeWarning)
+
+        x = np.dot(x, np.sqrt(s)[:, None] * v)
+        x += mean
+        x.shape = tuple(final_shape)
+        return x
+
+    def triangular(self, left, mode, right, size=None):
+        """
+        triangular(left, mode, right, size=None)
+
+        Draw samples from the triangular distribution.
+
+        The triangular distribution is a continuous probability
+        distribution with lower limit left, peak at mode, and upper
+        limit right. Unlike the other distributions, these parameters
+        directly define the shape of the pdf.
+
+        Parameters
+        ----------
+        left : scalar
+            Lower limit.
+        mode : scalar
+            The value where the peak of the distribution occurs.
+            The value should fulfill the condition ``left <= mode <= right``.
+        right : scalar
+            Upper limit, should be larger than `left`.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+            The returned samples all lie in the interval [left, right].
+
+        Notes
+        -----
+        The probability density function for the triangular distribution is
+
+        .. math:: P(x;l, m, r) = \\begin{cases}
+                  \\frac{2(x-l)}{(r-l)(m-l)}& \\text{for $l \\leq x \\leq m$},\\\\
+                  \\frac{2(r-x)}{(r-l)(r-m)}& \\text{for $m \\leq x \\leq r$},\\\\
+                  0& \\text{otherwise}.
+                  \\end{cases}
+
+        The triangular distribution is often used in ill-defined
+        problems where the underlying distribution is not known, but
+        some knowledge of the limits and mode exists. Often it is used
+        in simulations.
+
+        References
+        ----------
+        .. [1] Wikipedia, "Triangular distribution"
+               http://en.wikipedia.org/wiki/Triangular_distribution
+
+        Examples
+        --------
+        Draw values from the distribution and plot the histogram:
+
+        >>> import matplotlib.pyplot as plt
+        >>> h = plt.hist(np.random.triangular(-3, 0, 8, 100000), bins=200,
+        ...              normed=True)
+        >>> plt.show()
+
+        """
+        cdef bint is_scalar = True
+        cdef double fleft, fmode, fright
+        cdef np.ndarray oleft, omode, oright
+
+        fleft = PyFloat_AsDouble(left)
+        fright = PyFloat_AsDouble(right)
+        fmode = PyFloat_AsDouble(mode)
+        if fleft == -1.0 or fright == -1.0 or fmode == -1.0:
+            if PyErr_Occurred():
+                PyErr_Clear()
+                is_scalar = False
+
+        if is_scalar:
+            if fleft > fmode:
+                raise ValueError("left > mode")
+            if fmode > fright:
+                raise ValueError("mode > right")
+            if fleft == fright:
+                raise ValueError("left == right")
+            return cont(&self.rng_state, &random_triangular, size, self.lock, 3,
+                        fleft, '', CONS_NONE,
+                        fmode, '', CONS_NONE,
+                        fright, '', CONS_NONE)
+
+        oleft = <np.ndarray>np.PyArray_FROM_OTF(left, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        omode = <np.ndarray>np.PyArray_FROM_OTF(mode, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        oright = <np.ndarray>np.PyArray_FROM_OTF(right, np.NPY_DOUBLE, np.NPY_ALIGNED)
+
+        if np.any(np.greater(oleft, omode)):
+            raise ValueError("left > mode")
+        if np.any(np.greater(omode, oright)):
+            raise ValueError("mode > right")
+        if np.any(np.equal(oleft, oright)):
+            raise ValueError("left == right")
+
+        return cont_broadcast_3(&self.rng_state, &random_triangular, size, self.lock,
+                            oleft, '', CONS_NONE,
+                            omode, '', CONS_NONE,
+                            oright, '', CONS_NONE)
+
+
+    def hypergeometric(self, ngood, nbad, nsample, size=None):
+        """
+        hypergeometric(ngood, nbad, nsample, size=None)
+
+        Draw samples from a Hypergeometric distribution.
+
+        Samples are drawn from a hypergeometric distribution with specified
+        parameters, ngood (ways to make a good selection), nbad (ways to make
+        a bad selection), and nsample = number of items sampled, which is less
+        than or equal to the sum ngood + nbad.
+
+        Parameters
+        ----------
+        ngood : int or array_like
+            Number of ways to make a good selection.  Must be nonnegative.
+        nbad : int or array_like
+            Number of ways to make a bad selection.  Must be nonnegative.
+        nsample : int or array_like
+            Number of items sampled.  Must be at least 1 and at most
+            ``ngood + nbad``.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+            The values are all integers in  [0, n].
+
+        See Also
+        --------
+        scipy.stats.distributions.hypergeom : probability density function,
+            distribution or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the Hypergeometric distribution is
+
+        .. math:: P(x) = \\frac{\\binom{m}{n}\\binom{N-m}{n-x}}{\\binom{N}{n}},
+
+        where :math:`0 \\le x \\le m` and :math:`n+m-N \\le x \\le n`
+
+        for P(x) the probability of x successes, n = ngood, m = nbad, and
+        N = number of samples.
+
+        Consider an urn with black and white marbles in it, ngood of them
+        black and nbad are white. If you draw nsample balls without
+        replacement, then the hypergeometric distribution describes the
+        distribution of black balls in the drawn sample.
+
+        Note that this distribution is very similar to the binomial
+        distribution, except that in this case, samples are drawn without
+        replacement, whereas in the Binomial case samples are drawn with
+        replacement (or the sample space is infinite). As the sample space
+        becomes large, this distribution approaches the binomial.
+
+        References
+        ----------
+        .. [1] Lentner, Marvin, "Elementary Applied Statistics", Bogden
+               and Quigley, 1972.
+        .. [2] Weisstein, Eric W. "Hypergeometric Distribution." From
+               MathWorld--A Wolfram Web Resource.
+               http://mathworld.wolfram.com/HypergeometricDistribution.html
+        .. [3] Wikipedia, "Hypergeometric-distribution",
+               http://en.wikipedia.org/wiki/Hypergeometric_distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> ngood, nbad, nsamp = 100, 2, 10
+        # number of good, number of bad, and number of samples
+        >>> s = np.random.hypergeometric(ngood, nbad, nsamp, 1000)
+        >>> hist(s)
+        #   note that it is very unlikely to grab both bad items
+
+        Suppose you have an urn with 15 white and 15 black marbles.
+        If you pull 15 marbles at random, how likely is it that
+        12 or more of them are one color?
+
+        >>> s = np.random.hypergeometric(15, 15, 15, 100000)
+        >>> sum(s>=12)/100000. + sum(s<=3)/100000.
+        #   answer = 0.003 ... pretty unlikely!
+
+        """
+        cdef bint is_scalar = True
+        cdef np.ndarray ongood, onbad, onsample
+        cdef long lngood, lnbad, lnsample
+
+        lngood = PyInt_AsLong(ngood)
+        lnbad = PyInt_AsLong(nbad)
+        lnsample = PyInt_AsLong(nsample)
+        if lngood == -1 or lnbad == -1 or lnsample == -1:
+            if PyErr_Occurred():
+                PyErr_Clear()
+                is_scalar = False
+
+        if is_scalar:
+            if lngood < 0:
+                raise ValueError("ngood < 0")
+            if lnbad < 0:
+                raise ValueError("nbad < 0")
+            if lnsample < 1:
+                raise ValueError("nsample < 1")
+            if lngood + lnbad < lnsample:
+                raise ValueError("ngood + nbad < nsample")
+            return disc(&self.rng_state, &random_hypergeometric, size, self.lock, 0, 3,
+                        lngood, 'ngood', CONS_NON_NEGATIVE,
+                        lnbad, 'nbad', CONS_NON_NEGATIVE,
+                        lnsample, 'nsample', CONS_GTE_1)
+
+        PyErr_Clear()
+
+        ongood = <np.ndarray>np.PyArray_FROM_OTF(ngood, np.NPY_LONG, np.NPY_ALIGNED)
+        onbad = <np.ndarray>np.PyArray_FROM_OTF(nbad, np.NPY_LONG, np.NPY_ALIGNED)
+        onsample = <np.ndarray>np.PyArray_FROM_OTF(nsample, np.NPY_LONG, np.NPY_ALIGNED)
+
+        if np.any(np.less(np.add(ongood, onbad),onsample)):
+            raise ValueError("ngood + nbad < nsample")
+        return discrete_broadcast_iii(&self.rng_state, &random_hypergeometric, size, self.lock,
+                                      ongood, 'ngood', CONS_NON_NEGATIVE,
+                                      onbad, nbad, CONS_NON_NEGATIVE,
+                                      onsample, 'nsample', CONS_GTE_1)

@@ -13,6 +13,53 @@ import randomstate.xorshift128 as xorshift128
 
 from nose import SkipTest
 
+
+def params_0(f):
+    val = f()
+    assert np.isscalar(val)
+    val = f(10)
+    assert val.shape == (10,)
+    val = f((10, 10))
+    assert val.shape == (10, 10)
+    val = f((10, 10, 10))
+    assert val.shape == (10, 10, 10)
+    val = f(size=(5, 5))
+    assert val.shape == (5, 5)
+
+
+def params_1(f, bounded=False):
+    a = 5.0
+    b = np.arange(2.0, 12.0)
+    c = np.arange(2.0, 102.0).reshape(10, 10)
+    d = np.arange(2.0, 1002.0).reshape(10, 10, 10)
+    e = np.array([2.0, 3.0])
+    g = np.arange(2.0, 12.0).reshape(1, 10, 1)
+    if bounded:
+        a = 0.5
+        b = b / (1.5 * b.max())
+        c = c / (1.5 * c.max())
+        d = d / (1.5 * d.max())
+        e = e / (1.5 * e.max())
+        g = g / (1.5 * g.max())
+
+    # Scalar
+    f(a)
+    # Scalar - size
+    f(a, size=(10, 10))
+    # 1d
+    f(b)
+    # 2d
+    f(c)
+    # 3d
+    f(d)
+    # 1d size
+    f(b, size=10)
+    # 2d - size - broadcast
+    f(e, size=(10, 2))
+    # 3d - size
+    f(g, size=(10, 10, 10))
+
+
 def comp_state(state1, state2):
     identical = True
     if isinstance(state1, dict):
@@ -28,6 +75,12 @@ def comp_state(state1, state2):
 
 
 class RNG(object):
+    @classmethod
+    def _extra_setup(cls):
+        cls.vec_1d = np.arange(2.0, 102.0)
+        cls.vec_2d = np.arange(2.0, 102.0)[None, :]
+        cls.mat = np.arange(2.0, 102.0, 0.01).reshape((100, 100))
+
     def _reset_state(self):
         self.rs.set_state(self.initial_state)
 
@@ -66,46 +119,46 @@ class RNG(object):
         assert (r <= 0).all()
 
     def test_uniform_array(self):
-        r = self.rs.uniform(np.array([-1.0]*10), 0.0, size=10)
+        r = self.rs.uniform(np.array([-1.0] * 10), 0.0, size=10)
         assert len(r) == 10
         assert (r > -1).all()
         assert (r <= 0).all()
-        r = self.rs.uniform(np.array([-1.0]*10), np.array([0.0]*10), size=10)
+        r = self.rs.uniform(np.array([-1.0] * 10), np.array([0.0] * 10), size=10)
         assert len(r) == 10
         assert (r > -1).all()
         assert (r <= 0).all()
-        r = self.rs.uniform(-1.0, np.array([0.0]*10), size=10)
+        r = self.rs.uniform(-1.0, np.array([0.0] * 10), size=10)
         assert len(r) == 10
         assert (r > -1).all()
         assert (r <= 0).all()
-        
+
     def test_random_sample(self):
         assert len(self.rs.random_sample(10)) == 10
+        params_0(self.rs.random_sample)
 
     def test_standard_normal_zig(self):
         assert len(self.rs.standard_normal(10, method='zig')) == 10
 
     def test_standard_normal(self):
         assert len(self.rs.standard_normal(10)) == 10
+        params_0(self.rs.standard_normal)
 
     def test_standard_gamma(self):
         assert len(self.rs.standard_gamma(10, 10)) == 10
-        assert len(self.rs.standard_gamma(np.array([10]*10), 10)) == 10
-
-    def test_standard_gamma_array(self):
-        assert len(self.rs.standard_gamma(np.array([10]*10), 10)) == 10
+        assert len(self.rs.standard_gamma(np.array([10] * 10), 10)) == 10
+        params_1(self.rs.standard_gamma)
 
     def test_standard_exponential(self):
         assert len(self.rs.standard_exponential(10)) == 10
+        params_0(self.rs.standard_exponential)
 
     def test_standard_cauchy(self):
         assert len(self.rs.standard_cauchy(10)) == 10
+        params_0(self.rs.standard_cauchy)
 
     def test_standard_t(self):
         assert len(self.rs.standard_t(10, 10)) == 10
-
-    def test_standard_array(self):
-        assert len(self.rs.standard_t(np.arange(1,11.0), 10)) == 10
+        params_1(self.rs.standard_t)
 
     def test_binomial(self):
         assert self.rs.binomial(10, .5) >= 0
@@ -131,11 +184,11 @@ class RNG(object):
     def test_entropy_init(self):
         rs = self.mod.RandomState()
         rs2 = self.mod.RandomState()
-        print('\n'*10)
-        print('*'*80)
+        print('\n' * 10)
+        print('*' * 80)
         s1 = rs.get_state()
         s2 = rs2.get_state()
-        print('\n'*10)
+        print('\n' * 10)
         assert not comp_state(rs.get_state(), rs2.get_state())
 
     def test_seed(self):
@@ -164,31 +217,33 @@ class RNG(object):
         assert (n1 == n2).all()
 
     def test_shuffle(self):
-        original = np.arange(200,0,-1)
+        original = np.arange(200, 0, -1)
         permuted = self.rs.permutation(original)
         assert (original != permuted).any()
 
     def test_permutation(self):
-        original = np.arange(200,0,-1)
+        original = np.arange(200, 0, -1)
         permuted = self.rs.permutation(original)
         assert (original != permuted).any()
 
     def test_tomaxint(self):
         vals = self.rs.tomaxint(size=100000)
-        if sys.maxsize < 2**32:
+        if sys.maxsize < 2 ** 32:
             assert (vals < sys.maxsize).all()
         else:
             assert (vals >= 2 ** 32).any()
 
     def test_beta(self):
-        vals = self.rs.beta(2.0,2.0, 10)
+        vals = self.rs.beta(2.0, 2.0, 10)
         assert len(vals) == 10
-        vals = self.rs.beta(np.array([2.0]*10),2.0)
+        vals = self.rs.beta(np.array([2.0] * 10), 2.0)
         assert len(vals) == 10
-        vals = self.rs.beta(2.0, np.array([2.0]*10))
+        vals = self.rs.beta(2.0, np.array([2.0] * 10))
         assert len(vals) == 10
-        vals = self.rs.beta(np.array([2.0]*10), np.array([2.0]*10))
+        vals = self.rs.beta(np.array([2.0] * 10), np.array([2.0] * 10))
         assert len(vals) == 10
+        vals = self.rs.beta(np.array([2.0] * 10), np.array([[2.0]] * 10))
+        assert vals.shape == (10, 10)
 
     def test_bytes(self):
         vals = self.rs.bytes(10)
@@ -197,10 +252,12 @@ class RNG(object):
     def test_chisquare(self):
         vals = self.rs.chisquare(2.0, 10)
         assert len(vals) == 10
+        params_1(self.rs.chisquare)
 
     def test_exponential(self):
         vals = self.rs.exponential(2.0, 10)
         assert len(vals) == 10
+        params_1(self.rs.exponential)
 
     def test_f(self):
         vals = self.rs.f(3, 1000, 10)
@@ -213,6 +270,7 @@ class RNG(object):
     def test_geometric(self):
         vals = self.rs.geometric(0.5, 10)
         assert len(vals) == 10
+        params_1(self.rs.exponential, bounded=True)
 
     def test_gumbel(self):
         vals = self.rs.gumbel(2.0, 2.0, 10)
@@ -236,17 +294,17 @@ class RNG(object):
 
     def test_rand(self):
         state = self.rs.get_state()
-        vals = self.rs.rand(10,10,10)
+        vals = self.rs.rand(10, 10, 10)
         self.rs.set_state(state)
-        assert (vals == self.rs.random_sample((10,10,10))).all()
-        assert vals.shape == (10,10,10)
+        assert (vals == self.rs.random_sample((10, 10, 10))).all()
+        assert vals.shape == (10, 10, 10)
 
     def test_randn(self):
         state = self.rs.get_state()
-        vals = self.rs.randn(10,10,10)
+        vals = self.rs.randn(10, 10, 10)
         self.rs.set_state(state)
-        assert (vals == self.rs.standard_normal((10,10,10))).all()
-        assert vals.shape == (10,10,10)
+        assert (vals == self.rs.standard_normal((10, 10, 10))).all()
+        assert vals.shape == (10, 10, 10)
 
     def test_noncentral_chisquare(self):
         vals = self.rs.noncentral_chisquare(10, 2, 10)
@@ -255,11 +313,11 @@ class RNG(object):
     def test_noncentral_f(self):
         vals = self.rs.noncentral_f(3, 1000, 2, 10)
         assert len(vals) == 10
-        vals = self.rs.noncentral_f(np.array([3]*10), 1000, 2)
+        vals = self.rs.noncentral_f(np.array([3] * 10), 1000, 2)
         assert len(vals) == 10
-        vals = self.rs.noncentral_f(3, np.array([1000]*10), 2)
+        vals = self.rs.noncentral_f(3, np.array([1000] * 10), 2)
         assert len(vals) == 10
-        vals = self.rs.noncentral_f(3, 1000, np.array([2]*10))
+        vals = self.rs.noncentral_f(3, 1000, np.array([2] * 10))
         assert len(vals) == 10
 
     def test_normal(self):
@@ -273,12 +331,14 @@ class RNG(object):
     def test_poisson(self):
         vals = self.rs.poisson(10, 10)
         assert len(vals) == 10
-        vals = self.rs.poisson(np.array([10]*10))
+        vals = self.rs.poisson(np.array([10] * 10))
         assert len(vals) == 10
+        params_1(self.rs.poisson)
 
     def test_poisson_lam_max(self):
         vals = self.rs.poisson_lam_max
-        assert np.abs(vals - (np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10)) < (self.rs.poisson_lam_max * np.finfo('d').eps)
+        assert np.abs(vals - (np.iinfo('l').max - np.sqrt(np.iinfo('l').max) * 10)) < (
+        self.rs.poisson_lam_max * np.finfo('d').eps)
 
     def test_power(self):
         vals = self.rs.power(0.2, 10)
@@ -295,6 +355,7 @@ class RNG(object):
     def test_rayleigh(self):
         vals = self.rs.rayleigh(0.2, 10)
         assert len(vals) == 10
+        params_1(self.rs.rayleigh, bounded=True)
 
     def test_vonmises(self):
         vals = self.rs.vonmises(10, 0.2, 10)
@@ -311,6 +372,39 @@ class RNG(object):
     def test_zipf(self):
         vals = self.rs.zipf(10, 10)
         assert len(vals) == 10
+        vals = self.rs.zipf(self.vec_1d)
+        assert len(vals) == 100
+        vals = self.rs.zipf(self.vec_2d)
+        assert vals.shape == (1, 100)
+        vals = self.rs.zipf(self.mat)
+        assert vals.shape == (100, 100)
+
+    def test_hypergeometric(self):
+        vals = self.rs.hypergeometric(25, 25, 20)
+        assert np.isscalar(vals)
+        vals = self.rs.hypergeometric(np.array([25]*10), 25, 20)
+        assert vals.shape == (10,)
+
+    def test_triangular(self):
+        vals = self.rs.triangular(-5,0,5)
+        assert np.isscalar(vals)
+        vals = self.rs.triangular(-5,np.array([0]*10),5)
+        assert vals.shape == (10,)
+
+    def test_multivariate_normal(self):
+        mean = [0, 0]
+        cov = [[1, 0], [0, 100]]  # diagonal covariance
+        # x, y = self.rs.multivariate_normal(mean, cov, 5000).T
+
+    def test_multinomial(self):
+        #TODO: This seem broken
+        vals = self.rs.multinomial(100, [1.0 / 3, 2.0 / 3])
+
+
+    def test_dirichlet(self):
+        s = self.rs.dirichlet((10, 5, 3), 20)
+        assert s.shape == (20,3)
+
 
 
 class TestMT19937(RNG):
@@ -321,9 +415,9 @@ class TestMT19937(RNG):
         cls.seed = [2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls._extra_setup()
 
     def test_numpy_state(self):
-
         nprs = np.random.RandomState()
         nprs.standard_normal(99)
         state = nprs.get_state()
@@ -343,6 +437,7 @@ class TestPCG32(RNG, unittest.TestCase):
         cls.seed = [2 ** 48 + 2 ** 21 + 2 ** 16 + 2 ** 5 + 1, 2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls._extra_setup()
 
 
 class TestPCG64(RNG, unittest.TestCase):
@@ -354,6 +449,7 @@ class TestPCG64(RNG, unittest.TestCase):
                     2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls._extra_setup()
 
 
 class TestXorShift128(RNG, unittest.TestCase):
@@ -364,6 +460,7 @@ class TestXorShift128(RNG, unittest.TestCase):
         cls.seed = [12345]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls._extra_setup()
 
 
 class TestXorShift1024(RNG, unittest.TestCase):
@@ -374,6 +471,7 @@ class TestXorShift1024(RNG, unittest.TestCase):
         cls.seed = [12345]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls._extra_setup()
 
 
 class TestMLFG(RNG, unittest.TestCase):
@@ -384,6 +482,7 @@ class TestMLFG(RNG, unittest.TestCase):
         cls.seed = [12345]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls._extra_setup()
 
 
 class TestMRG32k3A(RNG, unittest.TestCase):
@@ -394,3 +493,4 @@ class TestMRG32k3A(RNG, unittest.TestCase):
         cls.seed = [12345]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls._extra_setup()

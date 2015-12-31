@@ -94,6 +94,8 @@ extern double random_wald(aug_state *state, double mean, double scale);
 
 extern double random_vonmises(aug_state *state, double mu, double kappa);
 
+extern double random_triangular(aug_state *state, double left, double mode, double right);
+
 extern long random_poisson(aug_state *state, double lam);
 
 extern long rk_negative_binomial(aug_state *state, double n, double p);
@@ -105,3 +107,5 @@ extern long random_logseries(aug_state *state, double p);
 extern long random_geometric(aug_state *state, double p);
 
 extern long random_zipf(aug_state *state, double a);
+
+extern long random_hypergeometric(aug_state *state, long good, long bad, long sample);

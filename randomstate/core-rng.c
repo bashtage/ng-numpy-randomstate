@@ -906,3 +906,118 @@ long random_zipf(aug_state *state, double a)
     } while (((V*X*(T-1.0)/(b-1.0)) > (T/b)) || X < 1);
     return X;
 }
+
+
+double random_triangular(aug_state *state, double left, double mode, double right)
+{
+    double base, leftbase, ratio, leftprod, rightprod;
+    double U;
+
+    base = right - left;
+    leftbase = mode - left;
+    ratio = leftbase / base;
+    leftprod = leftbase*base;
+    rightprod = (right - mode)*base;
+
+    U = random_double(state);
+    if (U <= ratio)
+    {
+        return left + sqrt(U*leftprod);
+    } else
+    {
+      return right - sqrt((1.0 - U) * rightprod);
+    }
+}
+
+
+long random_hypergeometric_hyp(aug_state *state, long good, long bad, long sample)
+{
+    long d1, k, z;
+    double d2, u, y;
+
+    d1 = bad + good - sample;
+    d2 = (double)min(bad, good);
+
+    y = d2;
+    k = sample;
+    while (y > 0.0)
+    {
+        u = random_double(state);
+        y -= (long)floor(u + y/(d1 + k));
+        k--;
+        if (k == 0) break;
+    }
+    z = (long)(d2 - y);
+    if (good > bad) z = sample - z;
+    return z;
+}
+
+/* D1 = 2*sqrt(2/e) */
+/* D2 = 3 - 2*sqrt(3/e) */
+#define D1 1.7155277699214135
+#define D2 0.8989161620588988
+long random_hypergeometric_hrua(aug_state *state, long good, long bad, long sample)
+{
+    long mingoodbad, maxgoodbad, popsize, m, d9;
+    double d4, d5, d6, d7, d8, d10, d11;
+    long Z;
+    double T, W, X, Y;
+
+    mingoodbad = min(good, bad);
+    popsize = good + bad;
+    maxgoodbad = max(good, bad);
+    m = min(sample, popsize - sample);
+    d4 = ((double)mingoodbad) / popsize;
+    d5 = 1.0 - d4;
+    d6 = m*d4 + 0.5;
+    d7 = sqrt((double)(popsize - m) * sample * d4 * d5 / (popsize - 1) + 0.5);
+    d8 = D1*d7 + D2;
+    d9 = (long)floor((double)(m + 1) * (mingoodbad + 1) / (popsize + 2));
+    d10 = (loggam(d9+1) + loggam(mingoodbad-d9+1) + loggam(m-d9+1) +
+           loggam(maxgoodbad-m+d9+1));
+    d11 = min(min(m, mingoodbad)+1.0, floor(d6+16*d7));
+    /* 16 for 16-decimal-digit precision in D1 and D2 */
+
+    while (1)
+    {
+        X = random_double(state);
+        Y = random_double(state);
+        W = d6 + d8*(Y- 0.5)/X;
+
+        /* fast rejection: */
+        if ((W < 0.0) || (W >= d11)) continue;
+
+        Z = (long)floor(W);
+        T = d10 - (loggam(Z+1) + loggam(mingoodbad-Z+1) + loggam(m-Z+1) +
+                   loggam(maxgoodbad-m+Z+1));
+
+        /* fast acceptance: */
+        if ((X*(4.0-X)-3.0) <= T) break;
+
+        /* fast rejection: */
+        if (X*(X-T) >= 1) continue;
+
+        if (2.0*log(X) <= T) break;  /* acceptance */
+    }
+
+    /* this is a correction to HRUA* by Ivan Frohne in rv.py */
+    if (good > bad) Z = m - Z;
+
+    /* another fix from rv.py to allow sample to exceed popsize/2 */
+    if (m < sample) Z = good - Z;
+
+    return Z;
+}
+#undef D1
+#undef D2
+
+long random_hypergeometric(aug_state *state, long good, long bad, long sample)
+{
+    if (sample > 10)
+    {
+        return random_hypergeometric_hrua(state, good, bad, sample);
+    } else
+    {
+        return random_hypergeometric_hyp(state, good, bad, sample);
+    }
+}
