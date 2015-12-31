@@ -157,8 +157,8 @@ setup(name='randomstate',
 
 # Clean up generated files
 for config in configs:
-    # unlink(join(mod_dir, config['file_name'] + '.pyx'))
-    # unlink(join(mod_dir, config['file_name'] + '-config.pxi'))
-    # unlink(join(mod_dir, config['file_name'] + '.c'))
+    unlink(join(mod_dir, config['file_name'] + '.pyx'))
+    unlink(join(mod_dir, config['file_name'] + '-config.pxi'))
+    unlink(join(mod_dir, config['file_name'] + '.c'))
     pass
 

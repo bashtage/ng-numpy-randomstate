@@ -394,12 +394,14 @@ class RNG(object):
     def test_multivariate_normal(self):
         mean = [0, 0]
         cov = [[1, 0], [0, 100]]  # diagonal covariance
-        # x, y = self.rs.multivariate_normal(mean, cov, 5000).T
+        x = self.rs.multivariate_normal(mean, cov, 5000)
+        assert x.shape == (5000,2)
 
     def test_multinomial(self):
-        #TODO: This seem broken
         vals = self.rs.multinomial(100, [1.0 / 3, 2.0 / 3])
-
+        assert vals.shape == (2,)
+        vals = self.rs.multinomial(100, [1.0 / 3, 2.0 / 3], size=10)
+        assert vals.shape == (10,2)
 
     def test_dirichlet(self):
         s = self.rs.dirichlet((10, 5, 3), 20)

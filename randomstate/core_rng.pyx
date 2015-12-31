@@ -49,7 +49,7 @@ cdef extern from "core-rng.h":
 
     cdef void entropy_init(aug_state* state) nogil
 
-    cdef double random_sample(aug_state* state) nogil
+    cdef double random_standard_uniform(aug_state* state) nogil
     cdef double random_gauss(aug_state* state) nogil
     cdef double random_gauss_zig(aug_state* state) nogil
     cdef double random_standard_exponential(aug_state* state) nogil
@@ -638,7 +638,7 @@ cdef double kahan_sum(double *darr, np.npy_intp n):
     cdef np.npy_intp i
     sum = darr[0]
     c = 0.0
-    for i in range(n):
+    for i in range(1, n):
         y = darr[i] - c
         t = sum + y
         c = (t-sum) - y
@@ -942,8 +942,11 @@ cdef class RandomState:
                [-1.23204345, -1.75224494]])
 
         """
-        return cont(&self.rng_state, &random_sample, size, self.lock, 0,
-                 0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
+        return cont(&self.rng_state, &random_standard_uniform,
+                    size, self.lock, 0,
+                    0.0, '', CONS_NONE,
+                    0.0, '', CONS_NONE,
+                    0.0, '', CONS_NONE)
 
     def random_uintegers(self, size=None, int bits=64):
         """
@@ -1234,7 +1237,7 @@ cdef class RandomState:
                     0.0, '', CONS_NONE,
                     0.0, '', CONS_NONE)
 
-    def binomial(self, uint64_t n, double p, size=None):
+    def binomial(self, n, p, size=None):
         """
         binomial(n, p, size=None)
         Draw samples from a binomial distribution.
@@ -3893,11 +3896,12 @@ cdef class RandomState:
             except:
                 shape = tuple(size) + (d,)
 
-        multin = np.zeros(shape, int)
+        multin = np.zeros(shape, dtype=np.long)
         mnarr = <np.ndarray>multin
         mnix = <long*>np.PyArray_DATA(mnarr)
         sz = np.PyArray_SIZE(mnarr)
-        with self.lock, nogil:
+
+        with self.lock:
             i = 0
             while i < sz:
                 Sum = 1.0
@@ -3910,7 +3914,6 @@ cdef class RandomState:
                     Sum = Sum - pix[j]
                 if dn > 0:
                     mnix[i+d-1] = dn
-
                 i = i + d
 
         return multin
@@ -4035,8 +4038,8 @@ cdef class RandomState:
         # standard normally distributed random numbers. The matrix has rows
         # with the same length as mean and as many rows are necessary to
         # form a matrix of shape final_shape.
-        final_shape = list(shape[:])
-        final_shape.append(mean.shape[0])
+        final_shape = tuple(shape[:])
+        final_shape += (mean.shape[0],)
         x = self.standard_normal(final_shape).reshape(-1, mean.shape[0])
 
         # Transform matrix of standard normals into matrix where each row
@@ -4290,3 +4293,59 @@ cdef class RandomState:
                                       ongood, 'ngood', CONS_NON_NEGATIVE,
                                       onbad, nbad, CONS_NON_NEGATIVE,
                                       onsample, 'nsample', CONS_GTE_1)
+
+
+
+_rand = RandomState()
+# TODO: Need rename of C-function
+# seed = _rand.seed
+get_state = _rand.get_state
+set_state = _rand.set_state
+random_sample = _rand.random_sample
+# TODO: Enable when implemented
+# choice = _rand.choice
+randint = _rand.randint
+bytes = _rand.bytes
+uniform = _rand.uniform
+rand = _rand.rand
+randn = _rand.randn
+random_integers = _rand.random_integers
+standard_normal = _rand.standard_normal
+normal = _rand.normal
+beta = _rand.beta
+exponential = _rand.exponential
+standard_exponential = _rand.standard_exponential
+standard_gamma = _rand.standard_gamma
+gamma = _rand.gamma
+f = _rand.f
+noncentral_f = _rand.noncentral_f
+chisquare = _rand.chisquare
+noncentral_chisquare = _rand.noncentral_chisquare
+standard_cauchy = _rand.standard_cauchy
+standard_t = _rand.standard_t
+vonmises = _rand.vonmises
+pareto = _rand.pareto
+weibull = _rand.weibull
+power = _rand.power
+laplace = _rand.laplace
+gumbel = _rand.gumbel
+logistic = _rand.logistic
+lognormal = _rand.lognormal
+rayleigh = _rand.rayleigh
+wald = _rand.wald
+triangular = _rand.triangular
+
+binomial = _rand.binomial
+negative_binomial = _rand.negative_binomial
+poisson = _rand.poisson
+zipf = _rand.zipf
+geometric = _rand.geometric
+hypergeometric = _rand.hypergeometric
+logseries = _rand.logseries
+
+multivariate_normal = _rand.multivariate_normal
+multinomial = _rand.multinomial
+dirichlet = _rand.dirichlet
+
+shuffle = _rand.shuffle
+permutation = _rand.permutation

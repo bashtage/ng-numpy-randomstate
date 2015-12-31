@@ -35,17 +35,6 @@ cdef object uint0_32(aug_state* state, random_uint_0_32 func, object size, objec
             randoms[i] = func(state)
     return np.asanyarray(randoms).reshape(size)
 
-cdef object uint1_i_32(aug_state* state, random_uint_1_i_32 func, uint32_t a, object size, object lock):
-    if size is None:
-        return func(state, a)
-    cdef Py_ssize_t i, n = compute_numel(size)
-    cdef uint64_t [:] randoms = np.empty(n, np.uint64)
-    with lock, nogil:
-        for i in range(n):
-            randoms[i] = func(state, a)
-    return np.asanyarray(randoms).reshape(size)
-
-
 cdef object int2_i(aug_state* state, random_int_2_i func, int64_t a, int32_t b, object size, object lock):
     if size is None:
         return func(state, a, b)

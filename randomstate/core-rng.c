@@ -40,7 +40,7 @@ int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high)
     return (int32_t)r + low;
 }
 
-double random_sample(aug_state* state)
+double random_standard_uniform(aug_state* state)
 {
     return random_double(state);
 }
@@ -681,7 +681,7 @@ long random_binomial_inversion(aug_state *state, long n, double p)
     return X;
 }
 
-long random_binomial(aug_state *state, long n, double p)
+long random_binomial(aug_state *state, double p, long n)
 {
     double q;
 

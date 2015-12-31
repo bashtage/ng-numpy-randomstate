@@ -5,11 +5,13 @@ alternative random generators in Python and Numpy. The first attempt is
 to include alternative core random number generators in addition to the 
 MT19937 that is included in NumPy. New RNGs include:
 
-* [MT19937](https://github.com/numpy/numpy/blob/master/numpy/random/mtrand/). - the NumPy rng
-* [xorshift128+](http://xorshift.di.unimi.it/) and [xorshift1024*](http://xorshift.di.unimi.it/)
-* [PCG32](http://www.pcg-random.org/) and [PCG64](http://www.pcg-random.org/)
-* A multiplicative lagged fibonacci generator (LFG(31, 1279, 861, *))
+* [MT19937](https://github.com/numpy/numpy/blob/master/numpy/random/mtrand/),
+ the NumPy rng
+* [xorshift128+](http://xorshift.di.unimi.it/) and 
+[xorshift1024*](http://xorshift.di.unimi.it/)
+* [PCG32](http://www.pcg-random.org/) and [PCG64](http:w//www.pcg-random.org/)
 * [MRG32K3A](http://simul.iro.umontreal.ca/rng)
+* A multiplicative lagged fibonacci generator (LFG(31, 1279, 861, *))
 * A dummy RNG  - repeats the same sequence of 20 values -- only for testing
 
 ## Rationale
@@ -20,30 +22,37 @@ quickly advance the generator, or to jump ahead.
 
 ## Status
 
-* There is no documentation.  
-* Only a small number of rngs are available: standard normal, standard gamma, 
-standard exponential, standard uniform and random 64-bit integers. 
+* There is no documentation for the core RNGs.
+* Mostly complete drop-in replacement for `numpy.random.RandomState` 
 * Setting and restoring state works
 
 ## Plans
-There are still many improvements needed before this is really usable. 
-
-At a minimum this needs to support:
-
-  * More critical distributions
-  * Entropy based initialization is missing for some RNGs
+It is mostly complete.  There are a few rough edges that need to be smoothed.
+  
+  * Document core RNG classes
+  * Complete implementation of all `numpy.random.RandomState` function
+  * Pickling support
+  * Verify entropy based initialization is missing for some RNGs
+  * Integrate a patch for PCG-64 that allows 32-bit platforms to be supported
+  * Build on Windows
+  * Additional refactoring where possible
+  * Check types for consistenct (e.g. `long` vs `uint64`) for discrete things 
 
 ## Requirements
-Requires (Built Using):
+Requires:
 
   * Numpy (1.10)
   * Cython (0.23)
- 
+
+**Note:** it might work with outher versions but only tested with these 
+versions. 
+
 So far all development has been on Linux. It has been tested (in a limited 
 manner, mostly against crashes and build failures) on Linux 32 and 64-bit, 
 as well as OSX 10.10 and PC-BSD 10.2 (should also work on Free BSD).
 
-Formal tests (unit) have not been implemented.
+All tests implemeted are _smoke_ tests that only make sure that something is 
+output from the expected inputs. Formal tests (unit) have not been implemented.
 
 ## Installing
 
@@ -53,7 +62,7 @@ python setup.py install
 
 ## Building for Testing Purposes
 
-There are two options.  The first will build a library for PCG64 called
+There are two options.  The first will build a library for xorshift128 called
 `core_rng`.  
 
 ```bash
@@ -149,35 +158,47 @@ xorshift128_random_sample      109.3%
 
 ### New
 
-* `random_bounded_integers` - bounded integers `[lower, upper]` where `lower >= -2**63` and `upper < 2**63`
-* `random_bounded_uintegers` - bounded unsigned integers `[0, upper]` where `upper < 2**64`
+* `random_bounded_integers` - bounded integers `[lower, upper]` where `lower >= -2**63` 
+and `upper < 2**63`
+* `random_bounded_uintegers` - bounded unsigned integers `[0, upper]` 
+where `upper < 2**64`
 * `random_uintegers` - unsigned integers `[0, 2**64-1]` 
-* `jump` - Jumps RNGs that support it.  `jump` moves the stata a great distinace.
-* `advance` - Advanced the core RNG 'as-if' a number of draws were made, without actually drawing the numbers
+* `jump` - Jumps RNGs that support it.  `jump` moves the state a great 
+distance. _Only available if supported by the RNG._
+* `advance` - Advanced the core RNG 'as-if' a number of draws were made, 
+without actually drawing the numbers. _Only available if supported by the RNG._
 
 ### Diffeent
 
 * `random_integers` - Not sure
-* `standard_t`- No support for broadcasting
-* `binomial`- No support for broadcasting
+* `tomaxint` - Might be different
 
 ### Same
 
-These have been implemented and are the same (or quanitatively similar)
+These have been implemented and are the same (or quantitatively similar)
+
 ```
-seed bytes get_state standard_cauchy standard_exponential
-standard_gamma standard_normal random_sample
+seed                    bytes                   get_state 
+standard_cauchy         standard_exponential    standard_gamma 
+standard_normal         random_sample           beta
+chisquare               choice                  dirichlet
+exponential             f                       gamma
+geometric               gumbel                  hypergeometric
+laplace                 logistic                lognormal
+logseries               multinomial             multivariate_normal
+negative_binomial       noncentral_chisquare    noncentral_f
+normal                  pareto                  permutation
+poisson                 poisson_lam_max         power
+rand                    randint                 randn   
+rayleigh                shuffle                 tomaxint    
+triangular              uniform                 vonmises
+wald                    weibull                 zipf
 ```
 
 ### Missing
 
-These have not been implemented.
+These have not been implemented yet.
 
 ```
-beta, chisquare, choice, dirichlet, exponential, f, gamma, geometric,
-gumbel, hypergeometric, laplace, logistic, lognormal, logseries,
-multinomial, multivariate_normal, negative_binomial, noncentral_chisquare, 
-noncentral_f, normal, pareto, permutation,
-poisson, poisson_lam_max, power, rand, randint, randn, rayleigh,
-shuffle, tomaxint, triangular, uniform, vonmises, wald, weibull, zipf
+choice
 ```
