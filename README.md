@@ -1,9 +1,10 @@
 # ng-numpy-randomstate
+[![Build Status](https://travis-ci.org/bashtage/ng-numpy-randomstate.svg?branch=master)](https://travis-ci.org/bashtage/ng-numpy-randomstate)
 
-This is an early attempt at writing a generic interface that would allow 
-alternative random generators in Python and Numpy. The first attempt is 
-to include alternative core random number generators in addition to the 
-MT19937 that is included in NumPy. New RNGs include:
+This is an attempt at writing a generic interface that would allow 
+alternative random generators in Python and Numpy. This modules 
+includes a number core random number generators in addition to the 
+MT19937 that is included in NumPy. The RNGs include:
 
 * [MT19937](https://github.com/numpy/numpy/blob/master/numpy/random/mtrand/),
  the NumPy rng

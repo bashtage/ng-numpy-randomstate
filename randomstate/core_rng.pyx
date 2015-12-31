@@ -52,6 +52,7 @@ cdef extern from "core-rng.h":
     cdef double random_standard_uniform(aug_state* state) nogil
     cdef double random_gauss(aug_state* state) nogil
     cdef double random_gauss_zig(aug_state* state) nogil
+    cdef double random_gauss_zig_julia(aug_state* state) nogil
     cdef double random_standard_exponential(aug_state* state) nogil
     cdef double random_standard_cauchy(aug_state* state) nogil
 
@@ -340,7 +341,7 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
             for i in range(n):
                 randoms[i] = f3(state, _a, _b, _c)
 
-    return np.asanyarray(randoms).reshape(size)
+    return np.asarray(randoms).reshape(size)
 
 cdef object discrete_broadcast_d(aug_state* state, void* func, object size, object lock,
                                  object a, object a_name, constraint_type a_constraint):
@@ -630,7 +631,7 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
             for i in range(n):
                 randoms[i] = fiii(state, _ia, _ib, _ic)
 
-    return np.asanyarray(randoms).reshape(size)
+    return np.asarray(randoms).reshape(size)
 
 
 cdef double kahan_sum(double *darr, np.npy_intp n):
@@ -999,7 +1000,7 @@ cdef class RandomState:
                 with self.lock, nogil:
                     for i in range(n):
                         randoms32[i] = random_bounded_uint32(&self.rng_state, high)
-                return np.asanyarray(randoms32).reshape(size)
+                return np.asarray(randoms32).reshape(size)
         else:
             if size is None:
                 return random_bounded_uint64(&self.rng_state, high)
@@ -1009,7 +1010,7 @@ cdef class RandomState:
                 with self.lock, nogil:
                     for i in range(n):
                         randoms64[i] = random_bounded_uint64(&self.rng_state, high)
-                return np.asanyarray(randoms64).reshape(size)
+                return np.asarray(randoms64).reshape(size)
 
 
     def random_bounded_integers(self, int64_t low, high=None, size=None):
@@ -1066,7 +1067,7 @@ cdef class RandomState:
             return cont(&self.rng_state, &random_gauss, size, self.lock, 0,
                         0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
         else:
-            return cont(&self.rng_state, &random_gauss_zig, size, self.lock, 0,
+            return cont(&self.rng_state, &random_gauss_zig_julia, size, self.lock, 0,
                         0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
 
     def standard_exponential(self, size=None):
@@ -3769,7 +3770,7 @@ cdef class RandomState:
         cdef double     acc, invacc
 
         k           = len(alpha)
-        alpha_arr   = <np.ndarray>np.PyArray_ContiguousFromObject(alpha, np.NPY_DOUBLE, 1, 1)
+        alpha_arr   = <np.ndarray>np.PyArray_FROM_OTF(alpha, np.NPY_DOUBLE, np.NPY_ALIGNED)
         alpha_data  = <double*>np.PyArray_DATA(alpha_arr)
 
         if size is None:
@@ -3901,9 +3902,8 @@ cdef class RandomState:
         mnix = <long*>np.PyArray_DATA(mnarr)
         sz = np.PyArray_SIZE(mnarr)
 
-        with self.lock:
-            i = 0
-            while i < sz:
+        with self.lock, nogil:
+            for i in range(sz):
                 Sum = 1.0
                 dn = n
                 for j in range(d-1):
@@ -4293,7 +4293,6 @@ cdef class RandomState:
                                       ongood, 'ngood', CONS_NON_NEGATIVE,
                                       onbad, nbad, CONS_NON_NEGATIVE,
                                       onsample, 'nsample', CONS_GTE_1)
-
 
 
 _rand = RandomState()

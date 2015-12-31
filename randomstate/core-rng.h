@@ -86,6 +86,8 @@ extern double random_rayleigh(aug_state *state, double mode);
 
 extern double random_gauss_zig(aug_state* state);
 
+extern double random_gauss_zig_julia(aug_state* state);
+
 extern double random_noncentral_chisquare(aug_state *state, double df, double nonc);
 
 extern double random_noncentral_f(aug_state *state, double dfnum, double dfden, double nonc);
