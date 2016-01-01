@@ -176,7 +176,8 @@ without actually drawing the numbers. _Only available if supported by the RNG._
 
 ### Same
 
-These have been implemented and are the same (or quantitatively similar)
+Every other function has been implemented and are the same (or quantitatively 
+similar):
 
 ```
 seed                    bytes                   get_state 
@@ -194,12 +195,6 @@ rand                    randint                 randn
 rayleigh                shuffle                 tomaxint    
 triangular              uniform                 vonmises
 wald                    weibull                 zipf
+choice 
 ```
 
-### Missing
-
-These have not been implemented yet.
-
-```
-choice
-```

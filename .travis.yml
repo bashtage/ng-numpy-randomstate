@@ -6,18 +6,21 @@ sudo: false
 
 language: python
 
-env:
-  # Default values for common packages, override as needed
-  global:
-    - CYTHON=0.23
-    - NUMPY=1.10
-
 matrix:
   fast_finish: true
   include:
   - python: 2.7
     env:
+    - PYTHON=2.6
+  - python: 2.7
+    env:
     - PYTHON=2.7
+  - python: 2.7
+    env:
+    - PYTHON=3.3
+  - python: 2.7
+    env:
+    - PYTHON=3.4
   - python: 2.7
     env:
     - PYTHON=3.5
@@ -46,4 +49,4 @@ script:
   - cd $HOME
   - nosetests randomstate
   - cd $BUILD_DIR/randomstate
-  - python performance.py
+  - if [ ${PYTHON} = "2.7" ]; then python performance.py; fi

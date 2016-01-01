@@ -317,7 +317,7 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
             return (<random_double_3>func)(state, _a, _b, _c)
 
     cdef Py_ssize_t i, n = compute_numel(size)
-    cdef double [:] randoms = np.empty(n, np.double)
+    cdef double [::1] randoms = np.empty(n, np.double)
     cdef random_double_0 f0;
     cdef random_double_1 f1;
     cdef random_double_2 f2;
@@ -594,7 +594,7 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
             return (<random_uint_iii>func)(state, _ia, _ib, _ic)
 
     cdef Py_ssize_t i, n = compute_numel(size)
-    cdef uint64_t [:] randoms = np.empty(n, np.uint64)
+    cdef uint64_t [::1] randoms = np.empty(n, np.uint64)
     cdef random_uint_0 f0;
     cdef random_uint_d fd;
     cdef random_uint_dd fdd;
@@ -989,8 +989,8 @@ cdef class RandomState:
 
     def random_bounded_uintegers(self, uint64_t high, size=None):
         cdef Py_ssize_t i, n
-        cdef uint32_t [:] randoms32
-        cdef uint64_t [:] randoms64
+        cdef uint32_t [::1] randoms32
+        cdef uint64_t [::1] randoms64
         if high < 4294967295:
             if size is None:
                 return random_bounded_uint32(&self.rng_state, high)
@@ -4295,14 +4295,196 @@ cdef class RandomState:
                                       onsample, 'nsample', CONS_GTE_1)
 
 
+    @cython.wraparound(True)
+    def choice(self, a, size=None, replace=True, p=None):
+        """
+        choice(a, size=None, replace=True, p=None)
+
+        Generates a random sample from a given 1-D array
+
+                .. versionadded:: 1.7.0
+
+        Parameters
+        -----------
+        a : 1-D array-like or int
+            If an ndarray, a random sample is generated from its elements.
+            If an int, the random sample is generated as if a was np.arange(n)
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+        replace : boolean, optional
+            Whether the sample is with or without replacement
+        p : 1-D array-like, optional
+            The probabilities associated with each entry in a.
+            If not given the sample assumes a uniform distribution over all
+            entries in a.
+
+        Returns
+        --------
+        samples : 1-D ndarray, shape (size,)
+            The generated random samples
+
+        Raises
+        -------
+        ValueError
+            If a is an int and less than zero, if a or p are not 1-dimensional,
+            if a is an array-like of size 0, if p is not a vector of
+            probabilities, if a and p have different lengths, or if
+            replace=False and the sample size is greater than the population
+            size
+
+        See Also
+        ---------
+        randint, shuffle, permutation
+
+        Examples
+        ---------
+        Generate a uniform random sample from np.arange(5) of size 3:
+
+        >>> np.random.choice(5, 3)
+        array([0, 3, 4])
+        >>> #This is equivalent to np.random.randint(0,5,3)
+
+        Generate a non-uniform random sample from np.arange(5) of size 3:
+
+        >>> np.random.choice(5, 3, p=[0.1, 0, 0.3, 0.6, 0])
+        array([3, 3, 0])
+
+        Generate a uniform random sample from np.arange(5) of size 3 without
+        replacement:
+
+        >>> np.random.choice(5, 3, replace=False)
+        array([3,1,0])
+        >>> #This is equivalent to np.random.permutation(np.arange(5))[:3]
+
+        Generate a non-uniform random sample from np.arange(5) of size
+        3 without replacement:
+
+        >>> np.random.choice(5, 3, replace=False, p=[0.1, 0, 0.3, 0.6, 0])
+        array([2, 3, 0])
+
+        Any of the above can be repeated with an arbitrary array-like
+        instead of just integers. For instance:
+
+        >>> aa_milne_arr = ['pooh', 'rabbit', 'piglet', 'Christopher']
+        >>> np.random.choice(aa_milne_arr, 5, p=[0.5, 0.1, 0.1, 0.3])
+        array(['pooh', 'pooh', 'pooh', 'Christopher', 'piglet'],
+              dtype='|S11')
+
+        """
+
+        # Format and Verify input
+        a = np.array(a, copy=False)
+        if a.ndim == 0:
+            try:
+                # __index__ must return an integer by python rules.
+                pop_size = operator.index(a.item())
+            except TypeError:
+                raise ValueError("a must be 1-dimensional or an integer")
+            if pop_size <= 0:
+                raise ValueError("a must be greater than 0")
+        elif a.ndim != 1:
+            raise ValueError("a must be 1-dimensional")
+        else:
+            pop_size = a.shape[0]
+            if pop_size is 0:
+                raise ValueError("a must be non-empty")
+
+        if p is not None:
+            d = len(p)
+
+            atol = np.sqrt(np.finfo(np.float64).eps)
+            if isinstance(p, np.ndarray):
+                if np.issubdtype(p.dtype, np.floating):
+                    atol = max(atol, np.sqrt(np.finfo(p.dtype).eps))
+
+            p = <np.ndarray>np.PyArray_FROM_OTF(p, np.NPY_DOUBLE, np.NPY_ALIGNED)
+            pix = <double*>np.PyArray_DATA(p)
+
+            if p.ndim != 1:
+                raise ValueError("p must be 1-dimensional")
+            if p.size != pop_size:
+                raise ValueError("a and p must have same size")
+            if np.logical_or.reduce(p < 0):
+                raise ValueError("probabilities are not non-negative")
+            if abs(kahan_sum(pix, d) - 1.) > atol:
+                raise ValueError("probabilities do not sum to 1")
+
+        shape = size
+        if shape is not None:
+            size = np.prod(shape, dtype=np.intp)
+        else:
+            size = 1
+
+        # Actual sampling
+        if replace:
+            if p is not None:
+                cdf = p.cumsum()
+                cdf /= cdf[-1]
+                uniform_samples = self.random_sample(shape)
+                idx = cdf.searchsorted(uniform_samples, side='right')
+                idx = np.array(idx, copy=False) # searchsorted returns a scalar
+            else:
+                idx = self.randint(0, pop_size, size=shape)
+        else:
+            if size > pop_size:
+                raise ValueError("Cannot take a larger sample than "
+                                 "population when 'replace=False'")
+
+            if p is not None:
+                if np.count_nonzero(p > 0) < size:
+                    raise ValueError("Fewer non-zero entries in p than size")
+                n_uniq = 0
+                p = p.copy()
+                found = np.zeros(shape, dtype=np.int)
+                flat_found = found.ravel()
+                while n_uniq < size:
+                    x = self.rand(size - n_uniq)
+                    if n_uniq > 0:
+                        p[flat_found[0:n_uniq]] = 0
+                    cdf = np.cumsum(p)
+                    cdf /= cdf[-1]
+                    new = cdf.searchsorted(x, side='right')
+                    _, unique_indices = np.unique(new, return_index=True)
+                    unique_indices.sort()
+                    new = new.take(unique_indices)
+                    flat_found[n_uniq:n_uniq + new.size] = new
+                    n_uniq += new.size
+                idx = found
+            else:
+                idx = self.permutation(pop_size)[:size]
+                if shape is not None:
+                    idx.shape = shape
+
+        if shape is None and isinstance(idx, np.ndarray):
+            # In most cases a scalar will have been made an array
+            idx = idx.item(0)
+
+        #Use samples as indices for a if a is array-like
+        if a.ndim == 0:
+            return idx
+
+        if shape is not None and idx.ndim == 0:
+            # If size == () then the user requested a 0-d array as opposed to
+            # a scalar object when size is None. However a[idx] is always a
+            # scalar and not an array. So this makes sure the result is an
+            # array, taking into account that np.array(item) may not work
+            # for object arrays.
+            res = np.empty((), dtype=a.dtype)
+            res[()] = a[idx]
+            return res
+
+        return a[idx]
+
+
 _rand = RandomState()
 # TODO: Need rename of C-function
 # seed = _rand.seed
 get_state = _rand.get_state
 set_state = _rand.set_state
 random_sample = _rand.random_sample
-# TODO: Enable when implemented
-# choice = _rand.choice
+choice = _rand.choice
 randint = _rand.randint
 bytes = _rand.bytes
 uniform = _rand.uniform

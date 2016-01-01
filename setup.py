@@ -41,7 +41,7 @@ def write_config(file_name, config):
 for rng in rngs:
     if rng not in compile_rngs:
         continue
-    flags = {k: False for k in rngs}
+    flags = dict([(k, False) for k in rngs])
     flags[rng] = True
 
     file_name = rng.lower().replace('rng_', '')
@@ -117,7 +117,8 @@ for rng in rngs:
               'sources': sources,
               'include_dirs': include_dirs,
               'defs': defs,
-              'flags': {k: v for k, v in flags.items()}}
+              'flags': dict([(k, v) for k, v in flags.items()])
+              }
 
     configs.append(config)
 
