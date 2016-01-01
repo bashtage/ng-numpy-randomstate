@@ -22,7 +22,7 @@ cdef extern from "core-rng.h":
 
     ctypedef s_aug_state aug_state
 
-    cdef void seed(aug_state* state, uint64_t seed, uint64_t inc)
+    cdef void set_seed(aug_state* state, uint64_t seed, uint64_t inc)
 
     cdef void advance(aug_state* state, uint64_t delta)
 

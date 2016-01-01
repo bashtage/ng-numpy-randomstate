@@ -26,7 +26,7 @@ inline uint64_t random_uint64(aug_state* state)
     return dummy_rng(state->rng);
 }
 
-inline void seed(aug_state* state, uint32_t seed)
+inline void set_seed(aug_state* state, uint32_t seed)
 {
     *(state->rng) = seed % 20;
 }
@@ -40,7 +40,7 @@ inline void entropy_init(aug_state* state)
 {
     uint32_t seeds[1];
     entropy_fill((void*) seeds, sizeof(seeds));
-    seed(state, seeds[0]);
+    set_seed(state, seeds[0]);
 }
 
 inline double random_double(aug_state* state)

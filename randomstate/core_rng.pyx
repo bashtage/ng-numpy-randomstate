@@ -721,7 +721,7 @@ cdef class RandomState:
 
             """
             if val is not None:
-                seed(&self.rng_state, val)
+                set_seed(&self.rng_state, val)
             else:
                 entropy_init(&self.rng_state)
     ELSE:
@@ -746,7 +746,7 @@ cdef class RandomState:
             RandomState
             """
             if val is not None and inc is not None:
-                seed(&self.rng_state, val, inc)
+                set_seed(&self.rng_state, val, inc)
             else:
                 entropy_init(&self.rng_state)
 
@@ -4479,8 +4479,7 @@ cdef class RandomState:
 
 
 _rand = RandomState()
-# TODO: Need rename of C-function
-# seed = _rand.seed
+seed = _rand.seed
 get_state = _rand.get_state
 set_state = _rand.set_state
 random_sample = _rand.random_sample

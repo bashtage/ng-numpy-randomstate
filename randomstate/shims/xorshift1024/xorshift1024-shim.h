@@ -34,7 +34,7 @@ inline uint64_t random_uint64(aug_state* state)
     return xorshift1024_next(state->rng);
 }
 
-inline void seed(aug_state* state, uint64_t seed)
+inline void set_seed(aug_state* state, uint64_t seed)
 {
     xorshift1024_seed(state->rng, seed);
 }

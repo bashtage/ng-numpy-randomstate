@@ -34,7 +34,7 @@ inline uint64_t random_uint64(aug_state* state)
     return out;
 }
 
-inline void seed(aug_state* state, uint64_t val)
+inline void set_seed(aug_state* state, uint64_t val)
 {
     mlfg_seed(state->rng, val);
 }

@@ -28,7 +28,7 @@ inline uint64_t random_uint64(aug_state* state)
     return (((uint64_t) mrg32k3a_random(state->rng) << 32) | mrg32k3a_random(state->rng));
 }
 
-inline void seed(aug_state* state, uint64_t val)
+inline void set_seed(aug_state* state, uint64_t val)
 {
     mrg32k3a_seed(state->rng, val);
 }

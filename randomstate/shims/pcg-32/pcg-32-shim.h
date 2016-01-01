@@ -26,7 +26,7 @@ inline uint64_t random_uint64(aug_state* state)
     return (((uint64_t) pcg32_random_r((*state).rng) << 32) | pcg32_random_r((*state).rng));
 }
 
-inline void seed(aug_state* state, uint64_t seed, uint64_t inc)
+inline void set_seed(aug_state* state, uint64_t seed, uint64_t inc)
 {
     pcg32_srandom_r(state->rng, seed, inc);
 }
@@ -40,7 +40,7 @@ inline void entropy_init(aug_state* state)
 {
     uint64_t seeds[2];
     entropy_fill((void*) seeds, sizeof(seeds));
-    seed(state, seeds[0], seeds[1]);
+    set_seed(state, seeds[0], seeds[1]);
 }
 
 inline double random_double(aug_state* state)

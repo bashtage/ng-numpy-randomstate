@@ -29,7 +29,7 @@ cdef extern from "core-rng.h":
 
     cdef void advance(aug_state* state, pcg128_t delta)
 
-    cdef void seed(aug_state* state, pcg128_t seed, pcg128_t inc)
+    cdef void set_seed(aug_state* state, pcg128_t seed, pcg128_t inc)
 
 ctypedef pcg128_t rng_state_t
 
