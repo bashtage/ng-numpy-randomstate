@@ -3903,7 +3903,8 @@ cdef class RandomState:
         sz = np.PyArray_SIZE(mnarr)
 
         with self.lock, nogil:
-            for i in range(sz):
+            i = 0
+            while i < sz:
                 Sum = 1.0
                 dn = n
                 for j in range(d-1):
