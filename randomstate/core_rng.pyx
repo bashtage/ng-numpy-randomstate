@@ -46,6 +46,12 @@ cdef extern from "core-rng.h":
     cdef uint32_t random_bounded_uint32(aug_state* state, uint32_t bound) nogil
     cdef int64_t random_bounded_int64(aug_state* state, int64_t low, int64_t high) nogil
     cdef int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high) nogil
+    cdef int64_t random_positive_int64(aug_state* state) nogil
+    cdef int32_t random_positive_int32(aug_state* state) nogil
+
+    cdef long random_positive_int(aug_state* state) nogil
+    cdef unsigned long random_uint(aug_state* state) nogil
+    cdef unsigned long random_interval(aug_state* state, unsigned long max) nogil
 
     cdef void entropy_init(aug_state* state) nogil
 
@@ -724,6 +730,11 @@ cdef class RandomState:
                 set_seed(&self.rng_state, val)
             else:
                 entropy_init(&self.rng_state)
+            self.rng_state.gauss = 0.0
+            self.rng_state.has_gauss = 0
+            self.rng_state.has_uint32= 0
+            self.rng_state.uinteger = 0
+
     ELSE:
         def seed(self, val=None, inc=None):
             """
@@ -749,6 +760,10 @@ cdef class RandomState:
                 set_seed(&self.rng_state, val, inc)
             else:
                 entropy_init(&self.rng_state)
+            self.rng_state.gauss = 0.0
+            self.rng_state.has_gauss = 0
+            self.rng_state.has_uint32= 0
+            self.rng_state.uinteger = 0
 
     if RNG_ADVANCEABLE:
         def advance(self, rng_state_t delta):
@@ -1628,7 +1643,8 @@ cdef class RandomState:
                [0, 1, 2]])
 
         """
-        cdef uint32_t i, j
+        cdef Py_ssize_t i
+        cdef long j
 
         i = len(x) - 1
 
@@ -1641,7 +1657,7 @@ cdef class RandomState:
             buf = np.empty_like(x[0])
             with self.lock:
                 while i > 0:
-                    j = random_bounded_uint32(&self.rng_state, i)
+                    j = random_interval(&self.rng_state, i)
                     buf[...] = x[j]
                     x[j] = x[i]
                     x[i] = buf
@@ -1652,10 +1668,9 @@ cdef class RandomState:
             # independent of the array contents, so we can just swap directly.
             with self.lock:
                 while i > 0:
-                    j = random_bounded_uint32(&self.rng_state, i)
+                    j = random_interval(&self.rng_state, i)
                     x[i], x[j] = x[j], x[i]
                     i = i - 1
-        return x
 
     def permutation(self, object x):
         """
@@ -1745,7 +1760,17 @@ cdef class RandomState:
                 [ True,  True]]], dtype=bool)
 
         """
-        return self.random_bounded_uintegers(MAXSIZE + 1, size)
+        cdef Py_ssize_t n
+        cdef np.long_t [::1] randoms
+
+        if size is None:
+            return random_positive_int(&self.rng_state)
+
+        n = compute_numel(size)
+        randoms = np.empty(n, np.long)
+        for i in range(n):
+            randoms[i] = random_positive_int(&self.rng_state)
+        return np.asarray(randoms).reshape(size)
 
     def normal(self, loc=0.0, scale=1.0, size=None):
         """
@@ -3053,7 +3078,7 @@ cdef class RandomState:
         >>> plt.show()
 
         """
-        return cont(&self.rng_state, &random_logistic, size, self.lock, 2,
+        return cont(&self.rng_state, &random_lognormal, size, self.lock, 2,
                     mean, 'mean', CONS_NONE,
                     sigma, 'sigma', CONS_POSITIVE,
                     0.0, '', CONS_NONE)
@@ -3238,7 +3263,15 @@ cdef class RandomState:
                [3, 2, 2, 0]])
 
         """
-        return self.random_bounded_integers(low, high, size)
+        if high is not None and low >= high:
+            raise ValueError("low >= high")
+
+        if high is None:
+            high = low
+            low = 0
+
+        return self.random_integers(low, high - 1, size)
+
 
     def negative_binomial(self, n, p, size=None):
         """
@@ -3387,16 +3420,33 @@ cdef class RandomState:
         >>> plt.show()
 
         """
-        # TODO: This assumes that __add__ can be made to low.
-        # TODO: Might need work if low can be a list
-        if high is None:
-            _low = 1
-            _high = low + 1
-        else:
-            _low = low
-            _high = high
+        if high is not None and low > high:
+            raise ValueError("low > high")
 
-        return self.random_bounded_integers(_low, _high, size)
+        cdef long lo, hi, rv
+        cdef unsigned long diff
+        cdef np.long_t [::1] randoms
+        cdef Py_ssize_t n, i
+
+        if high is None:
+            lo = 1
+            hi = low
+        else:
+            lo = low
+            hi = high
+
+        diff = <unsigned long>hi - <unsigned long>lo
+        if size is None:
+            with self.lock:
+                rv = lo + <long>random_interval(&self.rng_state, diff)
+            return rv
+
+        n = compute_numel(size)
+        randoms = np.empty(n, np.long)
+        with self.lock, nogil:
+            for i in range(n):
+                randoms[i] = lo + <long>random_interval(&self.rng_state, diff)
+        return np.asarray(randoms).reshape(size)
 
 
     def logseries(self, p, size=None):

@@ -1,4 +1,5 @@
 #include "core-rng.h"
+#include <limits.h>
 
 uint64_t random_bounded_uint64(aug_state* state, uint64_t bound)
 {
@@ -39,6 +40,35 @@ int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high)
     }
     return (int32_t)r + low;
 }
+
+int64_t random_positive_int64(aug_state* state)
+{
+    return random_uint64(state) >> 1;
+}
+
+int32_t random_positive_int32(aug_state* state)
+{
+    return random_uint32(state) >> 1;
+}
+
+long random_positive_int(aug_state* state)
+{
+#if ULONG_MAX <= 0xffffffffUL
+    return (long)(random_uint32(state) >> 1);
+#else
+    return (long)(random_uint64(state) >> 1);
+#endif
+}
+
+unsigned long random_uint(aug_state* state)
+{
+#if ULONG_MAX <= 0xffffffffUL
+    return random_uint32(state);
+#else
+    return random_uint64(state);
+#endif
+}
+
 
 double random_standard_uniform(aug_state* state)
 {
@@ -1306,4 +1336,36 @@ double random_gauss_zig_julia(aug_state *state){
                 return x;
         }
     }
+}
+
+
+unsigned long random_interval(aug_state *state, unsigned long max)
+{
+    unsigned long mask = max, value;
+
+    if (max == 0) {
+        return 0;
+    }
+    /* Smallest bit mask >= max */
+    mask |= mask >> 1;
+    mask |= mask >> 2;
+    mask |= mask >> 4;
+    mask |= mask >> 8;
+    mask |= mask >> 16;
+#if ULONG_MAX > 0xffffffffUL
+    mask |= mask >> 32;
+#endif
+
+    /* Search a random value in [0..mask] <= max */
+#if ULONG_MAX > 0xffffffffUL
+    if (max <= 0xffffffffUL) {
+        while ((value = (random_uint32(state) & mask)) > max);
+    }
+    else {
+        while ((value = (random_uint64(state) & mask)) > max);
+    }
+#else
+    while ((value = (random_uint32(state) & mask)) > max);
+#endif
+    return value;
 }

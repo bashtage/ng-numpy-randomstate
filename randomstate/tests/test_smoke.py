@@ -346,7 +346,7 @@ class RNG(object):
         assert len(vals) == 10
 
     def test_randint(self):
-        vals = self.rs.randint(10, 0.2, 10)
+        vals = self.rs.randint(10, 20, 10)
         assert len(vals) == 10
 
     def test_random_integers(self):

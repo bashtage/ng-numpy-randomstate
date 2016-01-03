@@ -40,6 +40,10 @@ extern int64_t random_bounded_int64(aug_state* state, int64_t low, int64_t high)
 
 extern int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high);
 
+extern int64_t random_positive_int64(aug_state* state);
+
+extern int32_t random_positive_int32(aug_state* state);
+
 extern double random_standard_uniform(aug_state* state);
 
 extern double random_standard_exponential(aug_state* state);
@@ -111,3 +115,9 @@ extern long random_geometric(aug_state *state, double p);
 extern long random_zipf(aug_state *state, double a);
 
 extern long random_hypergeometric(aug_state *state, long good, long bad, long sample);
+
+extern long random_positive_int(aug_state* state);
+
+extern unsigned long random_uint(aug_state* state);
+
+extern unsigned long random_interval(aug_state* state, unsigned long max);
