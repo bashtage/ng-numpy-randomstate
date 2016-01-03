@@ -1,12 +1,11 @@
 import sys
-import sys
 import unittest
 import numpy as np
-import numpy.random
 import randomstate.mlfg_1279_861 as mlfg_1279_861
 import randomstate.mrg32k3a as mrg32k3a
 import randomstate.mt19937 as mt19937
 import randomstate.pcg32 as pcg32
+
 if sys.maxsize > 2 ** 33:
     import randomstate.pcg64 as pcg64
 import randomstate.xorshift1024 as xorshift1024
@@ -164,16 +163,6 @@ class RNG(object):
     def test_binomial(self):
         assert self.rs.binomial(10, .5) >= 0
         assert self.rs.binomial(1000, .5) >= 0
-
-    def test_bounded_uint(self):
-        assert len(self.rs.random_bounded_uintegers(2 ** 24 + 1, 10)) == 10
-        assert len(self.rs.random_bounded_uintegers(2 ** 48 + 1, 10)) == 10
-
-    def test_bounded_int(self):
-        assert len(self.rs.random_bounded_integers(2 ** 24 + 1, size=10)) == 10
-        assert len(self.rs.random_bounded_integers(2 ** 48 + 1, size=10)) == 10
-        assert len(self.rs.random_bounded_integers(-2 ** 24, 2 ** 24 + 1, size=10)) == 10
-        assert len(self.rs.random_bounded_integers(-2 ** 48, 2 ** 48 + 1, size=10)) == 10
 
     def test_reset_state(self):
         state = self.rs.get_state()
@@ -339,7 +328,7 @@ class RNG(object):
     def test_poisson_lam_max(self):
         vals = self.rs.poisson_lam_max
         assert np.abs(vals - (np.iinfo('l').max - np.sqrt(np.iinfo('l').max) * 10)) < (
-        self.rs.poisson_lam_max * np.finfo('d').eps)
+            self.rs.poisson_lam_max * np.finfo('d').eps)
 
     def test_power(self):
         vals = self.rs.power(0.2, 10)
@@ -383,31 +372,30 @@ class RNG(object):
     def test_hypergeometric(self):
         vals = self.rs.hypergeometric(25, 25, 20)
         assert np.isscalar(vals)
-        vals = self.rs.hypergeometric(np.array([25]*10), 25, 20)
+        vals = self.rs.hypergeometric(np.array([25] * 10), 25, 20)
         assert vals.shape == (10,)
 
     def test_triangular(self):
-        vals = self.rs.triangular(-5,0,5)
+        vals = self.rs.triangular(-5, 0, 5)
         assert np.isscalar(vals)
-        vals = self.rs.triangular(-5,np.array([0]*10),5)
+        vals = self.rs.triangular(-5, np.array([0] * 10), 5)
         assert vals.shape == (10,)
 
     def test_multivariate_normal(self):
         mean = [0, 0]
         cov = [[1, 0], [0, 100]]  # diagonal covariance
         x = self.rs.multivariate_normal(mean, cov, 5000)
-        assert x.shape == (5000,2)
+        assert x.shape == (5000, 2)
 
     def test_multinomial(self):
         vals = self.rs.multinomial(100, [1.0 / 3, 2.0 / 3])
         assert vals.shape == (2,)
         vals = self.rs.multinomial(100, [1.0 / 3, 2.0 / 3], size=10)
-        assert vals.shape == (10,2)
+        assert vals.shape == (10, 2)
 
     def test_dirichlet(self):
         s = self.rs.dirichlet((10, 5, 3), 20)
-        assert s.shape == (20,3)
-
+        assert s.shape == (20, 3)
 
 
 class TestMT19937(RNG):

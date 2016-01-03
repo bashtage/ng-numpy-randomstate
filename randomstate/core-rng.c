@@ -1,46 +1,6 @@
 #include "core-rng.h"
 #include <limits.h>
 
-uint64_t random_bounded_uint64(aug_state* state, uint64_t bound)
-{
-    uint64_t r, threshold = -bound % bound;
-    for (;;) {
-        r = random_uint64(state);
-        if (r >= threshold)
-            return r % bound;
-    }
-}
-
-uint32_t random_bounded_uint32(aug_state* state, uint32_t bound)
-{
-    uint32_t r, threshold = -bound % bound;
-    for (;;) {
-        r = random_uint32(state);
-        if (r >= threshold)
-            return r % bound;
-    }
-}
-
-int64_t random_bounded_int64(aug_state* state, int64_t low, int64_t high)
-{
-    uint64_t r = random_bounded_uint64(state, (uint64_t)(high - low));
-    if(r >= -low)
-    {
-        return (int64_t)(r + low);
-    }
-    return (int64_t)r + low;
-}
-
-int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high)
-{
-    uint32_t r = random_bounded_uint32(state, (uint32_t)(high - low));
-    if(r >= -low)
-    {
-        return (int32_t)(r + low);
-    }
-    return (int32_t)r + low;
-}
-
 int64_t random_positive_int64(aug_state* state)
 {
     return random_uint64(state) >> 1;
@@ -1341,11 +1301,12 @@ double random_gauss_zig_julia(aug_state *state){
 
 unsigned long random_interval(aug_state *state, unsigned long max)
 {
-    unsigned long mask = max, value;
-
     if (max == 0) {
         return 0;
     }
+
+    unsigned long mask = max, value;
+
     /* Smallest bit mask >= max */
     mask |= mask >> 1;
     mask |= mask >> 2;

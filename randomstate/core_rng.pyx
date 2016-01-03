@@ -42,10 +42,6 @@ cdef extern from "core-rng.h":
 
     cdef uint64_t random_uint64(aug_state* state) nogil
     cdef uint32_t random_uint32(aug_state* state) nogil
-    cdef uint64_t random_bounded_uint64(aug_state* state, uint64_t bound) nogil
-    cdef uint32_t random_bounded_uint32(aug_state* state, uint32_t bound) nogil
-    cdef int64_t random_bounded_int64(aug_state* state, int64_t low, int64_t high) nogil
-    cdef int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high) nogil
     cdef int64_t random_positive_int64(aug_state* state) nogil
     cdef int32_t random_positive_int32(aug_state* state) nogil
 
@@ -822,42 +818,90 @@ cdef class RandomState:
             self.rng_state.gauss = 0.0
             return None
 
-    def get_state(self):
-        """
-        get_state()
+    IF RNG_MT19937:
+        def get_state(self, legacy=False):
+            """
+            get_state()
 
-        Return a tuple representing the internal state of the generator.
+            Return a tuple representing the internal state of the generator.
 
-        For more details, see `set_state`.
+            For more details, see `set_state`.
 
-        Returns
-        -------
-        out : tuple(str, tuple, tuple, tuple)
-            The returned tuple has the following items:
+            Parameters
+            ----------
+            legacy : bool
+                Flag indicating to return a legacy MT19937 state
 
-            1. the string containing the PRNG type.
-            2. a tuple containing the PRNG-specific state
-            3. a tuple containing two values :``has_gauss`` and ``cached_gaussian``
-            4. a tuple containing two values :``has_uint32`` and ``cached_uint32``
+            Returns
+            -------
+            out : tuple(str, tuple, tuple, tuple)
+                The returned tuple has the following items:
 
-        See Also
-        --------
-        set_state
+                1. the string containing the PRNG type.
+                2. a tuple containing the PRNG-specific state
+                3. a tuple containing two values :``has_gauss`` and ``cached_gaussian``
+                4. a tuple containing two values :``has_uint32`` and ``cached_uint32``
 
-        Notes
-        -----
-        `set_state` and `get_state` are not needed to work with any of the
-        random distributions in NumPy. If the internal state is manually altered,
-        the user should know exactly what he/she is doing.
+            See Also
+            --------
+            set_state
 
-        For information about the specific structure of the PRNG-specific
-        component, see the class documentation.
-        """
-        return  {'name': RNG_NAME,
-                 'state': _get_state(self.rng_state),
-                 'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
-                 'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger}
-                 }
+            Notes
+            -----
+            `set_state` and `get_state` are not needed to work with any of the
+            random distributions in NumPy. If the internal state is manually altered,
+            the user should know exactly what he/she is doing.
+
+            For information about the specific structure of the PRNG-specific
+            component, see the class documentation.
+            """
+            if legacy:
+                return (RNG_NAME,) \
+                       + _get_state(self.rng_state) \
+                       + (self.rng_state.has_gauss, self.rng_state.gauss)
+
+            return  {'name': RNG_NAME,
+                     'state': _get_state(self.rng_state),
+                     'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
+                     'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger}
+                     }
+    ELSE:
+        def get_state(self):
+            """
+            get_state()
+
+            Return a tuple representing the internal state of the generator.
+
+            For more details, see `set_state`.
+
+            Returns
+            -------
+            out : tuple(str, tuple, tuple, tuple)
+                The returned tuple has the following items:
+
+                1. the string containing the PRNG type.
+                2. a tuple containing the PRNG-specific state
+                3. a tuple containing two values :``has_gauss`` and ``cached_gaussian``
+                4. a tuple containing two values :``has_uint32`` and ``cached_uint32``
+
+            See Also
+            --------
+            set_state
+
+            Notes
+            -----
+            `set_state` and `get_state` are not needed to work with any of the
+            random distributions in NumPy. If the internal state is manually altered,
+            the user should know exactly what he/she is doing.
+
+            For information about the specific structure of the PRNG-specific
+            component, see the class documentation.
+            """
+            return  {'name': RNG_NAME,
+                     'state': _get_state(self.rng_state),
+                     'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
+                     'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger}
+                     }
 
     def set_state(self, state):
         """
@@ -992,7 +1036,7 @@ cdef class RandomState:
         random numbers.
 
         These should not be used to produce bounded random numbers by
-        simple truncation.  Instead see ``random_bounded_integers``.
+        simple truncation.
         """
         if bits == 64:
             return disc(&self.rng_state, &random_uint64, size, self.lock, 0, 0,
@@ -1001,48 +1045,6 @@ cdef class RandomState:
             return uint0_32(&self.rng_state, &random_uint32, size, self.lock)
         else:
             raise ValueError('Unknown value of bits.  Must be either 32 or 64.')
-
-    def random_bounded_uintegers(self, uint64_t high, size=None):
-        cdef Py_ssize_t i, n
-        cdef uint32_t [::1] randoms32
-        cdef uint64_t [::1] randoms64
-        if high < 4294967295:
-            if size is None:
-                return random_bounded_uint32(&self.rng_state, high)
-            else:
-                n = compute_numel(size)
-                randoms32 = np.empty(n, np.uint32)
-                with self.lock, nogil:
-                    for i in range(n):
-                        randoms32[i] = random_bounded_uint32(&self.rng_state, high)
-                return np.asarray(randoms32).reshape(size)
-        else:
-            if size is None:
-                return random_bounded_uint64(&self.rng_state, high)
-            else:
-                n = compute_numel(size)
-                randoms64 = np.empty(n, np.uint64)
-                with self.lock, nogil:
-                    for i in range(n):
-                        randoms64[i] = random_bounded_uint64(&self.rng_state, high)
-                return np.asarray(randoms64).reshape(size)
-
-
-    def random_bounded_integers(self, int64_t low, high=None, size=None):
-        cdef int64_t _low, _high
-        if high is None:
-            _high = low
-            _low = 0
-        else:
-            _high = high
-            _low = low
-
-        if _low >= -2147483648 and _high <= 2147483647:
-            return int2_i_32(&self.rng_state, &random_bounded_int32,
-                             <int32_t>_low, <int32_t>_high, size, self.lock)
-        else:
-            return int2_i(&self.rng_state, &random_bounded_int64, _low, _high, size, self.lock)
-
 
     def standard_normal(self, size=None, method='inv'):
         """
@@ -3343,8 +3345,6 @@ cdef class RandomState:
                         n, 'n', CONS_POSITIVE,
                         p, 'p', CONS_BOUNDED_0_1,
                         0.0, '', CONS_NONE)
-
-
 
     def random_integers(self, low, high=None, size=None):
         """

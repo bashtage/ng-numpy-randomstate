@@ -32,14 +32,6 @@
 #error Unknown RNG!!!  Unknown RNG!!!  Unknown RNG!!!
 #endif
 
-extern uint64_t random_bounded_uint64(aug_state* state, uint64_t bound);
-
-extern uint32_t random_bounded_uint32(aug_state* state, uint32_t bound);
-
-extern int64_t random_bounded_int64(aug_state* state, int64_t low, int64_t high);
-
-extern int32_t random_bounded_int32(aug_state* state, int32_t low, int32_t high);
-
 extern int64_t random_positive_int64(aug_state* state);
 
 extern int32_t random_positive_int32(aug_state* state);

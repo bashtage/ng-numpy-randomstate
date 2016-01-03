@@ -2,88 +2,72 @@ import unittest
 import numpy as np
 import numpy.random
 from numpy.testing import assert_allclose, assert_array_equal, assert_equal
-from numpy.testing.decorators import knownfailureif, skipif
 import randomstate.mt19937 as mt19937
 
-from nose import SkipTest
-
-# distributions = {
-#     'special': [
-# randint
-# ']
-# }
-
-# for n in distributions[3]:
-#     f = rs.__getattribute__(n)
-#     f(10, 20, 25)
-#
-# for n in distributions['1-vector']:
-#
-#     f = rs.__getattribute__(n)
-#     f(np.array([3,4,5,6,7.]))
-#
-#     rs = numpy.random.RandomState()
-#     rs.multinomial(100, np.arange(10.0) / 45.0)
 
 def compare_0_input(f1, f2):
-    inputs = [(tuple([]),{}), (tuple([]),{'size':10}), (tuple([]),{'size':(20,31)}), (tuple([]),{'size':(20,31,5)})]
+    inputs = [(tuple([]), {}), (tuple([]), {'size': 10}),
+              (tuple([]), {'size': (20, 31)}),
+              (tuple([]), {'size': (20, 31, 5)})]
+
 
 def compare_1_input(f1, f2, is_small=False):
-    a=0.3 if is_small else 10
-    inputs = [((a,),{}),
-              ((a,),{'size':10}),
-              ((np.array([a]*10),),{}),
-              ((np.array([a]*10),),{'size':10}),
-              ((np.array([a]*10),),{'size':(100,10)})]
+    a = 0.3 if is_small else 10
+    inputs = [((a,), {}),
+              ((a,), {'size': 10}),
+              ((np.array([a] * 10),), {}),
+              ((np.array([a] * 10),), {'size': 10}),
+              ((np.array([a] * 10),), {'size': (100, 10)})]
     for i in inputs:
         v1 = f1(*i[0], **i[1])
         v2 = f2(*i[0], **i[1])
         assert_equal(v1, v2)
 
+
 def compare_2_input(f1, f2, is_np=False, is_scalar=False):
     if is_np:
         a, b = 10, 0.3
-        dtype=np.int
+        dtype = np.int
     else:
         a, b = 2, 3
-        dtype=np.double
-    inputs = [((a, b),{}),
-              ((a, b),{'size':10}),
-              ((a, b),{'size':(23,7)}),
-              ((np.array([a]*10), b),{}),
-              ((a, np.array([b]*10)),{}),
-              ((a, np.array([b]*10)),{'size':10}),
-              ((np.array([[[a]]*100]), np.array([b]*10)),{'size':(100,10)}),
-              ((np.ones((7,31),dtype=dtype)*a, np.array([b]*31)),{'size':(7,31)}),
-              ((np.ones((7,31),dtype=dtype)*a, np.array([b]*31)),{'size':(10,7,31)})]
+        dtype = np.double
+    inputs = [((a, b), {}),
+              ((a, b), {'size': 10}),
+              ((a, b), {'size': (23, 7)}),
+              ((np.array([a] * 10), b), {}),
+              ((a, np.array([b] * 10)), {}),
+              ((a, np.array([b] * 10)), {'size': 10}),
+              ((np.array([[[a]] * 100]), np.array([b] * 10)), {'size': (100, 10)}),
+              ((np.ones((7, 31), dtype=dtype) * a, np.array([b] * 31)), {'size': (7, 31)}),
+              ((np.ones((7, 31), dtype=dtype) * a, np.array([b] * 31)), {'size': (10, 7, 31)})]
 
     if is_scalar:
         inputs = inputs[:3]
 
     for i in inputs:
-
         v1 = f1(*i[0], **i[1])
         v2 = f2(*i[0], **i[1])
         assert_equal(v1, v2)
 
+
 def compare_3_input(f1, f2, is_np=False):
     a, b, c = 10, 20, 25
-    inputs = [((a, b, c),{}),
-              ((a, b, c),{'size':10}),
-              ((a, b, c),{'size':(23,7)}),
-              ((np.array([a]*10), b, c),{}),
-              ((a, np.array([b]*10), c),{}),
-              ((a, b, np.array([c]*10)),{}),
-              ((a, np.array([b]*10), np.array([c]*10)),{}),
-              ((a, np.array([b]*10), c),{'size':10}),
-              ((np.ones((1,37),dtype=np.int)*a,
-                np.ones((23,1),dtype=np.int)*[b],
-                c*np.ones((7,1,1),dtype=np.int)),
+    inputs = [((a, b, c), {}),
+              ((a, b, c), {'size': 10}),
+              ((a, b, c), {'size': (23, 7)}),
+              ((np.array([a] * 10), b, c), {}),
+              ((a, np.array([b] * 10), c), {}),
+              ((a, b, np.array([c] * 10)), {}),
+              ((a, np.array([b] * 10), np.array([c] * 10)), {}),
+              ((a, np.array([b] * 10), c), {'size': 10}),
+              ((np.ones((1, 37), dtype=np.int) * a,
+                np.ones((23, 1), dtype=np.int) * [b],
+                c * np.ones((7, 1, 1), dtype=np.int)),
                {}),
-              ((np.ones((1,37),dtype=np.int)*a,
-                np.ones((23,1),dtype=np.int)*[b],
-                c*np.ones((7,1,1),dtype=np.int)),
-               {'size':(7,23,37)})
+              ((np.ones((1, 37), dtype=np.int) * a,
+                np.ones((23, 1), dtype=np.int) * [b],
+                c * np.ones((7, 1, 1), dtype=np.int)),
+               {'size': (7, 23, 37)})
               ]
 
     for i in inputs:
@@ -378,14 +362,14 @@ class TestAgainstNumpy(unittest.TestCase):
     def test_randn(self):
         f = self.rs.randn
         g = self.nprs.randn
-        assert_equal(f(10),g(10))
-        assert_equal(f(3,4,5),g(3,4,5))
+        assert_equal(f(10), g(10))
+        assert_equal(f(3, 4, 5), g(3, 4, 5))
 
     def test_rand(self):
         f = self.rs.rand
         g = self.nprs.rand
-        assert_equal(f(10),g(10))
-        assert_equal(f(3,4,5),g(3,4,5))
+        assert_equal(f(10), g(10))
+        assert_equal(f(3, 4, 5), g(3, 4, 5))
 
     def test_poisson_lam_max(self):
         assert_equal(self.rs.poisson_lam_max, self.nprs.poisson_lam_max)
@@ -393,11 +377,10 @@ class TestAgainstNumpy(unittest.TestCase):
     def test_dirichlet(self):
         f = self.rs.dirichlet
         g = self.nprs.dirichlet
-        a = [3,4,5,6,7,10]
-        assert_equal(f(a),g(a))
-        assert_equal(f(np.array(a), 10),g(np.array(a), 10))
-        assert_equal(f(np.array(a), (3,37)),g(np.array(a), (3,37)))
-
+        a = [3, 4, 5, 6, 7, 10]
+        assert_equal(f(a), g(a))
+        assert_equal(f(np.array(a), 10), g(np.array(a), 10))
+        assert_equal(f(np.array(a), (3, 37)), g(np.array(a), (3, 37)))
 
     def test_noncentral_f(self):
         self._set_common_state()
@@ -435,10 +418,10 @@ class TestAgainstNumpy(unittest.TestCase):
         self._is_state_common()
         f = self.rs.multinomial
         g = self.nprs.multinomial
-        p = [.1,.3,.4,.2]
-        assert_equal(f(100,p),g(100,p))
-        assert_equal(f(100,np.array(p)),g(100,np.array(p)))
-        assert_equal(f(100,np.array(p),size=(7,23)),g(100,np.array(p),size=(7,23)))
+        p = [.1, .3, .4, .2]
+        assert_equal(f(100, p), g(100, p))
+        assert_equal(f(100, np.array(p)), g(100, np.array(p)))
+        assert_equal(f(100, np.array(p), size=(7, 23)), g(100, np.array(p), size=(7, 23)))
         self._is_state_common()
 
     def test_choice(self):
@@ -449,8 +432,8 @@ class TestAgainstNumpy(unittest.TestCase):
         a = np.arange(100)
         size = 25
         for replace in (True, False):
-            assert_equal(f(a,size,replace), g(a,size,replace))
-            assert_equal(f(100,size,replace), g(100,size,replace))
+            assert_equal(f(a, size, replace), g(a, size, replace))
+            assert_equal(f(100, size, replace), g(100, size, replace))
         self._is_state_common()
 
     def test_permutation(self):
@@ -481,14 +464,14 @@ class TestAgainstNumpy(unittest.TestCase):
     def test_multivariate_normal(self):
         self._set_common_state()
         self._is_state_common()
-        mu = [1,2,3]
-        cov = [[1,.2,.3],[.2,4,1],[.3,1,10]]
+        mu = [1, 2, 3]
+        cov = [[1, .2, .3], [.2, 4, 1], [.3, 1, 10]]
         f = self.rs.multivariate_normal
         g = self.nprs.multivariate_normal
-        assert_equal(f(mu,cov),g(mu,cov))
-        assert_equal(f(np.array(mu),cov),g(np.array(mu),cov))
-        assert_equal(f(np.array(mu),np.array(cov)),g(np.array(mu),np.array(cov)))
-        assert_equal(f(np.array(mu),np.array(cov), size=(7,31)),g(np.array(mu),np.array(cov), size=(7,31)))
+        assert_equal(f(mu, cov), g(mu, cov))
+        assert_equal(f(np.array(mu), cov), g(np.array(mu), cov))
+        assert_equal(f(np.array(mu), np.array(cov)), g(np.array(mu), np.array(cov)))
+        assert_equal(f(np.array(mu), np.array(cov), size=(7, 31)), g(np.array(mu), np.array(cov), size=(7, 31)))
         self._is_state_common()
 
     def test_randint(self):
