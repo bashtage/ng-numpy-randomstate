@@ -1,4 +1,4 @@
-cdef extern from "core-rng.h":
+cdef extern from "distributions.h":
 
     cdef struct s_binomial_t:
         int has_binomial

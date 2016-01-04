@@ -4,7 +4,7 @@ DEF RNG_NAME = 'mrg32k3a'
 DEF RNG_STATE_LEN = 4
 DEF RNG_JUMPABLE = 0
 
-cdef extern from "core-rng.h":
+cdef extern from "distributions.h":
 
     cdef struct s_mrg32k3a_state:
         int64_t s10

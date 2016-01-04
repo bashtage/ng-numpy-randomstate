@@ -8,7 +8,7 @@ DEF RK_STATE_LEN = 624
 
 ctypedef uint32_t rng_state_t
 
-cdef extern from "core-rng.h":
+cdef extern from "distributions.h":
 
     cdef struct s_rk_state:
       uint32_t key[RK_STATE_LEN]
@@ -29,6 +29,10 @@ cdef extern from "core-rng.h":
 
     cdef void set_seed(aug_state* state, uint32_t seed)
 
+    cdef void set_seed_by_array(aug_state* state, unsigned long init_key[], int key_length)
+
+
+
 ctypedef rk_state rng_t
 
 cdef object _get_state(aug_state state):
@@ -46,5 +50,42 @@ cdef object _set_state(aug_state state, object state_info):
     state.rng.pos = state_info[1]
 
 DEF CLASS_DOCSTRING = """
-This is the mt19937 docstring.
+RandomState(seed=None)
+
+Container for the Mersenne Twister pseudo-random number generator.
+
+`RandomState` exposes a number of methods for generating random numbers
+drawn from a variety of probability distributions. In addition to the
+distribution-specific arguments, each method takes a keyword argument
+`size` that defaults to ``None``. If `size` is ``None``, then a single
+value is generated and returned. If `size` is an integer, then a 1-D
+array filled with generated values is returned. If `size` is a tuple,
+then an array with that shape is filled and returned.
+
+*Compatibility Guarantee*
+A fixed seed and a fixed series of calls to 'RandomState' methods using
+the same parameters will always produce the same results up to roundoff
+error except when the values were incorrect. Incorrect values will be
+fixed and the NumPy version in which the fix was made will be noted in
+the relevant docstring. Extension of existing parameter ranges and the
+addition of new parameters is allowed as long the previous behavior
+remains unchanged.
+
+Parameters
+----------
+seed : {None, int, array_like}, optional
+    Random seed initializing the pseudo-random number generator.
+    Can be an integer, an array (or other sequence) of integers of
+    any length, or ``None`` (the default).
+    If `seed` is ``None``, then `RandomState` will try to read data from
+    ``/dev/urandom`` (or the Windows analogue) if available or seed from
+    the clock otherwise.
+
+Notes
+-----
+The Python stdlib module "random" also contains a Mersenne Twister
+pseudo-random number generator with a number of methods that are similar
+to the ones available in `RandomState`. `RandomState`, besides being
+NumPy-aware, has the advantage that it provides a much larger number
+of probability distributions to choose from.
 """

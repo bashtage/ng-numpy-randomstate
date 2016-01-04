@@ -46,6 +46,8 @@ extern double random_standard_gamma(aug_state* state, double shape);
 
 extern double random_normal(aug_state *state, double loc, double scale);
 
+extern double random_normal_zig(aug_state *state, double loc, double scale);
+
 extern double random_exponential(aug_state *state, double scale);
 
 extern double random_uniform(aug_state *state, double loc, double scale);

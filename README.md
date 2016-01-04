@@ -31,6 +31,8 @@ identical sequence of random numbers for a given seed.
 ## Plans
 It is essentiall complete.  There are a few rough edges that need to be smoothed.
   
+  * Implement NumPy vector seeding for MT19937
+  * Pass full set of NumPy tests: Currently there are 4 failures
   * Document core RNG classes
   * Pickling support
   * Verify entropy based initialization is missing for some RNGs

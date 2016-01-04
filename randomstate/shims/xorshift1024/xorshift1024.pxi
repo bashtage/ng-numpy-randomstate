@@ -4,7 +4,7 @@ DEF RNG_JUMPABLE = 1
 DEF RNG_SEED = 1
 DEF RNG_STATE_LEN = 4
 
-cdef extern from "core-rng.h":
+cdef extern from "distributions.h":
 
     cdef struct s_xorshift1024_state:
       uint64_t s[16]

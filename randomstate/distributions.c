@@ -1,4 +1,4 @@
-#include "core-rng.h"
+#include "distributions.h"
 #include <limits.h>
 
 int64_t random_positive_int64(aug_state* state)
@@ -175,6 +175,11 @@ static double loggam(double x)
 double random_normal(aug_state *state, double loc, double scale)
 {
     return loc + scale * random_gauss(state);
+}
+
+double random_normal_zig(aug_state *state, double loc, double scale)
+{
+    return loc + scale * random_gauss_zig_julia(state);
 }
 
 double random_exponential(aug_state *state, double scale)

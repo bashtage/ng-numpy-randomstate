@@ -61,3 +61,5 @@ inline uint32_t rk_random(rk_state *state)
 
     return y;
 }
+
+extern void init_by_array(rk_state *state, unsigned long init_key[], int key_length);

@@ -7,7 +7,7 @@ DEF RNG_SEED=2
 cdef extern from "inttypes.h":
     ctypedef unsigned long long __uint128_t
 
-cdef extern from "core-rng.h":
+cdef extern from "distributions.h":
     ctypedef __uint128_t pcg128_t
 
     cdef struct pcg_state_setseq_128:

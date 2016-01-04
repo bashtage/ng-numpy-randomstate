@@ -4,7 +4,7 @@ DEF RNG_JUMPABLE = 1
 DEF RNG_STATE_LEN = 4
 DEF RNG_SEED=1
 
-cdef extern from "core-rng.h":
+cdef extern from "distributions.h":
 
     cdef struct s_xorshift128_state:
         uint64_t s[2]
@@ -33,10 +33,10 @@ ctypedef uint64_t rng_state_t
 
 ctypedef xorshift128_state rng_t
 
-cdef object _get_state(aug_state state):
+cdef inline object _get_state(aug_state state):
     return (state.rng.s[0], state.rng.s[1])
 
-cdef object _set_state(aug_state state, object state_info):
+cdef inline object _set_state(aug_state state, object state_info):
     state.rng.s[0] = state_info[0]
     state.rng.s[1] = state_info[1]
 

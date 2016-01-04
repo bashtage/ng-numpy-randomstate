@@ -101,6 +101,9 @@ class TestAgainstNumpy(unittest.TestCase):
     def _is_state_common(self):
         state = self.nprs.get_state()
         state2 = self.rs.get_state()
+        print(state2['gauss'])
+        print(state[3])
+        print(state[4])
         assert (state[1] == state2['state'][0]).all()
         assert (state[2] == state2['state'][1])
         assert (state[3] == state2['gauss']['has_gauss'])
@@ -481,3 +484,34 @@ class TestAgainstNumpy(unittest.TestCase):
                         self.nprs.randint,
                         is_scalar=True)
         self._is_state_common()
+
+    def test_scalar(self):
+        s = mt19937.RandomState(0)
+        assert_equal(s.randint(1000), 684)
+        s1 = np.random.RandomState(0)
+        assert_equal(s1.randint(1000), 684)
+        assert_equal(s1.randint(1000), s.randint(1000))
+
+        s = mt19937.RandomState(4294967295)
+        assert_equal(s.randint(1000), 419)
+        s1 = np.random.RandomState(4294967295)
+        assert_equal(s1.randint(1000), 419)
+        assert_equal(s1.randint(1000), s.randint(1000))
+
+        self.rs.seed(4294967295)
+        self.nprs.seed(4294967295)
+        self._is_state_common()
+
+    def test_array(self):
+        s = mt19937.RandomState(range(10))
+        assert_equal(s.randint(1000), 468)
+        s = np.random.RandomState(range(10))
+        assert_equal(s.randint(1000), 468)
+
+        s = mt19937.RandomState(np.arange(10))
+        assert_equal(s.randint(1000), 468)
+        s = mt19937.RandomState([0])
+        assert_equal(s.randint(1000), 973)
+        s = mt19937.RandomState([4294967295])
+        assert_equal(s.randint(1000), 265)
+

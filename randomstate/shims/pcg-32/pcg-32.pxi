@@ -4,7 +4,7 @@ DEF RNG_JUMPABLE = 0
 DEF RNG_STATE_LEN = 4
 DEF RNG_SEED = 2
 
-cdef extern from "core-rng.h":
+cdef extern from "distributions.h":
     cdef struct pcg_state_setseq_64:
         uint64_t state
         uint64_t inc

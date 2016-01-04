@@ -6,7 +6,7 @@ DEF RNG_SEED = 1
 
 DEF MLFG_STATE_LEN = 1279
 
-cdef extern from "core-rng.h":
+cdef extern from "distributions.h":
     cdef struct s_mlfg_state:
         uint64_t lags[1279]
         int pos

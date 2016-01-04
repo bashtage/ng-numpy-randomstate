@@ -47,7 +47,7 @@ for rng in rngs:
     file_name = rng.lower().replace('rng_', '')
     sources = [join(pwd, file_name + '.pyx'),
                join(pwd, 'src', 'common', 'entropy.c'),
-               join(pwd, 'core-rng.c')]
+               join(pwd, 'distributions.c')]
     include_dirs = [pwd] + [numpy.get_include()]
 
     if flags['RNG_PCG32']:

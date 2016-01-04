@@ -43,3 +43,5 @@ inline double random_double(aug_state* state)
     int32_t a = random_uint32(state) >> 5, b = random_uint32(state) >> 6;
     return (a * 67108864.0 + b) / 9007199254740992.0;
 }
+
+extern void set_seed_by_array(aug_state* state, unsigned long init_key[], int key_length);
