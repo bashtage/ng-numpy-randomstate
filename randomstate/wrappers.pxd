@@ -40,6 +40,7 @@ ctypedef uint32_t (* random_uint_1_i_32)(aug_state* state, uint32_t a) nogil
 ctypedef int32_t (* random_int_2_i_32)(aug_state* state, int32_t a, int32_t b) nogil
 ctypedef int64_t (* random_int_2_i)(aug_state* state, int64_t a, int64_t b) nogil
 
+cdef double POISSON_LAM_MAX = <uint64_t>(np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10)
 
 cdef enum ConstraintType:
     CONS_NONE
@@ -56,11 +57,11 @@ ctypedef ConstraintType constraint_type
 
 cdef Py_ssize_t compute_numel(size)
 
-cdef object uint0_32(aug_state* state, random_uint_0_32 func, object size, object lock)
-
 cdef int check_array_constraint(np.ndarray val, object name, constraint_type cons) except -1
 
 cdef int check_constraint(double val, object name, constraint_type cons) except -1
+
+cdef object uint0_32(aug_state* state, random_uint_0_32 func, object size, object lock)
 
 cdef object cont_broadcast_1(aug_state* state, void* func, object size, object lock,
                              object a, object a_name, constraint_type a_constraint)

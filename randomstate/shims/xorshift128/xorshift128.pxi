@@ -1,8 +1,4 @@
-DEF RNG_NAME = "xorshift-128+"
-DEF RNG_ADVANCEABLE = 0
-DEF RNG_JUMPABLE = 1
-DEF RNG_STATE_LEN = 4
-DEF RNG_SEED=1
+include "xorshift128-defs.pxi"
 
 cdef extern from "distributions.h":
 
@@ -39,8 +35,4 @@ cdef inline object _get_state(aug_state state):
 cdef inline object _set_state(aug_state state, object state_info):
     state.rng.s[0] = state_info[0]
     state.rng.s[1] = state_info[1]
-
-DEF CLASS_DOCSTRING = """
-This is the xorshift128 docstring.
-"""
 

@@ -18,7 +18,8 @@ with open('config.pxi', 'w') as config:
 
 pwd = getcwd()
 
-sources = [join(pwd, 'wrappers.pyx'),
+sources = [join(pwd, 'refactor.pyx'),
+           join(pwd, 'wrappers.pyx'),
            join(pwd, 'src', 'common', 'entropy.c'),
            join(pwd, 'distributions.c')]
 
@@ -30,7 +31,7 @@ defs = [('XORSHIFT128_RNG', '1')]
 include_dirs = [pwd] + [numpy.get_include()]
 include_dirs += [join(pwd, 'src', 'xorshift128')]
 
-setup(ext_modules=cythonize([Extension("core_rng",
+setup(ext_modules=cythonize([Extension("refactor",
                                        sources=sources,
                                        include_dirs=include_dirs,
                                        define_macros=defs,

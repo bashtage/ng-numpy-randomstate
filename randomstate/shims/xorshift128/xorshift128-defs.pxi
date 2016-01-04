@@ -1,0 +1,11 @@
+DEF RNG_NAME = "xorshift-128+"
+DEF RNG_ADVANCEABLE = 0
+DEF RNG_JUMPABLE = 1
+DEF RNG_STATE_LEN = 4
+DEF RNG_SEED=1
+DEF NORMAL_METHOD = 'zig'
+
+DEF CLASS_DOCSTRING = """
+This is the xorshift128 docstring.
+"""
+
