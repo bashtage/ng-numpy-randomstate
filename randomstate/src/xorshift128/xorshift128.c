@@ -1,3 +1,5 @@
+#include <inttypes.h>
+#include <stdio.h>
 #include "xorshift128.h"
 #include "../splitmix64/splitmix64.h"
 
@@ -34,4 +36,43 @@ void xorshift128_init_state(xorshift128_state* state, uint64_t seed, uint64_t in
 {
     state->s[0] = seed;
     state->s[1] = inc;
+}
+
+int main(void)
+{
+    int i;
+    uint64_t seed = 1ULL;
+    xorshift128_state state;
+    xorshift128_seed(&state, seed);
+
+    FILE *fp;
+    fp = fopen("xorshift-128-testset-1.csv", "w");
+    if(fp == NULL){
+         printf("Couldn't open file\n");
+         return -1;
+    }
+    fprintf(fp, "seed, %" PRIu64 "\n", seed);
+    for (i=0; i < 1000; i++)
+    {
+        fprintf(fp, "%d, %" PRIu64 "\n", i, xorshift128_next(&state));
+        printf("%d, %" PRIu64 "\n", i, xorshift128_next(&state));
+    }
+    fclose(fp);
+
+    xorshift128_seed(&state, seed);
+
+    seed = 12345678910111ULL;
+    xorshift128_seed(&state, seed);
+    fp = fopen("xorshift-128-testset-2.csv", "w");
+    if(fp == NULL){
+         printf("Couldn't open file\n");
+         return -1;
+    }
+    fprintf(fp, "seed, %" PRIu64 "\n", seed);
+    for (i=0; i < 1000; i++)
+    {
+        fprintf(fp, "%d, %" PRIu64 "\n", i, xorshift128_next(&state));
+        printf("%d, %" PRIu64 "\n", i, xorshift128_next(&state));
+    }
+    fclose(fp);
 }

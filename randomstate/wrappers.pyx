@@ -8,8 +8,6 @@ from wrappers cimport (aug_state, random_uint_0_32, constraint_type,
     random_uint_i, random_uint_di, random_uint_0, random_uint_d,
     random_uint_dd, random_double_0, POISSON_LAM_MAX)
 
-
-
 from cython_overrides cimport PyErr_Occurred, PyFloat_AsDouble, PyErr_Clear, PyInt_AsLong
 
 cdef Py_ssize_t compute_numel(size):

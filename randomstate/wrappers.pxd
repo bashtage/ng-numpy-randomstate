@@ -12,7 +12,8 @@ IF RNG_PCG64:
 IF RNG_MT19937:
     include "shims/random-kit/random-kit.pxi"
 IF RNG_XORSHIFT128:
-    include "shims/xorshift128/xorshift128.pxi"
+    # include "shims/xorshift128/xorshift128.pxi"
+    from xorshift128 cimport *
 IF RNG_XORSHIFT1024:
     include "shims/xorshift1024/xorshift1024.pxi"
 IF RNG_MRG32K3A:
