@@ -1,10 +1,10 @@
 # ng-numpy-randomstate
 [![Build Status](https://travis-ci.org/bashtage/ng-numpy-randomstate.svg?branch=master)](https://travis-ci.org/bashtage/ng-numpy-randomstate)
 
-This is a library and generic interface for 
-alternative random generators in Python and Numpy. This modules 
-includes a number core random number generators in addition to the 
-MT19937 that is included in NumPy. The RNGs include:
+This is a library and generic interface for alternative random generators 
+in Python and Numpy. This modules includes a number core random number 
+generators in addition to the MT19937 that is included in NumPy. 
+The RNGs include:
 
 * [MT19937](https://github.com/numpy/numpy/blob/master/numpy/random/mtrand/),
  the NumPy rng
@@ -16,13 +16,20 @@ MT19937 that is included in NumPy. The RNGs include:
 * A dummy RNG  - repeats the same sequence of 20 values -- only for testing
 
 ## Rationale
-The main reason for this project is to include other PRNGs 
-that support important features when working in parallel such
-as the ability to produce multiple independent streams, to 
-quickly advance the generator, or to jump ahead.
+The main reason for this project is to include other PRNGs that support 
+important features when working in parallel such as the ability to produce 
+multiple independent streams, to quickly advance the generator, or to jump 
+ahead.
 
 ## Status
 
+* Builds and passes all tests on:
+  * Linux 32/64 bit, Python 2.6, 2.7, 3.3, 3.4, 3.5
+  * PC-BSD (FreeBSD) 64-bit, Python 2.7
+  * OSX  64-bit, Python 2.7
+  * Windows 32/64 bit, Python 3.5 **only**. Support for 2.6/7 and 3.3/4 should come 
+    eventually, although the compilers for these version of Python present some big challenges.
+* 32-bit and all Windows versions do not support PCG-64.
 * There is no documentation for the core RNGs.
 * Complete drop-in replacement for `numpy.random.RandomState`. The `mt19937` 
 generator is identical to `numpy.random.RandomState`, and will produce an 
@@ -31,15 +38,12 @@ identical sequence of random numbers for a given seed.
 ## Plans
 It is essentiall complete.  There are a few rough edges that need to be smoothed.
   
-  * Implement NumPy vector seeding for MT19937
-  * Pass full set of NumPy tests: Currently there are 4 failures
   * Document core RNG classes
   * Pickling support
   * Verify entropy based initialization is missing for some RNGs
   * Integrate a patch for PCG-64 that allows 32-bit platforms to be supported
   * Additional refactoring where possible
-  * Check types for consistency (e.g. `long` vs `uint64`) for discrete random numbers 
-  * Build on Windows
+  * Build on Windows 2.6/7 and 3.3/4
   
 ## Requirements
 Building requires:
@@ -53,11 +57,13 @@ versions.
 
 So far all development has been on Linux. It has been tested (in a limited 
 manner, mostly against crashes and build failures) on Linux 32 and 64-bit, 
-as well as OSX 10.10 and PC-BSD 10.2 (should also work on Free BSD).
+as well as OSX 10.10, PC-BSD 10.2 (should also work on Free BSD) and Windows 
+(Python 3.5).
 
 Most tests implemeted are _smoke_ tests that only make sure that something is 
 output from the expected inputs. The only other tests compare the MT19937 
-generator to NumPy's implementation.  Formal tests (unit) have not been implemented.
+generator to NumPy's implementation.  Formal tests (unit) have not been 
+implemented for the individual RNGs.
 
 ## Installing
 
@@ -168,34 +174,10 @@ randomstate-xorshift128-random_sample      112.6%
 
 ## Differences from `numpy.random.RandomState`
 
-### New
+### New Functions
 
 * `random_uintegers` - unsigned integers `[0, 2**64-1]` 
 * `jump` - Jumps RNGs that support it.  `jump` moves the state a great 
 distance. _Only available if supported by the RNG._
 * `advance` - Advanced the core RNG 'as-if' a number of draws were made, 
 without actually drawing the numbers. _Only available if supported by the RNG._
-
-### Same
-
-Every function has been implemented and is the same (or quantitatively 
-similar):
-
-```
-seed                    bytes                   get_state 
-standard_cauchy         standard_exponential    standard_gamma 
-standard_normal         random_sample           beta
-chisquare               choice                  dirichlet
-exponential             f                       gamma
-geometric               gumbel                  hypergeometric
-laplace                 logistic                lognormal
-logseries               multinomial             multivariate_normal
-negative_binomial       noncentral_chisquare    noncentral_f
-normal                  pareto                  permutation
-poisson                 poisson_lam_max         power
-rand                    randint                 randn   
-rayleigh                shuffle                 tomaxint    
-triangular              uniform                 vonmises
-wald                    weibull                 zipf
-choice                  random_integers         randint 
-```
