@@ -1,6 +1,6 @@
 from distutils.core import setup
 from distutils.extension import Extension
-from os import getcwd
+from os import getcwd, name
 from os.path import join
 
 import numpy
@@ -30,10 +30,14 @@ defs = [('XORSHIFT128_RNG', '1')]
 include_dirs = [pwd] + [numpy.get_include()]
 include_dirs += [join(pwd, 'src', 'xorshift128')]
 
+extra_link_args = ['Advapi32.lib'] if name == 'nt' else []
+extra_compile_args= [] if name == 'nt' else ['-std=c99']
+
 setup(ext_modules=cythonize([Extension("core_rng",
                                        sources=sources,
                                        include_dirs=include_dirs,
                                        define_macros=defs,
-                                       extra_compile_args=['-std=c99'])
+                                       extra_compile_args=extra_compile_args,
+                                       extra_link_args=extra_link_args)
                              ])
       )

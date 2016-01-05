@@ -3,12 +3,12 @@ ctypedef double (* random_double_1)(aug_state* state, double a) nogil
 ctypedef double (* random_double_2)(aug_state* state, double a, double b) nogil
 ctypedef double (* random_double_3)(aug_state* state, double a, double b, double c) nogil
 
-ctypedef uint64_t (* random_uint_0)(aug_state* state) nogil
-ctypedef uint64_t (* random_uint_d)(aug_state* state, double a) nogil
-ctypedef uint64_t (* random_uint_dd)(aug_state* state, double a, double b) nogil
-ctypedef uint64_t (* random_uint_di)(aug_state* state, double a, uint64_t b) nogil
-ctypedef uint64_t (* random_uint_i)(aug_state* state, uint64_t a) nogil
-ctypedef uint64_t (* random_uint_iii)(aug_state* state, uint64_t a, uint64_t b, uint64_t c) nogil
+ctypedef long (* random_uint_0)(aug_state* state) nogil
+ctypedef long (* random_uint_d)(aug_state* state, double a) nogil
+ctypedef long (* random_uint_dd)(aug_state* state, double a, double b) nogil
+ctypedef long (* random_uint_di)(aug_state* state, double a, uint64_t b) nogil
+ctypedef long (* random_uint_i)(aug_state* state, long a) nogil
+ctypedef long (* random_uint_iii)(aug_state* state, long a, long b, long c) nogil
 
 ctypedef uint32_t (* random_uint_0_32)(aug_state* state) nogil
 ctypedef uint32_t (* random_uint_1_i_32)(aug_state* state, uint32_t a) nogil
@@ -47,7 +47,7 @@ cdef enum ConstraintType:
 
 ctypedef ConstraintType constraint_type
 
-cdef double POISSON_LAM_MAX = <uint64_t>(np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10)
+cdef double POISSON_LAM_MAX = <double>np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10
 cdef uint64_t MAXSIZE = <uint64_t>sys.maxsize
 
 cdef int check_array_constraint(np.ndarray val, object name, constraint_type cons) except -1:
@@ -299,7 +299,7 @@ cdef object discrete_broadcast_d(aug_state* state, void* func, object size, obje
         check_array_constraint(a_arr, a_name, a_constraint)
 
     if size is not None:
-        randoms = np.empty(size, np.long)
+        randoms = np.empty(size, np.int)
     else:
         #randoms = np.empty(np.shape(a_arr), np.double)
         randoms = np.PyArray_SimpleNew(np.PyArray_NDIM(a_arr), np.PyArray_DIMS(a_arr), np.NPY_LONG)
@@ -329,10 +329,10 @@ cdef object discrete_broadcast_dd(aug_state* state, void* func, object size, obj
         check_array_constraint(b_arr, b_name, b_constraint)
 
     if size is not None:
-        randoms = np.empty(size, np.long)
+        randoms = np.empty(size, np.int)
     else:
         it = np.PyArray_MultiIterNew2(a_arr, b_arr)
-        randoms = np.empty(it.shape, np.long)
+        randoms = np.empty(it.shape, np.int)
         # randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_LONG)
 
     it = np.PyArray_MultiIterNew3(randoms, a_arr, b_arr)
@@ -363,10 +363,10 @@ cdef object discrete_broadcast_di(aug_state* state, void* func, object size, obj
         check_array_constraint(b_arr, b_name, b_constraint)
 
     if size is not None:
-        randoms = np.empty(size, np.long)
+        randoms = np.empty(size, np.int)
     else:
         it = np.PyArray_MultiIterNew2(a_arr, b_arr)
-        randoms = np.empty(it.shape, np.long)
+        randoms = np.empty(it.shape, np.int)
         #randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_LONG)
 
     it = np.PyArray_MultiIterNew3(randoms, a_arr, b_arr)
@@ -401,10 +401,10 @@ cdef object discrete_broadcast_iii(aug_state* state, void* func, object size, ob
         check_array_constraint(c_arr, c_name, c_constraint)
 
     if size is not None:
-        randoms = np.empty(size, np.long)
+        randoms = np.empty(size, np.int)
     else:
         it = np.PyArray_MultiIterNew3(a_arr, b_arr, c_arr)
-        randoms = np.empty(it.shape, np.long)
+        randoms = np.empty(it.shape, np.int)
         #randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_LONG)
 
     it = np.PyArray_MultiIterNew4(randoms, a_arr, b_arr, c_arr)
@@ -430,7 +430,7 @@ cdef object discrete_broadcast_i(aug_state* state, void* func, object size, obje
         check_array_constraint(a_arr, a_name, a_constraint)
 
     if size is not None:
-        randoms = np.empty(size, np.long)
+        randoms = np.empty(size, np.int)
     else:
         #randoms = np.empty(np.shape(a_arr), np.double)
         randoms = np.PyArray_SimpleNew(np.PyArray_NDIM(a_arr), np.PyArray_DIMS(a_arr), np.NPY_LONG)
@@ -538,7 +538,7 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
             return (<random_uint_iii>func)(state, _ia, _ib, _ic)
 
     cdef Py_ssize_t i, n = compute_numel(size)
-    cdef uint64_t [::1] randoms = np.empty(n, np.uint64)
+    cdef np.int_t [::1] randoms = np.empty(n, np.int)
     cdef random_uint_0 f0;
     cdef random_uint_d fd;
     cdef random_uint_dd fdd;
@@ -576,4 +576,3 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
                 randoms[i] = fiii(state, _ia, _ib, _ic)
 
     return np.asarray(randoms).reshape(size)
-

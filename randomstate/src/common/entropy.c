@@ -42,7 +42,8 @@
 /* Windows */
 #include <time.h>
 #include <sys/timeb.h>
-
+#include <windows.h>
+#include <wincrypt.h>
 #else
 /* Unix */
 #include <time.h>
@@ -104,7 +105,7 @@ bool entropy_getbytes(void *dest, size_t size)
     }
     done = CryptGenRandom(hCryptProv, size, (unsigned char *)dest);
     CryptReleaseContext(hCryptProv, 0);
-    if (done) {
+    if (!done) {
         return false;
     }
 
@@ -146,20 +147,22 @@ uint32_t entropy_randombytes(void) {
 #else
     struct _timeb  tv;
     _ftime(&tv);
-    return entropy_hash_32(tv.time) ^ entropy_hash_32(tv.millitm) ^ entropy_hash_32(clock());
+    return entropy_hash_32(GetCurrentProcessId()) ^ entropy_hash_32((uint32_t)tv.time) ^ entropy_hash_32(tv.millitm) ^ entropy_hash_32(clock());
 #endif
 }
 
 bool entropy_fallback_getbytes(void *dest, size_t size)
 {
-    int hashes = 1 + ((size - 1) / 4);
-    uint32_t hash[hashes];
+    int hashes = (int)size;
+    uint32_t *hash = malloc(hashes * sizeof(uint32_t));
+    // uint32_t hash[hashes];
     int i;
     for (i=0; i < hashes; i++)
     {
         hash[i] = entropy_randombytes();
     }
     memcpy(dest, (void *) hash, size);
+    free(hash);
     return true;
 }
 

@@ -13,8 +13,6 @@ except:
     from dummy_threading import Lock
 np.import_array()
 
-DEF NORMAL_METHOD = 'inv'
-
 cdef extern from "Python.h":
     double PyFloat_AsDouble(object ob)
     long PyInt_AsLong(object ob)
@@ -40,6 +38,12 @@ IF RNG_MLFG_1279_861:
     include "shims/mlfg-1279-861/mlfg-1279-861.pxi"
 IF RNG_DUMMY:
     include "shims/dummy/dummy.pxi"
+
+IF NORMAL_METHOD == 'inv':
+    __normal_method = 'inv'
+ELSE:
+    __normal_method = 'zig'
+
 
 cdef extern from "distributions.h":
 
@@ -71,6 +75,7 @@ cdef extern from "distributions.h":
     cdef double random_chisquare(aug_state *state, double df) nogil
 
     cdef double random_normal(aug_state *state, double loc, double scale) nogil
+    cdef double random_normal_zig(aug_state *state, double loc, double scale) nogil
     cdef double random_uniform(aug_state *state, double loc, double scale) nogil
     cdef double random_gamma(aug_state *state, double shape, double scale) nogil
     cdef double random_beta(aug_state *state, double a, double b) nogil
@@ -542,15 +547,29 @@ cdef class RandomState:
         These should not be used to produce bounded random numbers by
         simple truncation.
         """
+        cdef uint32_t [:] randoms32
+        cdef uint64_t [:] randoms64
+        cdef Py_ssize_t i, n
         if bits == 64:
-            return disc(&self.rng_state, &random_uint64, size, self.lock, 0, 0,
-                            0, '', CONS_NONE, 0, '', CONS_NONE, 0, '', CONS_NONE)
+            if size is None:
+                return random_uint64(&self.rng_state)
+            n = compute_numel(size)
+            randoms64 = np.empty(n, np.uint64)
+            for i in range(n):
+                randoms64[i] = random_uint64(&self.rng_state)
+            return np.asarray(randoms64).reshape(size)
         elif bits == 32:
-            return uint0_32(&self.rng_state, &random_uint32, size, self.lock)
+            if size is None:
+                return random_uint32(&self.rng_state)
+            n = compute_numel(size)
+            randoms32 = np.empty(n, np.uint32)
+            for i in range(n):
+                randoms32[i] = random_uint32(&self.rng_state)
+            return np.asarray(randoms32).reshape(size)
         else:
             raise ValueError('Unknown value of bits.  Must be either 32 or 64.')
 
-    def standard_normal(self, size=None, method=NORMAL_METHOD):
+    def standard_normal(self, size=None, method=__normal_method):
         """
         standard_normal(size=None, method='inv')
 
@@ -947,7 +966,7 @@ cdef class RandomState:
         cdef Py_ssize_t n_uint32 = ((length - 1) // 4 + 1)
         return self.random_uintegers(n_uint32, bits=32).tobytes()[:length]
 
-    def randn(self, *args, method='inv'):
+    def randn(self, *args, method=__normal_method):
         """
         randn(d0, d1, ..., dn)
 
@@ -1294,20 +1313,20 @@ cdef class RandomState:
 
         """
         cdef Py_ssize_t n
-        cdef np.long_t [::1] randoms
+        cdef np.int_t [::1] randoms
 
         if size is None:
             return random_positive_int(&self.rng_state)
 
         n = compute_numel(size)
-        randoms = np.empty(n, np.long)
+        randoms = np.empty(n, np.int)
         for i in range(n):
             randoms[i] = random_positive_int(&self.rng_state)
         return np.asarray(randoms).reshape(size)
 
-    def normal(self, loc=0.0, scale=1.0, size=None, method=NORMAL_METHOD):
+    def normal(self, loc=0.0, scale=1.0, size=None, method=__normal_method):
         """
-        normal(loc=0.0, scale=1.0, size=None)
+        normal(loc=0.0, scale=1.0, size=None, method='inv')
 
         Draw random samples from a normal (Gaussian) distribution.
 
@@ -1388,11 +1407,16 @@ cdef class RandomState:
         >>> plt.show()
 
         """
-
-        return cont(&self.rng_state, &random_normal, size, self.lock, 2,
-                    loc, '', CONS_NONE,
-                    scale, 'scale', CONS_POSITIVE,
-                    0.0, '', CONS_NONE)
+        if method == 'inv':
+            return cont(&self.rng_state, &random_normal, size, self.lock, 2,
+                        loc, '', CONS_NONE,
+                        scale, 'scale', CONS_POSITIVE,
+                        0.0, '', CONS_NONE)
+        else:
+            return cont(&self.rng_state, &random_normal_zig, size, self.lock, 2,
+                        loc, '', CONS_NONE,
+                        scale, 'scale', CONS_POSITIVE,
+                        0.0, '', CONS_NONE)
 
     def beta(self, a, b, size=None):
         """
@@ -2957,7 +2981,7 @@ cdef class RandomState:
 
         cdef long lo, hi, rv
         cdef unsigned long diff
-        cdef np.long_t [::1] randoms
+        cdef np.int_t [::1] randoms
         cdef Py_ssize_t n, i
 
         if high is None:
@@ -2974,7 +2998,7 @@ cdef class RandomState:
             return rv
 
         n = compute_numel(size)
-        randoms = np.empty(n, np.long)
+        randoms = np.empty(n, np.int)
         with self.lock, nogil:
             for i in range(n):
                 randoms[i] = lo + <long>random_interval(&self.rng_state, diff)
@@ -3479,7 +3503,7 @@ cdef class RandomState:
             except:
                 shape = tuple(size) + (d,)
 
-        multin = np.zeros(shape, dtype=np.long)
+        multin = np.zeros(shape, dtype=np.int)
         mnarr = <np.ndarray>multin
         mnix = <long*>np.PyArray_DATA(mnarr)
         sz = np.PyArray_SIZE(mnarr)

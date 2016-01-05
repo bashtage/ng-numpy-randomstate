@@ -3,6 +3,7 @@ DEF RNG_ADVANCEABLE = 1
 DEF RNG_JUMPABLE = 0
 DEF RNG_STATE_LEN = 4
 DEF RNG_SEED=2
+DEF NORMAL_METHOD = 'zig'
 
 cdef extern from "inttypes.h":
     ctypedef unsigned long long __uint128_t

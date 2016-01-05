@@ -1,5 +1,5 @@
 import sys
-from os import unlink
+import os
 from os.path import join
 from setuptools import setup, find_packages
 from setuptools.extension import Extension
@@ -25,9 +25,11 @@ rngs = ['RNG_DUMMY', 'RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64', 'RNG_MT19937
 compile_rngs = rngs[:]
 
 extra_defs = []
-if sys.maxsize < 2 ** 33:
+if sys.maxsize < 2 ** 33 or os.name == 'nt':
     compile_rngs.remove('RNG_PCG64')
 
+extra_link_args = ['Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []
+extra_compile_args= [] if os.name == 'nt' else ['-std=c99']
 
 def write_config(file_name, config):
     flags = config['flags']
@@ -125,7 +127,7 @@ for rng in rngs:
 extensions = []
 # Generate files and extensions
 for config in configs:
-    config_file_name = join(mod_dir, config['file_name'] + '-config.pxi')
+    config_file_name = mod_dir + '/' + config['file_name'] + '-config.pxi'
     # Rewrite core_rng to replace generic #include "config.pxi"
     with open(join(mod_dir, 'core_rng.pyx'), 'r') as original:
         with open(join(mod_dir, config['file_name'] + '.pyx'), 'w') as mod:
@@ -141,7 +143,8 @@ for config in configs:
               sources=config['sources'],
               include_dirs=config['include_dirs'],
               define_macros=config['defs'] + extra_defs,
-              extra_compile_args=['-std=c99'])])[0]
+              extra_compile_args=extra_compile_args,
+              extra_link_args=extra_link_args)])[0]
     extensions.append(ext)
 
 setup(name='randomstate',
@@ -158,8 +161,7 @@ setup(name='randomstate',
 
 # Clean up generated files
 for config in configs:
-    unlink(join(mod_dir, config['file_name'] + '.pyx'))
-    unlink(join(mod_dir, config['file_name'] + '-config.pxi'))
-    unlink(join(mod_dir, config['file_name'] + '.c'))
+    #os.unlink(join(mod_dir, config['file_name'] + '.pyx'))
+    #os.unlink(join(mod_dir, config['file_name'] + '-config.pxi'))
+    #os.unlink(join(mod_dir, config['file_name'] + '.c'))
     pass
-

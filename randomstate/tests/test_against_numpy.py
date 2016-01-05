@@ -21,7 +21,7 @@ def compare_1_input(f1, f2, is_small=False):
     for i in inputs:
         v1 = f1(*i[0], **i[1])
         v2 = f2(*i[0], **i[1])
-        assert_equal(v1, v2)
+        assert_allclose(v1, v2)
 
 
 def compare_2_input(f1, f2, is_np=False, is_scalar=False):
@@ -47,7 +47,7 @@ def compare_2_input(f1, f2, is_np=False, is_scalar=False):
     for i in inputs:
         v1 = f1(*i[0], **i[1])
         v2 = f2(*i[0], **i[1])
-        assert_equal(v1, v2)
+        assert_allclose(v1, v2)
 
 
 def compare_3_input(f1, f2, is_np=False):
@@ -73,7 +73,7 @@ def compare_3_input(f1, f2, is_np=False):
     for i in inputs:
         v1 = f1(*i[0], **i[1])
         v2 = f2(*i[0], **i[1])
-        assert_equal(v1, v2)
+        assert_allclose(v1, v2)
 
 
 class TestAgainstNumpy(unittest.TestCase):
@@ -101,24 +101,17 @@ class TestAgainstNumpy(unittest.TestCase):
     def _is_state_common(self):
         state = self.nprs.get_state()
         state2 = self.rs.get_state()
-        print(state2['gauss'])
-        print(state[3])
-        print(state[4])
         assert (state[1] == state2['state'][0]).all()
         assert (state[2] == state2['state'][1])
         assert (state[3] == state2['gauss']['has_gauss'])
-        assert (state[4] == state2['gauss']['gauss'])
+        assert_allclose(state[4],state2['gauss']['gauss'])
 
     def test_common_seed(self):
         self.rs.seed(1234)
         self.nprs.seed(1234)
-        print(self.rs.get_state()['gauss'])
-        print(self.nprs.get_state()[3:])
         self._is_state_common()
         self.rs.seed(23456)
         self.nprs.seed(23456)
-        print(self.rs.get_state()['gauss'])
-        print(self.nprs.get_state()[3:])
         self._is_state_common()
 
     def test_numpy_state(self):
@@ -365,25 +358,25 @@ class TestAgainstNumpy(unittest.TestCase):
     def test_randn(self):
         f = self.rs.randn
         g = self.nprs.randn
-        assert_equal(f(10), g(10))
-        assert_equal(f(3, 4, 5), g(3, 4, 5))
+        assert_allclose(f(10), g(10))
+        assert_allclose(f(3, 4, 5), g(3, 4, 5))
 
     def test_rand(self):
         f = self.rs.rand
         g = self.nprs.rand
-        assert_equal(f(10), g(10))
-        assert_equal(f(3, 4, 5), g(3, 4, 5))
+        assert_allclose(f(10), g(10))
+        assert_allclose(f(3, 4, 5), g(3, 4, 5))
 
     def test_poisson_lam_max(self):
-        assert_equal(self.rs.poisson_lam_max, self.nprs.poisson_lam_max)
+        assert_allclose(self.rs.poisson_lam_max, self.nprs.poisson_lam_max)
 
     def test_dirichlet(self):
         f = self.rs.dirichlet
         g = self.nprs.dirichlet
         a = [3, 4, 5, 6, 7, 10]
-        assert_equal(f(a), g(a))
-        assert_equal(f(np.array(a), 10), g(np.array(a), 10))
-        assert_equal(f(np.array(a), (3, 37)), g(np.array(a), (3, 37)))
+        assert_allclose(f(a), g(a))
+        assert_allclose(f(np.array(a), 10), g(np.array(a), 10))
+        assert_allclose(f(np.array(a), (3, 37)), g(np.array(a), (3, 37)))
 
     def test_noncentral_f(self):
         self._set_common_state()
@@ -459,8 +452,6 @@ class TestAgainstNumpy(unittest.TestCase):
         ga = a.copy()
         g(ga)
         f(fa)
-        print(fa)
-        print(ga)
         assert_equal(fa, ga)
         self._is_state_common()
 
@@ -471,10 +462,10 @@ class TestAgainstNumpy(unittest.TestCase):
         cov = [[1, .2, .3], [.2, 4, 1], [.3, 1, 10]]
         f = self.rs.multivariate_normal
         g = self.nprs.multivariate_normal
-        assert_equal(f(mu, cov), g(mu, cov))
-        assert_equal(f(np.array(mu), cov), g(np.array(mu), cov))
-        assert_equal(f(np.array(mu), np.array(cov)), g(np.array(mu), np.array(cov)))
-        assert_equal(f(np.array(mu), np.array(cov), size=(7, 31)), g(np.array(mu), np.array(cov), size=(7, 31)))
+        assert_allclose(f(mu, cov), g(mu, cov))
+        assert_allclose(f(np.array(mu), cov), g(np.array(mu), cov))
+        assert_allclose(f(np.array(mu), np.array(cov)), g(np.array(mu), np.array(cov)))
+        assert_allclose(f(np.array(mu), np.array(cov), size=(7, 31)), g(np.array(mu), np.array(cov), size=(7, 31)))
         self._is_state_common()
 
     def test_randint(self):

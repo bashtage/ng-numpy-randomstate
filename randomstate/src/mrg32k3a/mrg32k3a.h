@@ -43,9 +43,9 @@ inline uint32_t mrg32k3a_random(mrg32k3a_state* state)
 
     /* Combination */
     if (p1 <= p2)
-        return (p1 - p2 + m1);
+        return (uint32_t)(p1 - p2 + m1);
     else
-        return (p1 - p2);
+        return (uint32_t)(p1 - p2);
 }
 
 void mrg32k3a_seed(mrg32k3a_state* state, uint64_t seed);

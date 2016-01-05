@@ -1,15 +1,17 @@
 import sys
+import os
 import unittest
 import numpy as np
 import randomstate.mlfg_1279_861 as mlfg_1279_861
 import randomstate.mrg32k3a as mrg32k3a
 import randomstate.mt19937 as mt19937
 import randomstate.pcg32 as pcg32
-
-if sys.maxsize > 2 ** 33:
-    import randomstate.pcg64 as pcg64
 import randomstate.xorshift1024 as xorshift1024
 import randomstate.xorshift128 as xorshift128
+from numpy.testing import assert_almost_equal, assert_equal
+
+if sys.maxsize > 2 ** 33 and os.name != 'nt':
+    import randomstate.pcg64 as pcg64
 
 from nose import SkipTest
 
@@ -114,7 +116,6 @@ class RNG(object):
     def test_uniform(self):
         r = self.rs.uniform(-1.0, 0.0, size=10)
         assert len(r) == 10
-        print(r)
         assert (r > -1).all()
         assert (r <= 0).all()
 
@@ -174,11 +175,8 @@ class RNG(object):
     def test_entropy_init(self):
         rs = self.mod.RandomState()
         rs2 = self.mod.RandomState()
-        print('\n' * 10)
-        print('*' * 80)
         s1 = rs.get_state()
         s2 = rs2.get_state()
-        print('\n' * 10)
         assert not comp_state(rs.get_state(), rs2.get_state())
 
     def test_seed(self):
@@ -218,7 +216,15 @@ class RNG(object):
 
     def test_tomaxint(self):
         vals = self.rs.tomaxint(size=100000)
-        if sys.maxsize < 2 ** 32:
+        maxsize = 0
+        if os.name == 'nt':
+            maxsize = 2**31 - 1
+        else:
+            try:
+                maxsize = sys.maxint
+            except:
+                maxsize = sys.maxsize
+        if maxsize < 2 ** 32:
             assert (vals < sys.maxsize).all()
         else:
             assert (vals >= 2 ** 32).any()
@@ -291,10 +297,12 @@ class RNG(object):
 
     def test_randn(self):
         state = self.rs.get_state()
+        print(state)
         vals = self.rs.randn(10, 10, 10)
         self.rs.set_state(state)
-        assert (vals == self.rs.standard_normal((10, 10, 10))).all()
-        assert vals.shape == (10, 10, 10)
+        print(self.rs.get_state())
+        assert_equal(vals,self.rs.standard_normal((10, 10, 10)))
+        assert_equal(vals.shape, (10, 10, 10))
 
     def test_noncentral_chisquare(self):
         vals = self.rs.noncentral_chisquare(10, 2, 10)
@@ -327,8 +335,7 @@ class RNG(object):
 
     def test_poisson_lam_max(self):
         vals = self.rs.poisson_lam_max
-        assert np.abs(vals - (np.iinfo('l').max - np.sqrt(np.iinfo('l').max) * 10)) < (
-            self.rs.poisson_lam_max * np.finfo('d').eps)
+        assert_almost_equal(vals, np.iinfo('l').max - np.sqrt(np.iinfo('l').max) * 10)
 
     def test_power(self):
         vals = self.rs.power(0.2, 10)
@@ -431,7 +438,7 @@ class TestPCG32(RNG, unittest.TestCase):
         cls._extra_setup()
 
 
-if sys.maxsize > 2 ** 33:
+if sys.maxsize > 2 ** 33 and os.name != 'nt':
     class TestPCG64(RNG, unittest.TestCase):
         @classmethod
         def setup_class(cls):
@@ -486,3 +493,7 @@ class TestMRG32k3A(RNG, unittest.TestCase):
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
         cls._extra_setup()
+
+if __name__ == '__main__':
+    import nose
+    nose.run(argv=[__file__, '-vv'])

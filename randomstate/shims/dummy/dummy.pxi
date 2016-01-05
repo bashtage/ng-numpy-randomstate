@@ -3,6 +3,7 @@ DEF RNG_ADVANCEABLE = 0
 DEF RNG_JUMPABLE = 0
 DEF RNG_STATE_LEN = 4
 DEF RNG_SEED = 1
+DEF NORMAL_METHOD = 'zig'
 
 cdef extern from "distributions.h":
 

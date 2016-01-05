@@ -648,7 +648,7 @@ long random_binomial_inversion(aug_state *state, long n, double p)
         state->binomial->q = q = 1.0 - p;
         state->binomial->r = qn = exp(n * log(q));
         state->binomial->c = np = n*p;
-        state->binomial->m = bound = min(n, np + 10.0*sqrt(np*q + 1));
+        state->binomial->m = bound = (long)min(n, np + 10.0*sqrt(np*q + 1));
     } else
     {
         q = state->binomial->q;
