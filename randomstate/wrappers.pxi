@@ -35,6 +35,8 @@ cdef object uint0_32(aug_state* state, random_uint_0_32 func, object size, objec
             randoms[i] = func(state)
     return np.asanyarray(randoms).reshape(size)
 
+cdef double POISSON_LAM_MAX = <double>np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10
+
 cdef enum ConstraintType:
     CONS_NONE
     CONS_NON_NEGATIVE
@@ -47,7 +49,7 @@ cdef enum ConstraintType:
 
 ctypedef ConstraintType constraint_type
 
-cdef double POISSON_LAM_MAX = <double>np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10
+
 cdef uint64_t MAXSIZE = <uint64_t>sys.maxsize
 
 cdef int check_array_constraint(np.ndarray val, object name, constraint_type cons) except -1:

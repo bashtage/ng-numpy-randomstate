@@ -31,6 +31,7 @@ cdef extern from "distributions.h":
     cdef double random_chisquare(aug_state *state, double df) nogil
 
     cdef double random_normal(aug_state *state, double loc, double scale) nogil
+    cdef double random_normal_zig(aug_state *state, double loc, double scale) nogil
     cdef double random_uniform(aug_state *state, double loc, double scale) nogil
     cdef double random_gamma(aug_state *state, double shape, double scale) nogil
     cdef double random_beta(aug_state *state, double a, double b) nogil

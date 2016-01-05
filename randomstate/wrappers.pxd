@@ -27,12 +27,12 @@ ctypedef double (* random_double_1)(aug_state* state, double a) nogil
 ctypedef double (* random_double_2)(aug_state* state, double a, double b) nogil
 ctypedef double (* random_double_3)(aug_state* state, double a, double b, double c) nogil
 
-ctypedef uint64_t (* random_uint_0)(aug_state* state) nogil
-ctypedef uint64_t (* random_uint_d)(aug_state* state, double a) nogil
-ctypedef uint64_t (* random_uint_dd)(aug_state* state, double a, double b) nogil
-ctypedef uint64_t (* random_uint_di)(aug_state* state, double a, uint64_t b) nogil
-ctypedef uint64_t (* random_uint_i)(aug_state* state, uint64_t a) nogil
-ctypedef uint64_t (* random_uint_iii)(aug_state* state, uint64_t a, uint64_t b, uint64_t c) nogil
+ctypedef long (* random_uint_0)(aug_state* state) nogil
+ctypedef long (* random_uint_d)(aug_state* state, double a) nogil
+ctypedef long (* random_uint_dd)(aug_state* state, double a, double b) nogil
+ctypedef long (* random_uint_di)(aug_state* state, double a, uint64_t b) nogil
+ctypedef long (* random_uint_i)(aug_state* state, long a) nogil
+ctypedef long (* random_uint_iii)(aug_state* state, long a, long b, long c) nogil
 
 ctypedef uint32_t (* random_uint_0_32)(aug_state* state) nogil
 ctypedef uint32_t (* random_uint_1_i_32)(aug_state* state, uint32_t a) nogil
@@ -40,7 +40,7 @@ ctypedef uint32_t (* random_uint_1_i_32)(aug_state* state, uint32_t a) nogil
 ctypedef int32_t (* random_int_2_i_32)(aug_state* state, int32_t a, int32_t b) nogil
 ctypedef int64_t (* random_int_2_i)(aug_state* state, int64_t a, int64_t b) nogil
 
-cdef double POISSON_LAM_MAX = <uint64_t>(np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10)
+cdef double POISSON_LAM_MAX = <double>np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10
 
 cdef enum ConstraintType:
     CONS_NONE
@@ -51,7 +51,6 @@ cdef enum ConstraintType:
     CONS_GT_1
     CONS_GTE_1
     CONS_POISSON
-
 
 ctypedef ConstraintType constraint_type
 
