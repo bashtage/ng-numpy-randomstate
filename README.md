@@ -23,27 +23,33 @@ ahead.
 
 ## Status
 
+* Complete drop-in replacement for `numpy.random.RandomState`. The `mt19937` 
+generator is identical to `numpy.random.RandomState`, and will produce an 
+identical sequence of random numbers for a given seed.   
 * Builds and passes all tests on:
   * Linux 32/64 bit, Python 2.6, 2.7, 3.3, 3.4, 3.5
   * PC-BSD (FreeBSD) 64-bit, Python 2.7
   * OSX  64-bit, Python 2.7
   * Windows 32/64 bit, Python 3.5 **only**. Support for 2.6/7 and 3.3/4 should come 
     eventually, although the compilers for these version of Python present some big challenges.
-* 32-bit and all Windows versions do not support PCG-64.
+* 32-bit (any OS) and all Windows versions do not support PCG-64 since there 
+is no support for unsigned 128-bit integers. This will likely be fixed 
+eventually using a limited implementation of this type where required See 
+[Issue 5](https://github.com/bashtage/ng-numpy-randomstate/issues/5).
 * There is no documentation for the core RNGs.
-* Complete drop-in replacement for `numpy.random.RandomState`. The `mt19937` 
-generator is identical to `numpy.random.RandomState`, and will produce an 
-identical sequence of random numbers for a given seed.   
 
 ## Plans
-It is essentiall complete.  There are a few rough edges that need to be smoothed.
+It is essentially complete.  There are a few rough edges that need to be smoothed.
   
   * Document core RNG classes
   * Pickling support
   * Verify entropy based initialization is missing for some RNGs
-  * Integrate a patch for PCG-64 that allows 32-bit platforms to be supported
+  * Integrate a patch for PCG-64 that allows 32-bit platforms/Windows to be supported
   * Additional refactoring where possible
   * Build on Windows 2.6/7 and 3.3/4
+  * Multiple stream support for MLFG and MRG32K3A
+  * Creation of additional streams from a RandomState where supported (i.e. 
+  a `next_stream()` method)
   
 ## Requirements
 Building requires:
@@ -52,7 +58,7 @@ Building requires:
   * Cython (0.22, 0.23)
   * Python (2.6, 2.7, 3.3, 3.4, 3.5)
 
-**Note:** it might work with outher versions but only tested with these 
+**Note:** it might work with other versions but only tested with these 
 versions. 
 
 So far all development has been on Linux. It has been tested (in a limited 
@@ -60,10 +66,8 @@ manner, mostly against crashes and build failures) on Linux 32 and 64-bit,
 as well as OSX 10.10, PC-BSD 10.2 (should also work on Free BSD) and Windows 
 (Python 3.5).
 
-Most tests implemeted are _smoke_ tests that only make sure that something is 
-output from the expected inputs. The only other tests compare the MT19937 
-generator to NumPy's implementation.  Formal tests (unit) have not been 
-implemented for the individual RNGs.
+Basic tests are in place for all RNGs. The MT19937 is tested against NumPy's 
+implementation for identical results.  
 
 ## Installing
 

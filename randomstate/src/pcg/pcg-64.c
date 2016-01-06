@@ -1,5 +1,5 @@
 /*
-*  gcc pcg-64.c pcg-rngs-128.c pcg-output-64.c pcg-output-128.c-std=c99 -D__SIZEOF_INT128__=16 -o pcg-64
+*  gcc pcg-64.c pcg-rngs-128.c pcg-output-64.c pcg-output-128.c pcg-advance-128.c pcg-output-32.c -std=c99 -D__SIZEOF_INT128__=16 -o pcg-64
 */
 
 #include <stdio.h>
@@ -11,7 +11,7 @@ int main(void)
     int i;
     pcg128_t seed1 = 42ULL, seed2 = 1ULL;
     uint64_t temp;
-    pcg64_random_t state = { 0 };
+    pcg64_random_t state = {{ 0 ]};
     pcg64_srandom_r(&state, seed1, seed2);
     FILE *fp;
     fp = fopen("pcg64-testset-1.csv", "w");

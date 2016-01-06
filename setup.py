@@ -151,6 +151,8 @@ setup(name='randomstate',
       version='0.1',
       packages=find_packages(),
       package_dir={'randomstate': './randomstate'},
+      package_data= {'randomstate.tests.data' : ['*.csv', '*.dat']},
+      include_package_data=True,
       license='NSCA',
       author='Kevin Sheppard',
       description='Next-gen RandoMState supporting multiple PRNGs',
@@ -161,7 +163,7 @@ setup(name='randomstate',
 
 # Clean up generated files
 for config in configs:
-    #os.unlink(join(mod_dir, config['file_name'] + '.pyx'))
-    #os.unlink(join(mod_dir, config['file_name'] + '-config.pxi'))
-    #os.unlink(join(mod_dir, config['file_name'] + '.c'))
+    os.unlink(join(mod_dir, config['file_name'] + '.pyx'))
+    os.unlink(join(mod_dir, config['file_name'] + '-config.pxi'))
+    os.unlink(join(mod_dir, config['file_name'] + '.c'))
     pass

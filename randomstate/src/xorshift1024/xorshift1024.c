@@ -34,7 +34,7 @@ void xorshift1024_seed(xorshift1024_state* state, uint64_t seed)
     uint64_t initial_state[16] = {0};
     uint64_t seed_copy = seed;
     int i;
-    for (int i = 0; i < 16; i++)
+    for (i = 0; i < 16; i++)
     {
         initial_state[i] = splitmix64_next(&seed_copy);
     }
@@ -52,7 +52,7 @@ int main(void)
 {
     int i;
     uint64_t temp, seed = 1ULL;
-    xorshift1024_state state = { 0 };
+    xorshift1024_state state = {{ 0 }};
     xorshift1024_seed(&state, seed);
 
     FILE *fp;

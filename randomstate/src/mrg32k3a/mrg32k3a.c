@@ -53,7 +53,8 @@ void mrg32k3a_seed(mrg32k3a_state* state, uint64_t seed)
 int main(void)
 {
     int i;
-    uint64_t temp, seed = 1ULL;
+    uint64_t seed = 1ULL;
+    uint32_t temp;
     mrg32k3a_state state = { 0 };
     mrg32k3a_seed(&state, seed);
 

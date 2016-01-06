@@ -11,7 +11,7 @@ int main(void)
     int i;
     uint64_t seed1 = 42ULL, seed2 = 1ULL;
     uint32_t temp;
-    pcg32_random_t state = { 0 };
+    pcg32_random_t state = {{ 0 }};
     pcg32_srandom_r(&state, seed1, seed2);
     FILE *fp;
     fp = fopen("pcg32-testset-1.csv", "w");

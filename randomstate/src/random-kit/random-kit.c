@@ -81,7 +81,7 @@ int main(void)
 {
     int i;
     uint32_t temp, seed = 1UL;
-    rk_state state = { 0 };
+    rk_state state = {{ 0 }};
     rk_seed(&state, seed);
 
     FILE *fp;

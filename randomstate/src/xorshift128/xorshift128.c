@@ -42,7 +42,7 @@ int main(void)
 {
     int i;
     uint64_t temp, seed = 1ULL;
-    xorshift128_state state = { 0 };
+    xorshift128_state state = {{ 0 }};
     xorshift128_seed(&state, seed);
 
     FILE *fp;

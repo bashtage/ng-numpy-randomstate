@@ -38,7 +38,7 @@ int main(void)
     int i;
     uint64_t seed = 1ULL;
     uint32_t temp;
-    mlfg_state state = { 0 };
+    mlfg_state state = {{ 0 }};
     mlfg_seed(&state, seed);
 
     FILE *fp;
@@ -63,7 +63,7 @@ int main(void)
          printf("Couldn't open file\n");
          return -1;
     }
-    fprintf(fp, "seed, %" PRIu32 "\n", seed);
+    fprintf(fp, "seed, %" PRIu64 "\n", seed);
     for (i=0; i < 1000; i++)
     {
         temp = mlfg_next(&state);
