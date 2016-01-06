@@ -7,6 +7,8 @@
            47, 1 (1999), 159--164.
    ---------------------------------------------------------
 */
+#include <stdio.h>
+#include <inttypes.h>
 #include "mrg32k3a.h"
 #include "../splitmix64/splitmix64.h"
 
@@ -64,7 +66,7 @@ int main(void)
     fprintf(fp, "seed, %" PRIu64 "\n", seed);
     for (i=0; i < 1000; i++)
     {
-        temp = mrg32k3a_next(&state);
+        temp = mrg32k3a_random(&state);
         fprintf(fp, "%d, %" PRIu32 "\n", i, temp);
         printf("%d, %" PRIu32 "\n", i, temp);
     }
@@ -80,7 +82,7 @@ int main(void)
     fprintf(fp, "seed, %" PRIu64 "\n", seed);
     for (i=0; i < 1000; i++)
     {
-        temp = mrg32k3a_next(&state);
+        temp = mrg32k3a_random(&state);
         fprintf(fp, "%d, %" PRIu32 "\n", i, temp);
         printf("%d, %" PRIu32 "\n", i, temp);
     }
