@@ -41,12 +41,12 @@ void xorshift128_init_state(xorshift128_state* state, uint64_t seed, uint64_t in
 int main(void)
 {
     int i;
-    uint64_t seed = 1ULL;
-    xorshift128_state state;
+    uint64_t temp, seed = 1ULL;
+    xorshift128_state state = { 0 };
     xorshift128_seed(&state, seed);
 
     FILE *fp;
-    fp = fopen("xorshift-128-testset-1.csv", "w");
+    fp = fopen("xorshift128-testset-1.csv", "w");
     if(fp == NULL){
          printf("Couldn't open file\n");
          return -1;
@@ -54,16 +54,15 @@ int main(void)
     fprintf(fp, "seed, %" PRIu64 "\n", seed);
     for (i=0; i < 1000; i++)
     {
-        fprintf(fp, "%d, %" PRIu64 "\n", i, xorshift128_next(&state));
-        printf("%d, %" PRIu64 "\n", i, xorshift128_next(&state));
+        temp = xorshift128_next(&state);
+        fprintf(fp, "%d, %" PRIu64 "\n", i, temp);
+        printf("%d, %" PRIu64 "\n", i, temp);
     }
     fclose(fp);
 
-    xorshift128_seed(&state, seed);
-
     seed = 12345678910111ULL;
     xorshift128_seed(&state, seed);
-    fp = fopen("xorshift-128-testset-2.csv", "w");
+    fp = fopen("xorshift128-testset-2.csv", "w");
     if(fp == NULL){
          printf("Couldn't open file\n");
          return -1;
@@ -71,8 +70,9 @@ int main(void)
     fprintf(fp, "seed, %" PRIu64 "\n", seed);
     for (i=0; i < 1000; i++)
     {
-        fprintf(fp, "%d, %" PRIu64 "\n", i, xorshift128_next(&state));
-        printf("%d, %" PRIu64 "\n", i, xorshift128_next(&state));
+        temp = xorshift128_next(&state);
+        fprintf(fp, "%d, %" PRIu64 "\n", i, temp);
+        printf("%d, %" PRIu64 "\n", i, temp);
     }
     fclose(fp);
 }
