@@ -99,7 +99,7 @@ cdef extern from "distributions.h":
     cdef long random_zipf(aug_state *state, double a) nogil
     cdef long random_hypergeometric(aug_state *state, long good, long bad, long sample) nogil
 
-include "wrappers.pxi"
+include "array_utilities.pxi"
 
 cdef double kahan_sum(double *darr, np.npy_intp n):
     cdef double c, y, t, sum
@@ -130,10 +130,7 @@ cdef class RandomState:
             self.rng_state.binomial = &self.binomial_info
             self._reset_state_variables()
             self.lock = Lock()
-            if seed is not None:
-                self.seed(seed)
-            else:
-                entropy_init(&self.rng_state)
+            self.seed(seed)
 
     ELSE:
         def __init__(self, seed=None, inc=None):
@@ -141,10 +138,7 @@ cdef class RandomState:
             self.rng_state.binomial = &self.binomial_info
             self._reset_state_variables()
             self.lock = Lock()
-            if seed is not None and inc is not None:
-                self.seed(seed, inc)
-            else:
-                entropy_init(&self.rng_state)
+            self.seed(seed, inc)
 
     # Pickling support:
     def __getstate__(self):
@@ -269,6 +263,7 @@ cdef class RandomState:
         self.rng_state.has_gauss = 0
         self.rng_state.has_uint32= 0
         self.rng_state.uinteger = 0
+        self.rng_state.binomial.has_binomial = 0
 
     if RNG_ADVANCEABLE:
         def advance(self, rng_state_t delta):

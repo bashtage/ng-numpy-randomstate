@@ -62,7 +62,7 @@ for rng in rngs:
         include_dirs += [join(mod_dir, 'src', 'pcg')]
 
     elif flags['RNG_PCG64']:
-        sources += [join(mod_dir, 'src', 'pcg', p) for p in ('pcg-advance-128.c', 'h')]
+        sources += [join(mod_dir, 'src', 'pcg', p) for p in ('pcg-advance-128.c', 'pcg-rngs-128.c')]
         sources += [join(mod_dir, 'shims/pcg-64', 'pcg-64-shim.c')]
 
         defs = [('PCG_64_RNG', '1'), ('PCG_HAS_128BIT_OPS', '1'), ('__SIZEOF_INT128__', '16')]

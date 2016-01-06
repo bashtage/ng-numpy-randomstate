@@ -1,22 +1,19 @@
 #!python
 #cython: wraparound=False, nonecheck=False, boundscheck=False, cdivision=True
-import sys
 import operator
+import sys
+
 try:
     from threading import Lock
 except:
     from dummy_threading import Lock
 
-import numpy as np
-
-cimport numpy as np
 cimport cython
-from libc.stdint cimport uint32_t, uint64_t, int64_t, int32_t
 from cython_overrides cimport *
 from cpython cimport Py_INCREF
 
 from binomial cimport *
-from wrappers cimport *
+from array_utilities cimport *
 from distributions cimport *
 from utility cimport kahan_sum
 
@@ -30,7 +27,7 @@ IF RNG_MT19937:
     include "shims/random-kit/random-kit-defs.pxi"
 IF RNG_XORSHIFT128:
     include "shims/xorshift128/xorshift128-defs.pxi"
-    from xorshift128 cimport *
+    from randomstate.shims.xorshift128.xorshift128 cimport *
 IF RNG_XORSHIFT1024:
     include "shims/xorshift1024/xorshift1024-defs.pxi"
 IF RNG_MRG32K3A:

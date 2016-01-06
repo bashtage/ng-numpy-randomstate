@@ -3,7 +3,7 @@
 import numpy as np
 cimport numpy as np
 from libc.stdint cimport uint32_t, uint64_t, int64_t, int32_t
-from wrappers cimport (aug_state, random_uint_0_32, constraint_type,
+from array_utilities cimport (aug_state, random_uint_0_32, constraint_type,
     random_double_1, random_double_2, random_double_3, random_uint_iii,
     random_uint_i, random_uint_di, random_uint_0, random_uint_d,
     random_uint_dd, random_double_0, POISSON_LAM_MAX)

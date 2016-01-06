@@ -1,4 +1,3 @@
-import numpy as np
 cimport numpy as np
 from libc.stdint cimport uint32_t, uint64_t, int64_t, int32_t
 
@@ -13,7 +12,7 @@ IF RNG_MT19937:
     include "shims/random-kit/random-kit.pxi"
 IF RNG_XORSHIFT128:
     # include "shims/xorshift128/xorshift128.pxi"
-    from xorshift128 cimport *
+    from randomstate.shims.xorshift128.xorshift128 cimport *
 IF RNG_XORSHIFT1024:
     include "shims/xorshift1024/xorshift1024.pxi"
 IF RNG_MRG32K3A:

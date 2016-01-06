@@ -25,16 +25,6 @@ cdef Py_ssize_t compute_numel(size):
         n = size
     return n
 
-cdef object uint0_32(aug_state* state, random_uint_0_32 func, object size, object lock):
-    if size is None:
-        return func(state)
-    cdef Py_ssize_t i, n = compute_numel(size)
-    cdef uint32_t [:] randoms = np.empty(n, np.uint32)
-    with lock, nogil:
-        for i in range(n):
-            randoms[i] = func(state)
-    return np.asanyarray(randoms).reshape(size)
-
 cdef double POISSON_LAM_MAX = <double>np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10
 
 cdef enum ConstraintType:
