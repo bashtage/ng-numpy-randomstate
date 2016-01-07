@@ -25,7 +25,7 @@ rngs = ['RNG_DUMMY', 'RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64', 'RNG_MT19937
 compile_rngs = rngs[:]
 
 extra_defs = []
-if sys.maxsize < 2 ** 33 or os.name == 'nt':
+if os.name == 'nt':
     compile_rngs.remove('RNG_PCG64')
 
 extra_link_args = ['Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []
@@ -62,7 +62,7 @@ for rng in rngs:
         include_dirs += [join(mod_dir, 'src', 'pcg')]
 
     elif flags['RNG_PCG64']:
-        sources += [join(mod_dir, 'src', 'pcg', p) for p in ('pcg-advance-128.c', 'pcg-rngs-128.c')]
+        sources += [join(mod_dir, 'src', 'pcg64-compat', p) for p in ('pcg64.c',)]
         sources += [join(mod_dir, 'shims/pcg-64', 'pcg-64-shim.c')]
 
         defs = [('PCG_64_RNG', '1'), ('PCG_HAS_128BIT_OPS', '1'), ('__SIZEOF_INT128__', '16')]
