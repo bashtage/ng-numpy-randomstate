@@ -4,7 +4,7 @@
 
 #include "../../src/common/binomial.h"
 #include "../../src/common/entropy.h"
-#include "../../src/pcg/pcg_variants.h"
+#include "../../src/pcg64-compat/pcg64.h"
 
 typedef struct s_aug_state {
     pcg64_random_t *rng;

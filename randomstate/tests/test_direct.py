@@ -12,7 +12,7 @@ import randomstate.xorshift1024 as xorshift1024
 import randomstate.xorshift128 as xorshift128
 from numpy.testing import assert_equal, assert_allclose
 
-if sys.maxsize > 2 ** 32 and os.name != 'nt':
+if os.name != 'nt':
     import randomstate.pcg64 as pcg64
 
 if (sys.version_info > (3, 0)):
@@ -167,7 +167,7 @@ class TestPCG32(Base, TestCase):
         cls.data2 = cls._read_csv(join(pwd, './data/pcg32-testset-2.csv'))
 
 
-if sys.maxsize > 2 ** 32 and os.name != 'nt':
+if os.name != 'nt':
     class TestPCG64(Base, TestCase):
         @classmethod
         def setUpClass(cls):

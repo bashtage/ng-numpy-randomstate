@@ -10,7 +10,7 @@ import randomstate.xorshift1024 as xorshift1024
 import randomstate.xorshift128 as xorshift128
 from numpy.testing import assert_almost_equal, assert_equal
 
-if sys.maxsize > 2 ** 33 and os.name != 'nt':
+if os.name != 'nt':
     import randomstate.pcg64 as pcg64
 
 from nose import SkipTest
@@ -438,7 +438,7 @@ class TestPCG32(RNG, unittest.TestCase):
         cls._extra_setup()
 
 
-if sys.maxsize > 2 ** 33 and os.name != 'nt':
+if os.name != 'nt':
     class TestPCG64(RNG, unittest.TestCase):
         @classmethod
         def setup_class(cls):
