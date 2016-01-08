@@ -22,21 +22,24 @@ cdef extern from "Python.h":
 include "config.pxi"
 include "src/common/binomial.pxi"
 
-IF RNG_PCG32:
+IF RNG_NAME == 'pcg32':
     include "shims/pcg-32/pcg-32.pxi"
-IF RNG_PCG64:
-    include "shims/pcg-64/pcg-64.pxi"
-IF RNG_MT19937:
+IF RNG_NAME == 'pcg64':
+    IF PCG128_EMULATED:
+        include "shims/pcg-64/pcg-64-emulated.pxi"
+    ELSE:
+        include "shims/pcg-64/pcg-64.pxi"
+IF RNG_NAME == 'mt19937':
     include "shims/random-kit/random-kit.pxi"
-IF RNG_XORSHIFT128:
+IF RNG_NAME == 'xorshift128':
     include "shims/xorshift128/xorshift128.pxi"
-IF RNG_XORSHIFT1024:
+IF RNG_NAME == 'xorshift1024':
     include "shims/xorshift1024/xorshift1024.pxi"
-IF RNG_MRG32K3A:
+IF RNG_NAME == 'mrg32k3a':
     include "shims/mrg32k3a/mrg32k3a.pxi"
-IF RNG_MLFG_1279_861:
+IF RNG_NAME == 'mlfg_1279_861':
     include "shims/mlfg-1279-861/mlfg-1279-861.pxi"
-IF RNG_DUMMY:
+IF RNG_NAME == 'dummy':
     include "shims/dummy/dummy.pxi"
 
 IF NORMAL_METHOD == 'inv':
@@ -152,7 +155,7 @@ cdef class RandomState:
         # TODO: Removed np.random.__RandomState_ctor - This is needed on a RNG-by-RNG basis
         return ((), (), self.get_state())
 
-    IF RNG_MT19937:
+    IF RNG_NAME == 'mt19937':
         def seed(self, seed=None):
             """
             seed(seed=None)
@@ -253,7 +256,15 @@ cdef class RandomState:
                     raise ValueError('val < 0')
                 if inc < 0:
                     raise ValueError('inc < 0')
-                set_seed(&self.rng_state, val, inc)
+                IF RNG_NAME == 'pcg64':
+                    IF PCG128_EMULATED:
+                        set_seed(&self.rng_state,
+                                 pcg128_from_pylong(val),
+                                 pcg128_from_pylong(inc))
+                    ELSE:
+                        set_seed(&self.rng_state, val, inc)
+                ELSE:
+                    set_seed(&self.rng_state, val, inc)
             else:
                 entropy_init(&self.rng_state)
             self._reset_state_variables()
@@ -265,8 +276,8 @@ cdef class RandomState:
         self.rng_state.uinteger = 0
         self.rng_state.binomial.has_binomial = 0
 
-    if RNG_ADVANCEABLE:
-        def advance(self, rng_state_t delta):
+    IF RNG_ADVANCEABLE:
+        def advance(self, delta):
             """
             advance(delta)
 
@@ -287,12 +298,19 @@ cdef class RandomState:
             Advancing the prng state resets any pre-computed random numbers.
             This is required to ensure exact reproducibility.
             """
-            advance(&self.rng_state, delta)
+            IF RNG_NAME == 'pcg64':
+                IF PCG128_EMULATED:
+                    advance(&self.rng_state, pcg128_from_pylong(delta))
+                ELSE:
+                    advance(&self.rng_state, delta)
+            ELSE:
+                advance(&self.rng_state, delta)
+
             self.rng_state.has_gauss = 0
             self.rng_state.gauss = 0.0
             return None
 
-    if RNG_JUMPABLE:
+    IF RNG_JUMPABLE:
         def jump(self, uint32_t iter = 1):
             """
             jump(iter = 1)
@@ -322,7 +340,7 @@ cdef class RandomState:
             self.rng_state.gauss = 0.0
             return None
 
-    IF RNG_MT19937:
+    IF RNG_NAME == 'mt19937':
         def get_state(self, legacy=False):
             """
             get_state()
@@ -445,7 +463,7 @@ cdef class RandomState:
         component, see the class documentation.
         """
         rng_name = RNG_NAME
-        if RNG_MT19937:
+        IF RNG_NAME == 'mt19937':
             if isinstance(state, tuple):
                 if state[0] != 'MT19937':
                     raise ValueError('Not a ' + rng_name + ' RNG state')

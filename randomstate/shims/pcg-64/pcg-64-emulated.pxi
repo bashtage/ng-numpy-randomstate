@@ -4,13 +4,15 @@ DEF RNG_JUMPABLE = 0
 DEF RNG_STATE_LEN = 4
 DEF RNG_SEED=2
 DEF NORMAL_METHOD = 'zig'
-DEF PCG128_EMULATED = 0
+DEF PCG128_EMULATED = 1
 
-cdef extern from "inttypes.h":
-    ctypedef unsigned long long __uint128_t
+from cpython cimport PyLong_FromUnsignedLongLong, PyLong_AsUnsignedLongLong
 
 cdef extern from "distributions.h":
-    ctypedef __uint128_t pcg128_t
+
+    ctypedef struct pcg128_t:
+        uint64_t high
+        uint64_t low
 
     cdef struct pcg_state_setseq_128:
         pcg128_t state
@@ -37,12 +39,21 @@ ctypedef pcg128_t rng_state_t
 
 ctypedef pcg64_random_t rng_t
 
+cdef object pcg128_to_pylong(pcg128_t x):
+    return PyLong_FromUnsignedLongLong(x.high) * 2**64 + PyLong_FromUnsignedLongLong(x.low)
+
+cdef pcg128_t pcg128_from_pylong(object x):
+    cdef pcg128_t out
+    out.high = PyLong_AsUnsignedLongLong(x // (2 ** 64))
+    out.low = PyLong_AsUnsignedLongLong(x % (2 ** 64))
+    return out
+
 cdef object _get_state(aug_state state):
-    return (state.rng.state, state.rng.inc)
+    return (pcg128_to_pylong(state.rng.state), pcg128_to_pylong(state.rng.inc))
 
 cdef object _set_state(aug_state state, object state_info):
-    state.rng.state = state_info[0]
-    state.rng.inc = state_info[1]
+    state.rng.state = pcg128_from_pylong(state_info[0])
+    state.rng.inc = pcg128_from_pylong(state_info[1])
 
 DEF CLASS_DOCSTRING = """
 This is the pcg64 docstring.
