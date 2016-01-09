@@ -1,4 +1,9 @@
+#ifdef _WIN32
+#include "../../src/common/stdint.h"
+#define inline __inline
+#else
 #include <stdint.h>
+#endif
 
 #include "../../src/common/binomial.h"
 #include "../../src/common/entropy.h"
@@ -17,13 +22,13 @@ typedef struct s_aug_state {
 
 inline uint32_t random_uint32(aug_state* state)
 {
+    uint64_t temp;
     if (state->has_uint32)
     {
         state->has_uint32 = 0;
         return state->uinteger;
     }
     state->has_uint32 = 1;
-    uint64_t temp;
     temp = xorshift1024_next(state->rng);
     state->uinteger = (uint32_t)(temp >> 32);
     return (uint32_t)(temp & 0xFFFFFFFFLL);

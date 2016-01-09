@@ -1,4 +1,12 @@
-#include <stdint.h>
+#ifdef _WIN32
+#include "../common/inttypes.h"
+#else
+#include <inttypes.h>
+#endif
+
+#ifdef _WIN32
+#define inline __inline
+#endif
 
 inline uint64_t splitmix64_next(uint64_t* x) {
     uint64_t z = (*x += UINT64_C(0x9E3779B97F4A7C15));

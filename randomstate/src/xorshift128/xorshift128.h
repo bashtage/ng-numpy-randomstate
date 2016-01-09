@@ -1,4 +1,11 @@
+#include <math.h>
+#ifdef _WIN32
+#include "../common/stdint.h"
+#define inline __inline
+#else
 #include <stdint.h>
+#endif
+
 
 typedef struct s_xorshift128_state
 {

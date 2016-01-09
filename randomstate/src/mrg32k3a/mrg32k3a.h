@@ -1,4 +1,9 @@
+#ifdef _WIN32
+#include "../../src/common/stdint.h"
+#define inline __inline
+#else
 #include <stdint.h>
+#endif
 
 #define m1   4294967087LL
 #define m2   4294944443LL
