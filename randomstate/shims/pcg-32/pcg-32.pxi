@@ -6,7 +6,7 @@ DEF RNG_SEED = 2
 DEF NORMAL_METHOD = 'zig'
 
 cdef extern from "distributions.h":
-    cdef struct pcg_state_setseq_64:
+    ctypedef struct pcg_state_setseq_64:
         uint64_t state
         uint64_t inc
 

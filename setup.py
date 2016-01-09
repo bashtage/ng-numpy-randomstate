@@ -51,10 +51,11 @@ for rng in rngs:
                join(mod_dir, 'src', 'common', 'entropy.c'),
                join(mod_dir, 'distributions.c')]
     include_dirs = [mod_dir] + [numpy.get_include()]
+    if os.name == 'nt' and sys.version_info < (3,5):
+        include_dirs += [join(mod_dir, 'src','common')]
 
     if rng == 'RNG_PCG32':
-        sources += [join(mod_dir, 'src', 'pcg', p) for p in ('pcg-rngs-64.c', 'pcg-advance-64.c',
-                                                             'pcg-output-64.c', 'pcg-output-32.c')]
+        sources += [join(mod_dir, 'src', 'pcg', 'pcg32.c')]
         sources += [join(mod_dir, 'shims/pcg-32', 'pcg-32-shim.c')]
 
         defs = [('PCG_32_RNG', '1')]

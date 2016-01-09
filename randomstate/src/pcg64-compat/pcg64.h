@@ -25,7 +25,13 @@
 #ifndef PCG64_H_INCLUDED
 #define PCG64_H_INCLUDED 1
 
+#ifdef _WIN32
+#include "../common/inttypes.h"
+#define inline __inline
+#else
 #include <inttypes.h>
+#endif
+
 
 #if __GNUC_GNU_INLINE__  &&  !defined(__cplusplus)
     #error Nonstandard GNU inlining semantics. Compile with -std=c99 or better.

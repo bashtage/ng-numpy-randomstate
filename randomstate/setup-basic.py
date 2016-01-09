@@ -1,5 +1,7 @@
+import sys
 from distutils.core import setup
 from distutils.extension import Extension
+import os
 from os import getcwd, name
 from os.path import join
 
@@ -26,6 +28,8 @@ sources += [join(pwd, 'shims', 'xorshift128', 'xorshift128-shim.c')]
 defs = [('XORSHIFT128_RNG', '1')]
 
 include_dirs = [pwd] + [numpy.get_include()]
+if os.name == 'nt' and sys.version_info < (3,5):
+    include_dirs += [join(pwd, 'src','common')]
 include_dirs += [join(pwd, 'src', 'xorshift128')]
 
 extra_link_args = ['Advapi32.lib'] if name == 'nt' else []

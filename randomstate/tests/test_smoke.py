@@ -11,6 +11,7 @@ import randomstate.xorshift1024 as xorshift1024
 import randomstate.xorshift128 as xorshift128
 from numpy.testing import assert_almost_equal, assert_equal
 
+
 from nose import SkipTest
 
 
@@ -423,7 +424,6 @@ class TestMT19937(RNG):
         assert (state[2] == state2['state'][1])
         assert (state[3] == state2['gauss']['has_gauss'])
         assert (state[4] == state2['gauss']['gauss'])
-
 
 class TestPCG32(RNG, unittest.TestCase):
     @classmethod
