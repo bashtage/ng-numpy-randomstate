@@ -120,3 +120,13 @@ extern long random_positive_int(aug_state* state);
 extern unsigned long random_uint(aug_state* state);
 
 extern unsigned long random_interval(aug_state* state, unsigned long max);
+
+extern void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, int cnt, uint64_t *out);
+
+extern void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, int cnt,uint32_t *out);
+
+extern void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, int cnt, uint16_t *out);
+
+extern void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int cnt, uint8_t *out);
+
+extern void random_bool_fill(aug_state *state, int off, int rng, int cnt, uint8_t *out);
