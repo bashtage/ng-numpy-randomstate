@@ -21,7 +21,15 @@
  *     http://www.pcg-random.org
  */
 #include <stddef.h>
+#ifdef _WIN32
+#include "../common/stdint.h"
+typedef int bool;
+#define false 0
+#define true 1
+#else
+#include <stdint.h>
 #include <stdbool.h>
+#endif
 
 extern void entropy_fill(void *dest, size_t size);
 

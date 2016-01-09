@@ -1306,11 +1306,12 @@ double random_gauss_zig_julia(aug_state *state){
 
 unsigned long random_interval(aug_state *state, unsigned long max)
 {
+    unsigned long mask, value;
     if (max == 0) {
         return 0;
     }
 
-    unsigned long mask = max, value;
+    mask = max;
 
     /* Smallest bit mask >= max */
     mask |= mask >> 1;

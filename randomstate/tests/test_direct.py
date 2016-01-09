@@ -13,9 +13,6 @@ import randomstate.xorshift1024 as xorshift1024
 import randomstate.xorshift128 as xorshift128
 from numpy.testing import assert_equal, assert_allclose
 
-
-
-
 if (sys.version_info > (3, 0)):
     long = int
 
@@ -157,7 +154,6 @@ class TestMT19937(Base, TestCase):
         cls.data1 = cls._read_csv(join(pwd, './data/randomkit-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/randomkit-testset-2.csv'))
 
-
 class TestPCG32(Base, TestCase):
     @classmethod
     def setUpClass(cls):
@@ -167,7 +163,6 @@ class TestPCG32(Base, TestCase):
         cls.data1 = cls._read_csv(join(pwd, './data/pcg32-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/pcg32-testset-2.csv'))
 
-
 class TestPCG64(Base, TestCase):
     @classmethod
     def setUpClass(cls):
@@ -176,6 +171,7 @@ class TestPCG64(Base, TestCase):
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/pcg64-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/pcg64-testset-2.csv'))
+
 
 
 class TestMRG32K3A(Base, TestCase):

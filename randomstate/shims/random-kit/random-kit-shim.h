@@ -1,6 +1,11 @@
 #define RNG_TYPE rk_state
 
+#ifdef _WIN32
+#include "../../src/common/stdint.h"
+#define inline __inline
+#else
 #include <stdint.h>
+#endif
 
 #include "../../src/common/binomial.h"
 #include "../../src/common/entropy.h"

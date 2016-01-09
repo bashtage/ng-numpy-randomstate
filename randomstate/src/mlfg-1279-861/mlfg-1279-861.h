@@ -1,5 +1,9 @@
+#ifdef _WIN32
+#include "../../src/common/stdint.h"
+#define inline __inline
+#else
 #include <stdint.h>
-#include <stdio.h>
+#endif
 
 #define K 1279
 #define J 861

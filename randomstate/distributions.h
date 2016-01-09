@@ -1,7 +1,12 @@
 #include <math.h>
-#include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
+
+#ifdef _WIN32
+typedef int bool;
+#define false 0
+#define true 1
+#else
+#endif
 
 #ifndef min
 #define min(x,y) ((x<y)?x:y)

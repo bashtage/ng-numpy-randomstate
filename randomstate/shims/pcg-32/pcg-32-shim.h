@@ -3,7 +3,8 @@
 #include <stdint.h>
 #include "../../src/common/binomial.h"
 #include "../../src/common/entropy.h"
-#include "../../src/pcg/pcg_variants.h"
+/* #include "../../src/pcg/pcg_variants.h" */
+#include "../../src/pcg/pcg32.h"
 
 
 typedef struct s_aug_state {

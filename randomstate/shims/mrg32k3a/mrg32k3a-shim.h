@@ -1,12 +1,15 @@
-#define RNG_TYPE pcg32_random_t
-
-#define STATE_MAX_VALUE_1 4294967086
-#define STATE_MAX_VALUE_2 4294944442
-
+#ifdef _WIN32
+#include "../../src/common/stdint.h"
+#define inline __inline
+#else
 #include <stdint.h>
+#endif
 #include "../../src/common/entropy.h"
 #include "../../src/common/binomial.h"
 #include "../../src/mrg32k3a/mrg32k3a.h"
+
+#define STATE_MAX_VALUE_1 4294967086
+#define STATE_MAX_VALUE_2 4294944442
 
 typedef struct s_aug_state {
     mrg32k3a_state *rng;

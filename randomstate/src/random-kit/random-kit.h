@@ -1,5 +1,14 @@
 #include <math.h>
+#ifdef _WIN32
+#include "../common/stdint.h"
+#else
 #include <stdint.h>
+#endif
+
+#ifdef _WIN32
+#define inline __inline
+#endif
+
 
 #define RK_STATE_LEN 624
 
@@ -16,19 +25,7 @@ typedef struct s_rk_state
 }
 rk_state;
 
-inline void rk_seed(rk_state *state, uint32_t seed)
-{
-    int pos;
-    seed &= 0xffffffffUL;
-
-    /* Knuth's PRNG as used in the Mersenne Twister reference implementation */
-    for (pos = 0; pos < RK_STATE_LEN; pos++) {
-        state->key[pos] = seed;
-        seed = (1812433253UL * (seed ^ (seed >> 30)) + pos + 1) & 0xffffffffUL;
-    }
-    state->pos = RK_STATE_LEN;
-}
-
+extern void rk_seed(rk_state *state, uint32_t seed);
 
 /* Slightly optimized reference implementation of the Mersenne Twister */
 inline uint32_t rk_random(rk_state *state)

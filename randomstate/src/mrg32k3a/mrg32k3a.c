@@ -7,8 +7,6 @@
            47, 1 (1999), 159--164.
    ---------------------------------------------------------
 */
-#include <stdio.h>
-#include <inttypes.h>
 #include "mrg32k3a.h"
 #include "../splitmix64/splitmix64.h"
 
@@ -46,46 +44,4 @@ void mrg32k3a_seed(mrg32k3a_state* state, uint64_t seed)
     state->s20 = seeds[3];
     state->s21 = seeds[4];
     state->s22 = seeds[5];
-}
-
-
-
-int main(void)
-{
-    int i;
-    uint64_t seed = 1ULL;
-    uint32_t temp;
-    mrg32k3a_state state = { 0 };
-    mrg32k3a_seed(&state, seed);
-
-    FILE *fp;
-    fp = fopen("mrg32k3a-testset-1.csv", "w");
-    if(fp == NULL){
-         printf("Couldn't open file\n");
-         return -1;
-    }
-    fprintf(fp, "seed, %" PRIu64 "\n", seed);
-    for (i=0; i < 1000; i++)
-    {
-        temp = mrg32k3a_random(&state);
-        fprintf(fp, "%d, %" PRIu32 "\n", i, temp);
-        printf("%d, %" PRIu32 "\n", i, temp);
-    }
-    fclose(fp);
-
-    seed = 12345678910111ULL;
-    mrg32k3a_seed(&state, seed);
-    fp = fopen("mrg32k3a-testset-2.csv", "w");
-    if(fp == NULL){
-         printf("Couldn't open file\n");
-         return -1;
-    }
-    fprintf(fp, "seed, %" PRIu64 "\n", seed);
-    for (i=0; i < 1000; i++)
-    {
-        temp = mrg32k3a_random(&state);
-        fprintf(fp, "%d, %" PRIu32 "\n", i, temp);
-        printf("%d, %" PRIu32 "\n", i, temp);
-    }
-    fclose(fp);
 }

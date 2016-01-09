@@ -1,9 +1,6 @@
-#include <inttypes.h>
-#include <stdio.h>
-#include "xorshift1024.h"
 #include "../splitmix64/splitmix64.h"
+#include "xorshift1024.h"
 
-#include <stdint.h>
 #include <string.h>
 
 extern inline uint64_t xorshift1024_next(xorshift1024_state* state);
@@ -16,12 +13,12 @@ void xorshift1024_jump(xorshift1024_state* state) {
                                      0x691548c86c1bd540ULL, 0x7910c41d10a1e6a5ULL, 0x0b5fc64563b3e2a8ULL,
                                      0x047f7684e9fc949dULL, 0xb99181f2d8f685caULL, 0x284600e3f30e38c3ULL
                                    };
-
+    int i, b, j;
     uint64_t t[16] = { 0 };
-    for(int i = 0; i < sizeof JUMP / sizeof *JUMP; i++)
-        for(int b = 0; b < 64; b++) {
+    for(i = 0; i < sizeof JUMP / sizeof *JUMP; i++)
+        for(b = 0; b < 64; b++) {
             if (JUMP[i] & 1ULL << b)
-                for(int j = 0; j < 16; j++)
+                for(j = 0; j < 16; j++)
                     t[j] ^= state->s[(j + state->p) & 15];
             xorshift1024_next(state);
         }
@@ -48,41 +45,3 @@ void xorshift1024_init_state(xorshift1024_state* state, uint64_t* seeds)
 }
 
 
-int main(void)
-{
-    int i;
-    uint64_t temp, seed = 1ULL;
-    xorshift1024_state state = {{ 0 }};
-    xorshift1024_seed(&state, seed);
-
-    FILE *fp;
-    fp = fopen("xorshift1024-testset-1.csv", "w");
-    if(fp == NULL){
-         printf("Couldn't open file\n");
-         return -1;
-    }
-    fprintf(fp, "seed, %" PRIu64 "\n", seed);
-    for (i=0; i < 1000; i++)
-    {
-        temp = xorshift1024_next(&state);
-        fprintf(fp, "%d, %" PRIu64 "\n", i, temp);
-        printf("%d, %" PRIu64 "\n", i, temp);
-    }
-    fclose(fp);
-
-    seed = 12345678910111ULL;
-    xorshift1024_seed(&state, seed);
-    fp = fopen("xorshift1024-testset-2.csv", "w");
-    if(fp == NULL){
-         printf("Couldn't open file\n");
-         return -1;
-    }
-    fprintf(fp, "seed, %" PRIu64 "\n", seed);
-    for (i=0; i < 1000; i++)
-    {
-        temp = xorshift1024_next(&state);
-        fprintf(fp, "%d, %" PRIu64 "\n", i, temp);
-        printf("%d, %" PRIu64 "\n", i, temp);
-    }
-    fclose(fp);
-}

@@ -1,4 +1,9 @@
+#ifdef _WIN32
+#include "../../src/common/stdint.h"
+#define inline __inline
+#else
 #include <stdint.h>
+#endif
 
 #include "../../src/common/entropy.h"
 #include "../../src/common/binomial.h"
@@ -21,7 +26,14 @@ typedef struct s_aug_state {
 inline uint32_t random_uint32(aug_state* state)
 {
     // Two are needed since there is only 31 bits in each
+#ifdef _WIN32 && !defined(_WIN64)
+   uint32_t a, b;
+    a = mlfg_next(state->rng) & BITMASK_UPPER;
+    b = mlfg_next(state->rng) >> 16;
+    return a | b;
+#else
     return (mlfg_next(state->rng) & BITMASK_UPPER) | (mlfg_next(state->rng) >> 16);
+#endif
 }
 
 inline uint64_t random_uint64(aug_state* state)
