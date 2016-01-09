@@ -8,12 +8,13 @@ import randomstate.mlfg_1279_861 as mlfg_1279_861
 import randomstate.mrg32k3a as mrg32k3a
 import randomstate.mt19937 as mt19937
 import randomstate.pcg32 as pcg32
+import randomstate.pcg64 as pcg64
 import randomstate.xorshift1024 as xorshift1024
 import randomstate.xorshift128 as xorshift128
 from numpy.testing import assert_equal, assert_allclose
 
-if os.name != 'nt':
-    import randomstate.pcg64 as pcg64
+
+
 
 if (sys.version_info > (3, 0)):
     long = int
@@ -167,15 +168,14 @@ class TestPCG32(Base, TestCase):
         cls.data2 = cls._read_csv(join(pwd, './data/pcg32-testset-2.csv'))
 
 
-if os.name != 'nt':
-    class TestPCG64(Base, TestCase):
-        @classmethod
-        def setUpClass(cls):
-            cls.RandomState = pcg64.RandomState
-            cls.bits = 64
-            cls.dtype = np.uint64
-            cls.data1 = cls._read_csv(join(pwd, './data/pcg64-testset-1.csv'))
-            cls.data2 = cls._read_csv(join(pwd, './data/pcg64-testset-2.csv'))
+class TestPCG64(Base, TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.RandomState = pcg64.RandomState
+        cls.bits = 64
+        cls.dtype = np.uint64
+        cls.data1 = cls._read_csv(join(pwd, './data/pcg64-testset-1.csv'))
+        cls.data2 = cls._read_csv(join(pwd, './data/pcg64-testset-2.csv'))
 
 
 class TestMRG32K3A(Base, TestCase):
