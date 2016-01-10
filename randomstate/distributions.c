@@ -1388,9 +1388,9 @@ void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, in
  * Fills an array with cnt random npy_uint32 between off and off + rng
  * inclusive. The numbers wrap if rng is sufficiently large.
  */
-void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, int cnt,uint32_t *out)
+void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, int cnt, uint32_t *out)
 {
-    uint32_t val, mask;
+    uint32_t val, mask = rng;
     int i;
 
     if (rng == 0) {
@@ -1400,13 +1400,13 @@ void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, in
         return;
     }
 
-    /* Smallest bit mask >= max */
+   /* Smallest bit mask >= max */
     mask = (uint32_t)gen_mask(rng);
 
-    for (i = 0; i < cnt; i++) {
-        while ((val = (random_uint32(state) & mask)) > rng);
-        out[i] =  off + val;
-    }
+     for (i = 0; i < cnt; i++) {
+         while ((val = (random_uint32(state) & mask)) > rng);
+         out[i] =  off + val;
+     }
 }
 
 
@@ -1490,7 +1490,7 @@ void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int c
  * inclusive.
  */
  /* TODO: This needs to use bools. See original */
-void random_bool_fill(aug_state *state, int off, int rng, int cnt, uint8_t *out)
+void random_bool_fill(aug_state *state, int8_t off, int8_t rng, int cnt, int8_t *out)
 {
     int i;
     uint32_t buf;

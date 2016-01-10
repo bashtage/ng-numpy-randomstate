@@ -129,4 +129,4 @@ extern void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t 
 
 extern void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int cnt, uint8_t *out);
 
-extern void random_bool_fill(aug_state *state, int off, int rng, int cnt, uint8_t *out);
+extern void random_bool_fill(aug_state *state, int8_t off, int8_t rng, int cnt, int8_t *out);

@@ -5,7 +5,7 @@ import numpy as np
 cimport numpy as np
 cimport cython
 import operator
-from libc.stdint cimport uint32_t, uint64_t, int64_t, int32_t
+from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t
 from cpython cimport Py_INCREF
 try:
     from threading import Lock
@@ -102,7 +102,14 @@ cdef extern from "distributions.h":
     cdef long random_zipf(aug_state *state, double a) nogil
     cdef long random_hypergeometric(aug_state *state, long good, long bad, long sample) nogil
 
+    cdef void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, int cnt, uint64_t *out) nogil
+    cdef void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, int cnt,uint32_t *out) nogil
+    cdef void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, int cnt, uint16_t *out) nogil
+    cdef void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int cnt, uint8_t *out) nogil
+    cdef void random_bool_fill(aug_state *state, int8_t off, int8_t rng, int cnt, int8_t *out) nogil
+
 include "array_utilities.pxi"
+include "bounded_integers.pxi"
 
 cdef double kahan_sum(double *darr, np.npy_intp n):
     cdef double c, y, t, sum
@@ -115,7 +122,6 @@ cdef double kahan_sum(double *darr, np.npy_intp n):
         c = (t-sum) - y
         sum = t
     return sum
-
 
 cdef class RandomState:
     CLASS_DOCSTRING
@@ -2783,15 +2789,15 @@ cdef class RandomState:
                     scale, 'scale', CONS_POSITIVE,
                     0.0, '', CONS_NONE)
 
-    def randint(self, low, high=None, size=None):
+    def randint(self, low, high=None, size=None, dtype='l'):
         """
-        randint(low, high=None, size=None)
+        randint(low, high=None, size=None, dtype='l')
 
         Return random integers from `low` (inclusive) to `high` (exclusive).
 
-        Return random integers from the "discrete uniform" distribution in the
-        "half-open" interval [`low`, `high`). If `high` is None (the default),
-        then results are from [0, `low`).
+        Return random integers from the "discrete uniform" distribution of
+        the specified dtype in the "half-open" interval [`low`, `high`). If
+        `high` is None (the default), then results are from [0, `low`).
 
         Parameters
         ----------
@@ -2806,6 +2812,13 @@ cdef class RandomState:
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
+        dtype : dtype, optional
+            Desired dtype of the result. All dtypes are determined by their
+            name, i.e., 'int64', 'int', etc, so byteorder is not available
+            and a specific precision may have different C types depending
+            on the platform. The default value is 'l' (C long).
+
+            .. versionadded:: 1.11.0
 
         Returns
         -------
@@ -2834,14 +2847,40 @@ cdef class RandomState:
                [3, 2, 2, 0]])
 
         """
-        if high is not None and low >= high:
-            raise ValueError("low >= high")
-
         if high is None:
             high = low
             low = 0
 
-        return self.random_integers(low, high - 1, size)
+        key = np.dtype(dtype).name
+        if not key in _randint_type:
+            raise TypeError('Unsupported dtype "%s" for randint' % key)
+        lowbnd, highbnd = _randint_type[key]
+
+        if low < lowbnd:
+            raise ValueError("low is out of bounds for %s" % (key,))
+        if high > highbnd:
+            raise ValueError("high is out of bounds for %s" % (key,))
+        if low >= high:
+            raise ValueError("low >= high")
+
+        if key == 'int32':
+            return _rand_int32(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'int64':
+            return _rand_int64(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'int16':
+            return _rand_int16(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'int8':
+            return _rand_int8(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'uint64':
+            return _rand_uint64(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'uint32':
+            return _rand_uint32(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'uint16':
+            return _rand_uint16(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'uint8':
+            return _rand_uint8(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'bool':
+            return _rand_bool(low, high - 1, size, &self.rng_state, self.lock)
 
 
     def negative_binomial(self, n, p, size=None):
@@ -2919,11 +2958,13 @@ cdef class RandomState:
         """
         random_integers(low, high=None, size=None)
 
-        Return random integers between `low` and `high`, inclusive.
+        Random integers of type np.int between `low` and `high`, inclusive.
 
-        Return random integers from the "discrete uniform" distribution in the
-        closed interval [`low`, `high`].  If `high` is None (the default),
-        then results are from [1, `low`].
+        Return random integers of type np.int from the "discrete uniform"
+        distribution in the closed interval [`low`, `high`].  If `high` is
+        None (the default), then results are from [1, `low`]. The np.int
+        type translates to the C long type used by Python 2 for "short"
+        integers and its precision is platform dependent.
 
         Parameters
         ----------
@@ -2989,34 +3030,11 @@ cdef class RandomState:
         >>> plt.show()
 
         """
-        if high is not None and low > high:
-            raise ValueError("low > high")
-
-        cdef long lo, hi, rv
-        cdef unsigned long diff
-        cdef np.int_t [::1] randoms
-        cdef Py_ssize_t n, i
-
         if high is None:
-            lo = 1
-            hi = low
-        else:
-            lo = low
-            hi = high
+            high = low
+            low = 1
 
-        diff = <unsigned long>hi - <unsigned long>lo
-        if size is None:
-            with self.lock:
-                rv = lo + <long>random_interval(&self.rng_state, diff)
-            return rv
-
-        n = compute_numel(size)
-        randoms = np.empty(n, np.int)
-        with self.lock, nogil:
-            for i in range(n):
-                randoms[i] = lo + <long>random_interval(&self.rng_state, diff)
-        return np.asarray(randoms).reshape(size)
-
+        return self.randint(low, high + 1, size=size, dtype='l')
 
     def logseries(self, p, size=None):
         """
@@ -4096,7 +4114,6 @@ cdef class RandomState:
             return res
 
         return a[idx]
-
 
 _rand = RandomState()
 seed = _rand.seed
