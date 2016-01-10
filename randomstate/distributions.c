@@ -1336,3 +1336,182 @@ unsigned long random_interval(aug_state *state, unsigned long max)
 #endif
     return value;
 }
+
+
+
+static inline uint64_t gen_mask(uint64_t max)
+{
+    uint64_t mask = max;
+    mask |= mask >> 1;
+    mask |= mask >> 2;
+    mask |= mask >> 4;
+    mask |= mask >> 8;
+    mask |= mask >> 16;
+    mask |= mask >> 32;
+    return mask;
+}
+/*
+ * Fills an array with cnt random npy_uint64 between off and off + rng
+ * inclusive. The numbers wrap if rng is sufficiently large.
+ */
+void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, int cnt, uint64_t *out)
+{
+    uint64_t val, mask;
+    int i;
+
+    if (rng == 0) {
+        for (i = 0; i < cnt; i++) {
+            out[i] = off;
+        }
+        return;
+    }
+
+    /* Smallest bit mask >= max */
+    mask = gen_mask(rng);
+
+    if (rng <= 0xffffffffUL) {
+        for (i = 0; i < cnt; i++) {
+            while ((val = (random_uint32(state) & mask)) > rng);
+            out[i] =  off + val;
+        }
+    }
+    else {
+        for (i = 0; i < cnt; i++) {
+            while ((val = (random_uint64(state) & mask)) > rng);
+            out[i] =  off + val;
+        }
+    }
+}
+
+
+/*
+ * Fills an array with cnt random npy_uint32 between off and off + rng
+ * inclusive. The numbers wrap if rng is sufficiently large.
+ */
+void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, int cnt, uint32_t *out)
+{
+    uint32_t val, mask = rng;
+    int i;
+
+    if (rng == 0) {
+        for (i = 0; i < cnt; i++) {
+            out[i] = off;
+        }
+        return;
+    }
+
+   /* Smallest bit mask >= max */
+    mask = (uint32_t)gen_mask(rng);
+
+     for (i = 0; i < cnt; i++) {
+         while ((val = (random_uint32(state) & mask)) > rng);
+         out[i] =  off + val;
+     }
+}
+
+
+/*
+ * Fills an array with cnt random npy_uint16 between off and off + rng
+ * inclusive. The numbers wrap if rng is sufficiently large.
+ */
+void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, int cnt, uint16_t *out)
+{
+    uint16_t val, mask;
+    int i;
+    uint32_t buf;
+    int bcnt = 0;
+
+    if (rng == 0) {
+        for (i = 0; i < cnt; i++) {
+            out[i] = off;
+        }
+        return;
+    }
+
+    /* Smallest bit mask >= max */
+    mask = (uint16_t)gen_mask(rng);
+
+    for (i = 0; i < cnt; i++) {
+        do {
+            if (!bcnt) {
+                buf = random_uint32(state);
+                bcnt = 1;
+            }
+            else {
+                buf >>= 16;
+                bcnt--;
+            }
+            val = (uint16_t)buf & mask;
+        } while (val > rng);
+        out[i] =  off + val;
+    }
+}
+
+/*
+ * Fills an array with cnt random npy_uint8 between off and off + rng
+ * inclusive. The numbers wrap if rng is sufficiently large.
+ */
+void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int cnt, uint8_t *out)
+{
+    uint8_t val, mask = rng;
+    int i;
+    uint32_t buf;
+    int bcnt = 0;
+
+    if (rng == 0) {
+        for (i = 0; i < cnt; i++) {
+            out[i] = off;
+        }
+        return;
+    }
+
+    /* Smallest bit mask >= max */
+    mask = (uint8_t)gen_mask(rng);
+
+    for (i = 0; i < cnt; i++) {
+        do {
+            if (!bcnt) {
+                buf = random_uint32(state);
+                bcnt = 3;
+            }
+            else {
+                buf >>= 8;
+                bcnt--;
+            }
+            val = (uint8_t)buf & mask;
+        } while (val > rng);
+        out[i] =  off + val;
+    }
+}
+
+
+/*
+ * Fills an array with cnt random npy_bool between off and off + rng
+ * inclusive.
+ */
+ /* TODO: This needs to use bools. See original */
+void random_bool_fill(aug_state *state, int8_t off, int8_t rng, int cnt, int8_t *out)
+{
+    int i;
+    uint32_t buf;
+    int bcnt = 0;
+
+    if (rng == 0) {
+        for (i = 0; i < cnt; i++) {
+            out[i] = off;
+        }
+        return;
+    }
+
+    for (i = 0; i < cnt; i++) {
+        if (!bcnt) {
+            buf = random_uint32(state);
+            bcnt = 31;
+        }
+        else {
+            buf >>= 1;
+            bcnt--;
+        }
+        out[i] = (buf & 0x00000001) != 0;
+    }
+}
