@@ -488,54 +488,6 @@ cdef class RandomState:
         self.rng_state.has_uint32 = state['uint32']['has_uint32']
         self.rng_state.uinteger = state['uint32']['uint32']
 
-    def random_sample(self, size=None):
-        """
-        random_sample(size=None)
-
-        Return random floats in the half-open interval [0.0, 1.0).
-
-        Results are from the "continuous uniform" distribution over the
-        stated interval.  To sample :math:`Unif[a, b), b > a` multiply
-        the output of `random_sample` by `(b-a)` and add `a`::
-
-          (b - a) * random_sample() + a
-
-        Parameters
-        ----------
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-
-        Returns
-        -------
-        out : float or ndarray of floats
-            Array of random floats of shape `size` (unless ``size=None``, in which
-            case a single float is returned).
-
-        Examples
-        --------
-        >>> np.random.random_sample()
-        0.47108547995356098
-        >>> type(np.random.random_sample())
-        <type 'float'>
-        >>> np.random.random_sample((5,))
-        array([ 0.30220482,  0.86820401,  0.1654503 ,  0.11659149,  0.54323428])
-
-        Three-by-two array of random numbers from [-5, 0):
-
-        >>> 5 * np.random.random_sample((3, 2)) - 5
-        array([[-3.99149989, -0.52338984],
-               [-2.99091858, -0.79479508],
-               [-1.23204345, -1.75224494]])
-
-        """
-        return cont(&self.rng_state, &random_standard_uniform,
-                    size, self.lock, 0,
-                    0.0, '', CONS_NONE,
-                    0.0, '', CONS_NONE,
-                    0.0, '', CONS_NONE)
-
     def random_uintegers(self, size=None, int bits=64):
         """
         random_uintegers(size=None, bits=64)
@@ -588,55 +540,17 @@ cdef class RandomState:
         else:
             raise ValueError('Unknown value of bits.  Must be either 32 or 64.')
 
-    def standard_normal(self, size=None, method=__normal_method):
+    def random_sample(self, size=None):
         """
-        standard_normal(size=None, method='inv')
+        random_sample(size=None)
 
-        Draw samples from a standard Normal distribution (mean=0, stdev=1).
+        Return random floats in the half-open interval [0.0, 1.0).
 
-        Parameters
-        ----------
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-        method : str
-            Either 'inv' or 'zig'. 'inv' uses the default FIXME method.  'zig' uses
-            the much faster ziggurat method of FIXME.
+        Results are from the "continuous uniform" distribution over the
+        stated interval.  To sample :math:`Unif[a, b), b > a` multiply
+        the output of `random_sample` by `(b-a)` and add `a`::
 
-        Returns
-        -------
-        out : float or ndarray
-            Drawn samples.
-
-        Examples
-        --------
-        >>> s = np.random.standard_normal(8000)
-        >>> s
-        array([ 0.6888893 ,  0.78096262, -0.89086505, ...,  0.49876311, #random
-               -0.38672696, -0.4685006 ])                               #random
-        >>> s.shape
-        (8000,)
-        >>> s = np.random.standard_normal(size=(3, 4, 2))
-        >>> s.shape
-        (3, 4, 2)
-
-        """
-        if method == 'inv':
-            return cont(&self.rng_state, &random_gauss, size, self.lock, 0,
-                        0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
-        else:
-            return cont(&self.rng_state, &random_gauss_zig_julia, size, self.lock, 0,
-                        0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
-
-    def standard_exponential(self, size=None):
-        """
-        standard_exponential(size=None)
-
-        Draw samples from the standard exponential distribution.
-
-        `standard_exponential` is identical to the exponential distribution
-        with a scale parameter of 1.
+          (b - a) * random_sample() + a
 
         Parameters
         ----------
@@ -647,644 +561,32 @@ cdef class RandomState:
 
         Returns
         -------
-        out : float or ndarray
-            Drawn samples.
+        out : float or ndarray of floats
+            Array of random floats of shape `size` (unless ``size=None``, in which
+            case a single float is returned).
 
         Examples
         --------
-        Output a 3x8000 array:
+        >>> np.random.random_sample()
+        0.47108547995356098
+        >>> type(np.random.random_sample())
+        <type 'float'>
+        >>> np.random.random_sample((5,))
+        array([ 0.30220482,  0.86820401,  0.1654503 ,  0.11659149,  0.54323428])
 
-        >>> n = np.random.standard_exponential((3, 8000))
+        Three-by-two array of random numbers from [-5, 0):
 
-        """
-        return cont(&self.rng_state, &random_standard_exponential, size, self.lock, 0,
-                    0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
-
-    def standard_cauchy(self, size=None):
-        """
-        standard_cauchy(size=None)
-
-        Draw samples from a standard Cauchy distribution with mode = 0.
-
-        Also known as the Lorentz distribution.
-
-        Parameters
-        ----------
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-
-        Returns
-        -------
-        samples : ndarray or scalar
-            The drawn samples.
-
-        Notes
-        -----
-        The probability density function for the full Cauchy distribution is
-
-        .. math:: P(x; x_0, \\gamma) = \\frac{1}{\\pi \\gamma \\bigl[ 1+
-                  (\\frac{x-x_0}{\\gamma})^2 \\bigr] }
-
-        and the Standard Cauchy distribution just sets :math:`x_0=0` and
-        :math:`\\gamma=1`
-
-        The Cauchy distribution arises in the solution to the driven harmonic
-        oscillator problem, and also describes spectral line broadening. It
-        also describes the distribution of values at which a line tilted at
-        a random angle will cut the x axis.
-
-        When studying hypothesis tests that assume normality, seeing how the
-        tests perform on data from a Cauchy distribution is a good indicator of
-        their sensitivity to a heavy-tailed distribution, since the Cauchy looks
-        very much like a Gaussian distribution, but with heavier tails.
-
-        References
-        ----------
-        .. [1] NIST/SEMATECH e-Handbook of Statistical Methods, "Cauchy
-              Distribution",
-              http://www.itl.nist.gov/div898/handbook/eda/section3/eda3663.htm
-        .. [2] Weisstein, Eric W. "Cauchy Distribution." From MathWorld--A
-              Wolfram Web Resource.
-              http://mathworld.wolfram.com/CauchyDistribution.html
-        .. [3] Wikipedia, "Cauchy distribution"
-              http://en.wikipedia.org/wiki/Cauchy_distribution
-
-        Examples
-        --------
-        Draw samples and plot the distribution:
-
-        >>> s = np.random.standard_cauchy(1000000)
-        >>> s = s[(s>-25) & (s<25)]  # truncate distribution so it plots well
-        >>> plt.hist(s, bins=100)
-        >>> plt.show()
+        >>> 5 * np.random.random_sample((3, 2)) - 5
+        array([[-3.99149989, -0.52338984],
+               [-2.99091858, -0.79479508],
+               [-1.23204345, -1.75224494]])
 
         """
-        return cont(&self.rng_state, &random_standard_cauchy, size, self.lock, 0,
-                    0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
-
-    def standard_gamma(self, object shape, size=None):
-        """
-        standard_gamma(shape, size=None)
-
-        Draw samples from a standard Gamma distribution.
-
-        Samples are drawn from a Gamma distribution with specified parameters,
-        shape (sometimes designated "k") and scale=1.
-
-        Parameters
-        ----------
-        shape : float
-            Parameter, should be > 0.
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-
-        Returns
-        -------
-        samples : ndarray or scalar
-            The drawn samples.
-
-        See Also
-        --------
-        scipy.stats.distributions.gamma : probability density function,
-            distribution or cumulative density function, etc.
-
-        Notes
-        -----
-        The probability density for the Gamma distribution is
-
-        .. math:: p(x) = x^{k-1}\\frac{e^{-x/\\theta}}{\\theta^k\\Gamma(k)},
-
-        where :math:`k` is the shape and :math:`\\theta` the scale,
-        and :math:`\\Gamma` is the Gamma function.
-
-        The Gamma distribution is often used to model the times to failure of
-        electronic components, and arises naturally in processes for which the
-        waiting times between Poisson distributed events are relevant.
-
-        References
-        ----------
-        .. [1] Weisstein, Eric W. "Gamma Distribution." From MathWorld--A
-               Wolfram Web Resource.
-               http://mathworld.wolfram.com/GammaDistribution.html
-        .. [2] Wikipedia, "Gamma-distribution",
-               http://en.wikipedia.org/wiki/Gamma-distribution
-
-        Examples
-        --------
-        Draw samples from the distribution:
-
-        >>> shape, scale = 2., 1. # mean and width
-        >>> s = np.random.standard_gamma(shape, 1000000)
-
-        Display the histogram of the samples, along with
-        the probability density function:
-
-        >>> import matplotlib.pyplot as plt
-        >>> import scipy.special as sps
-        >>> count, bins, ignored = plt.hist(s, 50, normed=True)
-        >>> y = bins**(shape-1) * ((np.exp(-bins/scale))/ \\
-        ...                       (sps.gamma(shape) * scale**shape))
-        >>> plt.plot(bins, y, linewidth=2, color='r')
-        >>> plt.show()
-
-        """
-        return cont(&self.rng_state, &random_standard_gamma, size, self.lock, 1,
-                    shape, 'shape', CONS_POSITIVE,
+        return cont(&self.rng_state, &random_standard_uniform,
+                    size, self.lock, 0,
+                    0.0, '', CONS_NONE,
                     0.0, '', CONS_NONE,
                     0.0, '', CONS_NONE)
-
-    def binomial(self, n, p, size=None):
-        """
-        binomial(n, p, size=None)
-        Draw samples from a binomial distribution.
-        Samples are drawn from a binomial distribution with specified
-        parameters, n trials and p probability of success where
-        n an integer >= 0 and p is in the interval [0,1]. (n may be
-        input as a float, but it is truncated to an integer in use)
-        Parameters
-        ----------
-        n : float (but truncated to an integer)
-                parameter, >= 0.
-        p : float
-                parameter, >= 0 and <=1.
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-        Returns
-        -------
-        samples : ndarray or scalar
-                  where the values are all integers in  [0, n].
-        See Also
-        --------
-        scipy.stats.distributions.binom : probability density function,
-            distribution or cumulative density function, etc.
-        Notes
-        -----
-        The probability density for the binomial distribution is
-        .. math:: P(N) = \\binom{n}{N}p^N(1-p)^{n-N},
-        where :math:`n` is the number of trials, :math:`p` is the probability
-        of success, and :math:`N` is the number of successes.
-        When estimating the standard error of a proportion in a population by
-        using a random sample, the normal distribution works well unless the
-        product p*n <=5, where p = population proportion estimate, and n =
-        number of samples, in which case the binomial distribution is used
-        instead. For example, a sample of 15 people shows 4 who are left
-        handed, and 11 who are right handed. Then p = 4/15 = 27%. 0.27*15 = 4,
-        so the binomial distribution should be used in this case.
-        References
-        ----------
-        .. [1] Dalgaard, Peter, "Introductory Statistics with R",
-               Springer-Verlag, 2002.
-        .. [2] Glantz, Stanton A. "Primer of Biostatistics.", McGraw-Hill,
-               Fifth Edition, 2002.
-        .. [3] Lentner, Marvin, "Elementary Applied Statistics", Bogden
-               and Quigley, 1972.
-        .. [4] Weisstein, Eric W. "Binomial Distribution." From MathWorld--A
-               Wolfram Web Resource.
-               http://mathworld.wolfram.com/BinomialDistribution.html
-        .. [5] Wikipedia, "Binomial-distribution",
-               http://en.wikipedia.org/wiki/Binomial_distribution
-        Examples
-        --------
-        Draw samples from the distribution:
-        >>> n, p = 10, .5  # number of trials, probability of each trial
-        >>> s = np.random.binomial(n, p, 1000)
-        # result of flipping a coin 10 times, tested 1000 times.
-        A real world example. A company drills 9 wild-cat oil exploration
-        wells, each with an estimated probability of success of 0.1. All nine
-        wells fail. What is the probability of that happening?
-        Let's do 20,000 trials of the model, and count the number that
-        generate zero positive results.
-        >>> sum(np.random.binomial(9, 0.1, 20000) == 0)/20000.
-        # answer = 0.38885, or 38%.
-
-        """
-        return disc(&self.rng_state, &random_binomial, size, self.lock, 1, 1,
-                    p, 'p', CONS_BOUNDED_0_1_NOTNAN,
-                    n, 'n', CONS_POSITIVE,
-                    0.0, '', CONS_NONE)
-
-
-    def standard_t(self, df, size=None):
-        """
-        standard_t(df, size=None)
-
-        Draw samples from a standard Student's t distribution with `df` degrees
-        of freedom.
-
-        A special case of the hyperbolic distribution.  As `df` gets
-        large, the result resembles that of the standard normal
-        distribution (`standard_normal`).
-
-        Parameters
-        ----------
-        df : int
-            Degrees of freedom, should be > 0.
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-
-        Returns
-        -------
-        samples : ndarray or scalar
-            Drawn samples.
-
-        Notes
-        -----
-        The probability density function for the t distribution is
-
-        .. math:: P(x, df) = \\frac{\\Gamma(\\frac{df+1}{2})}{\\sqrt{\\pi df}
-                  \\Gamma(\\frac{df}{2})}\\Bigl( 1+\\frac{x^2}{df} \\Bigr)^{-(df+1)/2}
-
-        The t test is based on an assumption that the data come from a
-        Normal distribution. The t test provides a way to test whether
-        the sample mean (that is the mean calculated from the data) is
-        a good estimate of the true mean.
-
-        The derivation of the t-distribution was first published in
-        1908 by William Gisset while working for the Guinness Brewery
-        in Dublin. Due to proprietary issues, he had to publish under
-        a pseudonym, and so he used the name Student.
-
-        References
-        ----------
-        .. [1] Dalgaard, Peter, "Introductory Statistics With R",
-               Springer, 2002.
-        .. [2] Wikipedia, "Student's t-distribution"
-               http://en.wikipedia.org/wiki/Student's_t-distribution
-
-        Examples
-        --------
-        From Dalgaard page 83 [1]_, suppose the daily energy intake for 11
-        women in Kj is:
-
-        >>> intake = np.array([5260., 5470, 5640, 6180, 6390, 6515, 6805, 7515, \\
-        ...                    7515, 8230, 8770])
-
-        Does their energy intake deviate systematically from the recommended
-        value of 7725 kJ?
-
-        We have 10 degrees of freedom, so is the sample mean within 95% of the
-        recommended value?
-
-        >>> s = np.random.standard_t(10, size=100000)
-        >>> np.mean(intake)
-        6753.636363636364
-        >>> intake.std(ddof=1)
-        1142.1232221373727
-
-        Calculate the t statistic, setting the ddof parameter to the unbiased
-        value so the divisor in the standard deviation will be degrees of
-        freedom, N-1.
-
-        >>> t = (np.mean(intake)-7725)/(intake.std(ddof=1)/np.sqrt(len(intake)))
-        >>> import matplotlib.pyplot as plt
-        >>> h = plt.hist(s, bins=100, normed=True)
-
-        For a one-sided t-test, how far out in the distribution does the t
-        statistic appear?
-
-        >>> np.sum(s<t) / float(len(s))
-        0.0090699999999999999  #random
-
-        So the p-value is about 0.009, which says the null hypothesis has a
-        probability of about 99% of being true.
-
-        """
-        return cont(&self.rng_state, &random_standard_t, size, self.lock, 1,
-                    df, 'df', CONS_POSITIVE,
-                    0, '', CONS_NONE,
-                    0, '', CONS_NONE)
-
-    def bytes(self, Py_ssize_t length):
-        """
-        bytes(length)
-
-        Return random bytes.
-        Parameters
-        ----------
-        length : int
-            Number of random bytes.
-
-        Returns
-        -------
-        out : str
-            String of length `length`.
-
-        Examples
-        --------
-        >>> np.random.bytes(10)
-        ' eh\\x85\\x022SZ\\xbf\\xa4' #random
-        """
-        cdef Py_ssize_t n_uint32 = ((length - 1) // 4 + 1)
-        return self.random_uintegers(n_uint32, bits=32).tobytes()[:length]
-
-    def randn(self, *args, method=__normal_method):
-        """
-        randn(d0, d1, ..., dn)
-
-        Return a sample (or samples) from the "standard normal" distribution.
-
-        If positive, int_like or int-convertible arguments are provided,
-        `randn` generates an array of shape ``(d0, d1, ..., dn)``, filled
-        with random floats sampled from a univariate "normal" (Gaussian)
-        distribution of mean 0 and variance 1 (if any of the :math:`d_i` are
-        floats, they are first converted to integers by truncation). A single
-        float randomly sampled from the distribution is returned if no
-        argument is provided.
-
-        This is a convenience function.  If you want an interface that takes a
-        tuple as the first argument, use `numpy.random.standard_normal` instead.
-
-        Parameters
-        ----------
-        d0, d1, ..., dn : int, optional
-            The dimensions of the returned array, should be all positive.
-            If no argument is given a single Python float is returned.
-
-        Returns
-        -------
-        Z : ndarray or float
-            A ``(d0, d1, ..., dn)``-shaped array of floating-point samples from
-            the standard normal distribution, or a single such float if
-            no parameters were supplied.
-
-        See Also
-        --------
-        random.standard_normal : Similar, but takes a tuple as its argument.
-
-        Notes
-        -----
-        For random samples from :math:`N(\mu, \sigma^2)`, use:
-
-        ``sigma * np.random.randn(...) + mu``
-
-        Examples
-        --------
-        >>> np.random.randn()
-        2.1923875335537315 #random
-
-        Two-by-four array of samples from N(3, 6.25):
-
-        >>> 2.5 * np.random.randn(2, 4) + 3
-        array([[-4.49401501,  4.00950034, -1.81814867,  7.29718677],  #random
-               [ 0.39924804,  4.68456316,  4.99394529,  4.84057254]]) #random
-        """
-        return self.standard_normal(size=args, method=method)
-
-    def rand(self, *args):
-        """
-        rand(d0, d1, ..., dn)
-
-        Random values in a given shape.
-
-        Create an array of the given shape and propagate it with
-        random samples from a uniform distribution
-        over ``[0, 1)``.
-
-        Parameters
-        ----------
-        d0, d1, ..., dn : int, optional
-            The dimensions of the returned array, should all be positive.
-            If no argument is given a single Python float is returned.
-
-        Returns
-        -------
-        out : ndarray, shape ``(d0, d1, ..., dn)``
-            Random values.
-
-        See Also
-        --------
-        random
-
-        Notes
-        -----
-        This is a convenience function. If you want an interface that
-        takes a shape-tuple as the first argument, refer to
-        np.random.random_sample .
-
-        Examples
-        --------
-        >>> np.random.rand(3,2)
-        array([[ 0.14022471,  0.96360618],  #random
-               [ 0.37601032,  0.25528411],  #random
-               [ 0.49313049,  0.94909878]]) #random
-        """
-        return self.random_sample(size=args)
-
-    def uniform(self, object low=0.0, object high=1.0, size=None):
-        """
-        uniform(low=0.0, high=1.0, size=None)
-
-        Draw samples from a uniform distribution.
-
-        Samples are uniformly distributed over the half-open interval
-        ``[low, high)`` (includes low, but excludes high).  In other words,
-        any value within the given interval is equally likely to be drawn
-        by `uniform`.
-
-        Parameters
-        ----------
-        low : float, optional
-            Lower boundary of the output interval.  All values generated will be
-            greater than or equal to low.  The default value is 0.
-        high : float
-            Upper boundary of the output interval.  All values generated will be
-            less than high.  The default value is 1.0.
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-
-        Returns
-        -------
-        out : ndarray
-            Drawn samples, with shape `size`.
-
-        See Also
-        --------
-        randint : Discrete uniform distribution, yielding integers.
-        random_integers : Discrete uniform distribution over the closed
-                          interval ``[low, high]``.
-        random_sample : Floats uniformly distributed over ``[0, 1)``.
-        random : Alias for `random_sample`.
-        rand : Convenience function that accepts dimensions as input, e.g.,
-               ``rand(2,2)`` would generate a 2-by-2 array of floats,
-               uniformly distributed over ``[0, 1)``.
-
-        Notes
-        -----
-        The probability density function of the uniform distribution is
-
-        .. math:: p(x) = \frac{1}{b - a}
-
-        anywhere within the interval ``[a, b)``, and zero elsewhere.
-
-        Examples
-        --------
-        Draw samples from the distribution:
-
-        >>> s = np.random.uniform(-1,0,1000)
-
-        All values are within the given interval:
-
-        >>> np.all(s >= -1)
-        True
-        >>> np.all(s < 0)
-        True
-
-        Display the histogram of the samples, along with the
-        probability density function:
-
-        >>> import matplotlib.pyplot as plt
-        >>> count, bins, ignored = plt.hist(s, 15, normed=True)
-        >>> plt.plot(bins, np.ones_like(bins), linewidth=2, color='r')
-        >>> plt.show()
-        """
-        cdef bint is_scalar = True
-        cdef np.ndarray alow, ahigh, arange
-        cdef double _low, _high, range
-        cdef object temp
-
-        _low = PyFloat_AsDouble(low)
-        _high = PyFloat_AsDouble(high)
-        if _low == -1.0 or _high == -1.0:
-            is_scalar = not PyErr_Occurred()
-        if is_scalar:
-            range = _high - _low
-            if not np.isfinite(range):
-                raise OverflowError('Range exceeds valid bounds')
-
-            return cont(&self.rng_state, &random_uniform, size, self.lock, 2,
-                        _low, '', CONS_NONE,
-                        range, '', CONS_NONE,
-                        0.0, '', CONS_NONE)
-
-        PyErr_Clear()
-        alow = <np.ndarray>np.PyArray_FROM_OTF(low, np.NPY_DOUBLE, np.NPY_ALIGNED)
-        ahigh = <np.ndarray>np.PyArray_FROM_OTF(high, np.NPY_DOUBLE, np.NPY_ALIGNED)
-        temp = np.subtract(ahigh, alow)
-        Py_INCREF(temp)  # needed to get around Pyrex's automatic reference-counting
-                         # rules because EnsureArray steals a reference
-        arange = <np.ndarray>np.PyArray_EnsureArray(temp)
-        if not np.isfinite(arange).all():
-            raise OverflowError('Range exceeds valid bounds')
-        return cont(&self.rng_state, &random_uniform, size, self.lock, 2,
-                    alow, '', CONS_NONE,
-                    arange, '', CONS_NONE,
-                    0.0, '', CONS_NONE)
-
-    # Shuffling and permutations:
-    def shuffle(self, object x):
-        """
-        shuffle(x)
-
-        Modify a sequence in-place by shuffling its contents.
-
-        Parameters
-        ----------
-        x : array_like
-            The array or list to be shuffled.
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        >>> arr = np.arange(10)
-        >>> np.random.shuffle(arr)
-        >>> arr
-        [1 7 5 2 9 4 3 6 0 8]
-
-        This function only shuffles the array along the first index of a
-        multi-dimensional array:
-
-        >>> arr = np.arange(9).reshape((3, 3))
-        >>> np.random.shuffle(arr)
-        >>> arr
-        array([[3, 4, 5],
-               [6, 7, 8],
-               [0, 1, 2]])
-
-        """
-        cdef Py_ssize_t i
-        cdef long j
-
-        i = len(x) - 1
-
-        # Logic adapted from random.shuffle()
-        if isinstance(x, np.ndarray) and \
-           (x.ndim > 1 or x.dtype.fields is not None):
-            # For a multi-dimensional ndarray, indexing returns a view onto
-            # each row. So we can't just use ordinary assignment to swap the
-            # rows; we need a bounce buffer.
-            buf = np.empty_like(x[0])
-            with self.lock:
-                while i > 0:
-                    j = random_interval(&self.rng_state, i)
-                    buf[...] = x[j]
-                    x[j] = x[i]
-                    x[i] = buf
-                    i = i - 1
-        else:
-            # For single-dimensional arrays, lists, and any other Python
-            # sequence types, indexing returns a real object that's
-            # independent of the array contents, so we can just swap directly.
-            with self.lock:
-                while i > 0:
-                    j = random_interval(&self.rng_state, i)
-                    x[i], x[j] = x[j], x[i]
-                    i = i - 1
-
-    def permutation(self, object x):
-        """
-        permutation(x)
-
-        Randomly permute a sequence, or return a permuted range.
-
-        If `x` is a multi-dimensional array, it is only shuffled along its
-        first index.
-
-        Parameters
-        ----------
-        x : int or array_like
-            If `x` is an integer, randomly permute ``np.arange(x)``.
-            If `x` is an array, make a copy and shuffle the elements
-            randomly.
-
-        Returns
-        -------
-        out : ndarray
-            Permuted sequence or array range.
-
-        Examples
-        --------
-        >>> np.random.permutation(10)
-        array([1, 7, 4, 3, 0, 9, 2, 5, 8, 6])
-
-        >>> np.random.permutation([1, 4, 9, 12, 15])
-        array([15,  1,  9,  4, 12])
-
-        >>> arr = np.arange(9).reshape((3, 3))
-        >>> np.random.permutation(arr)
-        array([[6, 7, 8],
-               [0, 1, 2],
-               [3, 4, 5]])
-
-        """
-        if isinstance(x, (int, long, np.integer)):
-            arr = np.arange(x)
-        else:
-            arr = np.array(x)
-        self.shuffle(arr)
-        return arr
 
     def tomaxint(self, size=None):
         """
@@ -1343,6 +645,636 @@ cdef class RandomState:
             randoms[i] = random_positive_int(&self.rng_state)
         return np.asarray(randoms).reshape(size)
 
+    def randint(self, low, high=None, size=None, dtype='l'):
+        """
+        randint(low, high=None, size=None, dtype='l')
+
+        Return random integers from `low` (inclusive) to `high` (exclusive).
+
+        Return random integers from the "discrete uniform" distribution of
+        the specified dtype in the "half-open" interval [`low`, `high`). If
+        `high` is None (the default), then results are from [0, `low`).
+
+        Parameters
+        ----------
+        low : int
+            Lowest (signed) integer to be drawn from the distribution (unless
+            ``high=None``, in which case this parameter is the *highest* such
+            integer).
+        high : int, optional
+            If provided, one above the largest (signed) integer to be drawn
+            from the distribution (see above for behavior if ``high=None``).
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+        dtype : dtype, optional
+            Desired dtype of the result. All dtypes are determined by their
+            name, i.e., 'int64', 'int', etc, so byteorder is not available
+            and a specific precision may have different C types depending
+            on the platform. The default value is 'l' (C long).
+
+            .. versionadded:: 1.11.0
+
+        Returns
+        -------
+        out : int or ndarray of ints
+            `size`-shaped array of random integers from the appropriate
+            distribution, or a single such random int if `size` not provided.
+
+        See Also
+        --------
+        random.random_integers : similar to `randint`, only for the closed
+            interval [`low`, `high`], and 1 is the lowest value if `high` is
+            omitted. In particular, this other one is the one to use to generate
+            uniformly distributed discrete non-integers.
+
+        Examples
+        --------
+        >>> np.random.randint(2, size=10)
+        array([1, 0, 0, 0, 1, 1, 0, 0, 1, 0])
+        >>> np.random.randint(1, size=10)
+        array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+        Generate a 2 x 4 array of ints between 0 and 4, inclusive:
+
+        >>> np.random.randint(5, size=(2, 4))
+        array([[4, 0, 2, 1],
+               [3, 2, 2, 0]])
+
+        """
+        if high is None:
+            high = low
+            low = 0
+
+        key = np.dtype(dtype).name
+        if not key in _randint_type:
+            raise TypeError('Unsupported dtype "%s" for randint' % key)
+        lowbnd, highbnd = _randint_type[key]
+
+        if low < lowbnd:
+            raise ValueError("low is out of bounds for %s" % (key,))
+        if high > highbnd:
+            raise ValueError("high is out of bounds for %s" % (key,))
+        if low >= high:
+            raise ValueError("low >= high")
+
+        if key == 'int32':
+            return _rand_int32(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'int64':
+            return _rand_int64(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'int16':
+            return _rand_int16(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'int8':
+            return _rand_int8(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'uint64':
+            return _rand_uint64(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'uint32':
+            return _rand_uint32(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'uint16':
+            return _rand_uint16(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'uint8':
+            return _rand_uint8(low, high - 1, size, &self.rng_state, self.lock)
+        elif key == 'bool':
+            return _rand_bool(low, high - 1, size, &self.rng_state, self.lock)
+
+    def bytes(self, Py_ssize_t length):
+        """
+        bytes(length)
+
+        Return random bytes.
+
+        Parameters
+        ----------
+        length : int
+            Number of random bytes.
+
+        Returns
+        -------
+        out : str
+            String of length `length`.
+
+        Examples
+        --------
+        >>> np.random.bytes(10)
+        ' eh\\x85\\x022SZ\\xbf\\xa4' #random
+
+        """
+        cdef Py_ssize_t n_uint32 = ((length - 1) // 4 + 1)
+        return self.random_uintegers(n_uint32, bits=32).tobytes()[:length]
+
+    @cython.wraparound(True)
+    def choice(self, a, size=None, replace=True, p=None):
+        """
+        choice(a, size=None, replace=True, p=None)
+
+        Generates a random sample from a given 1-D array
+
+                .. versionadded:: 1.7.0
+
+        Parameters
+        -----------
+        a : 1-D array-like or int
+            If an ndarray, a random sample is generated from its elements.
+            If an int, the random sample is generated as if a was np.arange(n)
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+        replace : boolean, optional
+            Whether the sample is with or without replacement
+        p : 1-D array-like, optional
+            The probabilities associated with each entry in a.
+            If not given the sample assumes a uniform distribution over all
+            entries in a.
+
+        Returns
+        --------
+        samples : 1-D ndarray, shape (size,)
+            The generated random samples
+
+        Raises
+        -------
+        ValueError
+            If a is an int and less than zero, if a or p are not 1-dimensional,
+            if a is an array-like of size 0, if p is not a vector of
+            probabilities, if a and p have different lengths, or if
+            replace=False and the sample size is greater than the population
+            size
+
+        See Also
+        ---------
+        randint, shuffle, permutation
+
+        Examples
+        ---------
+        Generate a uniform random sample from np.arange(5) of size 3:
+
+        >>> np.random.choice(5, 3)
+        array([0, 3, 4])
+        >>> #This is equivalent to np.random.randint(0,5,3)
+
+        Generate a non-uniform random sample from np.arange(5) of size 3:
+
+        >>> np.random.choice(5, 3, p=[0.1, 0, 0.3, 0.6, 0])
+        array([3, 3, 0])
+
+        Generate a uniform random sample from np.arange(5) of size 3 without
+        replacement:
+
+        >>> np.random.choice(5, 3, replace=False)
+        array([3,1,0])
+        >>> #This is equivalent to np.random.permutation(np.arange(5))[:3]
+
+        Generate a non-uniform random sample from np.arange(5) of size
+        3 without replacement:
+
+        >>> np.random.choice(5, 3, replace=False, p=[0.1, 0, 0.3, 0.6, 0])
+        array([2, 3, 0])
+
+        Any of the above can be repeated with an arbitrary array-like
+        instead of just integers. For instance:
+
+        >>> aa_milne_arr = ['pooh', 'rabbit', 'piglet', 'Christopher']
+        >>> np.random.choice(aa_milne_arr, 5, p=[0.5, 0.1, 0.1, 0.3])
+        array(['pooh', 'pooh', 'pooh', 'Christopher', 'piglet'],
+              dtype='|S11')
+
+        """
+
+        # Format and Verify input
+        a = np.array(a, copy=False)
+        if a.ndim == 0:
+            try:
+                # __index__ must return an integer by python rules.
+                pop_size = operator.index(a.item())
+            except TypeError:
+                raise ValueError("a must be 1-dimensional or an integer")
+            if pop_size <= 0:
+                raise ValueError("a must be greater than 0")
+        elif a.ndim != 1:
+            raise ValueError("a must be 1-dimensional")
+        else:
+            pop_size = a.shape[0]
+            if pop_size is 0:
+                raise ValueError("a must be non-empty")
+
+        if p is not None:
+            d = len(p)
+
+            atol = np.sqrt(np.finfo(np.float64).eps)
+            if isinstance(p, np.ndarray):
+                if np.issubdtype(p.dtype, np.floating):
+                    atol = max(atol, np.sqrt(np.finfo(p.dtype).eps))
+
+            p = <np.ndarray>np.PyArray_FROM_OTF(p, np.NPY_DOUBLE, np.NPY_ALIGNED)
+            pix = <double*>np.PyArray_DATA(p)
+
+            if p.ndim != 1:
+                raise ValueError("p must be 1-dimensional")
+            if p.size != pop_size:
+                raise ValueError("a and p must have same size")
+            if np.logical_or.reduce(p < 0):
+                raise ValueError("probabilities are not non-negative")
+            if abs(kahan_sum(pix, d) - 1.) > atol:
+                raise ValueError("probabilities do not sum to 1")
+
+        shape = size
+        if shape is not None:
+            size = np.prod(shape, dtype=np.intp)
+        else:
+            size = 1
+
+        # Actual sampling
+        if replace:
+            if p is not None:
+                cdf = p.cumsum()
+                cdf /= cdf[-1]
+                uniform_samples = self.random_sample(shape)
+                idx = cdf.searchsorted(uniform_samples, side='right')
+                idx = np.array(idx, copy=False) # searchsorted returns a scalar
+            else:
+                idx = self.randint(0, pop_size, size=shape)
+        else:
+            if size > pop_size:
+                raise ValueError("Cannot take a larger sample than "
+                                 "population when 'replace=False'")
+
+            if p is not None:
+                if np.count_nonzero(p > 0) < size:
+                    raise ValueError("Fewer non-zero entries in p than size")
+                n_uniq = 0
+                p = p.copy()
+                found = np.zeros(shape, dtype=np.int)
+                flat_found = found.ravel()
+                while n_uniq < size:
+                    x = self.rand(size - n_uniq)
+                    if n_uniq > 0:
+                        p[flat_found[0:n_uniq]] = 0
+                    cdf = np.cumsum(p)
+                    cdf /= cdf[-1]
+                    new = cdf.searchsorted(x, side='right')
+                    _, unique_indices = np.unique(new, return_index=True)
+                    unique_indices.sort()
+                    new = new.take(unique_indices)
+                    flat_found[n_uniq:n_uniq + new.size] = new
+                    n_uniq += new.size
+                idx = found
+            else:
+                idx = self.permutation(pop_size)[:size]
+                if shape is not None:
+                    idx.shape = shape
+
+        if shape is None and isinstance(idx, np.ndarray):
+            # In most cases a scalar will have been made an array
+            idx = idx.item(0)
+
+        #Use samples as indices for a if a is array-like
+        if a.ndim == 0:
+            return idx
+
+        if shape is not None and idx.ndim == 0:
+            # If size == () then the user requested a 0-d array as opposed to
+            # a scalar object when size is None. However a[idx] is always a
+            # scalar and not an array. So this makes sure the result is an
+            # array, taking into account that np.array(item) may not work
+            # for object arrays.
+            res = np.empty((), dtype=a.dtype)
+            res[()] = a[idx]
+            return res
+
+        return a[idx]
+
+
+    def uniform(self, low=0.0, high=1.0, size=None):
+        """
+        uniform(low=0.0, high=1.0, size=None)
+
+        Draw samples from a uniform distribution.
+
+        Samples are uniformly distributed over the half-open interval
+        ``[low, high)`` (includes low, but excludes high).  In other words,
+        any value within the given interval is equally likely to be drawn
+        by `uniform`.
+
+        Parameters
+        ----------
+        low : float, optional
+            Lower boundary of the output interval.  All values generated will be
+            greater than or equal to low.  The default value is 0.
+        high : float
+            Upper boundary of the output interval.  All values generated will be
+            less than high.  The default value is 1.0.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : ndarray
+            Drawn samples, with shape `size`.
+
+        See Also
+        --------
+        randint : Discrete uniform distribution, yielding integers.
+        random_integers : Discrete uniform distribution over the closed
+                          interval ``[low, high]``.
+        random_sample : Floats uniformly distributed over ``[0, 1)``.
+        random : Alias for `random_sample`.
+        rand : Convenience function that accepts dimensions as input, e.g.,
+               ``rand(2,2)`` would generate a 2-by-2 array of floats,
+               uniformly distributed over ``[0, 1)``.
+
+        Notes
+        -----
+        The probability density function of the uniform distribution is
+
+        .. math:: p(x) = \\frac{1}{b - a}
+
+        anywhere within the interval ``[a, b)``, and zero elsewhere.
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> s = np.random.uniform(-1,0,1000)
+
+        All values are within the given interval:
+
+        >>> np.all(s >= -1)
+        True
+        >>> np.all(s < 0)
+        True
+
+        Display the histogram of the samples, along with the
+        probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> count, bins, ignored = plt.hist(s, 15, normed=True)
+        >>> plt.plot(bins, np.ones_like(bins), linewidth=2, color='r')
+        >>> plt.show()
+        """
+        cdef bint is_scalar = True
+        cdef np.ndarray alow, ahigh, arange
+        cdef double _low, _high, range
+        cdef object temp
+
+        _low = PyFloat_AsDouble(low)
+        _high = PyFloat_AsDouble(high)
+        if _low == -1.0 or _high == -1.0:
+            is_scalar = not PyErr_Occurred()
+        if is_scalar:
+            range = _high - _low
+            if not np.isfinite(range):
+                raise OverflowError('Range exceeds valid bounds')
+
+            return cont(&self.rng_state, &random_uniform, size, self.lock, 2,
+                        _low, '', CONS_NONE,
+                        range, '', CONS_NONE,
+                        0.0, '', CONS_NONE)
+
+        PyErr_Clear()
+        alow = <np.ndarray>np.PyArray_FROM_OTF(low, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        ahigh = <np.ndarray>np.PyArray_FROM_OTF(high, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        temp = np.subtract(ahigh, alow)
+        Py_INCREF(temp)  # needed to get around Pyrex's automatic reference-counting
+                         # rules because EnsureArray steals a reference
+        arange = <np.ndarray>np.PyArray_EnsureArray(temp)
+        if not np.isfinite(arange).all():
+            raise OverflowError('Range exceeds valid bounds')
+        return cont(&self.rng_state, &random_uniform, size, self.lock, 2,
+                    alow, '', CONS_NONE,
+                    arange, '', CONS_NONE,
+                    0.0, '', CONS_NONE)
+
+    def rand(self, *args):
+        """
+        rand(d0, d1, ..., dn)
+
+        Random values in a given shape.
+
+        Create an array of the given shape and populate it with
+        random samples from a uniform distribution
+        over ``[0, 1)``.
+
+        Parameters
+        ----------
+        d0, d1, ..., dn : int, optional
+            The dimensions of the returned array, should all be positive.
+            If no argument is given a single Python float is returned.
+
+        Returns
+        -------
+        out : ndarray, shape ``(d0, d1, ..., dn)``
+            Random values.
+
+        See Also
+        --------
+        random
+
+        Notes
+        -----
+        This is a convenience function. If you want an interface that
+        takes a shape-tuple as the first argument, refer to
+        np.random.random_sample .
+
+        Examples
+        --------
+        >>> np.random.rand(3,2)
+        array([[ 0.14022471,  0.96360618],  #random
+               [ 0.37601032,  0.25528411],  #random
+               [ 0.49313049,  0.94909878]]) #random
+
+        """
+        if len(args) == 0:
+            return self.random_sample()
+        else:
+            return self.random_sample(size=args)
+
+    def randn(self, *args, method=__normal_method):
+        """
+        randn(d0, d1, ..., dn)
+
+        Return a sample (or samples) from the "standard normal" distribution.
+
+        If positive, int_like or int-convertible arguments are provided,
+        `randn` generates an array of shape ``(d0, d1, ..., dn)``, filled
+        with random floats sampled from a univariate "normal" (Gaussian)
+        distribution of mean 0 and variance 1 (if any of the :math:`d_i` are
+        floats, they are first converted to integers by truncation). A single
+        float randomly sampled from the distribution is returned if no
+        argument is provided.
+
+        This is a convenience function.  If you want an interface that takes a
+        tuple as the first argument, use `numpy.random.standard_normal` instead.
+
+        Parameters
+        ----------
+        d0, d1, ..., dn : int, optional
+            The dimensions of the returned array, should be all positive.
+            If no argument is given a single Python float is returned.
+
+        Returns
+        -------
+        Z : ndarray or float
+            A ``(d0, d1, ..., dn)``-shaped array of floating-point samples from
+            the standard normal distribution, or a single such float if
+            no parameters were supplied.
+
+        See Also
+        --------
+        random.standard_normal : Similar, but takes a tuple as its argument.
+
+        Notes
+        -----
+        For random samples from :math:`N(\\mu, \\sigma^2)`, use:
+
+        ``sigma * np.random.randn(...) + mu``
+
+        Examples
+        --------
+        >>> np.random.randn()
+        2.1923875335537315 #random
+
+        Two-by-four array of samples from N(3, 6.25):
+
+        >>> 2.5 * np.random.randn(2, 4) + 3
+        array([[-4.49401501,  4.00950034, -1.81814867,  7.29718677],  #random
+               [ 0.39924804,  4.68456316,  4.99394529,  4.84057254]]) #random
+
+        """
+        if len(args) == 0:
+            return self.standard_normal(method=method)
+        else:
+            return self.standard_normal(size=args, method=method)
+
+    def random_integers(self, low, high=None, size=None):
+        """
+        random_integers(low, high=None, size=None)
+
+        Random integers of type np.int between `low` and `high`, inclusive.
+
+        Return random integers of type np.int from the "discrete uniform"
+        distribution in the closed interval [`low`, `high`].  If `high` is
+        None (the default), then results are from [1, `low`]. The np.int
+        type translates to the C long type used by Python 2 for "short"
+        integers and its precision is platform dependent.
+
+        Parameters
+        ----------
+        low : int
+            Lowest (signed) integer to be drawn from the distribution (unless
+            ``high=None``, in which case this parameter is the *highest* such
+            integer).
+        high : int, optional
+            If provided, the largest (signed) integer to be drawn from the
+            distribution (see above for behavior if ``high=None``).
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : int or ndarray of ints
+            `size`-shaped array of random integers from the appropriate
+            distribution, or a single such random int if `size` not provided.
+
+        See Also
+        --------
+        random.randint : Similar to `random_integers`, only for the half-open
+            interval [`low`, `high`), and 0 is the lowest value if `high` is
+            omitted.
+
+        Notes
+        -----
+        To sample from N evenly spaced floating-point numbers between a and b,
+        use::
+
+          a + (b - a) * (np.random.random_integers(N) - 1) / (N - 1.)
+
+        Examples
+        --------
+        >>> np.random.random_integers(5)
+        4
+        >>> type(np.random.random_integers(5))
+        <type 'int'>
+        >>> np.random.random_integers(5, size=(3.,2.))
+        array([[5, 4],
+               [3, 3],
+               [4, 5]])
+
+        Choose five random numbers from the set of five evenly-spaced
+        numbers between 0 and 2.5, inclusive (*i.e.*, from the set
+        :math:`{0, 5/8, 10/8, 15/8, 20/8}`):
+
+        >>> 2.5 * (np.random.random_integers(5, size=(5,)) - 1) / 4.
+        array([ 0.625,  1.25 ,  0.625,  0.625,  2.5  ])
+
+        Roll two six sided dice 1000 times and sum the results:
+
+        >>> d1 = np.random.random_integers(1, 6, 1000)
+        >>> d2 = np.random.random_integers(1, 6, 1000)
+        >>> dsums = d1 + d2
+
+        Display results as a histogram:
+
+        >>> import matplotlib.pyplot as plt
+        >>> count, bins, ignored = plt.hist(dsums, 11, normed=True)
+        >>> plt.show()
+
+        """
+        if high is None:
+            high = low
+            low = 1
+
+        return self.randint(low, high + 1, size=size, dtype='l')
+
+
+
+    # Complicated, continuous distributions:
+    def standard_normal(self, size=None, method=__normal_method):
+        """
+        standard_normal(size=None, method='inv')
+
+        Draw samples from a standard Normal distribution (mean=0, stdev=1).
+
+        Parameters
+        ----------
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+        method : str, optional
+            Either 'inv' or 'zig'. 'inv' uses the default FIXME method.  'zig' uses
+            the much faster ziggurat method of FIXME.
+
+        Returns
+        -------
+        out : float or ndarray
+            Drawn samples.
+
+        Examples
+        --------
+        >>> s = np.random.standard_normal(8000)
+        >>> s
+        array([ 0.6888893 ,  0.78096262, -0.89086505, ...,  0.49876311, #random
+               -0.38672696, -0.4685006 ])                               #random
+        >>> s.shape
+        (8000,)
+        >>> s = np.random.standard_normal(size=(3, 4, 2))
+        >>> s.shape
+        (3, 4, 2)
+
+        """
+        if method == 'inv':
+            return cont(&self.rng_state, &random_gauss, size, self.lock, 0,
+                        0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
+        else:
+            return cont(&self.rng_state, &random_gauss_zig_julia, size, self.lock, 0,
+                        0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
+
     def normal(self, loc=0.0, scale=1.0, size=None, method=__normal_method):
         """
         normal(loc=0.0, scale=1.0, size=None, method='inv')
@@ -1369,6 +1301,9 @@ cdef class RandomState:
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
+        method : str, optional
+            Either 'inv' or 'zig'. 'inv' uses the default FIXME method.  'zig' uses
+            the much faster ziggurat method of FIXME.
 
         See Also
         --------
@@ -1522,6 +1457,110 @@ cdef class RandomState:
         """
         return cont(&self.rng_state, &random_exponential, size, self.lock, 1,
                     scale, 'scale', CONS_POSITIVE,
+                    0.0, '', CONS_NONE,
+                    0.0, '', CONS_NONE)
+
+    def standard_exponential(self, size=None):
+        """
+        standard_exponential(size=None)
+
+        Draw samples from the standard exponential distribution.
+
+        `standard_exponential` is identical to the exponential distribution
+        with a scale parameter of 1.
+
+        Parameters
+        ----------
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : float or ndarray
+            Drawn samples.
+
+        Examples
+        --------
+        Output a 3x8000 array:
+
+        >>> n = np.random.standard_exponential((3, 8000))
+
+        """
+        return cont(&self.rng_state, &random_standard_exponential, size, self.lock, 0,
+                    0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
+
+    def standard_gamma(self, shape, size=None):
+        """
+        standard_gamma(shape, size=None)
+
+        Draw samples from a standard Gamma distribution.
+
+        Samples are drawn from a Gamma distribution with specified parameters,
+        shape (sometimes designated "k") and scale=1.
+
+        Parameters
+        ----------
+        shape : float
+            Parameter, should be > 0.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+            The drawn samples.
+
+        See Also
+        --------
+        scipy.stats.distributions.gamma : probability density function,
+            distribution or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the Gamma distribution is
+
+        .. math:: p(x) = x^{k-1}\\frac{e^{-x/\\theta}}{\\theta^k\\Gamma(k)},
+
+        where :math:`k` is the shape and :math:`\\theta` the scale,
+        and :math:`\\Gamma` is the Gamma function.
+
+        The Gamma distribution is often used to model the times to failure of
+        electronic components, and arises naturally in processes for which the
+        waiting times between Poisson distributed events are relevant.
+
+        References
+        ----------
+        .. [1] Weisstein, Eric W. "Gamma Distribution." From MathWorld--A
+               Wolfram Web Resource.
+               http://mathworld.wolfram.com/GammaDistribution.html
+        .. [2] Wikipedia, "Gamma-distribution",
+               http://en.wikipedia.org/wiki/Gamma-distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> shape, scale = 2., 1. # mean and width
+        >>> s = np.random.standard_gamma(shape, 1000000)
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> import scipy.special as sps
+        >>> count, bins, ignored = plt.hist(s, 50, normed=True)
+        >>> y = bins**(shape-1) * ((np.exp(-bins/scale))/ \\
+        ...                       (sps.gamma(shape) * scale**shape))
+        >>> plt.plot(bins, y, linewidth=2, color='r')
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_standard_gamma, size, self.lock, 1,
+                    shape, 'shape', CONS_POSITIVE,
                     0.0, '', CONS_NONE,
                     0.0, '', CONS_NONE)
 
@@ -1905,6 +1944,162 @@ cdef class RandomState:
                     nonc, 'nonc', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE)
 
+    def standard_cauchy(self, size=None):
+        """
+        standard_cauchy(size=None)
+
+        Draw samples from a standard Cauchy distribution with mode = 0.
+
+        Also known as the Lorentz distribution.
+
+        Parameters
+        ----------
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+            The drawn samples.
+
+        Notes
+        -----
+        The probability density function for the full Cauchy distribution is
+
+        .. math:: P(x; x_0, \\gamma) = \\frac{1}{\\pi \\gamma \\bigl[ 1+
+                  (\\frac{x-x_0}{\\gamma})^2 \\bigr] }
+
+        and the Standard Cauchy distribution just sets :math:`x_0=0` and
+        :math:`\\gamma=1`
+
+        The Cauchy distribution arises in the solution to the driven harmonic
+        oscillator problem, and also describes spectral line broadening. It
+        also describes the distribution of values at which a line tilted at
+        a random angle will cut the x axis.
+
+        When studying hypothesis tests that assume normality, seeing how the
+        tests perform on data from a Cauchy distribution is a good indicator of
+        their sensitivity to a heavy-tailed distribution, since the Cauchy looks
+        very much like a Gaussian distribution, but with heavier tails.
+
+        References
+        ----------
+        .. [1] NIST/SEMATECH e-Handbook of Statistical Methods, "Cauchy
+              Distribution",
+              http://www.itl.nist.gov/div898/handbook/eda/section3/eda3663.htm
+        .. [2] Weisstein, Eric W. "Cauchy Distribution." From MathWorld--A
+              Wolfram Web Resource.
+              http://mathworld.wolfram.com/CauchyDistribution.html
+        .. [3] Wikipedia, "Cauchy distribution"
+              http://en.wikipedia.org/wiki/Cauchy_distribution
+
+        Examples
+        --------
+        Draw samples and plot the distribution:
+
+        >>> s = np.random.standard_cauchy(1000000)
+        >>> s = s[(s>-25) & (s<25)]  # truncate distribution so it plots well
+        >>> plt.hist(s, bins=100)
+        >>> plt.show()
+
+        """
+        return cont(&self.rng_state, &random_standard_cauchy, size, self.lock, 0,
+                    0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
+
+    def standard_t(self, df, size=None):
+        """
+        standard_t(df, size=None)
+
+        Draw samples from a standard Student's t distribution with `df` degrees
+        of freedom.
+
+        A special case of the hyperbolic distribution.  As `df` gets
+        large, the result resembles that of the standard normal
+        distribution (`standard_normal`).
+
+        Parameters
+        ----------
+        df : int
+            Degrees of freedom, should be > 0.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+            Drawn samples.
+
+        Notes
+        -----
+        The probability density function for the t distribution is
+
+        .. math:: P(x, df) = \\frac{\\Gamma(\\frac{df+1}{2})}{\\sqrt{\\pi df}
+                  \\Gamma(\\frac{df}{2})}\\Bigl( 1+\\frac{x^2}{df} \\Bigr)^{-(df+1)/2}
+
+        The t test is based on an assumption that the data come from a
+        Normal distribution. The t test provides a way to test whether
+        the sample mean (that is the mean calculated from the data) is
+        a good estimate of the true mean.
+
+        The derivation of the t-distribution was first published in
+        1908 by William Gisset while working for the Guinness Brewery
+        in Dublin. Due to proprietary issues, he had to publish under
+        a pseudonym, and so he used the name Student.
+
+        References
+        ----------
+        .. [1] Dalgaard, Peter, "Introductory Statistics With R",
+               Springer, 2002.
+        .. [2] Wikipedia, "Student's t-distribution"
+               http://en.wikipedia.org/wiki/Student's_t-distribution
+
+        Examples
+        --------
+        From Dalgaard page 83 [1]_, suppose the daily energy intake for 11
+        women in Kj is:
+
+        >>> intake = np.array([5260., 5470, 5640, 6180, 6390, 6515, 6805, 7515, \\
+        ...                    7515, 8230, 8770])
+
+        Does their energy intake deviate systematically from the recommended
+        value of 7725 kJ?
+
+        We have 10 degrees of freedom, so is the sample mean within 95% of the
+        recommended value?
+
+        >>> s = np.random.standard_t(10, size=100000)
+        >>> np.mean(intake)
+        6753.636363636364
+        >>> intake.std(ddof=1)
+        1142.1232221373727
+
+        Calculate the t statistic, setting the ddof parameter to the unbiased
+        value so the divisor in the standard deviation will be degrees of
+        freedom, N-1.
+
+        >>> t = (np.mean(intake)-7725)/(intake.std(ddof=1)/np.sqrt(len(intake)))
+        >>> import matplotlib.pyplot as plt
+        >>> h = plt.hist(s, bins=100, normed=True)
+
+        For a one-sided t-test, how far out in the distribution does the t
+        statistic appear?
+
+        >>> np.sum(s<t) / float(len(s))
+        0.0090699999999999999  #random
+
+        So the p-value is about 0.009, which says the null hypothesis has a
+        probability of about 99% of being true.
+
+        """
+        return cont(&self.rng_state, &random_standard_t, size, self.lock, 1,
+                    df, 'df', CONS_POSITIVE,
+                    0, '', CONS_NONE,
+                    0, '', CONS_NONE)
+
     def vonmises(self, mu, kappa, size=None):
         """
         vonmises(mu, kappa, size=None)
@@ -1986,8 +2181,6 @@ cdef class RandomState:
                     mu, 'mu', CONS_NONE,
                     kappa, 'kappa', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE)
-
-
 
     def pareto(self, a, size=None):
         """
@@ -2550,7 +2743,6 @@ cdef class RandomState:
                     scale, 'scale', CONS_POSITIVE,
                     0.0, '', CONS_NONE)
 
-
     def lognormal(self, mean=0.0, sigma=1.0, size=None):
         """
         lognormal(mean=0.0, sigma=1.0, size=None)
@@ -2659,7 +2851,6 @@ cdef class RandomState:
                     mean, 'mean', CONS_NONE,
                     sigma, 'sigma', CONS_POSITIVE,
                     0.0, '', CONS_NONE)
-
 
     def rayleigh(self, scale=1.0, size=None):
         """
@@ -2789,99 +2980,193 @@ cdef class RandomState:
                     scale, 'scale', CONS_POSITIVE,
                     0.0, '', CONS_NONE)
 
-    def randint(self, low, high=None, size=None, dtype='l'):
+    def triangular(self, left, mode, right, size=None):
         """
-        randint(low, high=None, size=None, dtype='l')
+        triangular(left, mode, right, size=None)
 
-        Return random integers from `low` (inclusive) to `high` (exclusive).
+        Draw samples from the triangular distribution.
 
-        Return random integers from the "discrete uniform" distribution of
-        the specified dtype in the "half-open" interval [`low`, `high`). If
-        `high` is None (the default), then results are from [0, `low`).
+        The triangular distribution is a continuous probability
+        distribution with lower limit left, peak at mode, and upper
+        limit right. Unlike the other distributions, these parameters
+        directly define the shape of the pdf.
 
         Parameters
         ----------
-        low : int
-            Lowest (signed) integer to be drawn from the distribution (unless
-            ``high=None``, in which case this parameter is the *highest* such
-            integer).
-        high : int, optional
-            If provided, one above the largest (signed) integer to be drawn
-            from the distribution (see above for behavior if ``high=None``).
+        left : scalar
+            Lower limit.
+        mode : scalar
+            The value where the peak of the distribution occurs.
+            The value should fulfill the condition ``left <= mode <= right``.
+        right : scalar
+            Upper limit, should be larger than `left`.
         size : int or tuple of ints, optional
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
-        dtype : dtype, optional
-            Desired dtype of the result. All dtypes are determined by their
-            name, i.e., 'int64', 'int', etc, so byteorder is not available
-            and a specific precision may have different C types depending
-            on the platform. The default value is 'l' (C long).
-
-            .. versionadded:: 1.11.0
 
         Returns
         -------
-        out : int or ndarray of ints
-            `size`-shaped array of random integers from the appropriate
-            distribution, or a single such random int if `size` not provided.
+        samples : ndarray or scalar
+            The returned samples all lie in the interval [left, right].
 
-        See Also
-        --------
-        random.random_integers : similar to `randint`, only for the closed
-            interval [`low`, `high`], and 1 is the lowest value if `high` is
-            omitted. In particular, this other one is the one to use to generate
-            uniformly distributed discrete non-integers.
+        Notes
+        -----
+        The probability density function for the triangular distribution is
+
+        .. math:: P(x;l, m, r) = \\begin{cases}
+                  \\frac{2(x-l)}{(r-l)(m-l)}& \\text{for $l \\leq x \\leq m$},\\\\
+                  \\frac{2(r-x)}{(r-l)(r-m)}& \\text{for $m \\leq x \\leq r$},\\\\
+                  0& \\text{otherwise}.
+                  \\end{cases}
+
+        The triangular distribution is often used in ill-defined
+        problems where the underlying distribution is not known, but
+        some knowledge of the limits and mode exists. Often it is used
+        in simulations.
+
+        References
+        ----------
+        .. [1] Wikipedia, "Triangular distribution"
+               http://en.wikipedia.org/wiki/Triangular_distribution
 
         Examples
         --------
-        >>> np.random.randint(2, size=10)
-        array([1, 0, 0, 0, 1, 1, 0, 0, 1, 0])
-        >>> np.random.randint(1, size=10)
-        array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        Draw values from the distribution and plot the histogram:
 
-        Generate a 2 x 4 array of ints between 0 and 4, inclusive:
-
-        >>> np.random.randint(5, size=(2, 4))
-        array([[4, 0, 2, 1],
-               [3, 2, 2, 0]])
+        >>> import matplotlib.pyplot as plt
+        >>> h = plt.hist(np.random.triangular(-3, 0, 8, 100000), bins=200,
+        ...              normed=True)
+        >>> plt.show()
 
         """
-        if high is None:
-            high = low
-            low = 0
+        cdef bint is_scalar = True
+        cdef double fleft, fmode, fright
+        cdef np.ndarray oleft, omode, oright
 
-        key = np.dtype(dtype).name
-        if not key in _randint_type:
-            raise TypeError('Unsupported dtype "%s" for randint' % key)
-        lowbnd, highbnd = _randint_type[key]
+        fleft = PyFloat_AsDouble(left)
+        fright = PyFloat_AsDouble(right)
+        fmode = PyFloat_AsDouble(mode)
+        if fleft == -1.0 or fright == -1.0 or fmode == -1.0:
+            if PyErr_Occurred():
+                PyErr_Clear()
+                is_scalar = False
 
-        if low < lowbnd:
-            raise ValueError("low is out of bounds for %s" % (key,))
-        if high > highbnd:
-            raise ValueError("high is out of bounds for %s" % (key,))
-        if low >= high:
-            raise ValueError("low >= high")
+        if is_scalar:
+            if fleft > fmode:
+                raise ValueError("left > mode")
+            if fmode > fright:
+                raise ValueError("mode > right")
+            if fleft == fright:
+                raise ValueError("left == right")
+            return cont(&self.rng_state, &random_triangular, size, self.lock, 3,
+                        fleft, '', CONS_NONE,
+                        fmode, '', CONS_NONE,
+                        fright, '', CONS_NONE)
 
-        if key == 'int32':
-            return _rand_int32(low, high - 1, size, &self.rng_state, self.lock)
-        elif key == 'int64':
-            return _rand_int64(low, high - 1, size, &self.rng_state, self.lock)
-        elif key == 'int16':
-            return _rand_int16(low, high - 1, size, &self.rng_state, self.lock)
-        elif key == 'int8':
-            return _rand_int8(low, high - 1, size, &self.rng_state, self.lock)
-        elif key == 'uint64':
-            return _rand_uint64(low, high - 1, size, &self.rng_state, self.lock)
-        elif key == 'uint32':
-            return _rand_uint32(low, high - 1, size, &self.rng_state, self.lock)
-        elif key == 'uint16':
-            return _rand_uint16(low, high - 1, size, &self.rng_state, self.lock)
-        elif key == 'uint8':
-            return _rand_uint8(low, high - 1, size, &self.rng_state, self.lock)
-        elif key == 'bool':
-            return _rand_bool(low, high - 1, size, &self.rng_state, self.lock)
+        oleft = <np.ndarray>np.PyArray_FROM_OTF(left, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        omode = <np.ndarray>np.PyArray_FROM_OTF(mode, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        oright = <np.ndarray>np.PyArray_FROM_OTF(right, np.NPY_DOUBLE, np.NPY_ALIGNED)
 
+        if np.any(np.greater(oleft, omode)):
+            raise ValueError("left > mode")
+        if np.any(np.greater(omode, oright)):
+            raise ValueError("mode > right")
+        if np.any(np.equal(oleft, oright)):
+            raise ValueError("left == right")
+
+        return cont_broadcast_3(&self.rng_state, &random_triangular, size, self.lock,
+                            oleft, '', CONS_NONE,
+                            omode, '', CONS_NONE,
+                            oright, '', CONS_NONE)
+
+    # Complicated, discrete distributions:
+    def binomial(self, n, p, size=None):
+        """
+        binomial(n, p, size=None)
+
+        Draw samples from a binomial distribution.
+
+        Samples are drawn from a binomial distribution with specified
+        parameters, n trials and p probability of success where
+        n an integer >= 0 and p is in the interval [0,1]. (n may be
+        input as a float, but it is truncated to an integer in use)
+
+        Parameters
+        ----------
+        n : float (but truncated to an integer)
+                parameter, >= 0.
+        p : float
+                parameter, >= 0 and <=1.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+                  where the values are all integers in  [0, n].
+
+        See Also
+        --------
+        scipy.stats.distributions.binom : probability density function,
+            distribution or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the binomial distribution is
+
+        .. math:: P(N) = \\binom{n}{N}p^N(1-p)^{n-N},
+
+        where :math:`n` is the number of trials, :math:`p` is the probability
+        of success, and :math:`N` is the number of successes.
+
+        When estimating the standard error of a proportion in a population by
+        using a random sample, the normal distribution works well unless the
+        product p*n <=5, where p = population proportion estimate, and n =
+        number of samples, in which case the binomial distribution is used
+        instead. For example, a sample of 15 people shows 4 who are left
+        handed, and 11 who are right handed. Then p = 4/15 = 27%. 0.27*15 = 4,
+        so the binomial distribution should be used in this case.
+
+        References
+        ----------
+        .. [1] Dalgaard, Peter, "Introductory Statistics with R",
+               Springer-Verlag, 2002.
+        .. [2] Glantz, Stanton A. "Primer of Biostatistics.", McGraw-Hill,
+               Fifth Edition, 2002.
+        .. [3] Lentner, Marvin, "Elementary Applied Statistics", Bogden
+               and Quigley, 1972.
+        .. [4] Weisstein, Eric W. "Binomial Distribution." From MathWorld--A
+               Wolfram Web Resource.
+               http://mathworld.wolfram.com/BinomialDistribution.html
+        .. [5] Wikipedia, "Binomial-distribution",
+               http://en.wikipedia.org/wiki/Binomial_distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> n, p = 10, .5  # number of trials, probability of each trial
+        >>> s = np.random.binomial(n, p, 1000)
+        # result of flipping a coin 10 times, tested 1000 times.
+
+        A real world example. A company drills 9 wild-cat oil exploration
+        wells, each with an estimated probability of success of 0.1. All nine
+        wells fail. What is the probability of that happening?
+
+        Let's do 20,000 trials of the model, and count the number that
+        generate zero positive results.
+
+        >>> sum(np.random.binomial(9, 0.1, 20000) == 0)/20000.
+        # answer = 0.38885, or 38%.
+
+        """
+        return disc(&self.rng_state, &random_binomial, size, self.lock, 1, 1,
+                    p, 'p', CONS_BOUNDED_0_1_NOTNAN,
+                    n, 'n', CONS_POSITIVE,
+                    0.0, '', CONS_NONE)
 
     def negative_binomial(self, n, p, size=None):
         """
@@ -2954,27 +3239,20 @@ cdef class RandomState:
                         p, 'p', CONS_BOUNDED_0_1,
                         0.0, '', CONS_NONE)
 
-    def random_integers(self, low, high=None, size=None):
+    def poisson(self, lam=1.0, size=None):
         """
-        random_integers(low, high=None, size=None)
+        poisson(lam=1.0, size=None)
 
-        Random integers of type np.int between `low` and `high`, inclusive.
+        Draw samples from a Poisson distribution.
 
-        Return random integers of type np.int from the "discrete uniform"
-        distribution in the closed interval [`low`, `high`].  If `high` is
-        None (the default), then results are from [1, `low`]. The np.int
-        type translates to the C long type used by Python 2 for "short"
-        integers and its precision is platform dependent.
+        The Poisson distribution is the limit of the binomial distribution
+        for large N.
 
         Parameters
         ----------
-        low : int
-            Lowest (signed) integer to be drawn from the distribution (unless
-            ``high=None``, in which case this parameter is the *highest* such
-            integer).
-        high : int, optional
-            If provided, the largest (signed) integer to be drawn from the
-            distribution (see above for behavior if ``high=None``).
+        lam : float or sequence of float
+            Expectation of interval, should be >= 0. A sequence of expectation
+            intervals must be broadcastable over the requested size.
         size : int or tuple of ints, optional
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
@@ -2982,59 +3260,307 @@ cdef class RandomState:
 
         Returns
         -------
-        out : int or ndarray of ints
-            `size`-shaped array of random integers from the appropriate
-            distribution, or a single such random int if `size` not provided.
-
-        See Also
-        --------
-        random.randint : Similar to `random_integers`, only for the half-open
-            interval [`low`, `high`), and 0 is the lowest value if `high` is
-            omitted.
+        samples : ndarray or scalar
+            The drawn samples, of shape *size*, if it was provided.
 
         Notes
         -----
-        To sample from N evenly spaced floating-point numbers between a and b,
-        use::
+        The Poisson distribution
 
-          a + (b - a) * (np.random.random_integers(N) - 1) / (N - 1.)
+        .. math:: f(k; \\lambda)=\\frac{\\lambda^k e^{-\\lambda}}{k!}
+
+        For events with an expected separation :math:`\\lambda` the Poisson
+        distribution :math:`f(k; \\lambda)` describes the probability of
+        :math:`k` events occurring within the observed
+        interval :math:`\\lambda`.
+
+        Because the output is limited to the range of the C long type, a
+        ValueError is raised when `lam` is within 10 sigma of the maximum
+        representable value.
+
+        References
+        ----------
+        .. [1] Weisstein, Eric W. "Poisson Distribution."
+               From MathWorld--A Wolfram Web Resource.
+               http://mathworld.wolfram.com/PoissonDistribution.html
+        .. [2] Wikipedia, "Poisson distribution",
+               http://en.wikipedia.org/wiki/Poisson_distribution
 
         Examples
         --------
-        >>> np.random.random_integers(5)
-        4
-        >>> type(np.random.random_integers(5))
-        <type 'int'>
-        >>> np.random.random_integers(5, size=(3.,2.))
-        array([[5, 4],
-               [3, 3],
-               [4, 5]])
+        Draw samples from the distribution:
 
-        Choose five random numbers from the set of five evenly-spaced
-        numbers between 0 and 2.5, inclusive (*i.e.*, from the set
-        :math:`{0, 5/8, 10/8, 15/8, 20/8}`):
+        >>> import numpy as np
+        >>> s = np.random.poisson(5, 10000)
 
-        >>> 2.5 * (np.random.random_integers(5, size=(5,)) - 1) / 4.
-        array([ 0.625,  1.25 ,  0.625,  0.625,  2.5  ])
-
-        Roll two six sided dice 1000 times and sum the results:
-
-        >>> d1 = np.random.random_integers(1, 6, 1000)
-        >>> d2 = np.random.random_integers(1, 6, 1000)
-        >>> dsums = d1 + d2
-
-        Display results as a histogram:
+        Display histogram of the sample:
 
         >>> import matplotlib.pyplot as plt
-        >>> count, bins, ignored = plt.hist(dsums, 11, normed=True)
+        >>> count, bins, ignored = plt.hist(s, 14, normed=True)
+        >>> plt.show()
+
+        Draw each 100 values for lambda 100 and 500:
+
+        >>> s = np.random.poisson(lam=(100., 500.), size=(100, 2))
+
+        """
+        return disc(&self.rng_state, &random_poisson, size, self.lock, 1, 0,
+                        lam, 'lam', CONS_POISSON,
+                        0.0, '', CONS_NONE,
+                        0.0, '', CONS_NONE)
+
+    def zipf(self, a, size=None):
+        """
+        zipf(a, size=None)
+
+        Draw samples from a Zipf distribution.
+
+        Samples are drawn from a Zipf distribution with specified parameter
+        `a` > 1.
+
+        The Zipf distribution (also known as the zeta distribution) is a
+        continuous probability distribution that satisfies Zipf's law: the
+        frequency of an item is inversely proportional to its rank in a
+        frequency table.
+
+        Parameters
+        ----------
+        a : float > 1
+            Distribution parameter.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : scalar or ndarray
+            The returned samples are greater than or equal to one.
+
+        See Also
+        --------
+        scipy.stats.distributions.zipf : probability density function,
+            distribution, or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the Zipf distribution is
+
+        .. math:: p(x) = \\frac{x^{-a}}{\\zeta(a)},
+
+        where :math:`\\zeta` is the Riemann Zeta function.
+
+        It is named for the American linguist George Kingsley Zipf, who noted
+        that the frequency of any word in a sample of a language is inversely
+        proportional to its rank in the frequency table.
+
+        References
+        ----------
+        .. [1] Zipf, G. K., "Selected Studies of the Principle of Relative
+               Frequency in Language," Cambridge, MA: Harvard Univ. Press,
+               1932.
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> a = 2. # parameter
+        >>> s = np.random.zipf(a, 1000)
+
+        Display the histogram of the samples, along with
+        the probability density function:
+
+        >>> import matplotlib.pyplot as plt
+        >>> import scipy.special as sps
+        Truncate s values at 50 so plot is interesting
+        >>> count, bins, ignored = plt.hist(s[s<50], 50, normed=True)
+        >>> x = np.arange(1., 50.)
+        >>> y = x**(-a)/sps.zetac(a)
+        >>> plt.plot(x, y/max(y), linewidth=2, color='r')
         >>> plt.show()
 
         """
-        if high is None:
-            high = low
-            low = 1
+        return disc(&self.rng_state, &random_zipf, size, self.lock, 1, 0,
+                        a, 'a', CONS_GT_1,
+                        0.0, '', CONS_NONE,
+                        0.0, '', CONS_NONE)
 
-        return self.randint(low, high + 1, size=size, dtype='l')
+    def geometric(self, p, size=None):
+        """
+        geometric(p, size=None)
+
+        Draw samples from the geometric distribution.
+
+        Bernoulli trials are experiments with one of two outcomes:
+        success or failure (an example of such an experiment is flipping
+        a coin).  The geometric distribution models the number of trials
+        that must be run in order to achieve success.  It is therefore
+        supported on the positive integers, ``k = 1, 2, ...``.
+
+        The probability mass function of the geometric distribution is
+
+        .. math:: f(k) = (1 - p)^{k - 1} p
+
+        where `p` is the probability of success of an individual trial.
+
+        Parameters
+        ----------
+        p : float
+            The probability of success of an individual trial.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        out : ndarray
+            Samples from the geometric distribution, shaped according to
+            `size`.
+
+        Examples
+        --------
+        Draw ten thousand values from the geometric distribution,
+        with the probability of an individual success equal to 0.35:
+
+        >>> z = np.random.geometric(p=0.35, size=10000)
+
+        How many trials succeeded after a single run?
+
+        >>> (z == 1).sum() / 10000.
+        0.34889999999999999 #random
+
+        """
+
+        return disc(&self.rng_state, &random_geometric, size, self.lock, 1, 0,
+                        p, 'p', CONS_BOUNDED_0_1,
+                        0.0, '', CONS_NONE,
+                        0.0, '', CONS_NONE)
+
+    def hypergeometric(self, ngood, nbad, nsample, size=None):
+        """
+        hypergeometric(ngood, nbad, nsample, size=None)
+
+        Draw samples from a Hypergeometric distribution.
+
+        Samples are drawn from a hypergeometric distribution with specified
+        parameters, ngood (ways to make a good selection), nbad (ways to make
+        a bad selection), and nsample = number of items sampled, which is less
+        than or equal to the sum ngood + nbad.
+
+        Parameters
+        ----------
+        ngood : int or array_like
+            Number of ways to make a good selection.  Must be nonnegative.
+        nbad : int or array_like
+            Number of ways to make a bad selection.  Must be nonnegative.
+        nsample : int or array_like
+            Number of items sampled.  Must be at least 1 and at most
+            ``ngood + nbad``.
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray or scalar
+            The values are all integers in  [0, n].
+
+        See Also
+        --------
+        scipy.stats.distributions.hypergeom : probability density function,
+            distribution or cumulative density function, etc.
+
+        Notes
+        -----
+        The probability density for the Hypergeometric distribution is
+
+        .. math:: P(x) = \\frac{\\binom{m}{n}\\binom{N-m}{n-x}}{\\binom{N}{n}},
+
+        where :math:`0 \\le x \\le m` and :math:`n+m-N \\le x \\le n`
+
+        for P(x) the probability of x successes, n = ngood, m = nbad, and
+        N = number of samples.
+
+        Consider an urn with black and white marbles in it, ngood of them
+        black and nbad are white. If you draw nsample balls without
+        replacement, then the hypergeometric distribution describes the
+        distribution of black balls in the drawn sample.
+
+        Note that this distribution is very similar to the binomial
+        distribution, except that in this case, samples are drawn without
+        replacement, whereas in the Binomial case samples are drawn with
+        replacement (or the sample space is infinite). As the sample space
+        becomes large, this distribution approaches the binomial.
+
+        References
+        ----------
+        .. [1] Lentner, Marvin, "Elementary Applied Statistics", Bogden
+               and Quigley, 1972.
+        .. [2] Weisstein, Eric W. "Hypergeometric Distribution." From
+               MathWorld--A Wolfram Web Resource.
+               http://mathworld.wolfram.com/HypergeometricDistribution.html
+        .. [3] Wikipedia, "Hypergeometric-distribution",
+               http://en.wikipedia.org/wiki/Hypergeometric_distribution
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> ngood, nbad, nsamp = 100, 2, 10
+        # number of good, number of bad, and number of samples
+        >>> s = np.random.hypergeometric(ngood, nbad, nsamp, 1000)
+        >>> hist(s)
+        #   note that it is very unlikely to grab both bad items
+
+        Suppose you have an urn with 15 white and 15 black marbles.
+        If you pull 15 marbles at random, how likely is it that
+        12 or more of them are one color?
+
+        >>> s = np.random.hypergeometric(15, 15, 15, 100000)
+        >>> sum(s>=12)/100000. + sum(s<=3)/100000.
+        #   answer = 0.003 ... pretty unlikely!
+
+        """
+        cdef bint is_scalar = True
+        cdef np.ndarray ongood, onbad, onsample
+        cdef long lngood, lnbad, lnsample
+
+        lngood = PyInt_AsLong(ngood)
+        lnbad = PyInt_AsLong(nbad)
+        lnsample = PyInt_AsLong(nsample)
+        if lngood == -1 or lnbad == -1 or lnsample == -1:
+            if PyErr_Occurred():
+                PyErr_Clear()
+                is_scalar = False
+
+        if is_scalar:
+            if lngood < 0:
+                raise ValueError("ngood < 0")
+            if lnbad < 0:
+                raise ValueError("nbad < 0")
+            if lnsample < 1:
+                raise ValueError("nsample < 1")
+            if lngood + lnbad < lnsample:
+                raise ValueError("ngood + nbad < nsample")
+            return disc(&self.rng_state, &random_hypergeometric, size, self.lock, 0, 3,
+                        lngood, 'ngood', CONS_NON_NEGATIVE,
+                        lnbad, 'nbad', CONS_NON_NEGATIVE,
+                        lnsample, 'nsample', CONS_GTE_1)
+
+        PyErr_Clear()
+
+        ongood = <np.ndarray>np.PyArray_FROM_OTF(ngood, np.NPY_LONG, np.NPY_ALIGNED)
+        onbad = <np.ndarray>np.PyArray_FROM_OTF(nbad, np.NPY_LONG, np.NPY_ALIGNED)
+        onsample = <np.ndarray>np.PyArray_FROM_OTF(nsample, np.NPY_LONG, np.NPY_ALIGNED)
+
+        if np.any(np.less(np.add(ongood, onbad),onsample)):
+            raise ValueError("ngood + nbad < nsample")
+        return discrete_broadcast_iii(&self.rng_state, &random_hypergeometric, size, self.lock,
+                                      ongood, 'ngood', CONS_NON_NEGATIVE,
+                                      onbad, nbad, CONS_NON_NEGATIVE,
+                                      onsample, 'nsample', CONS_GTE_1)
 
     def logseries(self, p, size=None):
         """
@@ -3116,447 +3642,7 @@ cdef class RandomState:
                  0.0, '', CONS_NONE,
                  0.0, '', CONS_NONE)
 
-
-    def geometric(self, p, size=None):
-        """
-        geometric(p, size=None)
-
-        Draw samples from the geometric distribution.
-
-        Bernoulli trials are experiments with one of two outcomes:
-        success or failure (an example of such an experiment is flipping
-        a coin).  The geometric distribution models the number of trials
-        that must be run in order to achieve success.  It is therefore
-        supported on the positive integers, ``k = 1, 2, ...``.
-
-        The probability mass function of the geometric distribution is
-
-        .. math:: f(k) = (1 - p)^{k - 1} p
-
-        where `p` is the probability of success of an individual trial.
-
-        Parameters
-        ----------
-        p : float
-            The probability of success of an individual trial.
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-
-        Returns
-        -------
-        out : ndarray
-            Samples from the geometric distribution, shaped according to
-            `size`.
-
-        Examples
-        --------
-        Draw ten thousand values from the geometric distribution,
-        with the probability of an individual success equal to 0.35:
-
-        >>> z = np.random.geometric(p=0.35, size=10000)
-
-        How many trials succeeded after a single run?
-
-        >>> (z == 1).sum() / 10000.
-        0.34889999999999999 #random
-
-        """
-
-        return disc(&self.rng_state, &random_geometric, size, self.lock, 1, 0,
-                        p, 'p', CONS_BOUNDED_0_1,
-                        0.0, '', CONS_NONE,
-                        0.0, '', CONS_NONE)
-
-
-    def zipf(self, a, size=None):
-        """
-        zipf(a, size=None)
-
-        Draw samples from a Zipf distribution.
-
-        Samples are drawn from a Zipf distribution with specified parameter
-        `a` > 1.
-
-        The Zipf distribution (also known as the zeta distribution) is a
-        continuous probability distribution that satisfies Zipf's law: the
-        frequency of an item is inversely proportional to its rank in a
-        frequency table.
-
-        Parameters
-        ----------
-        a : float > 1
-            Distribution parameter.
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-
-        Returns
-        -------
-        samples : scalar or ndarray
-            The returned samples are greater than or equal to one.
-
-        See Also
-        --------
-        scipy.stats.distributions.zipf : probability density function,
-            distribution, or cumulative density function, etc.
-
-        Notes
-        -----
-        The probability density for the Zipf distribution is
-
-        .. math:: p(x) = \\frac{x^{-a}}{\\zeta(a)},
-
-        where :math:`\\zeta` is the Riemann Zeta function.
-
-        It is named for the American linguist George Kingsley Zipf, who noted
-        that the frequency of any word in a sample of a language is inversely
-        proportional to its rank in the frequency table.
-
-        References
-        ----------
-        .. [1] Zipf, G. K., "Selected Studies of the Principle of Relative
-               Frequency in Language," Cambridge, MA: Harvard Univ. Press,
-               1932.
-
-        Examples
-        --------
-        Draw samples from the distribution:
-
-        >>> a = 2. # parameter
-        >>> s = np.random.zipf(a, 1000)
-
-        Display the histogram of the samples, along with
-        the probability density function:
-
-        >>> import matplotlib.pyplot as plt
-        >>> import scipy.special as sps
-        Truncate s values at 50 so plot is interesting
-        >>> count, bins, ignored = plt.hist(s[s<50], 50, normed=True)
-        >>> x = np.arange(1., 50.)
-        >>> y = x**(-a)/sps.zetac(a)
-        >>> plt.plot(x, y/max(y), linewidth=2, color='r')
-        >>> plt.show()
-
-        """
-        return disc(&self.rng_state, &random_zipf, size, self.lock, 1, 0,
-                        a, 'a', CONS_GT_1,
-                        0.0, '', CONS_NONE,
-                        0.0, '', CONS_NONE)
-
-
-    def poisson(self, lam=1.0, size=None):
-        """
-        poisson(lam=1.0, size=None)
-
-        Draw samples from a Poisson distribution.
-
-        The Poisson distribution is the limit of the binomial distribution
-        for large N.
-
-        Parameters
-        ----------
-        lam : float or sequence of float
-            Expectation of interval, should be >= 0. A sequence of expectation
-            intervals must be broadcastable over the requested size.
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-
-        Returns
-        -------
-        samples : ndarray or scalar
-            The drawn samples, of shape *size*, if it was provided.
-
-        Notes
-        -----
-        The Poisson distribution
-
-        .. math:: f(k; \\lambda)=\\frac{\\lambda^k e^{-\\lambda}}{k!}
-
-        For events with an expected separation :math:`\\lambda` the Poisson
-        distribution :math:`f(k; \\lambda)` describes the probability of
-        :math:`k` events occurring within the observed
-        interval :math:`\\lambda`.
-
-        Because the output is limited to the range of the C long type, a
-        ValueError is raised when `lam` is within 10 sigma of the maximum
-        representable value.
-
-        References
-        ----------
-        .. [1] Weisstein, Eric W. "Poisson Distribution."
-               From MathWorld--A Wolfram Web Resource.
-               http://mathworld.wolfram.com/PoissonDistribution.html
-        .. [2] Wikipedia, "Poisson distribution",
-               http://en.wikipedia.org/wiki/Poisson_distribution
-
-        Examples
-        --------
-        Draw samples from the distribution:
-
-        >>> import numpy as np
-        >>> s = np.random.poisson(5, 10000)
-
-        Display histogram of the sample:
-
-        >>> import matplotlib.pyplot as plt
-        >>> count, bins, ignored = plt.hist(s, 14, normed=True)
-        >>> plt.show()
-
-        Draw each 100 values for lambda 100 and 500:
-
-        >>> s = np.random.poisson(lam=(100., 500.), size=(100, 2))
-
-        """
-        return disc(&self.rng_state, &random_poisson, size, self.lock, 1, 0,
-                        lam, 'lam', CONS_POISSON,
-                        0.0, '', CONS_NONE,
-                        0.0, '', CONS_NONE)
-
-    def dirichlet(self, object alpha, size=None):
-        """
-        dirichlet(alpha, size=None)
-
-        Draw samples from the Dirichlet distribution.
-
-        Draw `size` samples of dimension k from a Dirichlet distribution. A
-        Dirichlet-distributed random variable can be seen as a multivariate
-        generalization of a Beta distribution. Dirichlet pdf is the conjugate
-        prior of a multinomial in Bayesian inference.
-
-        Parameters
-        ----------
-        alpha : array
-            Parameter of the distribution (k dimension for sample of
-            dimension k).
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-
-        Returns
-        -------
-        samples : ndarray,
-            The drawn samples, of shape (size, alpha.ndim).
-
-        Notes
-        -----
-        .. math:: X \\approx \\prod_{i=1}^{k}{x^{\\alpha_i-1}_i}
-
-        Uses the following property for computation: for each dimension,
-        draw a random sample y_i from a standard gamma generator of shape
-        `alpha_i`, then
-        :math:`X = \\frac{1}{\\sum_{i=1}^k{y_i}} (y_1, \\ldots, y_n)` is
-        Dirichlet distributed.
-
-        References
-        ----------
-        .. [1] David McKay, "Information Theory, Inference and Learning
-               Algorithms," chapter 23,
-               http://www.inference.phy.cam.ac.uk/mackay/
-        .. [2] Wikipedia, "Dirichlet distribution",
-               http://en.wikipedia.org/wiki/Dirichlet_distribution
-
-        Examples
-        --------
-        Taking an example cited in Wikipedia, this distribution can be used if
-        one wanted to cut strings (each of initial length 1.0) into K pieces
-        with different lengths, where each piece had, on average, a designated
-        average length, but allowing some variation in the relative sizes of
-        the pieces.
-
-        >>> s = np.random.dirichlet((10, 5, 3), 20).transpose()
-
-        >>> plt.barh(range(20), s[0])
-        >>> plt.barh(range(20), s[1], left=s[0], color='g')
-        >>> plt.barh(range(20), s[2], left=s[0]+s[1], color='r')
-        >>> plt.title("Lengths of Strings")
-
-        """
-
-        #=================
-        # Pure python algo
-        #=================
-        #alpha   = N.atleast_1d(alpha)
-        #k       = alpha.size
-
-        #if n == 1:
-        #    val = N.zeros(k)
-        #    for i in range(k):
-        #        val[i]   = sgamma(alpha[i], n)
-        #    val /= N.sum(val)
-        #else:
-        #    val = N.zeros((k, n))
-        #    for i in range(k):
-        #        val[i]   = sgamma(alpha[i], n)
-        #    val /= N.sum(val, axis = 0)
-        #    val = val.T
-
-        #return val
-
-        cdef np.npy_intp   k
-        cdef np.npy_intp   totsize
-        cdef np.ndarray    alpha_arr, val_arr
-        cdef double     *alpha_data
-        cdef double     *val_data
-        cdef np.npy_intp   i, j
-        cdef double     acc, invacc
-
-        k           = len(alpha)
-        alpha_arr   = <np.ndarray>np.PyArray_FROM_OTF(alpha, np.NPY_DOUBLE, np.NPY_ALIGNED)
-        alpha_data  = <double*>np.PyArray_DATA(alpha_arr)
-
-        if size is None:
-            shape = (k,)
-        else:
-            try:
-                shape = (operator.index(size), k)
-            except:
-                shape = tuple(size) + (k,)
-
-        diric   = np.zeros(shape, np.float64)
-        val_arr = <np.ndarray>diric
-        val_data= <double*>np.PyArray_DATA(val_arr)
-
-        i = 0
-        totsize = np.PyArray_SIZE(val_arr)
-        with self.lock, nogil:
-            while i < totsize:
-                acc = 0.0
-                for j in range(k):
-                    val_data[i+j] = random_standard_gamma(&self.rng_state, alpha_data[j])
-                    acc             = acc + val_data[i + j]
-                invacc  = 1/acc
-                for j in range(k):
-                    val_data[i + j]   = val_data[i + j] * invacc
-                i = i + k
-
-        return diric
-
-    def multinomial(self, np.npy_intp n, object pvals, size=None):
-        """
-        multinomial(n, pvals, size=None)
-
-        Draw samples from a multinomial distribution.
-
-        The multinomial distribution is a multivariate generalisation of the
-        binomial distribution.  Take an experiment with one of ``p``
-        possible outcomes.  An example of such an experiment is throwing a dice,
-        where the outcome can be 1 through 6.  Each sample drawn from the
-        distribution represents `n` such experiments.  Its values,
-        ``X_i = [X_0, X_1, ..., X_p]``, represent the number of times the
-        outcome was ``i``.
-
-        Parameters
-        ----------
-        n : int
-            Number of experiments.
-        pvals : sequence of floats, length p
-            Probabilities of each of the ``p`` different outcomes.  These
-            should sum to 1 (however, the last element is always assumed to
-            account for the remaining probability, as long as
-            ``sum(pvals[:-1]) <= 1)``.
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-
-        Returns
-        -------
-        out : ndarray
-            The drawn samples, of shape *size*, if that was provided.  If not,
-            the shape is ``(N,)``.
-
-            In other words, each entry ``out[i,j,...,:]`` is an N-dimensional
-            value drawn from the distribution.
-
-        Examples
-        --------
-        Throw a dice 20 times:
-
-        >>> np.random.multinomial(20, [1/6.]*6, size=1)
-        array([[4, 1, 7, 5, 2, 1]])
-
-        It landed 4 times on 1, once on 2, etc.
-
-        Now, throw the dice 20 times, and 20 times again:
-
-        >>> np.random.multinomial(20, [1/6.]*6, size=2)
-        array([[3, 4, 3, 3, 4, 3],
-               [2, 4, 3, 4, 0, 7]])
-
-        For the first run, we threw 3 times 1, 4 times 2, etc.  For the second,
-        we threw 2 times 1, 4 times 2, etc.
-
-        A loaded die is more likely to land on number 6:
-
-        >>> np.random.multinomial(100, [1/7.]*5 + [2/7.])
-        array([11, 16, 14, 17, 16, 26])
-
-        The probability inputs should be normalized. As an implementation
-        detail, the value of the last entry is ignored and assumed to take
-        up any leftover probability mass, but this should not be relied on.
-        A biased coin which has twice as much weight on one side as on the
-        other should be sampled like so:
-
-        >>> np.random.multinomial(100, [1.0 / 3, 2.0 / 3])  # RIGHT
-        array([38, 62])
-
-        not like:
-
-        >>> np.random.multinomial(100, [1.0, 2.0])  # WRONG
-        array([100,   0])
-
-        """
-        cdef np.npy_intp d
-        cdef np.ndarray parr "arrayObject_parr", mnarr "arrayObject_mnarr"
-        cdef double *pix
-        cdef long *mnix
-        cdef np.npy_intp i, j, dn, sz
-        cdef double Sum
-
-        d = len(pvals)
-        parr = <np.ndarray>np.PyArray_ContiguousFromObject(pvals, np.NPY_DOUBLE, 1, 1)
-        pix = <double*>np.PyArray_DATA(parr)
-
-        if kahan_sum(pix, d-1) > (1.0 + 1e-12):
-            raise ValueError("sum(pvals[:-1]) > 1.0")
-
-        if size is None:
-            shape = (d,)
-        else:
-            try:
-                shape = (operator.index(size), d)
-            except:
-                shape = tuple(size) + (d,)
-
-        multin = np.zeros(shape, dtype=np.int)
-        mnarr = <np.ndarray>multin
-        mnix = <long*>np.PyArray_DATA(mnarr)
-        sz = np.PyArray_SIZE(mnarr)
-
-        with self.lock, nogil:
-            i = 0
-            while i < sz:
-                Sum = 1.0
-                dn = n
-                for j in range(d-1):
-                    mnix[i+j] = random_binomial(&self.rng_state, pix[j]/Sum, dn)
-                    dn = dn - mnix[i+j]
-                    if dn <= 0:
-                        break
-                    Sum = Sum - pix[j]
-                if dn > 0:
-                    mnix[i+d-1] = dn
-                i = i + d
-
-        return multin
-
-
+    # Multivariate distributions:
     def multivariate_normal(self, mean, cov, size=None):
         """
         multivariate_normal(mean, cov[, size])
@@ -3706,26 +3792,29 @@ cdef class RandomState:
         x.shape = tuple(final_shape)
         return x
 
-    def triangular(self, left, mode, right, size=None):
+    def multinomial(self, np.npy_intp n, object pvals, size=None):
         """
-        triangular(left, mode, right, size=None)
+        multinomial(n, pvals, size=None)
 
-        Draw samples from the triangular distribution.
+        Draw samples from a multinomial distribution.
 
-        The triangular distribution is a continuous probability
-        distribution with lower limit left, peak at mode, and upper
-        limit right. Unlike the other distributions, these parameters
-        directly define the shape of the pdf.
+        The multinomial distribution is a multivariate generalisation of the
+        binomial distribution.  Take an experiment with one of ``p``
+        possible outcomes.  An example of such an experiment is throwing a dice,
+        where the outcome can be 1 through 6.  Each sample drawn from the
+        distribution represents `n` such experiments.  Its values,
+        ``X_i = [X_0, X_1, ..., X_p]``, represent the number of times the
+        outcome was ``i``.
 
         Parameters
         ----------
-        left : scalar
-            Lower limit.
-        mode : scalar
-            The value where the peak of the distribution occurs.
-            The value should fulfill the condition ``left <= mode <= right``.
-        right : scalar
-            Upper limit, should be larger than `left`.
+        n : int
+            Number of experiments.
+        pvals : sequence of floats, length p
+            Probabilities of each of the ``p`` different outcomes.  These
+            should sum to 1 (however, the last element is always assumed to
+            account for the remaining probability, as long as
+            ``sum(pvals[:-1]) <= 1)``.
         size : int or tuple of ints, optional
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
@@ -3733,387 +3822,320 @@ cdef class RandomState:
 
         Returns
         -------
-        samples : ndarray or scalar
-            The returned samples all lie in the interval [left, right].
+        out : ndarray
+            The drawn samples, of shape *size*, if that was provided.  If not,
+            the shape is ``(N,)``.
 
-        Notes
-        -----
-        The probability density function for the triangular distribution is
-
-        .. math:: P(x;l, m, r) = \\begin{cases}
-                  \\frac{2(x-l)}{(r-l)(m-l)}& \\text{for $l \\leq x \\leq m$},\\\\
-                  \\frac{2(r-x)}{(r-l)(r-m)}& \\text{for $m \\leq x \\leq r$},\\\\
-                  0& \\text{otherwise}.
-                  \\end{cases}
-
-        The triangular distribution is often used in ill-defined
-        problems where the underlying distribution is not known, but
-        some knowledge of the limits and mode exists. Often it is used
-        in simulations.
-
-        References
-        ----------
-        .. [1] Wikipedia, "Triangular distribution"
-               http://en.wikipedia.org/wiki/Triangular_distribution
+            In other words, each entry ``out[i,j,...,:]`` is an N-dimensional
+            value drawn from the distribution.
 
         Examples
         --------
-        Draw values from the distribution and plot the histogram:
+        Throw a dice 20 times:
 
-        >>> import matplotlib.pyplot as plt
-        >>> h = plt.hist(np.random.triangular(-3, 0, 8, 100000), bins=200,
-        ...              normed=True)
-        >>> plt.show()
+        >>> np.random.multinomial(20, [1/6.]*6, size=1)
+        array([[4, 1, 7, 5, 2, 1]])
 
-        """
-        cdef bint is_scalar = True
-        cdef double fleft, fmode, fright
-        cdef np.ndarray oleft, omode, oright
+        It landed 4 times on 1, once on 2, etc.
 
-        fleft = PyFloat_AsDouble(left)
-        fright = PyFloat_AsDouble(right)
-        fmode = PyFloat_AsDouble(mode)
-        if fleft == -1.0 or fright == -1.0 or fmode == -1.0:
-            if PyErr_Occurred():
-                PyErr_Clear()
-                is_scalar = False
+        Now, throw the dice 20 times, and 20 times again:
 
-        if is_scalar:
-            if fleft > fmode:
-                raise ValueError("left > mode")
-            if fmode > fright:
-                raise ValueError("mode > right")
-            if fleft == fright:
-                raise ValueError("left == right")
-            return cont(&self.rng_state, &random_triangular, size, self.lock, 3,
-                        fleft, '', CONS_NONE,
-                        fmode, '', CONS_NONE,
-                        fright, '', CONS_NONE)
+        >>> np.random.multinomial(20, [1/6.]*6, size=2)
+        array([[3, 4, 3, 3, 4, 3],
+               [2, 4, 3, 4, 0, 7]])
 
-        oleft = <np.ndarray>np.PyArray_FROM_OTF(left, np.NPY_DOUBLE, np.NPY_ALIGNED)
-        omode = <np.ndarray>np.PyArray_FROM_OTF(mode, np.NPY_DOUBLE, np.NPY_ALIGNED)
-        oright = <np.ndarray>np.PyArray_FROM_OTF(right, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        For the first run, we threw 3 times 1, 4 times 2, etc.  For the second,
+        we threw 2 times 1, 4 times 2, etc.
 
-        if np.any(np.greater(oleft, omode)):
-            raise ValueError("left > mode")
-        if np.any(np.greater(omode, oright)):
-            raise ValueError("mode > right")
-        if np.any(np.equal(oleft, oright)):
-            raise ValueError("left == right")
+        A loaded die is more likely to land on number 6:
 
-        return cont_broadcast_3(&self.rng_state, &random_triangular, size, self.lock,
-                            oleft, '', CONS_NONE,
-                            omode, '', CONS_NONE,
-                            oright, '', CONS_NONE)
+        >>> np.random.multinomial(100, [1/7.]*5 + [2/7.])
+        array([11, 16, 14, 17, 16, 26])
 
+        The probability inputs should be normalized. As an implementation
+        detail, the value of the last entry is ignored and assumed to take
+        up any leftover probability mass, but this should not be relied on.
+        A biased coin which has twice as much weight on one side as on the
+        other should be sampled like so:
 
-    def hypergeometric(self, ngood, nbad, nsample, size=None):
-        """
-        hypergeometric(ngood, nbad, nsample, size=None)
+        >>> np.random.multinomial(100, [1.0 / 3, 2.0 / 3])  # RIGHT
+        array([38, 62])
 
-        Draw samples from a Hypergeometric distribution.
+        not like:
 
-        Samples are drawn from a hypergeometric distribution with specified
-        parameters, ngood (ways to make a good selection), nbad (ways to make
-        a bad selection), and nsample = number of items sampled, which is less
-        than or equal to the sum ngood + nbad.
-
-        Parameters
-        ----------
-        ngood : int or array_like
-            Number of ways to make a good selection.  Must be nonnegative.
-        nbad : int or array_like
-            Number of ways to make a bad selection.  Must be nonnegative.
-        nsample : int or array_like
-            Number of items sampled.  Must be at least 1 and at most
-            ``ngood + nbad``.
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-
-        Returns
-        -------
-        samples : ndarray or scalar
-            The values are all integers in  [0, n].
-
-        See Also
-        --------
-        scipy.stats.distributions.hypergeom : probability density function,
-            distribution or cumulative density function, etc.
-
-        Notes
-        -----
-        The probability density for the Hypergeometric distribution is
-
-        .. math:: P(x) = \\frac{\\binom{m}{n}\\binom{N-m}{n-x}}{\\binom{N}{n}},
-
-        where :math:`0 \\le x \\le m` and :math:`n+m-N \\le x \\le n`
-
-        for P(x) the probability of x successes, n = ngood, m = nbad, and
-        N = number of samples.
-
-        Consider an urn with black and white marbles in it, ngood of them
-        black and nbad are white. If you draw nsample balls without
-        replacement, then the hypergeometric distribution describes the
-        distribution of black balls in the drawn sample.
-
-        Note that this distribution is very similar to the binomial
-        distribution, except that in this case, samples are drawn without
-        replacement, whereas in the Binomial case samples are drawn with
-        replacement (or the sample space is infinite). As the sample space
-        becomes large, this distribution approaches the binomial.
-
-        References
-        ----------
-        .. [1] Lentner, Marvin, "Elementary Applied Statistics", Bogden
-               and Quigley, 1972.
-        .. [2] Weisstein, Eric W. "Hypergeometric Distribution." From
-               MathWorld--A Wolfram Web Resource.
-               http://mathworld.wolfram.com/HypergeometricDistribution.html
-        .. [3] Wikipedia, "Hypergeometric-distribution",
-               http://en.wikipedia.org/wiki/Hypergeometric_distribution
-
-        Examples
-        --------
-        Draw samples from the distribution:
-
-        >>> ngood, nbad, nsamp = 100, 2, 10
-        # number of good, number of bad, and number of samples
-        >>> s = np.random.hypergeometric(ngood, nbad, nsamp, 1000)
-        >>> hist(s)
-        #   note that it is very unlikely to grab both bad items
-
-        Suppose you have an urn with 15 white and 15 black marbles.
-        If you pull 15 marbles at random, how likely is it that
-        12 or more of them are one color?
-
-        >>> s = np.random.hypergeometric(15, 15, 15, 100000)
-        >>> sum(s>=12)/100000. + sum(s<=3)/100000.
-        #   answer = 0.003 ... pretty unlikely!
+        >>> np.random.multinomial(100, [1.0, 2.0])  # WRONG
+        array([100,   0])
 
         """
-        cdef bint is_scalar = True
-        cdef np.ndarray ongood, onbad, onsample
-        cdef long lngood, lnbad, lnsample
+        cdef np.npy_intp d
+        cdef np.ndarray parr "arrayObject_parr", mnarr "arrayObject_mnarr"
+        cdef double *pix
+        cdef long *mnix
+        cdef np.npy_intp i, j, dn, sz
+        cdef double Sum
 
-        lngood = PyInt_AsLong(ngood)
-        lnbad = PyInt_AsLong(nbad)
-        lnsample = PyInt_AsLong(nsample)
-        if lngood == -1 or lnbad == -1 or lnsample == -1:
-            if PyErr_Occurred():
-                PyErr_Clear()
-                is_scalar = False
+        d = len(pvals)
+        parr = <np.ndarray>np.PyArray_ContiguousFromObject(pvals, np.NPY_DOUBLE, 1, 1)
+        pix = <double*>np.PyArray_DATA(parr)
 
-        if is_scalar:
-            if lngood < 0:
-                raise ValueError("ngood < 0")
-            if lnbad < 0:
-                raise ValueError("nbad < 0")
-            if lnsample < 1:
-                raise ValueError("nsample < 1")
-            if lngood + lnbad < lnsample:
-                raise ValueError("ngood + nbad < nsample")
-            return disc(&self.rng_state, &random_hypergeometric, size, self.lock, 0, 3,
-                        lngood, 'ngood', CONS_NON_NEGATIVE,
-                        lnbad, 'nbad', CONS_NON_NEGATIVE,
-                        lnsample, 'nsample', CONS_GTE_1)
+        if kahan_sum(pix, d-1) > (1.0 + 1e-12):
+            raise ValueError("sum(pvals[:-1]) > 1.0")
 
-        PyErr_Clear()
-
-        ongood = <np.ndarray>np.PyArray_FROM_OTF(ngood, np.NPY_LONG, np.NPY_ALIGNED)
-        onbad = <np.ndarray>np.PyArray_FROM_OTF(nbad, np.NPY_LONG, np.NPY_ALIGNED)
-        onsample = <np.ndarray>np.PyArray_FROM_OTF(nsample, np.NPY_LONG, np.NPY_ALIGNED)
-
-        if np.any(np.less(np.add(ongood, onbad),onsample)):
-            raise ValueError("ngood + nbad < nsample")
-        return discrete_broadcast_iii(&self.rng_state, &random_hypergeometric, size, self.lock,
-                                      ongood, 'ngood', CONS_NON_NEGATIVE,
-                                      onbad, nbad, CONS_NON_NEGATIVE,
-                                      onsample, 'nsample', CONS_GTE_1)
-
-
-    @cython.wraparound(True)
-    def choice(self, a, size=None, replace=True, p=None):
-        """
-        choice(a, size=None, replace=True, p=None)
-
-        Generates a random sample from a given 1-D array
-
-                .. versionadded:: 1.7.0
-
-        Parameters
-        -----------
-        a : 1-D array-like or int
-            If an ndarray, a random sample is generated from its elements.
-            If an int, the random sample is generated as if a was np.arange(n)
-        size : int or tuple of ints, optional
-            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-            ``m * n * k`` samples are drawn.  Default is None, in which case a
-            single value is returned.
-        replace : boolean, optional
-            Whether the sample is with or without replacement
-        p : 1-D array-like, optional
-            The probabilities associated with each entry in a.
-            If not given the sample assumes a uniform distribution over all
-            entries in a.
-
-        Returns
-        --------
-        samples : 1-D ndarray, shape (size,)
-            The generated random samples
-
-        Raises
-        -------
-        ValueError
-            If a is an int and less than zero, if a or p are not 1-dimensional,
-            if a is an array-like of size 0, if p is not a vector of
-            probabilities, if a and p have different lengths, or if
-            replace=False and the sample size is greater than the population
-            size
-
-        See Also
-        ---------
-        randint, shuffle, permutation
-
-        Examples
-        ---------
-        Generate a uniform random sample from np.arange(5) of size 3:
-
-        >>> np.random.choice(5, 3)
-        array([0, 3, 4])
-        >>> #This is equivalent to np.random.randint(0,5,3)
-
-        Generate a non-uniform random sample from np.arange(5) of size 3:
-
-        >>> np.random.choice(5, 3, p=[0.1, 0, 0.3, 0.6, 0])
-        array([3, 3, 0])
-
-        Generate a uniform random sample from np.arange(5) of size 3 without
-        replacement:
-
-        >>> np.random.choice(5, 3, replace=False)
-        array([3,1,0])
-        >>> #This is equivalent to np.random.permutation(np.arange(5))[:3]
-
-        Generate a non-uniform random sample from np.arange(5) of size
-        3 without replacement:
-
-        >>> np.random.choice(5, 3, replace=False, p=[0.1, 0, 0.3, 0.6, 0])
-        array([2, 3, 0])
-
-        Any of the above can be repeated with an arbitrary array-like
-        instead of just integers. For instance:
-
-        >>> aa_milne_arr = ['pooh', 'rabbit', 'piglet', 'Christopher']
-        >>> np.random.choice(aa_milne_arr, 5, p=[0.5, 0.1, 0.1, 0.3])
-        array(['pooh', 'pooh', 'pooh', 'Christopher', 'piglet'],
-              dtype='|S11')
-
-        """
-
-        # Format and Verify input
-        a = np.array(a, copy=False)
-        if a.ndim == 0:
+        if size is None:
+            shape = (d,)
+        else:
             try:
-                # __index__ must return an integer by python rules.
-                pop_size = operator.index(a.item())
-            except TypeError:
-                raise ValueError("a must be 1-dimensional or an integer")
-            if pop_size <= 0:
-                raise ValueError("a must be greater than 0")
-        elif a.ndim != 1:
-            raise ValueError("a must be 1-dimensional")
+                shape = (operator.index(size), d)
+            except:
+                shape = tuple(size) + (d,)
+
+        multin = np.zeros(shape, dtype=np.int)
+        mnarr = <np.ndarray>multin
+        mnix = <long*>np.PyArray_DATA(mnarr)
+        sz = np.PyArray_SIZE(mnarr)
+
+        with self.lock, nogil:
+            i = 0
+            while i < sz:
+                Sum = 1.0
+                dn = n
+                for j in range(d-1):
+                    mnix[i+j] = random_binomial(&self.rng_state, pix[j]/Sum, dn)
+                    dn = dn - mnix[i+j]
+                    if dn <= 0:
+                        break
+                    Sum = Sum - pix[j]
+                if dn > 0:
+                    mnix[i+d-1] = dn
+                i = i + d
+
+        return multin
+
+    def dirichlet(self, object alpha, size=None):
+        """
+        dirichlet(alpha, size=None)
+
+        Draw samples from the Dirichlet distribution.
+
+        Draw `size` samples of dimension k from a Dirichlet distribution. A
+        Dirichlet-distributed random variable can be seen as a multivariate
+        generalization of a Beta distribution. Dirichlet pdf is the conjugate
+        prior of a multinomial in Bayesian inference.
+
+        Parameters
+        ----------
+        alpha : array
+            Parameter of the distribution (k dimension for sample of
+            dimension k).
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+
+        Returns
+        -------
+        samples : ndarray,
+            The drawn samples, of shape (size, alpha.ndim).
+
+        Notes
+        -----
+        .. math:: X \\approx \\prod_{i=1}^{k}{x^{\\alpha_i-1}_i}
+
+        Uses the following property for computation: for each dimension,
+        draw a random sample y_i from a standard gamma generator of shape
+        `alpha_i`, then
+        :math:`X = \\frac{1}{\\sum_{i=1}^k{y_i}} (y_1, \\ldots, y_n)` is
+        Dirichlet distributed.
+
+        References
+        ----------
+        .. [1] David McKay, "Information Theory, Inference and Learning
+               Algorithms," chapter 23,
+               http://www.inference.phy.cam.ac.uk/mackay/
+        .. [2] Wikipedia, "Dirichlet distribution",
+               http://en.wikipedia.org/wiki/Dirichlet_distribution
+
+        Examples
+        --------
+        Taking an example cited in Wikipedia, this distribution can be used if
+        one wanted to cut strings (each of initial length 1.0) into K pieces
+        with different lengths, where each piece had, on average, a designated
+        average length, but allowing some variation in the relative sizes of
+        the pieces.
+
+        >>> s = np.random.dirichlet((10, 5, 3), 20).transpose()
+
+        >>> plt.barh(range(20), s[0])
+        >>> plt.barh(range(20), s[1], left=s[0], color='g')
+        >>> plt.barh(range(20), s[2], left=s[0]+s[1], color='r')
+        >>> plt.title("Lengths of Strings")
+
+        """
+
+        #=================
+        # Pure python algo
+        #=================
+        #alpha   = N.atleast_1d(alpha)
+        #k       = alpha.size
+
+        #if n == 1:
+        #    val = N.zeros(k)
+        #    for i in range(k):
+        #        val[i]   = sgamma(alpha[i], n)
+        #    val /= N.sum(val)
+        #else:
+        #    val = N.zeros((k, n))
+        #    for i in range(k):
+        #        val[i]   = sgamma(alpha[i], n)
+        #    val /= N.sum(val, axis = 0)
+        #    val = val.T
+
+        #return val
+
+        cdef np.npy_intp   k
+        cdef np.npy_intp   totsize
+        cdef np.ndarray    alpha_arr, val_arr
+        cdef double     *alpha_data
+        cdef double     *val_data
+        cdef np.npy_intp   i, j
+        cdef double     acc, invacc
+
+        k           = len(alpha)
+        alpha_arr   = <np.ndarray>np.PyArray_FROM_OTF(alpha, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        alpha_data  = <double*>np.PyArray_DATA(alpha_arr)
+
+        if size is None:
+            shape = (k,)
         else:
-            pop_size = a.shape[0]
-            if pop_size is 0:
-                raise ValueError("a must be non-empty")
+            try:
+                shape = (operator.index(size), k)
+            except:
+                shape = tuple(size) + (k,)
 
-        if p is not None:
-            d = len(p)
+        diric   = np.zeros(shape, np.float64)
+        val_arr = <np.ndarray>diric
+        val_data= <double*>np.PyArray_DATA(val_arr)
 
-            atol = np.sqrt(np.finfo(np.float64).eps)
-            if isinstance(p, np.ndarray):
-                if np.issubdtype(p.dtype, np.floating):
-                    atol = max(atol, np.sqrt(np.finfo(p.dtype).eps))
+        i = 0
+        totsize = np.PyArray_SIZE(val_arr)
+        with self.lock, nogil:
+            while i < totsize:
+                acc = 0.0
+                for j in range(k):
+                    val_data[i+j] = random_standard_gamma(&self.rng_state, alpha_data[j])
+                    acc             = acc + val_data[i + j]
+                invacc  = 1/acc
+                for j in range(k):
+                    val_data[i + j]   = val_data[i + j] * invacc
+                i = i + k
 
-            p = <np.ndarray>np.PyArray_FROM_OTF(p, np.NPY_DOUBLE, np.NPY_ALIGNED)
-            pix = <double*>np.PyArray_DATA(p)
+        return diric
 
-            if p.ndim != 1:
-                raise ValueError("p must be 1-dimensional")
-            if p.size != pop_size:
-                raise ValueError("a and p must have same size")
-            if np.logical_or.reduce(p < 0):
-                raise ValueError("probabilities are not non-negative")
-            if abs(kahan_sum(pix, d) - 1.) > atol:
-                raise ValueError("probabilities do not sum to 1")
+    # Shuffling and permutations:
+    def shuffle(self, object x):
+        """
+        shuffle(x)
 
-        shape = size
-        if shape is not None:
-            size = np.prod(shape, dtype=np.intp)
+        Modify a sequence in-place by shuffling its contents.
+
+        Parameters
+        ----------
+        x : array_like
+            The array or list to be shuffled.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        >>> arr = np.arange(10)
+        >>> np.random.shuffle(arr)
+        >>> arr
+        [1 7 5 2 9 4 3 6 0 8]
+
+        This function only shuffles the array along the first index of a
+        multi-dimensional array:
+
+        >>> arr = np.arange(9).reshape((3, 3))
+        >>> np.random.shuffle(arr)
+        >>> arr
+        array([[3, 4, 5],
+               [6, 7, 8],
+               [0, 1, 2]])
+
+        """
+        cdef Py_ssize_t i
+        cdef long j
+
+        i = len(x) - 1
+
+        # Logic adapted from random.shuffle()
+        if isinstance(x, np.ndarray) and \
+           (x.ndim > 1 or x.dtype.fields is not None):
+            # For a multi-dimensional ndarray, indexing returns a view onto
+            # each row. So we can't just use ordinary assignment to swap the
+            # rows; we need a bounce buffer.
+            buf = np.empty_like(x[0])
+            with self.lock:
+                while i > 0:
+                    j = random_interval(&self.rng_state, i)
+                    buf[...] = x[j]
+                    x[j] = x[i]
+                    x[i] = buf
+                    i = i - 1
         else:
-            size = 1
+            # For single-dimensional arrays, lists, and any other Python
+            # sequence types, indexing returns a real object that's
+            # independent of the array contents, so we can just swap directly.
+            with self.lock:
+                while i > 0:
+                    j = random_interval(&self.rng_state, i)
+                    x[i], x[j] = x[j], x[i]
+                    i = i - 1
 
-        # Actual sampling
-        if replace:
-            if p is not None:
-                cdf = p.cumsum()
-                cdf /= cdf[-1]
-                uniform_samples = self.random_sample(shape)
-                idx = cdf.searchsorted(uniform_samples, side='right')
-                idx = np.array(idx, copy=False) # searchsorted returns a scalar
-            else:
-                idx = self.randint(0, pop_size, size=shape)
+    def permutation(self, object x):
+        """
+        permutation(x)
+
+        Randomly permute a sequence, or return a permuted range.
+
+        If `x` is a multi-dimensional array, it is only shuffled along its
+        first index.
+
+        Parameters
+        ----------
+        x : int or array_like
+            If `x` is an integer, randomly permute ``np.arange(x)``.
+            If `x` is an array, make a copy and shuffle the elements
+            randomly.
+
+        Returns
+        -------
+        out : ndarray
+            Permuted sequence or array range.
+
+        Examples
+        --------
+        >>> np.random.permutation(10)
+        array([1, 7, 4, 3, 0, 9, 2, 5, 8, 6])
+
+        >>> np.random.permutation([1, 4, 9, 12, 15])
+        array([15,  1,  9,  4, 12])
+
+        >>> arr = np.arange(9).reshape((3, 3))
+        >>> np.random.permutation(arr)
+        array([[6, 7, 8],
+               [0, 1, 2],
+               [3, 4, 5]])
+
+        """
+        if isinstance(x, (int, long, np.integer)):
+            arr = np.arange(x)
         else:
-            if size > pop_size:
-                raise ValueError("Cannot take a larger sample than "
-                                 "population when 'replace=False'")
-
-            if p is not None:
-                if np.count_nonzero(p > 0) < size:
-                    raise ValueError("Fewer non-zero entries in p than size")
-                n_uniq = 0
-                p = p.copy()
-                found = np.zeros(shape, dtype=np.int)
-                flat_found = found.ravel()
-                while n_uniq < size:
-                    x = self.rand(size - n_uniq)
-                    if n_uniq > 0:
-                        p[flat_found[0:n_uniq]] = 0
-                    cdf = np.cumsum(p)
-                    cdf /= cdf[-1]
-                    new = cdf.searchsorted(x, side='right')
-                    _, unique_indices = np.unique(new, return_index=True)
-                    unique_indices.sort()
-                    new = new.take(unique_indices)
-                    flat_found[n_uniq:n_uniq + new.size] = new
-                    n_uniq += new.size
-                idx = found
-            else:
-                idx = self.permutation(pop_size)[:size]
-                if shape is not None:
-                    idx.shape = shape
-
-        if shape is None and isinstance(idx, np.ndarray):
-            # In most cases a scalar will have been made an array
-            idx = idx.item(0)
-
-        #Use samples as indices for a if a is array-like
-        if a.ndim == 0:
-            return idx
-
-        if shape is not None and idx.ndim == 0:
-            # If size == () then the user requested a 0-d array as opposed to
-            # a scalar object when size is None. However a[idx] is always a
-            # scalar and not an array. So this makes sure the result is an
-            # array, taking into account that np.array(item) may not work
-            # for object arrays.
-            res = np.empty((), dtype=a.dtype)
-            res[()] = a[idx]
-            return res
-
-        return a[idx]
+            arr = np.array(x)
+        self.shuffle(arr)
+        return arr
 
 _rand = RandomState()
 seed = _rand.seed

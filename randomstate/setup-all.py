@@ -124,7 +124,7 @@ for rng in rngs:
 for config in configs:
     write_config(config)
 
-    with open('core_rng.pyx', 'r') as original:
+    with open('interface.pyx', 'r') as original:
         with open(config['file_name'] + '.pyx', 'w') as mod:
             mod.writelines(original.read())
 
