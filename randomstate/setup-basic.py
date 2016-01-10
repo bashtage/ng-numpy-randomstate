@@ -18,7 +18,7 @@ with open('config.pxi', 'w') as config:
 
 pwd = getcwd()
 
-sources = [join(pwd, 'core_rng.pyx'),
+sources = [join(pwd, 'interface.pyx'),
            join(pwd, 'src', 'common', 'entropy.c'),
            join(pwd, 'distributions.c')]
 

@@ -135,7 +135,7 @@ extensions = []
 for config in configs:
     config_file_name = mod_dir + '/' + config['file_name'] + '-config.pxi'
     # Rewrite core_rng to replace generic #include "config.pxi"
-    with open(join(mod_dir, 'core_rng.pyx'), 'r') as original:
+    with open(join(mod_dir, 'interface.pyx'), 'r') as original:
         with open(join(mod_dir, config['file_name'] + '.pyx'), 'w') as mod:
             for line in original:
                 if line.strip() == 'include "config.pxi"':
