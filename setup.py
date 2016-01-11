@@ -51,8 +51,8 @@ for rng in rngs:
                join(mod_dir, 'src', 'common', 'entropy.c'),
                join(mod_dir, 'distributions.c')]
     include_dirs = [mod_dir] + [numpy.get_include()]
-    if os.name == 'nt' and sys.version_info < (3,5):
-        include_dirs += [join(mod_dir, 'src','common')]
+    if os.name == 'nt' and sys.version_info < (3, 5):
+        include_dirs += [join(mod_dir, 'src', 'common')]
 
     if rng == 'RNG_PCG32':
         sources += [join(mod_dir, 'src', 'pcg', 'pcg32.c')]
@@ -72,6 +72,10 @@ for rng in rngs:
             # Force emulated mode here
             defs += [('PCG_FORCE_EMULATED_128BIT_MATH', '1')]
             flags['PCG128_EMULATED'] = 1
+        else:
+            # TODO: This isn't really right - should test for this and only
+            # TODO: use this path if the compiler defines this. For now, an assumption.
+            defs += [('__SIZEOF_INT128__', '16')]
 
         include_dirs += [join(mod_dir, 'src', 'pcg')]
 

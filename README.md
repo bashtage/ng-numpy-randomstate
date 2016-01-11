@@ -2,8 +2,8 @@
 [![Build Status](https://travis-ci.org/bashtage/ng-numpy-randomstate.svg?branch=master)](https://travis-ci.org/bashtage/ng-numpy-randomstate)
 
 This is a library and generic interface for alternative random generators 
-in Python and Numpy. This modules includes a number core random number 
-generators in addition to the MT19937 that is included in NumPy. 
+in Python and Numpy. This modules includes a number of alternative random 
+number generators in addition to the MT19937 that is included in NumPy. 
 The RNGs include:
 
 * [MT19937](https://github.com/numpy/numpy/blob/master/numpy/random/mtrand/),
@@ -30,12 +30,7 @@ identical sequence of random numbers for a given seed.
   * Linux 32/64 bit, Python 2.6, 2.7, 3.3, 3.4, 3.5
   * PC-BSD (FreeBSD) 64-bit, Python 2.7
   * OSX  64-bit, Python 2.7
-  * Windows 32/64 bit, Python 3.5 **only**. Support for 2.6/7 and 3.3/4 should come 
-    eventually, although the compilers for these version of Python present some big challenges.
-* 32-bit (any OS) and all Windows versions do not support PCG-64 since there 
-is no support for unsigned 128-bit integers. This will likely be fixed 
-eventually using a limited implementation of this type where required See 
-[Issue 5](https://github.com/bashtage/ng-numpy-randomstate/issues/5).
+  * Windows 32/64 bit (only tested on Python 2.7 and 3.5, but should work on 3.3/3.4)
 * There is no documentation for the core RNGs.
 
 ## Plans
@@ -44,9 +39,7 @@ It is essentially complete.  There are a few rough edges that need to be smoothe
   * Document core RNG classes
   * Pickling support
   * Verify entropy based initialization is missing for some RNGs
-  * Integrate a patch for PCG-64 that allows 32-bit platforms/Windows to be supported
-  * Additional refactoring where possible
-  * Build on Windows 2.6/7 and 3.3/4
+  * Add direct access to the system cryptographic random number generator
   * Multiple stream support for MLFG and MRG32K3A
   * Creation of additional streams from a RandomState where supported (i.e. 
   a `next_stream()` method)
@@ -61,13 +54,13 @@ Building requires:
 **Note:** it might work with other versions but only tested with these 
 versions. 
 
-So far all development has been on Linux. It has been tested (in a limited 
-manner, mostly against crashes and build failures) on Linux 32 and 64-bit, 
-as well as OSX 10.10, PC-BSD 10.2 (should also work on Free BSD) and Windows 
-(Python 3.5).
+All development has been on 64-bit Linux, and it is regularly tested on 
+Travis-CI. The library is occasionally tested on Linux 32-bit,  OSX 10.10, 
+PC-BSD 10.2 (should also work on Free BSD) and Windows (Python 2.7/3.5, 
+both 32 and 64-bit).
 
 Basic tests are in place for all RNGs. The MT19937 is tested against NumPy's 
-implementation for identical results.  
+implementation for identical results. It also passes NumPy's test suite.
 
 ## Installing
 
