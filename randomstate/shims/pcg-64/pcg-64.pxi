@@ -4,7 +4,6 @@ DEF RNG_JUMPABLE = 0
 DEF RNG_STATE_LEN = 4
 DEF RNG_SEED=2
 DEF NORMAL_METHOD = 'zig'
-DEF PCG128_EMULATED = 0
 
 cdef extern from "inttypes.h":
     ctypedef unsigned long long __uint128_t

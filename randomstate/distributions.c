@@ -1418,7 +1418,7 @@ void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, in
 {
     uint16_t val, mask;
     int i;
-    uint32_t buf;
+    uint32_t buf = 0;
     int bcnt = 0;
 
     if (rng == 0) {
@@ -1455,7 +1455,7 @@ void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int c
 {
     uint8_t val, mask = rng;
     int i;
-    uint32_t buf;
+    uint32_t buf = 0;
     int bcnt = 0;
 
     if (rng == 0) {
@@ -1493,7 +1493,7 @@ void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int c
 void random_bool_fill(aug_state *state, int8_t off, int8_t rng, int cnt, int8_t *out)
 {
     int i;
-    uint32_t buf;
+    uint32_t buf = 0;
     int bcnt = 0;
 
     if (rng == 0) {
