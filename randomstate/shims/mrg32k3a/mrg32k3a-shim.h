@@ -58,7 +58,7 @@ inline void entropy_init(aug_state* state)
         for (i = 0; i<6; i++)
         {
             val = (i < 3) ? STATE_MAX_VALUE_1 : STATE_MAX_VALUE_2;
-            seeds[i] = (int64_t)((buf[i] < val) ? buf[i] : (buf[i] / 2) + 1);
+            seeds[i] = (int64_t)(buf[i] % val);
             all_zero = all_zero || (seeds[i] > 0);
         }
     }
