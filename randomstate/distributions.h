@@ -23,8 +23,6 @@ typedef int bool;
 #include "shims/pcg-64/pcg-64-shim.h"
 #elif defined(RANDOMKIT_RNG)
 #include "shims/random-kit/random-kit-shim.h"
-#elif defined(DUMMY_RNG)
-#include "shims/dummy/dummy-shim.h"
 #elif defined(XORSHIFT128_RNG)
 #include "shims/xorshift128/xorshift128-shim.h"
 #elif defined(XORSHIFT1024_RNG)
