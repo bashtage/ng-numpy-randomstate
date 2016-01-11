@@ -13,7 +13,6 @@ The RNGs include:
 * [PCG32](http://www.pcg-random.org/) and [PCG64](http:w//www.pcg-random.org/)
 * [MRG32K3A](http://simul.iro.umontreal.ca/rng)
 * A multiplicative lagged fibonacci generator (LFG(31, 1279, 861, *))
-* A dummy RNG  - repeats the same sequence of 20 values -- only for testing
 
 ## Rationale
 The main reason for this project is to include other PRNGs that support 

@@ -20,7 +20,7 @@ class WriteConfigExtension(Extension):
 mod_dir = './randomstate'
 configs = []
 
-rngs = ['RNG_DUMMY', 'RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64',
+rngs = ['RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64',
         'RNG_MT19937', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
 
 compile_rngs = rngs[:]
@@ -116,14 +116,6 @@ for rng in rngs:
         defs = [('MLFG_1279_861_RNG', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'mlfg_1279_861')]
-
-    elif rng == 'RNG_DUMMY':
-        sources += [join(mod_dir, 'src', 'dummy', 'dummy.c')]
-        sources += [join(mod_dir, 'shims', 'dummy', 'dummy-shim.c')]
-
-        defs = [('DUMMY_RNG', '1')]
-
-        include_dirs += [join(mod_dir, 'src', 'dummy')]
 
     config = {'file_name': file_name,
               'sources': sources,

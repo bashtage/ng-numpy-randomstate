@@ -6,7 +6,7 @@ from os.path import join
 import numpy
 from Cython.Build import cythonize
 
-rngs = ['RNG_DUMMY', 'RNG_PCG32', 'RNG_PCG64',
+rngs = ['RNG_PCG32', 'RNG_PCG64',
         'RNG_MT19937', 'RNG_XORSHIFT128',
         'RNG_XORSHIFT1024', 'RNG_MRG32K3A', 'RNG_MLFG_1279_861']
 
