@@ -24,8 +24,8 @@ def uniform_from_uint(x, bits):
         return uniform_from_uint64(x)
     elif bits == 32:
         return uniform_from_uint32(x)
-    elif bits == 31:
-        return uniform_from_uint32(x)
+    elif bits == 63:
+        return uniform_from_uint64(x)
 
 
 def uniform_from_uint64(x):
@@ -43,11 +43,11 @@ def uniform_from_uint32(x):
     return out
 
 
-def uint32_from_uint31(x):
-    out = np.empty(len(x) // 2, dtype=np.uint32)
+def uint64_from_uint63(x):
+    out = np.empty(len(x) // 2, dtype=np.uint64)
     for i in range(0, len(x), 2):
-        a = x[i] & 0xffff0000
-        b = x[i + 1] >> 16
+        a = x[i] & np.uint64(0xffffffff00000000)
+        b = x[i + 1] >> np.uint64(32)
         out[i // 2] = a | b
     return out
 
@@ -188,18 +188,18 @@ class TestMLFG(Base, TestCase):
     @classmethod
     def setUpClass(cls):
         cls.RandomState = mlfg_1279_861.RandomState
-        cls.bits = 32
-        cls.dtype = np.uint32
+        cls.bits = 64
+        cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/mlfg-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/mlfg-testset-2.csv'))
 
     def test_raw(self):
         rs = self.RandomState(*self.data1['seed'])
-        vals = uint32_from_uint31(self.data1['data'])
+        vals = uint64_from_uint63(self.data1['data'])
         uints = rs.random_uintegers(len(vals), bits=self.bits)
         assert_equal(uints, vals)
 
         rs = self.RandomState(*self.data2['seed'])
-        vals = uint32_from_uint31(self.data2['data'])
+        vals = uint64_from_uint63(self.data2['data'])
         uints = rs.random_uintegers(len(vals), bits=self.bits)
         assert_equal(uints, vals)
