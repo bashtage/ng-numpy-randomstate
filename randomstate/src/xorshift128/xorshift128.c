@@ -6,7 +6,8 @@ extern inline uint64_t xorshift128_next(xorshift128_state* state);
 void xorshift128_jump(xorshift128_state* state) {
     static const uint64_t JUMP[] = { 0x8a5cd789635d2dffULL, 0x121fd2155c472f96ULL };
 
-    int i, b;
+    size_t i;
+    uint64_t b;
     uint64_t s0 = 0;
     uint64_t s1 = 0;
     for(i = 0; i < sizeof JUMP / sizeof *JUMP; i++)

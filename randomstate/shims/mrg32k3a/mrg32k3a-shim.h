@@ -50,14 +50,15 @@ inline void entropy_init(aug_state* state)
 {
     uint32_t buf[6] = { 0 };
     int64_t seeds[6];
-    int i, val, all_zero = 0;
+    uint32_t i, val;
+    int all_zero = 0;
     while (!all_zero)
     {
         entropy_fill((void*) buf, sizeof(buf));
-        for (i=0; i<6; i++)
+        for (i = 0; i<6; i++)
         {
             val = (i < 3) ? STATE_MAX_VALUE_1 : STATE_MAX_VALUE_2;
-            seeds[i] = (int64_t)((buf[i] < val) ? buf[i] : val);
+            seeds[i] = (int64_t)((buf[i] < val) ? buf[i] : (buf[i] / 2) + 1);
             all_zero = all_zero || (seeds[i] > 0);
         }
     }

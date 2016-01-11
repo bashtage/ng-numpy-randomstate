@@ -13,7 +13,8 @@ void xorshift1024_jump(xorshift1024_state* state) {
                                      0x691548c86c1bd540ULL, 0x7910c41d10a1e6a5ULL, 0x0b5fc64563b3e2a8ULL,
                                      0x047f7684e9fc949dULL, 0xb99181f2d8f685caULL, 0x284600e3f30e38c3ULL
                                    };
-    int i, b, j;
+    size_t i, j;
+    uint64_t b;
     uint64_t t[16] = { 0 };
     for(i = 0; i < sizeof JUMP / sizeof *JUMP; i++)
         for(b = 0; b < 64; b++) {

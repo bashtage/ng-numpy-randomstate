@@ -83,8 +83,8 @@ bool entropy_getbytes(void* dest, size_t size)
     int fd = open("/dev/urandom", O_RDONLY);
     if (fd < 0)
         return false;
-    int sz = read(fd, dest, size);
-    if (sz < size)
+    ssize_t sz = read(fd, dest, size);
+    if ((sz < 0) || ((size_t)sz < size))
         return false;
     return close(fd) == 0;
 }

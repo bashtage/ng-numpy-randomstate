@@ -54,8 +54,8 @@ RandomState(seed=None)
 
 Container for the Mersenne Twister pseudo-random number generator.
 
-`RandomState` exposes a number of methods for generating random numbers
-drawn from a variety of probability distributions. In addition to the
+`mt19937.RandomState` exposes a number of methods for generating random
+numbers drawn from a variety of probability distributions. In addition to the
 distribution-specific arguments, each method takes a keyword argument
 `size` that defaults to ``None``. If `size` is ``None``, then a single
 value is generated and returned. If `size` is an integer, then a 1-D
@@ -63,13 +63,14 @@ array filled with generated values is returned. If `size` is a tuple,
 then an array with that shape is filled and returned.
 
 *Compatibility Guarantee*
-A fixed seed and a fixed series of calls to 'RandomState' methods using
-the same parameters will always produce the same results up to roundoff
-error except when the values were incorrect. Incorrect values will be
-fixed and the NumPy version in which the fix was made will be noted in
-the relevant docstring. Extension of existing parameter ranges and the
-addition of new parameters is allowed as long the previous behavior
-remains unchanged.
+'mt19937.RandomState' is identical to 'numpy.random.RandomState' and
+makes the same compatability guarantee. A fixed seed and a fixed series of
+calls to 'mt19937.RandomState' methods using the same parameters will always
+produce the same results up to roundoff error except when the values were
+incorrect. Incorrect values will be fixed and the version in which the fix
+was made will be noted in the relevant docstring. Extension of existing
+parameter ranges and the addition of new parameters is allowed as long the
+previous behavior remains unchanged.
 
 Parameters
 ----------

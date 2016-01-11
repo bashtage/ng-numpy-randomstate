@@ -1,9 +1,11 @@
+#include <stddef.h>
 #ifdef _WIN32
 #include "../common/stdint.h"
 #define inline __inline
 #else
 #include <stdint.h>
 #endif
+
 
 typedef struct s_xorshift1024_state
 {
