@@ -33,14 +33,14 @@ ctypedef uint64_t rng_state_t
 ctypedef mlfg_state rng_t
 
 cdef object _get_state(aug_state state):
-    cdef uint32_t [:] key = np.zeros(MLFG_STATE_LEN, dtype=np.uint32)
+    cdef uint64_t [:] key = np.zeros(MLFG_STATE_LEN, dtype=np.uint64)
     cdef Py_ssize_t i
     for i in range(MLFG_STATE_LEN):
         key[i] = state.rng.lags[i]
     return (np.asanyarray(key), state.rng.pos, state.rng.lag_pos)
 
 cdef object _set_state(aug_state state, object state_info):
-    cdef uint32_t [:] key = state_info[0]
+    cdef uint64_t [:] key = state_info[0]
     cdef Py_ssize_t i
     for i in range(MLFG_STATE_LEN):
         state.rng.lags[i] = key[i]
@@ -48,5 +48,47 @@ cdef object _set_state(aug_state state, object state_info):
     state.rng.lag_pos = state_info[2]
 
 DEF CLASS_DOCSTRING = """
-This is the mlfg docstring.
+RandomState(seed=None)
+
+Container for a multiplicative lagged fibonacci generator (MLFG).
+
+MLFG(1279, 861, *) is a 64-bit implementation of a MLFG that uses lags 1279 and
+861 where random numbers are determined by
+
+.. math x_x = (x_{n-k} * x_{n-l}) \mathrm{Mod} M
+
+where k=861, k=1279 and M is 2 ** 64. The period of the generator is
+2**1340 - 2**61.  Even though the PRNG uses 64 bits, only 63 are random
+since all numbers in x must be odd.
+
+`mlfg_1279_861.RandomState` exposes a number of methods for generating random
+numbers drawn from a variety of probability distributions. In addition to the
+distribution-specific arguments, each method takes a keyword argument
+`size` that defaults to ``None``. If `size` is ``None``, then a single
+value is generated and returned. If `size` is an integer, then a 1-D
+array filled with generated values is returned. If `size` is a tuple,
+then an array with that shape is filled and returned.
+
+*No Compatibility Guarantee*
+'mlfg_1279_861.RandomState' does not make a guarantee that a fixed seed and a
+fixed series of calls to 'mlfg_1279_861.RandomState' methods using the same
+parameters will always produce the same results. This is different from
+'numpy.random.RandomState' guarantee. This is done to simplify improving
+random number generators.  To ensure identical results, you must use the
+same release version.
+
+Parameters
+----------
+seed : {None, int}, optional
+    Random seed initializing the pseudo-random number generator.
+    Can be an integer in [0, 2**64] or ``None`` (the default).
+    If `seed` is ``None``, then `mlfg_1279_861.RandomState` will try to read data
+    from ``/dev/urandom`` (or the Windows analogue) if available or seed from
+    the clock otherwise.
+
+Notes
+-----
+The state of the MLFG(1279,861,*) PRNG is represented by 1279 64-bit unsigned
+integers as well as a single 32-bit integer representing the location in the
+state array of the next value.
 """

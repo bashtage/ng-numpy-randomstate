@@ -10,25 +10,25 @@
 
 typedef struct s_mlfg_state
 {
-     uint32_t lags[K];
+     uint64_t lags[K];
      int pos;
      int lag_pos;
 } mlfg_state;
 
 void mlfg_seed(mlfg_state* state, uint64_t seed);
 
-void mlfg_init_state(mlfg_state *state, uint32_t seeds[K]);
+void mlfg_init_state(mlfg_state *state, uint64_t seeds[K]);
 
 /*
-*  Returns 32 bits, but the last bit is always 1.
+*  Returns 64 bits, but the last bit is always 1.
 *  Upstream functions are expected to understand this and
-*  only use the upper 31 bits.  In most implmentations,
-*  fewer than 31 bits are needed, and it is thought to
+*  only use the upper 63 bits.  In most implementations,
+*  fewer than 63 bits are needed, and it is thought to
 *  be better to use the upper bits first.  For example,
-*  when making a 32 bit unsigned int, take the two upper
-*  16 bit segments.
+*  when making a 64 bit unsigned int, take the two upper
+*  32 bit segments.
 */
-inline uint32_t mlfg_next(mlfg_state* state)
+inline uint64_t mlfg_next(mlfg_state* state)
 {
    state->pos++;
    state->lag_pos++;

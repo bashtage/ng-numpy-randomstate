@@ -1,11 +1,8 @@
 #ifdef _WIN32
 #include "../common/inttypes.h"
+#define inline __inline
 #else
 #include <inttypes.h>
-#endif
-
-#ifdef _WIN32
-#define inline __inline
 #endif
 
 inline uint64_t splitmix64_next(uint64_t* x) {

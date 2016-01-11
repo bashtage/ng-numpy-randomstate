@@ -80,7 +80,7 @@ inc : {None, int}, optional
 Notes
 -----
 Supports the method advance to advance the PRNG an arbitrary number of steps. 
-The state of the PCG-32 PRNG is represented by 2 64-bit integers.
+The state of the PCG-32 PRNG is represented by 2 64-bit unsigned integers.
 
 See pcg64 for a similar implementation with a larger period.
 

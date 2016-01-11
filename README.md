@@ -35,10 +35,9 @@ identical sequence of random numbers for a given seed.
 ## Plans
 It is essentially complete.  There are a few rough edges that need to be smoothed.
   
-  * Document core RNG classes
   * Pickling support
-  * Verify entropy based initialization is missing for some RNGs
-  * Multiple stream support for MLFG and MRG32K3A
+  * Verify entropy based initialization for some RNGs
+  * Stream support for MLFG and MRG32K3A
   * Creation of additional streams from a RandomState where supported (i.e. 
   a `next_stream()` method)
   
@@ -134,36 +133,36 @@ Performance is promising.  Some early numbers:
 ```
 Time to produce 1,000,000 Uniforms
 ************************************************************
-numpy-random-random_sample                 11.44 ms
-randomstate-mlfg_1279_861-random_sample     7.18 ms
-randomstate-mrg32k3a-random_sample         35.70 ms
-randomstate-mt19937-random_sample           9.26 ms
-randomstate-pcg32-random_sample             6.75 ms
-randomstate-pcg64-random_sample             5.79 ms
-randomstate-xorshift1024-random_sample      5.73 ms
-randomstate-xorshift128-random_sample       5.38 ms
+numpy-random-random_sample                 13.68 ms
+randomstate-mlfg_1279_861-random_sample     6.64 ms
+randomstate-mrg32k3a-random_sample         37.87 ms
+randomstate-mt19937-random_sample          13.33 ms
+randomstate-pcg32-random_sample            10.20 ms
+randomstate-pcg64-random_sample             7.83 ms
+randomstate-xorshift1024-random_sample      6.20 ms
+randomstate-xorshift128-random_sample       5.49 ms
 
 Uniforms per second
 ************************************************************
-numpy-random-random_sample                  87.39 million
-randomstate-mlfg_1279_861-random_sample    139.27 million
-randomstate-mrg32k3a-random_sample          28.01 million
-randomstate-mt19937-random_sample          107.94 million
-randomstate-pcg32-random_sample            148.16 million
-randomstate-pcg64-random_sample            172.63 million
-randomstate-xorshift1024-random_sample     174.63 million
-randomstate-xorshift128-random_sample      185.83 million
-dtype: object
+numpy-random-random_sample                  73.11 million
+randomstate-mlfg_1279_861-random_sample    150.71 million
+randomstate-mrg32k3a-random_sample          26.41 million
+randomstate-mt19937-random_sample           75.03 million
+randomstate-pcg32-random_sample             98.00 million
+randomstate-pcg64-random_sample            127.77 million
+randomstate-xorshift1024-random_sample     161.39 million
+randomstate-xorshift128-random_sample      182.29 million
 
 Speed-up relative to NumPy
 ************************************************************
-randomstate-mlfg_1279_861-random_sample     59.4%
-randomstate-mrg32k3a-random_sample         -67.9%
-randomstate-mt19937-random_sample           23.5%
-randomstate-pcg32-random_sample             69.5%
-randomstate-pcg64-random_sample             97.5%
-randomstate-xorshift1024-random_sample      99.8%
-randomstate-xorshift128-random_sample      112.6%
+randomstate-mlfg_1279_861-random_sample    106.1%
+randomstate-mrg32k3a-random_sample         -63.9%
+randomstate-mt19937-random_sample            2.6%
+randomstate-pcg32-random_sample             34.0%
+randomstate-pcg64-random_sample             74.8%
+randomstate-xorshift1024-random_sample     120.7%
+randomstate-xorshift128-random_sample      149.3%
+
 --------------------------------------------------------------------------------
 ```
 
