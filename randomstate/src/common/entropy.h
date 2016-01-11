@@ -33,3 +33,4 @@ typedef int bool;
 
 extern void entropy_fill(void *dest, size_t size);
 
+extern bool entropy_getbytes(void* dest, size_t size);

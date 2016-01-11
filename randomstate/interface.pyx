@@ -1,26 +1,31 @@
 #!python
 #cython: wraparound=False, nonecheck=False, boundscheck=False, cdivision=True
 import sys
-import numpy as np
-cimport numpy as np
-cimport cython
 import operator
-from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t
-from cpython cimport Py_INCREF
 try:
     from threading import Lock
 except:
     from dummy_threading import Lock
+
+import numpy as np
+cimport numpy as np
+cimport cython
+from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t
+from cpython cimport Py_INCREF
+
+from binomial cimport binomial_t
+from cython_overrides cimport PyFloat_AsDouble, PyInt_AsLong, PyErr_Occurred, PyErr_Clear
+
 np.import_array()
 
-cdef extern from "Python.h":
-    double PyFloat_AsDouble(object ob)
-    long PyInt_AsLong(object ob)
-    int PyErr_Occurred()
-    void PyErr_Clear()
+#cdef extern from "Python.h":
+#    double PyFloat_AsDouble(object ob)
+#    long PyInt_AsLong(object ob)
+#    int PyErr_Occurred()
+#    void PyErr_Clear()
 
 include "config.pxi"
-include "src/common/binomial.pxi"
+#include "src/common/binomial.pxi"
 
 IF RNG_NAME == 'pcg32':
     include "shims/pcg-32/pcg-32.pxi"
@@ -108,8 +113,54 @@ cdef extern from "distributions.h":
     cdef void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int cnt, uint8_t *out) nogil
     cdef void random_bool_fill(aug_state *state, int8_t off, int8_t rng, int cnt, int8_t *out) nogil
 
+    cdef void entropy_fill(void *dest, size_t size)
+    cdef bint entropy_getbytes(void* dest, size_t size)
+
 include "array_utilities.pxi"
 include "bounded_integers.pxi"
+
+def read_entropy(size=None):
+    """
+    Read entropy from the system cryptographic provider
+
+    Parameters
+    ----------
+    size : int or tuple of ints, optional
+        Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+        ``m * n * k`` samples are drawn.  Default is None, in which case a
+        single value is returned.
+
+    Returns
+    -------
+    entropy : scalar or ndarray
+        Entropy bits in 32-bit unsigned integers
+
+    Notes
+    -----
+    On Unix-like machines, reads from /dev/urandom. On Windows machines reads
+    from the RSA Full cryptographic service provider.
+
+    Raises RuntimeError if the command fails.
+    """
+    cdef bint success
+    cdef size_t n = 0
+    cdef uint32_t random = 0
+    cdef uint32_t [:] randoms
+
+    if size is None:
+        success = entropy_getbytes(<void *>&random, 4)
+    else:
+        n = compute_numel(size)
+        randoms = np.zeros(n, dtype=np.uint32)
+        print(n)
+        success = entropy_getbytes(<void *>(&randoms[0]), 4 * n)
+    if not success:
+        raise RuntimeError('Unable to read from system cryptographic provider')
+
+    if n == 0:
+        return random
+    return np.asarray(randoms).reshape(size)
+
 
 cdef double kahan_sum(double *darr, np.npy_intp n):
     cdef double c, y, t, sum

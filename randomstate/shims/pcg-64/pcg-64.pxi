@@ -43,6 +43,4 @@ cdef object _set_state(aug_state state, object state_info):
     state.rng.state = state_info[0]
     state.rng.inc = state_info[1]
 
-DEF CLASS_DOCSTRING = """
-This is the pcg64 docstring.
-"""
+include "pcg-64-docstring.pxi"

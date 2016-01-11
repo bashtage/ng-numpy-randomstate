@@ -55,6 +55,4 @@ cdef object _set_state(aug_state state, object state_info):
     state.rng.state = pcg128_from_pylong(state_info[0])
     state.rng.inc = pcg128_from_pylong(state_info[1])
 
-DEF CLASS_DOCSTRING = """
-This is the pcg64 docstring.
-"""
+include "pcg-64-docstring.pxi"

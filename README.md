@@ -39,7 +39,6 @@ It is essentially complete.  There are a few rough edges that need to be smoothe
   * Document core RNG classes
   * Pickling support
   * Verify entropy based initialization is missing for some RNGs
-  * Add direct access to the system cryptographic random number generator
   * Multiple stream support for MLFG and MRG32K3A
   * Creation of additional streams from a RandomState where supported (i.e. 
   a `next_stream()` method)
