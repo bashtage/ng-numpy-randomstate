@@ -8,7 +8,7 @@ from Cython.Build import cythonize
 from setuptools import setup, find_packages
 from setuptools.extension import Extension
 
-FORCE_EMULATION = False
+FORCE_EMULATION = True
 
 
 mod_dir = './randomstate'
