@@ -4,30 +4,14 @@
 # stack
 sudo: false
 
-language: python
+language: objective-c
 
-matrix:
-  fast_finish: true
-  include:
-  - python: 2.7
-    env:
-    - PYTHON=2.6
-  - python: 2.7
-    env:
-    - PYTHON=2.7
-  - python: 2.7
-    env:
-    - PYTHON=3.3
-  - python: 2.7
-    env:
-    - PYTHON=3.4
-  - python: 2.7
-    env:
-    - PYTHON=3.5
+env:
+  - PYTHON=2.7
 
 before_install:
+  - which python
   - if [ ${TRAVIS_OS_NAME} = "osx" ]; then wget https://repo.continuum.io/miniconda/Miniconda-latest-MacOSX-x86_64.sh -O miniconda.sh; fi
-  - if [ ${TRAVIS_OS_NAME} = "linux" ]; then wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh; fi
   - chmod +x miniconda.sh
   - ./miniconda.sh -b
   - export PATH=$HOME/miniconda/bin:$PATH
