@@ -156,6 +156,11 @@ randomstate.prng-xorshift128-standard_normal       28.0%
 
 ## Differences from `numpy.random.RandomState`
 
+### New Features
+* `stanard_normal` and `normal` support an additional `method` keyword 
+argument which can be `inv` or `zig` where `inv` corresponds to the 
+current method and `zig` uses tha much faster (100%+) ziggurat method.
+
 ### New Functions
 
 * `random_entropy` - Read from the system entropy provider, which is commonly 
@@ -165,5 +170,3 @@ used in cryptographic applications
 distance. _Only available if supported by the RNG._
 * `advance` - Advanced the core RNG 'as-if' a number of draws were made, 
 without actually drawing the numbers. _Only available if supported by the RNG._
-
-### New Functions
