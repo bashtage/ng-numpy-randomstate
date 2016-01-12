@@ -27,26 +27,16 @@ rk_state;
 
 extern void rk_seed(rk_state *state, uint32_t seed);
 
+extern void rk_gen(rk_state *state);
+
 /* Slightly optimized reference implementation of the Mersenne Twister */
 inline uint32_t rk_random(rk_state *state)
 {
     uint32_t y;
 
     if (state->pos == RK_STATE_LEN) {
-        int i;
-
-        for (i = 0; i < N - M; i++) {
-            y = (state->key[i] & UPPER_MASK) | (state->key[i+1] & LOWER_MASK);
-            state->key[i] = state->key[i+M] ^ (y>>1) ^ (-(y & 1) & MATRIX_A);
-        }
-        for (; i < N - 1; i++) {
-            y = (state->key[i] & UPPER_MASK) | (state->key[i+1] & LOWER_MASK);
-            state->key[i] = state->key[i+(M-N)] ^ (y>>1) ^ (-(y & 1) & MATRIX_A);
-        }
-        y = (state->key[N - 1] & UPPER_MASK) | (state->key[0] & LOWER_MASK);
-        state->key[N - 1] = state->key[M - 1] ^ (y >> 1) ^ (-(y & 1) & MATRIX_A);
-
-        state->pos = 0;
+        // Move to function to help inlining
+        rk_gen(state);
     }
     y = state->key[state->pos++];
 

@@ -161,5 +161,5 @@ setup(name='randomstate',
 # Clean up generated files
 for config in configs:
     os.unlink(join(mod_dir, config['file_name'] + '.pyx'))
-   #  os.unlink(join(mod_dir, config['file_name'] + '-config.pxi'))
-   #  os.unlink(join(mod_dir, config['file_name'] + '.c'))
+    os.unlink(join(mod_dir, config['file_name'] + '-config.pxi'))
+    os.unlink(join(mod_dir, config['file_name'] + '.c'))
