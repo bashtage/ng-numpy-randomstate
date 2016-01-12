@@ -6,7 +6,7 @@ from numpy.testing import (
         assert_warns, decorators)
 from numpy import random
 from numpy.compat import asbytes
-import randomstate.mt19937 as mt19937
+from randomstate.prng.mt19937 import mt19937
 import sys
 
 class TestSeed(TestCase):

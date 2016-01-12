@@ -1,6 +1,7 @@
 import os
 import sys
 from os.path import join
+import shutil
 
 import numpy
 from Cython.Build import cythonize
@@ -8,13 +9,6 @@ from setuptools import setup, find_packages
 from setuptools.extension import Extension
 
 FORCE_EMULATION = False
-
-
-class WriteConfigExtension(Extension):
-    def __init__(self, **kwargs):
-        self.config_info = kwargs['config_info']
-        del kwargs['config_info']
-        super(Extension, WriteConfigExtension).__init__(**kwargs)
 
 
 mod_dir = './randomstate'
@@ -137,11 +131,12 @@ for config in configs:
                 if line.strip() == 'include "config.pxi"':
                     line = 'include "' + config_file_name + '"\n'
                 mod.write(line)
-
+    shutil.copystat(join(mod_dir, 'interface.pyx'), join(mod_dir, config['file_name'] + '.pyx'))
     # Write specific config file
     write_config(config_file_name, config)
+    shutil.copystat(join(mod_dir, 'interface.pyx'), config_file_name)
 
-    ext = cythonize([Extension('randomstate.' + config['file_name'],
+    ext = cythonize([Extension('randomstate.prng.' + config['file_name'] + '.' + config['file_name'],
                                sources=config['sources'],
                                include_dirs=config['include_dirs'],
                                define_macros=config['defs'] + extra_defs,
@@ -166,5 +161,5 @@ setup(name='randomstate',
 # Clean up generated files
 for config in configs:
     os.unlink(join(mod_dir, config['file_name'] + '.pyx'))
-    os.unlink(join(mod_dir, config['file_name'] + '-config.pxi'))
-    os.unlink(join(mod_dir, config['file_name'] + '.c'))
+   #  os.unlink(join(mod_dir, config['file_name'] + '-config.pxi'))
+   #  os.unlink(join(mod_dir, config['file_name'] + '.c'))
