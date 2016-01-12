@@ -1,3 +1,8 @@
+import pickle
+try:
+    import cPickle
+except ImportError:
+    cPickle = pickle
 import sys
 import os
 import unittest
@@ -403,6 +408,16 @@ class RNG(object):
         s = self.rs.dirichlet((10, 5, 3), 20)
         assert s.shape == (20, 3)
 
+    def test_pickle(self):
+        pick = pickle.dumps(self.rs)
+        unpick = pickle.loads(pick)
+        assert(type(self.rs) == type(unpick))
+        assert comp_state(self.rs.get_state(), unpick.get_state())
+
+        pick = cPickle.dumps(self.rs)
+        unpick = cPickle.loads(pick)
+        assert(type(self.rs) == type(unpick))
+        assert comp_state(self.rs.get_state(), unpick.get_state())
 
 class TestMT19937(RNG):
     @classmethod

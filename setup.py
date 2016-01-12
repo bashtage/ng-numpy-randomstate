@@ -40,7 +40,7 @@ for rng in rngs:
         continue
 
     file_name = rng.lower().replace('rng_', '')
-    flags = {'RNG_NAME': file_name}
+    flags = {'RNG_MOD_NAME': file_name}
     sources = [join(mod_dir, file_name + '.pyx'),
                join(mod_dir, 'src', 'common', 'entropy.c'),
                join(mod_dir, 'distributions.c')]

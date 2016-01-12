@@ -28,22 +28,22 @@ np.import_array()
 include "config.pxi"
 #include "src/common/binomial.pxi"
 
-IF RNG_NAME == 'pcg32':
+IF RNG_MOD_NAME == 'pcg32':
     include "shims/pcg-32/pcg-32.pxi"
-IF RNG_NAME == 'pcg64':
+IF RNG_MOD_NAME == 'pcg64':
     IF PCG128_EMULATED:
         include "shims/pcg-64/pcg-64-emulated.pxi"
     ELSE:
         include "shims/pcg-64/pcg-64.pxi"
-IF RNG_NAME == 'mt19937':
+IF RNG_MOD_NAME == 'mt19937':
     include "shims/random-kit/random-kit.pxi"
-IF RNG_NAME == 'xorshift128':
+IF RNG_MOD_NAME == 'xorshift128':
     include "shims/xorshift128/xorshift128.pxi"
-IF RNG_NAME == 'xorshift1024':
+IF RNG_MOD_NAME == 'xorshift1024':
     include "shims/xorshift1024/xorshift1024.pxi"
-IF RNG_NAME == 'mrg32k3a':
+IF RNG_MOD_NAME == 'mrg32k3a':
     include "shims/mrg32k3a/mrg32k3a.pxi"
-IF RNG_NAME == 'mlfg_1279_861':
+IF RNG_MOD_NAME == 'mlfg_1279_861':
     include "shims/mlfg-1279-861/mlfg-1279-861.pxi"
 
 IF NORMAL_METHOD == 'inv':
@@ -213,9 +213,7 @@ cdef class RandomState:
         self.set_state(state)
 
     def __reduce__(self):
-        # TODO: This is wrong
-        # TODO: Removed np.random.__RandomState_ctor - This is needed on a RNG-by-RNG basis
-        return (randomstate.prng.__generic_ctor, (RNG_NAME,), self.get_state())
+        return (randomstate.prng.__generic_ctor, (RNG_MOD_NAME,), self.get_state())
 
     IF RNG_NAME == 'mt19937':
         def seed(self, seed=None):

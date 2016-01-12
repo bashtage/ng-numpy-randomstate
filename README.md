@@ -35,7 +35,6 @@ identical sequence of random numbers for a given seed.
 ## Plans
 It is essentially complete.  There are a few rough edges that need to be smoothed.
   
-  * Pickling support
   * Stream support for MLFG and MRG32K3A
   * Creation of additional streams from a RandomState where supported (i.e. 
   a `next_stream()` method)

@@ -22,7 +22,5 @@ build_script:
   - pip install . -vvv
 
 test_script:
-  - echo %cd%
   - cd ..
-  - echo %cd%
   - nosetests randomstate
