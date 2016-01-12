@@ -32,7 +32,8 @@ before_install:
   - ./miniconda.sh -b
   - export PATH=$HOME/miniconda/bin:$PATH
   - export PATH=$HOME/miniconda2/bin:$PATH
-  - conda update --yes --quiet conda
+  - conda config --set always_yes yes
+  - conda update --all --quiet
   - PKGS="python=${PYTHON}"
   - PKGS="${PKGS} numpy"; if [ ${NUMPY} ]; then PKGS="${PKGS}=${NUMPY}"; fi
   - PKGS="${PKGS} Cython"; if [ ${CYTHON} ]; then PKGS="${PKGS}=${CYTHON}"; fi
@@ -40,7 +41,7 @@ before_install:
 
 # Install packages
 install:
-  - conda create --yes --quiet -n rng-test ${PKGS} nose pip setuptools
+  - conda create -n rng-test ${PKGS} nose pip setuptools --quiet
   - source activate rng-test
   - export BUILD_DIR=$PWD
   - python setup.py install
