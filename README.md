@@ -67,60 +67,48 @@ python setup.py install
 
 ## Building for Testing Purposes
 
-There are two options.  The first will build a library for xorshift128 called
-`core_rng`.  
+This command will build a single module containining xorshift128 called
+`interface`.  
 
 ```bash
 cd randomstate
 python setup-basic.py build_ext --inplace
 ```
 
-The second will build a numberfiles, one for each RNG.
-
-```bash
-cd randomstate
-python setup-all.py build_ext --inplace
-```
-
 ## Using
-If you installed,
+
+The separate generators are importable from `randomstate.prng`.
 
 ```python
-import randomstate.xorshift128
-rs = randomstate.xorshift128.RandomState()
+import randomstate
+rs = randomstate.prng.xorshift128.RandomState()
 rs.random_sample(100)
 
-import randomstate.pcg64
-rs = randomstate.pcg64.RandomState()
+rs = randomstate.prng.pcg64.RandomState()
 rs.random_sample(100)
 
 # Identical to NumPy
-import randomstate.mt19937
-rs = randomstate.mt19937.RandomState()
+rs = randomstate.prng.mt19937.RandomState()
 rs.random_sample(100)
 ```
+
+Like NumPy, `randomstate` also exposes a single instance of the `mt19937` 
+generator directly at the moduel level so that commands like
+
+```python
+import randomstate
+randomstate.standard_normal()
+randomstate.exponential(1.0, 1.0, size=10)
+```
+
+will work.
 
 If you use `setup-basic.py`, 
 
 ```python
-import core_rng
+import interface
 
-rs = core_rng.RandomState()
-rs.random_sample(100)
-```
-
-If you use `setup-all.py`, 
-
-```python
-import mt19937, pcg32, xorshift128
-
-rs = mt19937.RandomState()
-rs.random_sample(100)
-
-rs = pcg32.RandomState()
-rs.random_sample(100)
-
-rs = xorshift129.RandomState()
+rs = interface.RandomState()
 rs.random_sample(100)
 ```
 
@@ -128,40 +116,40 @@ rs.random_sample(100)
 Standard NCSA, plus sub licenses for components.
 
 ## Performance
-Performance is promising.  Some early numbers:
+Performance is promising, and even the mt19937 seems to be faster than NumPy's mt19937. 
 
 ```
-Time to produce 1,000,000 Uniforms
+Time to produce 1,000,000 Standard normals
 ************************************************************
-numpy-random-random_sample                 13.68 ms
-randomstate-mlfg_1279_861-random_sample     6.64 ms
-randomstate-mrg32k3a-random_sample         37.87 ms
-randomstate-mt19937-random_sample          13.33 ms
-randomstate-pcg32-random_sample            10.20 ms
-randomstate-pcg64-random_sample             7.83 ms
-randomstate-xorshift1024-random_sample      6.20 ms
-randomstate-xorshift128-random_sample       5.49 ms
+numpy-random-standard_normal                      58.34 ms
+randomstate.prng-mlfg_1279_861-standard_normal    46.20 ms
+randomstate.prng-mrg32k3a-standard_normal         75.95 ms
+randomstate.prng-mt19937-standard_normal          52.68 ms
+randomstate.prng-pcg32-standard_normal            48.38 ms
+randomstate.prng-pcg64-standard_normal            46.27 ms
+randomstate.prng-xorshift1024-standard_normal     45.53 ms
+randomstate.prng-xorshift128-standard_normal      45.57 ms
 
-Uniforms per second
+Standard normals per second
 ************************************************************
-numpy-random-random_sample                  73.11 million
-randomstate-mlfg_1279_861-random_sample    150.71 million
-randomstate-mrg32k3a-random_sample          26.41 million
-randomstate-mt19937-random_sample           75.03 million
-randomstate-pcg32-random_sample             98.00 million
-randomstate-pcg64-random_sample            127.77 million
-randomstate-xorshift1024-random_sample     161.39 million
-randomstate-xorshift128-random_sample      182.29 million
+numpy-random-standard_normal                      17.14 million
+randomstate.prng-mlfg_1279_861-standard_normal    21.65 million
+randomstate.prng-mrg32k3a-standard_normal         13.17 million
+randomstate.prng-mt19937-standard_normal          18.98 million
+randomstate.prng-pcg32-standard_normal            20.67 million
+randomstate.prng-pcg64-standard_normal            21.61 million
+randomstate.prng-xorshift1024-standard_normal     21.96 million
+randomstate.prng-xorshift128-standard_normal      21.94 million
 
 Speed-up relative to NumPy
 ************************************************************
-randomstate-mlfg_1279_861-random_sample    106.1%
-randomstate-mrg32k3a-random_sample         -63.9%
-randomstate-mt19937-random_sample            2.6%
-randomstate-pcg32-random_sample             34.0%
-randomstate-pcg64-random_sample             74.8%
-randomstate-xorshift1024-random_sample     120.7%
-randomstate-xorshift128-random_sample      149.3%
+randomstate.prng-mlfg_1279_861-standard_normal     26.3%
+randomstate.prng-mrg32k3a-standard_normal         -23.2%
+randomstate.prng-mt19937-standard_normal           10.8%
+randomstate.prng-pcg32-standard_normal             20.6%
+randomstate.prng-pcg64-standard_normal             26.1%
+randomstate.prng-xorshift1024-standard_normal      28.1%
+randomstate.prng-xorshift128-standard_normal       28.0%
 
 --------------------------------------------------------------------------------
 ```
@@ -170,8 +158,12 @@ randomstate-xorshift128-random_sample      149.3%
 
 ### New Functions
 
+* `random_entropy` - Read from the system entropy provider, which is commonly 
+used in cryptographic applications
 * `random_uintegers` - unsigned integers `[0, 2**64-1]` 
 * `jump` - Jumps RNGs that support it.  `jump` moves the state a great 
 distance. _Only available if supported by the RNG._
 * `advance` - Advanced the core RNG 'as-if' a number of draws were made, 
 without actually drawing the numbers. _Only available if supported by the RNG._
+
+### New Functions

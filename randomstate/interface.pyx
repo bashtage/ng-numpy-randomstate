@@ -117,8 +117,10 @@ cdef extern from "distributions.h":
 include "array_utilities.pxi"
 include "bounded_integers.pxi"
 
-def read_entropy(size=None):
+def random_entropy(size=None):
     """
+    random_entropy(size=None)
+
     Read entropy from the system cryptographic provider
 
     Parameters
@@ -137,6 +139,10 @@ def read_entropy(size=None):
     -----
     On Unix-like machines, reads from /dev/urandom. On Windows machines reads
     from the RSA Full cryptographic service provider.
+
+    This function reads from the system entropy pool and so samples are
+    not reproducible.  In particular, it does *NOT* make use of a
+    RandomState, and so seed, get_state and set_state have no effect.
 
     Raises RuntimeError if the command fails.
     """

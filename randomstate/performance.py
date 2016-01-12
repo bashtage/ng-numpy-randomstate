@@ -9,12 +9,6 @@ rs = {mod}.{rng}.RandomState()
 rs.random_sample()
 '''
 
-SETUP_RS = '''
-import {mod}.{rng}
-rs = {mod}.{rng}.RandomState()
-rs.random_sample()
-'''
-
 scale_32 = scale_64 = 1
 if sys.maxsize < 2 ** 32:
     # 32 bit
@@ -40,7 +34,7 @@ def run_timer(dist, command, numpy_command=None, setup='', random_type=''):
 
     res = {}
     for rng in RNGS:
-        mod = 'randomstate.prng.' + rng if rng != 'random' else 'numpy'
+        mod = 'randomstate.prng' if rng != 'random' else 'numpy'
         key = '-'.join((mod, rng, dist)).replace('"', '')
         command = numpy_command if 'numpy' in mod else command
         res[key] = timer(command.format(dist=dist), setup=setup.format(mod=mod, rng=rng))
