@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import numpy.random
 from numpy.testing import assert_allclose, assert_array_equal, assert_equal
-import randomstate.mt19937 as mt19937
+from randomstate.prng.mt19937 import mt19937
 
 
 def compare_0_input(f1, f2):
