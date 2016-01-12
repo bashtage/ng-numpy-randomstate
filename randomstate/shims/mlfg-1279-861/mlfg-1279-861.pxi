@@ -82,13 +82,14 @@ Parameters
 seed : {None, int}, optional
     Random seed initializing the pseudo-random number generator.
     Can be an integer in [0, 2**64] or ``None`` (the default).
-    If `seed` is ``None``, then `mlfg_1279_861.RandomState` will try to read data
-    from ``/dev/urandom`` (or the Windows analogue) if available or seed from
-    the clock otherwise.
+    If `seed` is ``None``, then `mlfg_1279_861.RandomState` will try to read
+    entropy from ``/dev/urandom`` (or the Windows analogue) if available to
+    produce a 64-bit seed. If unavailable, the a 64-bit hash of the time
+    (and process ID on Unix) is used.
 
 Notes
 -----
 The state of the MLFG(1279,861,*) PRNG is represented by 1279 64-bit unsigned
-integers as well as a single 32-bit integer representing the location in the
-state array of the next value.
+integers as well as a two 32-bit integers representing the location in the
+state array of the current and lagged values.
 """

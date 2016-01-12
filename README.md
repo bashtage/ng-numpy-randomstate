@@ -36,7 +36,6 @@ identical sequence of random numbers for a given seed.
 It is essentially complete.  There are a few rough edges that need to be smoothed.
   
   * Pickling support
-  * Verify entropy based initialization for some RNGs
   * Stream support for MLFG and MRG32K3A
   * Creation of additional streams from a RandomState where supported (i.e. 
   a `next_stream()` method)

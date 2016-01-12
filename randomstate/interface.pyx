@@ -13,6 +13,7 @@ cimport cython
 from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t
 from cpython cimport Py_INCREF
 
+import randomstate
 from binomial cimport binomial_t
 from cython_overrides cimport PyFloat_AsDouble, PyInt_AsLong, PyErr_Occurred, PyErr_Clear
 
@@ -214,7 +215,7 @@ cdef class RandomState:
     def __reduce__(self):
         # TODO: This is wrong
         # TODO: Removed np.random.__RandomState_ctor - This is needed on a RNG-by-RNG basis
-        return ((), (), self.get_state())
+        return (randomstate.prng.__generic_ctor, (RNG_NAME,), self.get_state())
 
     IF RNG_NAME == 'mt19937':
         def seed(self, seed=None):

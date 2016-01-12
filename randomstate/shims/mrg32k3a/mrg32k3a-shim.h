@@ -31,42 +31,15 @@ inline uint64_t random_uint64(aug_state* state)
     return (((uint64_t) mrg32k3a_random(state->rng) << 32) | mrg32k3a_random(state->rng));
 }
 
-inline void set_seed(aug_state* state, uint64_t val)
-{
-    mrg32k3a_seed(state->rng, val);
-}
-
-inline void init_state(aug_state* state, int64_t val[6])
-{
-    state->rng->s10 =  val[0];
-    state->rng->s11 =  val[1];
-    state->rng->s12 =  val[2];
-    state->rng->s20 =  val[3];
-    state->rng->s21 =  val[4];
-    state->rng->s22 =  val[5];
-}
-
-inline void entropy_init(aug_state* state)
-{
-    uint32_t buf[6] = { 0 };
-    int64_t seeds[6];
-    uint32_t i, val;
-    int all_zero = 0;
-    while (!all_zero)
-    {
-        entropy_fill((void*) buf, sizeof(buf));
-        for (i = 0; i<6; i++)
-        {
-            val = (i < 3) ? STATE_MAX_VALUE_1 : STATE_MAX_VALUE_2;
-            seeds[i] = (int64_t)(buf[i] % val);
-            all_zero = all_zero || (seeds[i] > 0);
-        }
-    }
-    init_state(state, seeds);
-}
-
 inline double random_double(aug_state* state)
 {
     int32_t a = random_uint32(state) >> 5, b = random_uint32(state) >> 6;
     return (a * 67108864.0 + b) / 9007199254740992.0;
 }
+
+extern void set_seed(aug_state* state, uint64_t val);
+
+extern void init_state(aug_state* state, int64_t vals[6]);
+
+extern void entropy_init(aug_state* state);
+

@@ -32,17 +32,6 @@ inline uint64_t random_uint64(aug_state* state)
     return out;
 }
 
-inline void set_seed(aug_state* state, uint64_t val)
-{
-    mlfg_seed(state->rng, val);
-}
-
-inline void entropy_init(aug_state* state)
-{
-    uint64_t seeds[1];
-    entropy_fill((void*) seeds, sizeof(seeds));
-    mlfg_seed(state->rng, seeds[0]);
-}
 
 inline double random_double(aug_state* state)
 {
@@ -53,3 +42,7 @@ inline double random_double(aug_state* state)
     b = (rn & 0xFFFFFFFFULL) >> 6;
     return (a * 67108864.0 + b) / 9007199254740992.0;
 }
+
+extern void set_seed(aug_state* state, uint64_t seed);
+
+extern void entropy_init(aug_state* state);
