@@ -1,0 +1,37 @@
+# Travis script that uses miniconda in place of the system installed python
+# versions.  Allows substantial flexability for choosing versions of
+# required packages and is simpler to use to test up-to-date scientific Python
+# stack
+sudo: false
+
+language: objective-c
+
+env:
+  - PYTHON=2.7
+
+before_install:
+  - which python
+  - if [ ${TRAVIS_OS_NAME} = "osx" ]; then wget https://repo.continuum.io/miniconda/Miniconda-latest-MacOSX-x86_64.sh -O miniconda.sh; fi
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=$HOME/miniconda/bin:$PATH
+  - export PATH=$HOME/miniconda2/bin:$PATH
+  - conda config --set always_yes yes
+  - conda update --all --quiet
+  - PKGS="python=${PYTHON}"
+  - PKGS="${PKGS} numpy"; if [ ${NUMPY} ]; then PKGS="${PKGS}=${NUMPY}"; fi
+  - PKGS="${PKGS} Cython"; if [ ${CYTHON} ]; then PKGS="${PKGS}=${CYTHON}"; fi
+  - PKGS="${PKGS} pandas"; if [ ${PANDAS} ]; then PKGS="${PKGS}=${PANDAS}"; fi
+
+# Install packages
+install:
+  - conda create -n rng-test ${PKGS} nose pip setuptools --quiet
+  - source activate rng-test
+  - export BUILD_DIR=$PWD
+  - python setup.py install
+
+script:
+  - cd $HOME
+  - nosetests randomstate
+  - cd $BUILD_DIR/randomstate
+  - if [ ${PYTHON} = "2.7" ]; then python performance.py; fi
