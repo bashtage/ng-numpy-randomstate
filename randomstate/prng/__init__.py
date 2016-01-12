@@ -42,5 +42,7 @@ def __generic_ctor(mod_name='mt19937'):
         mod = xorshift128
     elif mod_name == 'xorshift1024':
         mod = xorshift1024
+    else:
+        raise ValueError(str(mod_name) + ' is not a known PRNG module.')
 
     return mod.RandomState(0)
