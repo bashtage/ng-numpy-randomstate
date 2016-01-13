@@ -1,4 +1,4 @@
-import sys
+import struct
 import timeit
 
 import pandas as pd
@@ -10,11 +10,11 @@ rs.random_sample()
 '''
 
 scale_32 = scale_64 = 1
-if sys.maxsize < 2 ** 32:
-    # 32 bit
-    scale_64 = 2
-else:
+if struct.calcsize('P') ==8:
+    # 64 bit
     scale_32 = 0.5
+else:
+    scale_64 = 2
 
 RNGS = ['mlfg_1279_861', 'mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024', 'random']
 
