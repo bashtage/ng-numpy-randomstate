@@ -120,8 +120,15 @@ for rng in rngs:
 
     configs.append(config)
 
-extensions = []
 # Generate files and extensions
+extensions = cythonize([Extension('randomstate.entropy',
+                               sources=[join(mod_dir, 'entropy.pyx'),
+                                        join(mod_dir, 'src', 'common', 'entropy.c')],
+                               include_dirs=config['include_dirs'],
+                               define_macros=extra_defs,
+                               extra_compile_args=extra_compile_args,
+                               extra_link_args=extra_link_args)])
+
 for config in configs:
     config_file_name = mod_dir + '/' + config['file_name'] + '-config.pxi'
     # Rewrite core_rng to replace generic #include "config.pxi"
