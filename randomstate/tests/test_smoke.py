@@ -1,3 +1,4 @@
+import time
 import pickle
 try:
     import cPickle
@@ -512,12 +513,19 @@ class TestEntropy(unittest.TestCase):
         e1 = entropy.random_entropy()
         e2 = entropy.random_entropy()
         assert (e1 != e2)
-        e1 = entropy.random_entropy(source='fallback')
-        e2 = entropy.random_entropy(source='fallback')
-        assert (e1 != e2)
         e1 = entropy.random_entropy(10)
         e2 = entropy.random_entropy(10)
         assert (e1 != e2).all()
+        e1 = entropy.random_entropy(10, source='system')
+        e2 = entropy.random_entropy(10, source='system')
+        assert (e1 != e2).all()
+
+    def test_fallback(self):
+        e1 = entropy.random_entropy(source='fallback')
+        time.sleep(0.1)
+        e2 = entropy.random_entropy(source='fallback')
+        assert (e1 != e2)
+
 
 
 

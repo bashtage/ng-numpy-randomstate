@@ -19,14 +19,7 @@ from cython_overrides cimport PyFloat_AsDouble, PyInt_AsLong, PyErr_Occurred, Py
 
 np.import_array()
 
-#cdef extern from "Python.h":
-#    double PyFloat_AsDouble(object ob)
-#    long PyInt_AsLong(object ob)
-#    int PyErr_Occurred()
-#    void PyErr_Clear()
-
 include "config.pxi"
-#include "src/common/binomial.pxi"
 
 IF RNG_MOD_NAME == 'pcg32':
     include "shims/pcg-32/pcg-32.pxi"
@@ -56,8 +49,6 @@ cdef extern from "distributions.h":
 
     cdef uint64_t random_uint64(aug_state* state) nogil
     cdef uint32_t random_uint32(aug_state* state) nogil
-    cdef int64_t random_positive_int64(aug_state* state) nogil
-    cdef int32_t random_positive_int32(aug_state* state) nogil
 
     cdef long random_positive_int(aug_state* state) nogil
     cdef unsigned long random_uint(aug_state* state) nogil
@@ -112,9 +103,6 @@ cdef extern from "distributions.h":
     cdef void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int cnt, uint8_t *out) nogil
     cdef void random_bool_fill(aug_state *state, int8_t off, int8_t rng, int cnt, int8_t *out) nogil
 
-    cdef void entropy_fill(void *dest, size_t size)
-    cdef bint entropy_getbytes(void* dest, size_t size)
-    cdef bint entropy_fallback_getbytes(void *dest, size_t size)
 
 include "array_utilities.pxi"
 include "bounded_integers.pxi"
