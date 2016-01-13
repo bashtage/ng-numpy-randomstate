@@ -1,7 +1,10 @@
 import struct
+import os
 import timeit
 
 import pandas as pd
+from numpy.random import RandomState
+rs = RandomState()
 
 SETUP = '''
 import {mod}.{rng}
@@ -10,7 +13,7 @@ rs.random_sample()
 '''
 
 scale_32 = scale_64 = 1
-if struct.calcsize('P') ==8:
+if struct.calcsize('P') == 8 and os.name != 'nt':
     # 64 bit
     scale_32 = 0.5
 else:
@@ -68,6 +71,11 @@ def timer_uniform():
 def timer_32bit():
     command = 'rs.{dist}(1000000, bits=32)'
     command_numpy = 'rs.tomaxint({scale} * 1000000)'.format(scale=scale_32)
+    print('32 bit commands')
+    print(command)
+    print(command_numpy)
+    print('Typical values')
+    print(rs.tomaxint(5))
     dist = 'random_uintegers'
     run_timer(dist, command, command_numpy, SETUP, '32-bit unsigned integers')
 
@@ -76,6 +84,9 @@ def timer_64bit():
     dist = 'random_uintegers'
     command = 'rs.{dist}(1000000, bits=64)'
     command_numpy = 'rs.tomaxint({scale} * 1000000)'.format(scale=scale_64)
+    print('64 bit commands')
+    print(command)
+    print(command_numpy)
     run_timer(dist, command, command_numpy, SETUP, '64-bit unsigned integers')
 
 
