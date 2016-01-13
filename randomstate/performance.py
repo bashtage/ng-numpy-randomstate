@@ -20,7 +20,7 @@ RNGS = ['mlfg_1279_861', 'mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128',
 
 
 def timer(code, setup):
-    return 1000 * min(timeit.Timer(code, setup=setup).repeat(3, 10)) / 10.0
+    return 1000 * min(timeit.Timer(code, setup=setup).repeat(10, 10)) / 10.0
 
 
 def print_legend(legend):

@@ -16,6 +16,8 @@ ctypedef uint32_t (* random_uint_1_i_32)(aug_state* state, uint32_t a) nogil
 ctypedef int32_t (* random_int_2_i_32)(aug_state* state, int32_t a, int32_t b) nogil
 ctypedef int64_t (* random_int_2_i)(aug_state* state, int64_t a, int64_t b) nogil
 
+ctypedef void (* random_double_fill)(aug_state* state, int count, double *out) nogil
+
 cdef Py_ssize_t compute_numel(size):
     cdef Py_ssize_t i, n = 1
     if isinstance(size, tuple):
@@ -568,3 +570,20 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
                 randoms[i] = fiii(state, _ia, _ib, _ic)
 
     return np.asarray(randoms).reshape(size)
+
+
+cdef object double_fill(aug_state* state, void *func, object size, object lock):
+    cdef random_double_fill f = <random_double_fill>func
+    cdef double out
+    cdef double [::1] out_array
+    cdef Py_ssize_t n
+    if size is None:
+        with lock:
+            f(state, 1, &out)
+        return out
+    else:
+        n = compute_numel(size)
+        out_array = np.empty(n, np.double)
+        with lock, nogil:
+            f(state, n, &out_array[0])
+        return np.asarray(out_array).reshape(size)
