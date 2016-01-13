@@ -28,4 +28,4 @@ test_script:
 
 on_success:
   - cd %GIT_DIR%\randomstate
-  - python performance.py
+  - IF %PYTHON_ARCH%==x86_64 python performance.py
