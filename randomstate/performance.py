@@ -1,9 +1,10 @@
-import struct
 import os
+import struct
 import timeit
 
 import pandas as pd
 from numpy.random import RandomState
+
 rs = RandomState()
 
 SETUP = '''
@@ -19,7 +20,8 @@ if struct.calcsize('P') == 8 and os.name != 'nt':
 else:
     scale_64 = 2
 
-RNGS = ['mlfg_1279_861', 'mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024', 'random']
+RNGS = ['mlfg_1279_861', 'mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024',
+        'random']
 
 
 def timer(code, setup):
@@ -71,11 +73,6 @@ def timer_uniform():
 def timer_32bit():
     command = 'rs.{dist}(1000000, bits=32)'
     command_numpy = 'rs.tomaxint({scale} * 1000000)'.format(scale=scale_32)
-    print('32 bit commands')
-    print(command)
-    print(command_numpy)
-    print('Typical values')
-    print(rs.tomaxint(5))
     dist = 'random_uintegers'
     run_timer(dist, command, command_numpy, SETUP, '32-bit unsigned integers')
 
@@ -84,9 +81,6 @@ def timer_64bit():
     dist = 'random_uintegers'
     command = 'rs.{dist}(1000000, bits=64)'
     command_numpy = 'rs.tomaxint({scale} * 1000000)'.format(scale=scale_64)
-    print('64 bit commands')
-    print(command)
-    print(command_numpy)
     run_timer(dist, command, command_numpy, SETUP, '64-bit unsigned integers')
 
 
@@ -95,6 +89,7 @@ def timer_normal():
     command_numpy = 'rs.{dist}(1000000)'
     dist = 'standard_normal'
     run_timer(dist, command, command_numpy, SETUP, 'Standard normals')
+
 
 def timer_normal_zig():
     command = 'rs.{dist}(1000000, method="zig")'
@@ -109,4 +104,3 @@ if __name__ == '__main__':
     timer_64bit()
     timer_normal()
     timer_normal_zig()
-

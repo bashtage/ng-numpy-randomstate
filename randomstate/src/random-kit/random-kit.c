@@ -57,7 +57,7 @@ extern void init_by_array(rk_state *state, unsigned long init_key[], int key_len
     for (; k; k--) {
         /* non linear */
         mt[i] = (mt[i] ^ ((mt[i - 1] ^ (mt[i - 1] >> 30)) * 1664525UL))
-            + init_key[j] + j;
+                + init_key[j] + j;
         /* for > 32 bit machines */
         mt[i] &= 0xffffffffUL;
         i++;
@@ -72,7 +72,7 @@ extern void init_by_array(rk_state *state, unsigned long init_key[], int key_len
     }
     for (k = RK_STATE_LEN - 1; k; k--) {
         mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941UL))
-             - i; /* non linear */
+                - i; /* non linear */
         mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
         i++;
         if (i >= RK_STATE_LEN) {
@@ -86,20 +86,20 @@ extern void init_by_array(rk_state *state, unsigned long init_key[], int key_len
 
 void rk_gen(rk_state *state)
 {
-        uint32_t y;
-        int i;
+    uint32_t y;
+    int i;
 
-        for (i = 0; i < N - M; i++) {
-            y = (state->key[i] & UPPER_MASK) | (state->key[i+1] & LOWER_MASK);
-            state->key[i] = state->key[i+M] ^ (y>>1) ^ (-(y & 1) & MATRIX_A);
-        }
-        for (; i < N - 1; i++) {
-            y = (state->key[i] & UPPER_MASK) | (state->key[i+1] & LOWER_MASK);
-            state->key[i] = state->key[i+(M-N)] ^ (y>>1) ^ (-(y & 1) & MATRIX_A);
-        }
-        y = (state->key[N - 1] & UPPER_MASK) | (state->key[0] & LOWER_MASK);
-        state->key[N - 1] = state->key[M - 1] ^ (y >> 1) ^ (-(y & 1) & MATRIX_A);
+    for (i = 0; i < N - M; i++) {
+        y = (state->key[i] & UPPER_MASK) | (state->key[i+1] & LOWER_MASK);
+        state->key[i] = state->key[i+M] ^ (y>>1) ^ (-(y & 1) & MATRIX_A);
+    }
+    for (; i < N - 1; i++) {
+        y = (state->key[i] & UPPER_MASK) | (state->key[i+1] & LOWER_MASK);
+        state->key[i] = state->key[i+(M-N)] ^ (y>>1) ^ (-(y & 1) & MATRIX_A);
+    }
+    y = (state->key[N - 1] & UPPER_MASK) | (state->key[0] & LOWER_MASK);
+    state->key[N - 1] = state->key[M - 1] ^ (y >> 1) ^ (-(y & 1) & MATRIX_A);
 
-        state->pos = 0;
+    state->pos = 0;
 }
 

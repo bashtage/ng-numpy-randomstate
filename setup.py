@@ -1,7 +1,7 @@
 import os
+import shutil
 import sys
 from os.path import join
-import shutil
 
 import numpy
 from Cython.Build import cythonize
@@ -9,7 +9,6 @@ from setuptools import setup, find_packages
 from setuptools.extension import Extension
 
 FORCE_EMULATION = True
-
 
 mod_dir = './randomstate'
 configs = []
@@ -122,12 +121,12 @@ for rng in rngs:
 
 # Generate files and extensions
 extensions = cythonize([Extension('randomstate.entropy',
-                               sources=[join(mod_dir, 'entropy.pyx'),
-                                        join(mod_dir, 'src', 'common', 'entropy.c')],
-                               include_dirs=config['include_dirs'],
-                               define_macros=extra_defs,
-                               extra_compile_args=extra_compile_args,
-                               extra_link_args=extra_link_args)])
+                                  sources=[join(mod_dir, 'entropy.pyx'),
+                                           join(mod_dir, 'src', 'common', 'entropy.c')],
+                                  include_dirs=config['include_dirs'],
+                                  define_macros=extra_defs,
+                                  extra_compile_args=extra_compile_args,
+                                  extra_link_args=extra_link_args)])
 
 for config in configs:
     config_file_name = mod_dir + '/' + config['file_name'] + '-config.pxi'
@@ -143,12 +142,13 @@ for config in configs:
     write_config(config_file_name, config)
     shutil.copystat(join(mod_dir, 'interface.pyx'), config_file_name)
 
-    ext = cythonize([Extension('randomstate.prng.' + config['file_name'] + '.' + config['file_name'],
-                               sources=config['sources'],
-                               include_dirs=config['include_dirs'],
-                               define_macros=config['defs'] + extra_defs,
-                               extra_compile_args=extra_compile_args,
-                               extra_link_args=extra_link_args)])[0]
+    ext = \
+    cythonize([Extension('randomstate.prng.' + config['file_name'] + '.' + config['file_name'],
+                         sources=config['sources'],
+                         include_dirs=config['include_dirs'],
+                         define_macros=config['defs'] + extra_defs,
+                         extra_compile_args=extra_compile_args,
+                         extra_link_args=extra_link_args)])[0]
     extensions.append(ext)
 
 setup(name='randomstate',

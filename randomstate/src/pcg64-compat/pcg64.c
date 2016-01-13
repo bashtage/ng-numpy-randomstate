@@ -27,12 +27,12 @@
 extern inline void pcg_setseq_128_step_r(pcg_state_setseq_128* rng);
 extern inline uint64_t pcg_output_xsl_rr_128_64(pcg128_t state);
 extern inline void pcg_setseq_128_srandom_r(pcg_state_setseq_128* rng,
-				     pcg128_t initstate, pcg128_t initseq);
+        pcg128_t initstate, pcg128_t initseq);
 extern inline uint64_t
 pcg_setseq_128_xsl_rr_64_random_r(pcg_state_setseq_128* rng);
 extern inline uint64_t
 pcg_setseq_128_xsl_rr_64_boundedrand_r(pcg_state_setseq_128* rng,
-				       uint64_t bound);
+                                       uint64_t bound);
 extern inline void pcg_setseq_128_advance_r(pcg_state_setseq_128* rng, pcg128_t delta);
 
 /* Multi-step advance functions (jump-ahead, jump-back)
@@ -49,41 +49,41 @@ extern inline void pcg_setseq_128_advance_r(pcg_state_setseq_128* rng, pcg128_t 
 #ifndef PCG_EMULATED_128BIT_MATH
 
 pcg128_t pcg_advance_lcg_128(pcg128_t state, pcg128_t delta, pcg128_t cur_mult,
-			    pcg128_t cur_plus)
+                             pcg128_t cur_plus)
 {
-   pcg128_t acc_mult = 1u;
-   pcg128_t acc_plus = 0u;
-   while (delta > 0) {
-       if (delta & 1) {
-	   acc_mult *= cur_mult;
-	   acc_plus = acc_plus * cur_mult + cur_plus;
-       }
-       cur_plus = (cur_mult + 1) * cur_plus;
-       cur_mult *= cur_mult;
-       delta /= 2;
-   }
-   return acc_mult * state + acc_plus;
+    pcg128_t acc_mult = 1u;
+    pcg128_t acc_plus = 0u;
+    while (delta > 0) {
+        if (delta & 1) {
+            acc_mult *= cur_mult;
+            acc_plus = acc_plus * cur_mult + cur_plus;
+        }
+        cur_plus = (cur_mult + 1) * cur_plus;
+        cur_mult *= cur_mult;
+        delta /= 2;
+    }
+    return acc_mult * state + acc_plus;
 }
 
 #else
 
 pcg128_t pcg_advance_lcg_128(pcg128_t state, pcg128_t delta, pcg128_t cur_mult,
-			    pcg128_t cur_plus)
+                             pcg128_t cur_plus)
 {
-   pcg128_t acc_mult = PCG_128BIT_CONSTANT(0u, 1u);
-   pcg128_t acc_plus = PCG_128BIT_CONSTANT(0u, 0u);
-   while ((delta.high > 0) || (delta.low > 0)) {
-       if (delta.low & 1) {
-	   acc_mult = _pcg128_mult(acc_mult, cur_mult);
-	   acc_plus = _pcg128_add(_pcg128_mult(acc_plus, cur_mult), cur_plus);
-       }
-       cur_plus = _pcg128_mult(_pcg128_add(cur_mult, PCG_128BIT_CONSTANT(0u, 1u)), cur_plus);
-       cur_mult = _pcg128_mult(cur_mult, cur_mult);
-       delta.low >>= 1;
-       delta.low += delta.high & 1;
-       delta.high >>= 1;
-   }
-   return _pcg128_add(_pcg128_mult(acc_mult, state), acc_plus);
+    pcg128_t acc_mult = PCG_128BIT_CONSTANT(0u, 1u);
+    pcg128_t acc_plus = PCG_128BIT_CONSTANT(0u, 0u);
+    while ((delta.high > 0) || (delta.low > 0)) {
+        if (delta.low & 1) {
+            acc_mult = _pcg128_mult(acc_mult, cur_mult);
+            acc_plus = _pcg128_add(_pcg128_mult(acc_plus, cur_mult), cur_plus);
+        }
+        cur_plus = _pcg128_mult(_pcg128_add(cur_mult, PCG_128BIT_CONSTANT(0u, 1u)), cur_plus);
+        cur_mult = _pcg128_mult(cur_mult, cur_mult);
+        delta.low >>= 1;
+        delta.low += delta.high & 1;
+        delta.high >>= 1;
+    }
+    return _pcg128_add(_pcg128_mult(acc_mult, state), acc_plus);
 }
 
 #endif

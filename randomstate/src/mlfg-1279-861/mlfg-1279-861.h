@@ -10,9 +10,9 @@
 
 typedef struct s_mlfg_state
 {
-     uint64_t lags[K];
-     int pos;
-     int lag_pos;
+    uint64_t lags[K];
+    int pos;
+    int lag_pos;
 } mlfg_state;
 
 void mlfg_seed(mlfg_state* state, uint64_t seed);
@@ -30,13 +30,13 @@ void mlfg_init_state(mlfg_state *state, uint64_t seeds[K]);
 */
 inline uint64_t mlfg_next(mlfg_state* state)
 {
-   state->pos++;
-   state->lag_pos++;
-   if (state->pos >= K)
-       state->pos = 0;
-   else if (state->lag_pos >= K)
-       state->lag_pos = 0;
-   state->lags[state->pos] = state->lags[state->lag_pos] * state->lags[state->pos];
-   return state->lags[state->pos];
+    state->pos++;
+    state->lag_pos++;
+    if (state->pos >= K)
+        state->pos = 0;
+    else if (state->lag_pos >= K)
+        state->lag_pos = 0;
+    state->lags[state->pos] = state->lags[state->lag_pos] * state->lags[state->pos];
+    return state->lags[state->pos];
 }
 

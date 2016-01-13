@@ -6,7 +6,7 @@
 #endif
 
 #if __GNUC_GNU_INLINE__  &&  !defined(__cplusplus)
-    #error Nonstandard GNU inlining semantics. Compile with -std=c99 or better.
+#error Nonstandard GNU inlining semantics. Compile with -std=c99 or better.
 #endif
 
 typedef struct {

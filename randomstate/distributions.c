@@ -1377,7 +1377,7 @@ void random_gauss_zig_julia_fill(aug_state *state, int count, double *out) {
                     xx = -ziggurat_nor_inv_r*log(random_double(state));
                     yy = -log(random_double(state));
                 } while (yy+yy <= xx*xx);
-                
+
                 out[i] = ((rabs >> 8) & 0x1) ? -(ziggurat_nor_r+xx) : ziggurat_nor_r+xx;
                 break;
             }
