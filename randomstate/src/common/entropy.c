@@ -142,9 +142,14 @@ uint32_t entropy_randombytes(void) {
     gettimeofday(&tv, NULL);
     return entropy_hash_32(getpid()) ^ entropy_hash_32(tv.tv_sec) ^ entropy_hash_32(tv.tv_usec) ^ entropy_hash_32(clock());
 #else
+    uint32_t out = 0;
+    int64_t counter;
     struct _timeb  tv;
     _ftime(&tv);
-    return entropy_hash_32(GetCurrentProcessId()) ^ entropy_hash_32((uint32_t)tv.time) ^ entropy_hash_32(tv.millitm) ^ entropy_hash_32(clock());
+    out = entropy_hash_32(GetCurrentProcessId()) ^ entropy_hash_32((uint32_t)tv.time) ^ entropy_hash_32(tv.millitm) ^ entropy_hash_32(clock());
+    if (QueryPerformanceCounter((LARGE_INTEGER *)&counter) != 0)
+        out ^= entropy_hash_32((uint32_t)(counter & 0xffffffff));
+    return out;
 #endif
 }
 
