@@ -2,6 +2,7 @@
 #cython: wraparound=False, nonecheck=False, boundscheck=False, cdivision=True
 import sys
 import operator
+import warnings
 try:
     from threading import Lock
 except:
@@ -1166,6 +1167,10 @@ cdef class RandomState:
         type translates to the C long type used by Python 2 for "short"
         integers and its precision is platform dependent.
 
+        This function has been deprecated. Use randint instead.
+
+        .. deprecated:: 1.11.0
+
         Parameters
         ----------
         low : int
@@ -1231,8 +1236,16 @@ cdef class RandomState:
 
         """
         if high is None:
+            warnings.warn(("This function is deprecated. Please call "
+                           "randint(1, {low} + 1) instead".format(low=low)),
+                          DeprecationWarning)
             high = low
             low = 1
+
+        else:
+            warnings.warn(("This function is deprecated. Please call "
+                           "randint({low}, {high} + 1) instead".format(
+                    low=low, high=high)), DeprecationWarning)
 
         return self.randint(low, high + 1, size=size, dtype='l')
 
@@ -3789,7 +3802,6 @@ cdef class RandomState:
         neg = (np.sum(u.T * v, axis=1) < 0) & (s > 0)
         if np.any(neg):
             s[neg] = 0.
-            import warnings
             warnings.warn("covariance is not positive-semidefinite.",
                           RuntimeWarning)
 
