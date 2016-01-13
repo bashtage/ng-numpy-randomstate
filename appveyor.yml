@@ -20,7 +20,12 @@ build_script:
   - conda update conda --quiet
   - conda install numpy cython nose --quiet
   - pip install . -vvv
+  - set "GIT_DIR=%cd%"
 
 test_script:
   - cd ..
   - nosetests randomstate
+
+on_success:
+  - cd %GIT_DIR%\randomstate
+  - python performance.py

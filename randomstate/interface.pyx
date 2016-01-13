@@ -111,6 +111,10 @@ cdef extern from "distributions.h":
     cdef void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, int cnt, uint16_t *out) nogil
     cdef void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int cnt, uint8_t *out) nogil
     cdef void random_bool_fill(aug_state *state, int8_t off, int8_t rng, int cnt, int8_t *out) nogil
+    cdef void random_uniform_fill(aug_state *state, int cnt, double *out) nogil
+    cdef void random_standard_exponential_fill(aug_state* state, int count, double *out) nogil
+    cdef void random_gauss_fill(aug_state* state, int count, double *out) nogil
+    cdef void random_gauss_zig_julia_fill(aug_state* state, int count, double *out) nogil
 
     cdef void entropy_fill(void *dest, size_t size)
     cdef bint entropy_getbytes(void* dest, size_t size)
@@ -636,11 +640,18 @@ cdef class RandomState:
                [-1.23204345, -1.75224494]])
 
         """
-        return cont(&self.rng_state, &random_standard_uniform,
-                    size, self.lock, 0,
-                    0.0, '', CONS_NONE,
-                    0.0, '', CONS_NONE,
-                    0.0, '', CONS_NONE)
+        return double_fill(&self.rng_state, &random_uniform_fill, size, self.lock)
+        # cdef double out
+        # cdef double [::1] out_array
+        # cdef Py_ssize_t n
+        # if size is None:
+        #     random_uniform_fill(&self.rng_state, 1, &out)
+        #     return out
+        # else:
+        #     n = compute_numel(size)
+        #     out_array = np.empty(n, np.double)
+        #     random_uniform_fill(&self.rng_state, n, &out_array[0])
+        #     return np.asarray(out_array).reshape(size)
 
     def tomaxint(self, size=None):
         """
@@ -1323,11 +1334,11 @@ cdef class RandomState:
 
         """
         if method == 'inv':
-            return cont(&self.rng_state, &random_gauss, size, self.lock, 0,
-                        0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
+            return double_fill(&self.rng_state, &random_gauss_fill,
+                               size, self.lock)
         else:
-            return cont(&self.rng_state, &random_gauss_zig_julia, size, self.lock, 0,
-                        0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
+            return double_fill(&self.rng_state, &random_gauss_zig_julia_fill,
+                               size, self.lock)
 
     def normal(self, loc=0.0, scale=1.0, size=None, method=__normal_method):
         """
@@ -1542,8 +1553,9 @@ cdef class RandomState:
         >>> n = np.random.standard_exponential((3, 8000))
 
         """
-        return cont(&self.rng_state, &random_standard_exponential, size, self.lock, 0,
-                    0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
+        return double_fill(&self.rng_state,
+                           &random_standard_exponential_fill,
+                           size, self.lock)
 
     def standard_gamma(self, shape, size=None):
         """
