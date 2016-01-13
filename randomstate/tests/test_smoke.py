@@ -1,3 +1,4 @@
+import time
 import pickle
 try:
     import cPickle
@@ -7,6 +8,7 @@ import sys
 import os
 import unittest
 import numpy as np
+import randomstate.entropy as entropy
 from randomstate.prng.mlfg_1279_861 import mlfg_1279_861
 from randomstate.prng.mrg32k3a import mrg32k3a
 from randomstate.prng.mt19937 import mt19937
@@ -505,6 +507,27 @@ class TestMRG32k3A(RNG, unittest.TestCase):
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
         cls._extra_setup()
+
+class TestEntropy(unittest.TestCase):
+    def test_entropy(self):
+        e1 = entropy.random_entropy()
+        e2 = entropy.random_entropy()
+        assert (e1 != e2)
+        e1 = entropy.random_entropy(10)
+        e2 = entropy.random_entropy(10)
+        assert (e1 != e2).all()
+        e1 = entropy.random_entropy(10, source='system')
+        e2 = entropy.random_entropy(10, source='system')
+        assert (e1 != e2).all()
+
+    def test_fallback(self):
+        e1 = entropy.random_entropy(source='fallback')
+        time.sleep(0.1)
+        e2 = entropy.random_entropy(source='fallback')
+        assert (e1 != e2)
+
+
+
 
 if __name__ == '__main__':
     import nose
