@@ -33,6 +33,10 @@ def write_config(file_name, config):
                 val = '"' + val + '"'
             config.write('DEF ' + key + ' = ' + str(val) + '\n')
 
+base_include_dirs = [mod_dir] + [numpy.get_include()]
+if os.name == 'nt' and sys.version_info < (3, 5):
+    base_include_dirs  += [join(mod_dir, 'src', 'common')]
+
 
 for rng in rngs:
     if rng not in compile_rngs:
@@ -43,9 +47,7 @@ for rng in rngs:
     sources = [join(mod_dir, file_name + '.pyx'),
                join(mod_dir, 'src', 'common', 'entropy.c'),
                join(mod_dir, 'distributions.c')]
-    include_dirs = [mod_dir] + [numpy.get_include()]
-    if os.name == 'nt' and sys.version_info < (3, 5):
-        include_dirs += [join(mod_dir, 'src', 'common')]
+    include_dirs = base_include_dirs[:]
 
     if rng == 'RNG_PCG32':
         sources += [join(mod_dir, 'src', 'pcg', 'pcg32.c')]
@@ -120,13 +122,13 @@ for rng in rngs:
     configs.append(config)
 
 # Generate files and extensions
-extensions = cythonize([Extension('randomstate.entropy',
-                                  sources=[join(mod_dir, 'entropy.pyx'),
-                                           join(mod_dir, 'src', 'common', 'entropy.c')],
-                                  include_dirs=config['include_dirs'],
-                                  define_macros=extra_defs,
-                                  extra_compile_args=extra_compile_args,
-                                  extra_link_args=extra_link_args)])
+extensions = [Extension('randomstate.entropy',
+                        sources=[join(mod_dir, 'entropy.pyx'),
+                                 join(mod_dir, 'src', 'common', 'entropy.c')],
+                        include_dirs=base_include_dirs,
+                        define_macros=extra_defs,
+                        extra_compile_args=extra_compile_args,
+                        extra_link_args=extra_link_args)]
 
 for config in configs:
     config_file_name = mod_dir + '/' + config['file_name'] + '-config.pxi'
@@ -142,14 +144,15 @@ for config in configs:
     write_config(config_file_name, config)
     shutil.copystat(join(mod_dir, 'interface.pyx'), config_file_name)
 
-    ext = \
-    cythonize([Extension('randomstate.prng.' + config['file_name'] + '.' + config['file_name'],
-                         sources=config['sources'],
-                         include_dirs=config['include_dirs'],
-                         define_macros=config['defs'] + extra_defs,
-                         extra_compile_args=extra_compile_args,
-                         extra_link_args=extra_link_args)])[0]
+    ext = Extension('randomstate.prng.' + config['file_name'] + '.' + config['file_name'],
+                    sources=config['sources'],
+                    include_dirs=config['include_dirs'],
+                    define_macros=config['defs'] + extra_defs,
+                    extra_compile_args=extra_compile_args,
+                    extra_link_args=extra_link_args)
     extensions.append(ext)
+
+ext_modules = cythonize(extensions)
 
 setup(name='randomstate',
       version='0.1',
@@ -162,7 +165,7 @@ setup(name='randomstate',
       description='Next-gen RandomState supporting multiple PRNGs',
       url='https://github.com/bashtage/ng-numpy-randomstate',
       long_description=open('README.md').read(),
-      ext_modules=extensions,
+      ext_modules=ext_modules,
       zip_safe=False)
 
 # Clean up generated files
