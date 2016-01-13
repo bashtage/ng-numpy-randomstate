@@ -100,7 +100,7 @@ bool entropy_getbytes(void *dest, size_t size)
                              CRYPT_VERIFYCONTEXT) || !hCryptProv) {
         return true;
     }
-    done = CryptGenRandom(hCryptProv, size, (unsigned char *)dest);
+    done = CryptGenRandom(hCryptProv, (DWORD)size, (unsigned char *)dest);
     CryptReleaseContext(hCryptProv, 0);
     if (!done) {
         return false;
