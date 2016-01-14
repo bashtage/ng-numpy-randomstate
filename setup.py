@@ -8,12 +8,12 @@ from Cython.Build import cythonize
 from setuptools import setup, find_packages
 from setuptools.extension import Extension
 
-FORCE_EMULATION = True
+FORCE_EMULATION = False
 
 mod_dir = './randomstate'
 configs = []
 
-rngs = ['RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64',
+rngs = ['RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64', 'RNG_DSFMT',
         'RNG_MT19937', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
 
 compile_rngs = rngs[:]
@@ -112,6 +112,15 @@ for rng in rngs:
 
         include_dirs += [join(mod_dir, 'src', 'mlfg_1279_861')]
 
+    elif rng == 'RNG_DSFMT':
+        sources += [join(mod_dir, 'src', 'dSFMT', 'dSFMT.c')]
+        sources += [join(mod_dir, 'shims', 'dSFMT', 'dSFMT-shim.c')]
+        # TODO: HAVE_SSE2 should only be for platforms that have SSE2
+        # TODO: But how to reliable detect?
+        defs = [('DSFMT_RNG', '1'),('DSFMT_MEXP','19937')] #  ('HAVE_SSE2', '1'),
+
+        include_dirs += [join(mod_dir, 'src', 'dSFMT')]
+
     config = {'file_name': file_name,
               'sources': sources,
               'include_dirs': include_dirs,
@@ -159,7 +168,7 @@ setup(name='randomstate',
       packages=find_packages(),
       package_dir={'randomstate': './randomstate'},
       package_data={'randomstate.tests.data': ['*.csv', '*.dat']},
-      include_package_data=True,
+      include_package_data=False,
       license='NSCA',
       author='Kevin Sheppard',
       description='Next-gen RandomState supporting multiple PRNGs',

@@ -39,6 +39,8 @@ IF RNG_MOD_NAME == 'mrg32k3a':
     include "shims/mrg32k3a/mrg32k3a.pxi"
 IF RNG_MOD_NAME == 'mlfg_1279_861':
     include "shims/mlfg-1279-861/mlfg-1279-861.pxi"
+IF RNG_MOD_NAME == 'dsfmt':
+    include "shims/dSFMT/dSFMT.pxi"
 
 IF NORMAL_METHOD == 'inv':
     __normal_method = 'inv'

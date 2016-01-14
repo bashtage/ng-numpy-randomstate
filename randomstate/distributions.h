@@ -31,6 +31,8 @@ typedef int bool;
 #include "shims/mrg32k3a/mrg32k3a-shim.h"
 #elif defined(MLFG_1279_861_RNG)
 #include "shims/mlfg-1279-861/mlfg-1279-861-shim.h"
+#elif defined(DSFMT_RNG)
+#include "shims/dSFMT/dSFMT-shim.h"
 #else
 #error Unknown RNG!!!  Unknown RNG!!!  Unknown RNG!!!
 #endif

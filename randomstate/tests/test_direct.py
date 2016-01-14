@@ -11,6 +11,7 @@ from randomstate.prng.pcg32 import pcg32
 from randomstate.prng.pcg64 import pcg64
 from randomstate.prng.xorshift1024 import xorshift1024
 from randomstate.prng.xorshift128 import xorshift128
+from randomstate.prng.dsfmt import dsfmt
 from numpy.testing import assert_equal, assert_allclose
 
 if (sys.version_info > (3, 0)):
@@ -51,12 +52,16 @@ def uint64_from_uint63(x):
         out[i // 2] = a | b
     return out
 
+def uniform_from_dsfmt(x):
+    return x.view(np.double) - 1.0
 
 def gauss_from_uint(x, n, bits):
     if bits == 64:
         doubles = uniform_from_uint64(x)
-    else:
+    elif bits == 32:
         doubles = uniform_from_uint32(x)
+    elif bits == 'dsfmt':
+        doubles = uniform_from_dsfmt(x)
     gauss = []
     loc = 0
     while len(gauss) < n:
@@ -203,3 +208,42 @@ class TestMLFG(Base, TestCase):
         vals = uint64_from_uint63(self.data2['data'])
         uints = rs.random_uintegers(len(vals), bits=self.bits)
         assert_equal(uints, vals)
+
+class TestDSFMT(Base, TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.RandomState = dsfmt.RandomState
+        cls.bits = 64
+        cls.dtype = np.uint64
+        cls.data1 = cls._read_csv(join(pwd, './data/dSFMT-testset-1.csv'))
+        cls.data2 = cls._read_csv(join(pwd, './data/dSFMT-testset-2.csv'))
+
+    def test_raw(self):
+        rs = self.RandomState(*self.data1['seed'])
+        expected = np.array(self.data1['data'] & 0xffffffff, np.uint32)
+        assert_equal(expected, rs.random_uintegers(1000, bits=32))
+
+        rs = self.RandomState(*self.data2['seed'])
+        expected = np.array(self.data2['data'] & 0xffffffff, np.uint32)
+        assert_equal(expected, rs.random_uintegers(1000, bits=32))
+
+    def test_double(self):
+        rs = self.RandomState(*self.data1['seed'])
+        assert_equal(uniform_from_dsfmt(self.data1['data']),
+                     rs.random_sample(1000))
+
+        rs = self.RandomState(*self.data2['seed'])
+        assert_equal(uniform_from_dsfmt(self.data2['data']),
+                     rs.random_sample(1000))
+
+    def test_gauss_inv(self):
+        n = 25
+        rs = self.RandomState(*self.data1['seed'])
+        gauss = rs.standard_normal(n, method='inv')
+        assert_allclose(gauss,
+                        gauss_from_uint(self.data1['data'], n, 'dsfmt'))
+
+        rs = self.RandomState(*self.data2['seed'])
+        gauss = rs.standard_normal(25, method='inv')
+        assert_allclose(gauss,
+                        gauss_from_uint(self.data2['data'], n, 'dsfmt'))
