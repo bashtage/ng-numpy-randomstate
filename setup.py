@@ -13,14 +13,14 @@ FORCE_EMULATION = False
 mod_dir = './randomstate'
 configs = []
 
-rngs = ['RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64', 'RNG_DSFMT',
-        'RNG_MT19937', 'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
+rngs = ['RNG_DSFMT', 'RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64', 'RNG_MT19937',
+        'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
 
-compile_rngs = rngs[:]
+compile_rngs = rngs[:] # ['RNG_DSFMT'] # rngs[:]
 
 extra_defs = []
 extra_link_args = ['Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []
-extra_compile_args = [] if os.name == 'nt' else ['-std=c99']
+base_extra_compile_args = [] if os.name == 'nt' else ['-std=c99']
 
 
 def write_config(file_name, config):
@@ -48,6 +48,7 @@ for rng in rngs:
                join(mod_dir, 'src', 'common', 'entropy.c'),
                join(mod_dir, 'distributions.c')]
     include_dirs = base_include_dirs[:]
+    extra_compile_args = base_extra_compile_args[:]
 
     if rng == 'RNG_PCG32':
         sources += [join(mod_dir, 'src', 'pcg', 'pcg32.c')]
@@ -117,7 +118,10 @@ for rng in rngs:
         sources += [join(mod_dir, 'shims', 'dSFMT', 'dSFMT-shim.c')]
         # TODO: HAVE_SSE2 should only be for platforms that have SSE2
         # TODO: But how to reliable detect?
-        defs = [('DSFMT_RNG', '1'),('DSFMT_MEXP','19937')] #  ('HAVE_SSE2', '1'),
+        defs = [('DSFMT_RNG', '1'),('DSFMT_MEXP','19937')]
+        defs += [('HAVE_SSE2', '1')]
+        if os.name == 'nt':
+            extra_compile_args = base_extra_compile_args + ['/arch:SSE2']
 
         include_dirs += [join(mod_dir, 'src', 'dSFMT')]
 
@@ -125,7 +129,8 @@ for rng in rngs:
               'sources': sources,
               'include_dirs': include_dirs,
               'defs': defs,
-              'flags': dict([(k, v) for k, v in flags.items()])
+              'flags': dict([(k, v) for k, v in flags.items()]),
+              'compile_args': extra_compile_args
               }
 
     configs.append(config)
@@ -136,7 +141,7 @@ extensions = [Extension('randomstate.entropy',
                                  join(mod_dir, 'src', 'common', 'entropy.c')],
                         include_dirs=base_include_dirs,
                         define_macros=extra_defs,
-                        extra_compile_args=extra_compile_args,
+                        extra_compile_args=base_extra_compile_args,
                         extra_link_args=extra_link_args)]
 
 for config in configs:
@@ -157,7 +162,7 @@ for config in configs:
                     sources=config['sources'],
                     include_dirs=config['include_dirs'],
                     define_macros=config['defs'] + extra_defs,
-                    extra_compile_args=extra_compile_args,
+                    extra_compile_args=config['compile_args'],
                     extra_link_args=extra_link_args)
     extensions.append(ext)
 

@@ -24,7 +24,8 @@ build_script:
 
 test_script:
   - cd ..
-  - nosetests randomstate
+  - python -c "import randomstate.prng.dsfmt as d;d.RandomState(1)"
+  - nosetests -vv randomstate
 
 on_success:
   - cd %GIT_DIR%\randomstate
