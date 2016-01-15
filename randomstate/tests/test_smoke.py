@@ -1,5 +1,6 @@
-import time
 import pickle
+import time
+
 try:
     import cPickle
 except ImportError:
@@ -16,8 +17,8 @@ from randomstate.prng.pcg32 import pcg32
 from randomstate.prng.pcg64 import pcg64
 from randomstate.prng.xorshift1024 import xorshift1024
 from randomstate.prng.xorshift128 import xorshift128
+from randomstate.prng.dsfmt import dsfmt
 from numpy.testing import assert_almost_equal, assert_equal
-
 
 from nose import SkipTest
 
@@ -224,7 +225,7 @@ class RNG(object):
         vals = self.rs.tomaxint(size=100000)
         maxsize = 0
         if os.name == 'nt':
-            maxsize = 2**31 - 1
+            maxsize = 2 ** 31 - 1
         else:
             try:
                 maxsize = sys.maxint
@@ -307,7 +308,7 @@ class RNG(object):
         vals = self.rs.randn(10, 10, 10)
         self.rs.set_state(state)
         print(self.rs.get_state())
-        assert_equal(vals,self.rs.standard_normal((10, 10, 10)))
+        assert_equal(vals, self.rs.standard_normal((10, 10, 10)))
         assert_equal(vals.shape, (10, 10, 10))
 
     def test_noncentral_chisquare(self):
@@ -413,13 +414,14 @@ class RNG(object):
     def test_pickle(self):
         pick = pickle.dumps(self.rs)
         unpick = pickle.loads(pick)
-        assert(type(self.rs) == type(unpick))
+        assert (type(self.rs) == type(unpick))
         assert comp_state(self.rs.get_state(), unpick.get_state())
 
         pick = cPickle.dumps(self.rs)
         unpick = cPickle.loads(pick)
-        assert(type(self.rs) == type(unpick))
+        assert (type(self.rs) == type(unpick))
         assert comp_state(self.rs.get_state(), unpick.get_state())
+
 
 class TestMT19937(RNG):
     @classmethod
@@ -441,6 +443,7 @@ class TestMT19937(RNG):
         assert (state[2] == state2['state'][1])
         assert (state[3] == state2['gauss']['has_gauss'])
         assert (state[4] == state2['gauss']['gauss'])
+
 
 class TestPCG32(RNG, unittest.TestCase):
     @classmethod
@@ -508,6 +511,18 @@ class TestMRG32k3A(RNG, unittest.TestCase):
         cls.initial_state = cls.rs.get_state()
         cls._extra_setup()
 
+
+class TestDSFMT(RNG, unittest.TestCase):
+    @classmethod
+    def setup_class(cls):
+        cls.mod = dsfmt
+        cls.advance = None
+        cls.seed = [12345]
+        cls.rs = cls.mod.RandomState(*cls.seed)
+        cls.initial_state = cls.rs.get_state()
+        cls._extra_setup()
+
+
 class TestEntropy(unittest.TestCase):
     def test_entropy(self):
         e1 = entropy.random_entropy()
@@ -527,8 +542,7 @@ class TestEntropy(unittest.TestCase):
         assert (e1 != e2)
 
 
-
-
 if __name__ == '__main__':
     import nose
+
     nose.run(argv=[__file__, '-vv'])

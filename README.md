@@ -9,6 +9,8 @@ The RNGs include:
 
 * [MT19937](https://github.com/numpy/numpy/blob/master/numpy/random/mtrand/),
  the NumPy rng
+* [dSFMT](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/) a SSE2-aware 
+version of the MT19937 generator that is especially fast at generating doubles
 * [xorshift128+](http://xorshift.di.unimi.it/) and 
 [xorshift1024*](http://xorshift.di.unimi.it/)
 * [PCG32](http://www.pcg-random.org/) and [PCG64](http:w//www.pcg-random.org/)
