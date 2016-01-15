@@ -11,8 +11,10 @@ except:
 import numpy as np
 cimport numpy as np
 cimport cython
-from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t
+from libc.stdint cimport (uint8_t, uint16_t, uint32_t, uint64_t, int8_t,
+                          int16_t, int32_t, int64_t, intptr_t)
 from cpython cimport Py_INCREF
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
 import randomstate
 from binomial cimport binomial_t
@@ -129,8 +131,9 @@ cdef double kahan_sum(double *darr, np.npy_intp n):
 cdef class RandomState:
     CLASS_DOCSTRING
 
+    # cdef rng_t rng
+    cdef void *rng_loc
     cdef binomial_t binomial_info
-    cdef rng_t rng
     cdef aug_state rng_state
     cdef object lock
     poisson_lam_max = POISSON_LAM_MAX
@@ -138,7 +141,23 @@ cdef class RandomState:
 
     IF RNG_SEED==1:
         def __init__(self, seed=None):
-            self.rng_state.rng = &self.rng
+            IF RNG_MOD_NAME == 'dsfmt':
+                cdef int8_t *iptr
+                cdef int8_t offset = 0
+                cdef intptr_t alignment = 0
+                self.rng_loc = PyMem_Malloc(sizeof(rng_t))
+                self.rng_state.rng = <rng_t *>self.rng_loc
+                alignment  = <intptr_t>(&(self.rng_state.rng.status[0].u32[0]))
+                if (alignment % 16) != 0:
+                    iptr = <int8_t *>self.rng_state.rng
+                    offset = 16 - (alignment % 16)
+                    if offset < 0:
+                        offset += 16
+                    self.rng_state.rng = <rng_t *>(iptr + offset)
+            ELSE:
+                self.rng_loc = PyMem_Malloc(sizeof(rng_t))
+                self.rng_state.rng = <rng_t *>self.rng_loc
+
             self.rng_state.binomial = &self.binomial_info
             self._reset_state_variables()
             self.lock = Lock()
@@ -146,11 +165,14 @@ cdef class RandomState:
 
     ELSE:
         def __init__(self, seed=None, inc=None):
-            self.rng_state.rng = &self.rng
+            self.rng_state.rng = <rng_t *>PyMem_Malloc(sizeof(rng_t)) # &self.rng
             self.rng_state.binomial = &self.binomial_info
             self._reset_state_variables()
             self.lock = Lock()
             self.seed(seed, inc)
+
+    def __dealloc__(self):
+        PyMem_Free(self.rng_loc)
 
     # Pickling support:
     def __getstate__(self):
