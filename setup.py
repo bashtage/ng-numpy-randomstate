@@ -16,7 +16,7 @@ configs = []
 rngs = ['RNG_DSFMT', 'RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64', 'RNG_MT19937',
         'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
 
-compile_rngs = rngs[:] # ['RNG_DSFMT'] # rngs[:]
+compile_rngs = rngs[:]
 
 extra_defs = []
 extra_link_args = ['Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []
@@ -46,7 +46,8 @@ for rng in rngs:
     flags = {'RNG_MOD_NAME': file_name}
     sources = [join(mod_dir, file_name + '.pyx'),
                join(mod_dir, 'src', 'common', 'entropy.c'),
-               join(mod_dir, 'distributions.c')]
+               join(mod_dir, 'distributions.c'),
+               join(mod_dir, 'aligned_malloc.c')]
     include_dirs = base_include_dirs[:]
     extra_compile_args = base_extra_compile_args[:]
 

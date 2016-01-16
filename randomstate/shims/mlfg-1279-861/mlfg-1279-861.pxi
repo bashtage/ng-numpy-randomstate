@@ -39,7 +39,7 @@ cdef object _get_state(aug_state state):
         key[i] = state.rng.lags[i]
     return (np.asanyarray(key), state.rng.pos, state.rng.lag_pos)
 
-cdef object _set_state(aug_state state, object state_info):
+cdef object _set_state(aug_state *state, object state_info):
     cdef uint64_t [:] key = state_info[0]
     cdef Py_ssize_t i
     for i in range(MLFG_STATE_LEN):

@@ -40,7 +40,7 @@ cdef object _get_state(aug_state state):
         key[i] = state.rng.s[i]
     return (np.asanyarray(key), state.rng.p)
 
-cdef object _set_state(aug_state state, object state_info):
+cdef object _set_state(aug_state *state, object state_info):
     cdef uint64_t [:] key = state_info[0]
     cdef Py_ssize_t i
     for i in range(16):

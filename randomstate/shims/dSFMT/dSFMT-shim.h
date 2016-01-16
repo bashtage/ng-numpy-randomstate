@@ -19,23 +19,39 @@ typedef struct s_aug_state {
     double gauss;
     uint32_t uinteger;
     uint64_t zig_random_int;
+
+    double *buffered_uniforms;
+    int buffer_loc;
 } aug_state;
+
+static inline double random_double_from_buffer(aug_state *state)
+{
+    double out;
+    if (state->buffer_loc >= (2 * DSFMT_N))
+    {
+        state->buffer_loc = 0;
+        dsfmt_fill_array_close1_open2(state->rng, state->buffered_uniforms, 2 * DSFMT_N);
+    }
+    out = state->buffered_uniforms[state->buffer_loc];
+    state->buffer_loc++;
+    return  out;
+}
 
 static inline uint32_t random_uint32(aug_state* state)
 {
-    double d = dsfmt_genrand_close1_open2(state->rng);
+    double d = random_double_from_buffer(state);//dsfmt_genrand_close1_open2(state->rng);
     uint64_t *out = (uint64_t *)&d;
     return (uint32_t)(*out & 0xffffffff);
 }
 
 static inline uint64_t random_uint64(aug_state* state)
 {
-    double d = dsfmt_genrand_close1_open2(state->rng);
+    double d = random_double_from_buffer(state);//dsfmt_genrand_close1_open2(state->rng);
     uint64_t out;
     uint64_t *tmp;
     tmp = (uint64_t *)&d;
     out = *tmp << 32;
-    d = dsfmt_genrand_close1_open2(state->rng);
+    d = random_double_from_buffer(state);//dsfmt_genrand_close1_open2(state->rng);
     tmp =  (uint64_t *)&d;
     out |= *tmp & 0xffffffff;
     return out;
@@ -43,7 +59,8 @@ static inline uint64_t random_uint64(aug_state* state)
 
 static inline double random_double(aug_state* state)
 {
-    return dsfmt_genrand_close1_open2(state->rng) - 1.0;
+    return random_double_from_buffer(state) - 1.0;
+    // return dsfmt_genrand_close1_open2(state->rng) - 1.0;
 }
 
 extern void entropy_init(aug_state* state);
