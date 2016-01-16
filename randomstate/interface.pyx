@@ -791,7 +791,7 @@ cdef class RandomState:
                 .. versionadded:: 1.7.0
 
         Parameters
-        -----------
+        ----------
         a : 1-D array-like or int
             If an ndarray, a random sample is generated from its elements.
             If an int, the random sample is generated as if a was np.arange(n)
@@ -807,12 +807,12 @@ cdef class RandomState:
             entries in a.
 
         Returns
-        --------
+        -------
         samples : 1-D ndarray, shape (size,)
             The generated random samples
 
         Raises
-        -------
+        ------
         ValueError
             If a is an int and less than zero, if a or p are not 1-dimensional,
             if a is an array-like of size 0, if p is not a vector of
@@ -821,11 +821,11 @@ cdef class RandomState:
             size
 
         See Also
-        ---------
+        --------
         randint, shuffle, permutation
 
         Examples
-        ---------
+        --------
         Generate a uniform random sample from np.arange(5) of size 3:
 
         >>> np.random.choice(5, 3)

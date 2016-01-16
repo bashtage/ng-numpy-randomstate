@@ -575,15 +575,18 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
 cdef object double_fill(aug_state* state, void *func, object size, object lock):
     cdef random_double_fill f = <random_double_fill>func
     cdef double out
-    cdef double [::1] out_array
-    cdef Py_ssize_t n
+    cdef double *out_array_data
+    cdef np.ndarray out_array
+    cdef np.npy_intp n
+
     if size is None:
         with lock:
             f(state, 1, &out)
         return out
     else:
-        n = compute_numel(size)
-        out_array = np.empty(n, np.double)
+        out_array = <np.ndarray>np.empty(size, np.float64)
+        n = np.PyArray_SIZE(out_array)
+        out_array_data = <double *>np.PyArray_DATA(out_array)
         with lock, nogil:
-            f(state, n, &out_array[0])
-        return np.asarray(out_array).reshape(size)
+            f(state, n, out_array_data)
+        return out_array

@@ -1,0 +1,7 @@
+MT19937 Randomstate
+===================
+
+.. py:currentmodule:: randomstate.prng.mt19937
+
+.. autoclass:: RandomState
+   :members:
