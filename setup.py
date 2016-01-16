@@ -123,6 +123,8 @@ for rng in rngs:
         defs += [('HAVE_SSE2', '1')]
         if os.name == 'nt':
             extra_compile_args = base_extra_compile_args + ['/arch:SSE2']
+        else:
+            extra_compile_args = base_extra_compile_args + ['-msse2']
 
         include_dirs += [join(mod_dir, 'src', 'dSFMT')]
 
