@@ -38,7 +38,7 @@ cdef object _get_state(aug_state state):
     return (state.rng.s10, state.rng.s11, state.rng.s12,
             state.rng.s20, state.rng.s21, state.rng.s22)
 
-cdef object _set_state(aug_state state, object state_info):
+cdef object _set_state(aug_state *state, object state_info):
     state.rng.s10 = state_info[0]
     state.rng.s11 = state_info[1]
     state.rng.s12 = state_info[2]

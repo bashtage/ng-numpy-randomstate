@@ -34,7 +34,7 @@ ctypedef pcg32_random_t rng_t
 cdef object _get_state(aug_state state):
     return (state.rng.state, state.rng.inc)
 
-cdef object _set_state(aug_state state, object state_info):
+cdef object _set_state(aug_state *state, object state_info):
     state.rng.state = state_info[0]
     state.rng.inc = state_info[1]
 

@@ -51,7 +51,7 @@ cdef pcg128_t pcg128_from_pylong(object x):
 cdef object _get_state(aug_state state):
     return (pcg128_to_pylong(state.rng.state), pcg128_to_pylong(state.rng.inc))
 
-cdef object _set_state(aug_state state, object state_info):
+cdef object _set_state(aug_state *state, object state_info):
     state.rng.state = pcg128_from_pylong(state_info[0])
     state.rng.inc = pcg128_from_pylong(state_info[1])
 

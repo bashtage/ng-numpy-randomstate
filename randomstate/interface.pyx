@@ -112,9 +112,9 @@ cdef extern from "distributions.h":
     cdef void random_gauss_fill(aug_state* state, int count, double *out) nogil
     cdef void random_gauss_zig_julia_fill(aug_state* state, int count, double *out) nogil
 
-
 include "array_utilities.pxi"
 include "bounded_integers.pxi"
+include "aligned_malloc.pxi"
 
 cdef double kahan_sum(double *darr, np.npy_intp n):
     cdef double c, y, t, sum
@@ -141,38 +141,25 @@ cdef class RandomState:
 
     IF RNG_SEED==1:
         def __init__(self, seed=None):
-            IF RNG_MOD_NAME == 'dsfmt':
-                cdef int8_t *iptr
-                cdef int8_t offset = 0
-                cdef intptr_t alignment = 0
-                self.rng_loc = PyMem_Malloc(sizeof(rng_t))
-                self.rng_state.rng = <rng_t *>self.rng_loc
-                alignment  = <intptr_t>(&(self.rng_state.rng.status[0].u32[0]))
-                if (alignment % 16) != 0:
-                    iptr = <int8_t *>self.rng_state.rng
-                    offset = 16 - (alignment % 16)
-                    if offset < 0:
-                        offset += 16
-                    self.rng_state.rng = <rng_t *>(iptr + offset)
-            ELSE:
-                self.rng_loc = PyMem_Malloc(sizeof(rng_t))
-                self.rng_state.rng = <rng_t *>self.rng_loc
-
+            self.rng_state.rng = <rng_t *>PyArray_malloc_aligned(sizeof(rng_t))
             self.rng_state.binomial = &self.binomial_info
-            self._reset_state_variables()
+            IF RNG_MOD_NAME == 'dsfmt':
+                self.rng_state.buffered_uniforms = <double *>PyArray_malloc_aligned(2 * DSFMT_N * sizeof(double))
             self.lock = Lock()
+            self._reset_state_variables()
             self.seed(seed)
-
     ELSE:
         def __init__(self, seed=None, inc=None):
-            self.rng_state.rng = <rng_t *>PyMem_Malloc(sizeof(rng_t)) # &self.rng
+            self.rng_state.rng = <rng_t *>PyArray_malloc_aligned(sizeof(rng_t))
             self.rng_state.binomial = &self.binomial_info
-            self._reset_state_variables()
             self.lock = Lock()
+            self._reset_state_variables()
             self.seed(seed, inc)
 
     def __dealloc__(self):
-        PyMem_Free(self.rng_loc)
+        PyArray_free_aligned(self.rng_state.rng)
+        IF RNG_MOD_NAME == 'dsfmt':
+            PyArray_free_aligned(self.rng_state.buffered_uniforms)
 
     # Pickling support:
     def __getstate__(self):
@@ -496,7 +483,7 @@ cdef class RandomState:
             if isinstance(state, tuple):
                 if state[0] != 'MT19937':
                     raise ValueError('Not a ' + rng_name + ' RNG state')
-                _set_state(self.rng_state, (state[1], state[2]))
+                _set_state(&self.rng_state, (state[1], state[2]))
                 self.rng_state.has_gauss = state[3]
                 self.rng_state.gauss = state[4]
                 self.rng_state.has_uint32 = 0
@@ -505,7 +492,8 @@ cdef class RandomState:
 
         if state['name'] != rng_name:
             raise ValueError('Not a ' + rng_name + ' RNG state')
-        _set_state(self.rng_state, state['state'])
+        print(state['state'])
+        _set_state(&self.rng_state, state['state'])
         self.rng_state.has_gauss = state['gauss']['has_gauss']
         self.rng_state.gauss = state['gauss']['gauss']
         self.rng_state.has_uint32 = state['uint32']['has_uint32']

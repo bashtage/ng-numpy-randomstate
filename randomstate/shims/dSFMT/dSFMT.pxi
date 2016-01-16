@@ -34,6 +34,9 @@ cdef extern from "distributions.h":
         uint64_t zig_random_int
         uint32_t uinteger
 
+        double *buffered_uniforms
+        int buffer_loc
+
     ctypedef s_aug_state aug_state
 
     cdef void set_seed(aug_state* state, uint32_t seed)
@@ -43,7 +46,8 @@ cdef extern from "distributions.h":
 ctypedef dsfmt_t rng_t
 
 cdef object _get_state(aug_state state):
-    cdef uint32_t [:] key = np.zeros(4 * DSFMT_N_PLUS_1, dtype=np.uint32)
+    cdef uint32_t [::1] key = np.zeros(4 * DSFMT_N_PLUS_1, dtype=np.uint32)
+    cdef double [::1] buf = np.zeros(2 * DSFMT_N, dtype=np.double)
     cdef Py_ssize_t i, j, key_loc = 0
     cdef w128_t state_val
     for i in range(DSFMT_N_PLUS_1):
@@ -51,17 +55,29 @@ cdef object _get_state(aug_state state):
         for j in range(4):
             key[key_loc] = state_val.u32[j]
             key_loc += 1
-    return (np.asarray(key), state.rng.idx)
+    for i in range(2 * DSFMT_N):
+        buf[i] = state.buffered_uniforms[i]
 
-cdef object _set_state(aug_state state, object state_info):
-    cdef uint32_t [:] key = state_info[0]
+    return (np.asarray(key), state.rng.idx,
+            np.asarray(buf), state.buffer_loc)
+
+cdef object _set_state(aug_state *state, object state_info):
     cdef Py_ssize_t i, j, key_loc = 0
+    cdef uint32_t [::1] key = state_info[0]
+    state.rng.idx = state_info[1]
+
+
     for i in range(DSFMT_N_PLUS_1):
         for j in range(4):
             state.rng.status[i].u32[j] = key[key_loc]
             key_loc += 1
 
-    state.rng.idx = state_info[1]
+    state.buffer_loc = <int>state_info[3]
+    for i in range(2 * DSFMT_N):
+        state.buffered_uniforms[i] = state_info[2][i]
+
+
+
 
 DEF CLASS_DOCSTRING = """
 RandomState(seed=None)
