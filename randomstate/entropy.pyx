@@ -18,7 +18,7 @@ cdef Py_ssize_t compute_numel(size):
 
 def random_entropy(size=None, source='system'):
     """
-    random_entropy(size=None)
+    random_entropy(size=None, source='system')
 
     Read entropy from the system cryptographic provider
 
@@ -39,12 +39,13 @@ def random_entropy(size=None, source='system'):
 
     Notes
     -----
-    On Unix-like machines, reads from /dev/urandom. On Windows machines reads
-    from the RSA Full cryptographic service provider.
+    On Unix-like machines, reads from ``/dev/urandom``. On Windows machines
+    reads from the RSA Full cryptographic service provider.
 
     This function reads from the system entropy pool and so samples are
     not reproducible.  In particular, it does *NOT* make use of a
-    RandomState, and so seed, get_state and set_state have no effect.
+    RandomState, and so ``seed``, ``get_state`` and ``set_state`` have no
+    effect.
 
     Raises RuntimeError if the command fails.
     """

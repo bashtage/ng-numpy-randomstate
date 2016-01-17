@@ -14,7 +14,6 @@ void *PyArray_realloc_aligned(void *p, size_t n)
         if (NPY_LIKELY(p1 == base)) return p;
         p2 = (void**)(((Py_uintptr_t)(p1)+offs) & ~(NPY_MEMALIGN-1));
         old_offs = (size_t)((Py_uintptr_t)p - (Py_uintptr_t)base);
-        /* TODO: This isn't right, removed void* to aloow msvc to do pointer math */
         memmove((void*)p2,((char*)p1)+old_offs,n);
     } else {
         if (NPY_UNLIKELY((p1 = PyMem_Malloc(n + offs)) == NULL)) return NULL;

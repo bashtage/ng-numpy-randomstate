@@ -55,22 +55,24 @@ Container for a multiplicative lagged fibonacci generator (MLFG).
 MLFG(1279, 861, *) is a 64-bit implementation of a MLFG that uses lags 1279 and
 861 where random numbers are determined by
 
-.. math x_x = (x_{n-k} * x_{n-l}) \mathrm{Mod} M
+.. math::
 
-where k=861, k=1279 and M is 2 ** 64. The period of the generator is
+   x_n = (x_{n-k} * x_{n-l}) \mathrm{Mod} 2^M
+
+where k=861, l=1279 and M=64. The period of the generator is
 2**1340 - 2**61.  Even though the PRNG uses 64 bits, only 63 are random
 since all numbers in x must be odd.
 
-`mlfg_1279_861.RandomState` exposes a number of methods for generating random
+``mlfg_1279_861.RandomState`` exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the
 distribution-specific arguments, each method takes a keyword argument
-`size` that defaults to ``None``. If `size` is ``None``, then a single
+``size`` that defaults to ``None``. If ``size`` is ``None``, then a single
 value is generated and returned. If `size` is an integer, then a 1-D
-array filled with generated values is returned. If `size` is a tuple,
+array filled with generated values is returned. If ``size`` is a tuple,
 then an array with that shape is filled and returned.
 
 *No Compatibility Guarantee*
-'mlfg_1279_861.RandomState' does not make a guarantee that a fixed seed and a
+``mlfg_1279_861.RandomState`` does not make a guarantee that a fixed seed and a
 fixed series of calls to 'mlfg_1279_861.RandomState' methods using the same
 parameters will always produce the same results. This is different from
 'numpy.random.RandomState' guarantee. This is done to simplify improving
@@ -82,7 +84,7 @@ Parameters
 seed : {None, int}, optional
     Random seed initializing the pseudo-random number generator.
     Can be an integer in [0, 2**64] or ``None`` (the default).
-    If `seed` is ``None``, then `mlfg_1279_861.RandomState` will try to read
+    If ``seed`` is ``None``, then `mlfg_1279_861.RandomState` will try to read
     entropy from ``/dev/urandom`` (or the Windows analogue) if available to
     produce a 64-bit seed. If unavailable, the a 64-bit hash of the time
     (and process ID on Unix) is used.
