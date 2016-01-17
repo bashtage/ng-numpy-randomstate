@@ -16,7 +16,7 @@ ctypedef uint32_t (* random_uint_1_i_32)(aug_state* state, uint32_t a) nogil
 ctypedef int32_t (* random_int_2_i_32)(aug_state* state, int32_t a, int32_t b) nogil
 ctypedef int64_t (* random_int_2_i)(aug_state* state, int64_t a, int64_t b) nogil
 
-ctypedef void (* random_double_fill)(aug_state* state, int count, double *out) nogil
+ctypedef void (* random_double_fill)(aug_state* state, np.npy_intp count, double *out) nogil
 
 cdef Py_ssize_t compute_numel(size):
     cdef Py_ssize_t i, n = 1
@@ -104,25 +104,28 @@ cdef object cont_broadcast_1(aug_state* state, void* func, object size, object l
                              object a, object a_name, constraint_type a_constraint):
 
     cdef np.ndarray a_arr, randoms
+    cdef double *randoms_data
     cdef np.broadcast it
     cdef random_double_1 f = (<random_double_1>func)
+    cdef np.npy_intp i, n
 
     a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if a_constraint != CONS_NONE:
         check_array_constraint(a_arr, a_name, a_constraint)
 
     if size is not None:
-        randoms = np.empty(size, np.double)
+        randoms = <np.ndarray>np.empty(size, np.double)
     else:
-        #randoms = np.empty(np.shape(a_arr), np.double)
         randoms = np.PyArray_SimpleNew(np.PyArray_NDIM(a_arr), np.PyArray_DIMS(a_arr), np.NPY_DOUBLE)
 
-
+    randoms_data = <double *>np.PyArray_DATA(randoms)
+    n = np.PyArray_SIZE(randoms)
     it = np.broadcast(randoms, a_arr)
+
     with lock, nogil:
-        while np.PyArray_MultiIter_NOTDONE(it):
+        for i in range(n):
             a_val = (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
-            (<double*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val)
+            randoms_data[i] = f(state, a_val)
 
             np.PyArray_MultiIter_NEXT(it)
 
@@ -132,8 +135,10 @@ cdef object cont_broadcast_2(aug_state* state, void* func, object size, object l
                  object a, object a_name, constraint_type a_constraint,
                  object b, object b_name, constraint_type b_constraint):
     cdef np.ndarray a_arr, b_arr, randoms
+    cdef double *randoms_data
     cdef np.broadcast it
     cdef random_double_2 f = (<random_double_2>func)
+    cdef np.npy_intp i, n
 
     a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if a_constraint != CONS_NONE:
@@ -144,18 +149,22 @@ cdef object cont_broadcast_2(aug_state* state, void* func, object size, object l
         check_array_constraint(b_arr, b_name, b_constraint)
 
     if size is not None:
-        randoms = np.empty(size, np.double)
+        randoms = <np.ndarray>np.empty(size, np.double)
     else:
         it = np.PyArray_MultiIterNew2(a_arr, b_arr)
-        randoms = np.empty(it.shape, np.double)
+        randoms = <np.ndarray>np.empty(it.shape, np.double)
         #randoms = np.PyArray_SimpleNew(it.nd, np.PyArray_DIMS(it), np.NPY_DOUBLE)
+    # TODO: These are needed when using a for loop
+
+    randoms_data = <double *>np.PyArray_DATA(randoms)
+    n = np.PyArray_SIZE(randoms)
 
     it = np.PyArray_MultiIterNew3(randoms, a_arr, b_arr)
     with lock, nogil:
-        while np.PyArray_MultiIter_NOTDONE(it):
+        for i in range(n):
             a_val = (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
             b_val = (<double*>np.PyArray_MultiIter_DATA(it, 2))[0]
-            (<double*>np.PyArray_MultiIter_DATA(it, 0))[0] = f(state, a_val, b_val)
+            randoms_data[i] = f(state, a_val, b_val)
 
             np.PyArray_MultiIter_NEXT(it)
 

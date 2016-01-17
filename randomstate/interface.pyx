@@ -102,15 +102,15 @@ cdef extern from "distributions.h":
     cdef long random_zipf(aug_state *state, double a) nogil
     cdef long random_hypergeometric(aug_state *state, long good, long bad, long sample) nogil
 
-    cdef void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, int cnt, uint64_t *out) nogil
-    cdef void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, int cnt,uint32_t *out) nogil
-    cdef void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, int cnt, uint16_t *out) nogil
-    cdef void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int cnt, uint8_t *out) nogil
-    cdef void random_bool_fill(aug_state *state, int8_t off, int8_t rng, int cnt, int8_t *out) nogil
-    cdef void random_uniform_fill(aug_state *state, int cnt, double *out) nogil
-    cdef void random_standard_exponential_fill(aug_state* state, int count, double *out) nogil
-    cdef void random_gauss_fill(aug_state* state, int count, double *out) nogil
-    cdef void random_gauss_zig_julia_fill(aug_state* state, int count, double *out) nogil
+    cdef void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, intptr_t cnt, uint64_t *out) nogil
+    cdef void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, intptr_t cnt,uint32_t *out) nogil
+    cdef void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, intptr_t cnt, uint16_t *out) nogil
+    cdef void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, intptr_t cnt, uint8_t *out) nogil
+    cdef void random_bool_fill(aug_state *state, int8_t off, int8_t rng, intptr_t cnt, int8_t *out) nogil
+    cdef void random_uniform_fill(aug_state *state, intptr_t cnt, double *out) nogil
+    cdef void random_standard_exponential_fill(aug_state* state, intptr_t count, double *out) nogil
+    cdef void random_gauss_fill(aug_state* state, intptr_t count, double *out) nogil
+    cdef void random_gauss_zig_julia_fill(aug_state* state, intptr_t count, double *out) nogil
 
 include "array_utilities.pxi"
 include "bounded_integers.pxi"
