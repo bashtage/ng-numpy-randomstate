@@ -52,7 +52,7 @@ RandomState(seed=None)
 
 Container for a multiplicative lagged fibonacci generator (MLFG).
 
-MLFG(1279, 861, *) is a 64-bit implementation of a MLFG that uses lags 1279 and
+MLFG(1279, 861, \*) is a 64-bit implementation of a MLFG that uses lags 1279 and
 861 where random numbers are determined by
 
 .. math::
