@@ -35,6 +35,11 @@ identical sequence of random numbers for a given seed.
   * Windows 32/64 bit (only tested on Python 2.7 and 3.5, but should work on 3.3/3.4)
 * There is no documentation for the core RNGs.
 
+## Documentation
+
+A occasionally update build of the documentation is available on
+[my github pages](http://bashtage.github.io/ng-numpy-randomstate/).
+
 ## Plans
 It is essentially complete.  There are a few rough edges that need to be smoothed.
   
