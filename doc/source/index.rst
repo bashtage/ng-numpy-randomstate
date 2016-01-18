@@ -31,10 +31,14 @@ generators, 'in addition' to the standard PRNG in NumPy.  The included PRNGs are
   sequence identical to MT19937. See the `dSFMT authors' page`_.
 * XorShit128+ and XorShift1024* - Vast fast generators based on the XSadd
   generator. These generators can be rapidly 'jumped' and so can be used in
-  parallel applications. See the `xorshift authors' page`_.
+  parallel applications. See the documentation for
+  :meth:`randomstate.prng.xorshift1024.jump` for details. More information
+  about these PRNGs is available at the `xorshift authors' page`_.
 * PCG-32 and PCG-64 - Fast generators that support many parallel streams and
-  can be advanced by an arbitrary amount. PCG-32 only as a period of  :math:`2^{64}`
-  while PCG-64 has a period of :math:`2^{128}`. See the `PCG author's page`_.
+  can be advanced by an arbitrary amount. See the documentation for
+  :meth:`randomstate.prng.pcg64.advance`.  PCG-32 only as a period of
+  :math:`2^{64}` while PCG-64 has a period of :math:`2^{128}`. See the
+  `PCG author's page`_ for more details about this class of PRNG.
 * Multiplicative Lagged Fibbonacci Generator MLFG(1279, 861, \*) - A directly
   implemented multiplicative lagged fibbonacci generator with a very large
   period and good performance. Future plans include multiple stream support.
