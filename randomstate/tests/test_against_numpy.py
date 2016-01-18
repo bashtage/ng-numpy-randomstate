@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 import numpy.random
 from numpy.testing import assert_allclose, assert_array_equal, assert_equal
+import randomstate
 from randomstate.prng.mt19937 import mt19937
 
 
@@ -505,4 +506,20 @@ class TestAgainstNumpy(unittest.TestCase):
         assert_equal(s.randint(1000), 973)
         s = mt19937.RandomState([4294967295])
         assert_equal(s.randint(1000), 265)
+
+    def test_dir(self):
+        nprs_d = dir(self.nprs)
+        rs_d = dir(self.rs)
+        print(set(nprs_d).difference(rs_d))
+        assert(len(set(nprs_d).difference(rs_d)) == 0)
+
+        npmod = dir(numpy.random)
+        mod = dir(randomstate)
+        known_exlcuded = ['__all__', 'Tester', 'info', 'bench',
+                          '__RandomState_ctor', 'mtrand', 'test',
+                          '__warningregistry__']
+        mod += known_exlcuded
+        print(set(npmod).difference(mod))
+        assert(len(set(npmod).difference(mod)) == 0)
+
 
