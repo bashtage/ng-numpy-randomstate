@@ -47,7 +47,7 @@ PCG-32 is a 64-bit implementation of O'Neill's permutation congruential
 generator ([1]_, [2]_). PCG-32 has a period of 2**64 and supports advancing 
 an arbitrary number of steps as well as 2**63 streams.
 
-`pcg32.RandomState` exposes a number of methods for generating random
+``pcg32.RandomState`` exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the
 distribution-specific arguments, each method takes a keyword argument
 `size` that defaults to ``None``. If `size` is ``None``, then a single
@@ -56,10 +56,10 @@ array filled with generated values is returned. If `size` is a tuple,
 then an array with that shape is filled and returned.
 
 *No Compatibility Guarantee*
-'pcg32.RandomState' does not make a guarantee that a fixed seed and a
-fixed series of calls to 'pcg32.RandomState' methods using the same
+``pcg32.RandomState`` does not make a guarantee that a fixed seed and a
+fixed series of calls to ``pcg32.RandomState`` methods using the same
 parameters will always produce the same results. This is different from
-'numpy.random.RandomState' guarantee. This is done to simplify improving
+``numpy.random.RandomState`` guarantee. This is done to simplify improving
 random number generators.  To ensure identical results, you must use the
 same release version.
 
@@ -68,7 +68,7 @@ Parameters
 seed : {None, long}, optional
     Random seed initializing the pseudo-random number generator.
     Can be an integer in [0, 2**64] or ``None`` (the default).
-    If `seed` is ``None``, then `xorshift1024.RandomState` will try to read data
+    If `seed` is ``None``, then ``pcg32.RandomState`` will try to read data
     from ``/dev/urandom`` (or the Windows analogue) if available or seed from
     the clock otherwise.  
 inc : {None, int}, optional

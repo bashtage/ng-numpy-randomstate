@@ -53,7 +53,7 @@ generator [1]_. xorshift128+ has a period of 2**128 - 1 and supports jumping
 the sequence in increments of 2**64, which allow multiple non-overlapping
 sequences to be generated.
 
-`xorshift128.RandomState` exposes a number of methods for generating random
+``xorshift128.RandomState`` exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the
 distribution-specific arguments, each method takes a keyword argument
 `size` that defaults to ``None``. If `size` is ``None``, then a single
@@ -62,10 +62,10 @@ array filled with generated values is returned. If `size` is a tuple,
 then an array with that shape is filled and returned.
 
 *No Compatibility Guarantee*
-'xorshift128.RandomState' does not make a guarantee that a fixed seed and a
-fixed series of calls to 'xorshift128.RandomState' methods using the same
+``xorshift128.RandomState`` does not make a guarantee that a fixed seed and a
+fixed series of calls to ``xorshift128.RandomState`` methods using the same
 parameters will always produce the same results. This is different from
-'numpy.random.RandomState' guarantee. This is done to simplify improving
+``numpy.random.RandomState`` guarantee. This is done to simplify improving
 random number generators.  To ensure identical results, you must use the
 same release version.
 
@@ -74,7 +74,7 @@ Parameters
 seed : {None, int}, optional
     Random seed initializing the pseudo-random number generator.
     Can be an integer or ``None`` (the default).
-    If `seed` is ``None``, then `xorshift128.RandomState` will try to read data
+    If `seed` is ``None``, then ``xorshift128.RandomState`` will try to read data
     from ``/dev/urandom`` (or the Windows analogue) if available or seed from
     the clock otherwise.
 
