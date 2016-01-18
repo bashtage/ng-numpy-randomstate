@@ -1112,7 +1112,7 @@ cdef class RandomState:
 
     def randn(self, *args, method=__normal_method):
         """
-        randn(d0, d1, ..., dn)
+        randn(d0, d1, ..., dn, method='inv')
 
         Return a sample (or samples) from the "standard normal" distribution.
 
@@ -1132,6 +1132,9 @@ cdef class RandomState:
         d0, d1, ..., dn : int, optional
             The dimensions of the returned array, should be all positive.
             If no argument is given a single Python float is returned.
+        method : str, optional
+            Either 'inv' or 'zig'. 'inv' uses the default FIXME method.  'zig' uses
+            the much faster ziggurat method of FIXME.
 
         Returns
         -------
@@ -3674,9 +3677,9 @@ cdef class RandomState:
                  0.0, '', CONS_NONE)
 
     # Multivariate distributions:
-    def multivariate_normal(self, mean, cov, size=None):
+    def multivariate_normal(self, mean, cov, size=None, method=__normal_method):
         """
-        multivariate_normal(mean, cov[, size])
+        multivariate_normal(mean, cov, size=None, method='inv')
 
         Draw random samples from a multivariate normal distribution.
 
@@ -3699,6 +3702,9 @@ cdef class RandomState:
             generated, and packed in an `m`-by-`n`-by-`k` arrangement.  Because
             each sample is `N`-dimensional, the output shape is ``(m,n,k,N)``.
             If no shape is specified, a single (`N`-D) sample is returned.
+        method : str, optional
+            Either 'inv' or 'zig'. 'inv' uses the default FIXME method.  'zig' uses
+            the much faster ziggurat method of FIXME.
 
         Returns
         -------
@@ -3795,7 +3801,7 @@ cdef class RandomState:
         # form a matrix of shape final_shape.
         final_shape = tuple(shape[:])
         final_shape += (mean.shape[0],)
-        x = self.standard_normal(final_shape).reshape(-1, mean.shape[0])
+        x = self.standard_normal(final_shape, method=method).reshape(-1, mean.shape[0])
 
         # Transform matrix of standard normals into matrix where each row
         # contains multivariate normals with the desired covariance.

@@ -304,12 +304,21 @@ class RNG(object):
 
     def test_randn(self):
         state = self.rs.get_state()
-        print(state)
         vals = self.rs.randn(10, 10, 10)
         self.rs.set_state(state)
-        print(self.rs.get_state())
         assert_equal(vals, self.rs.standard_normal((10, 10, 10)))
         assert_equal(vals.shape, (10, 10, 10))
+
+        state = self.rs.get_state()
+        vals = self.rs.randn(10, 10, 10, method='inv')
+        self.rs.set_state(state)
+        assert_equal(vals, self.rs.standard_normal((10, 10, 10), method='inv'))
+
+        state = self.rs.get_state()
+        vals_inv = self.rs.randn(10, 10, 10, method='inv')
+        self.rs.set_state(state)
+        vals_zig = self.rs.randn(10, 10, 10, method='zig')
+        assert (vals_zig != vals_inv).any()
 
     def test_noncentral_chisquare(self):
         vals = self.rs.noncentral_chisquare(10, 2, 10)
@@ -400,6 +409,11 @@ class RNG(object):
         cov = [[1, 0], [0, 100]]  # diagonal covariance
         x = self.rs.multivariate_normal(mean, cov, 5000)
         assert x.shape == (5000, 2)
+        x_zig = self.rs.multivariate_normal(mean, cov, 5000, method='zig')
+        assert x.shape == (5000, 2)
+        x_inv = self.rs.multivariate_normal(mean, cov, 5000, method='inv')
+        assert x.shape == (5000, 2)
+        assert (x_zig != x_inv).any()
 
     def test_multinomial(self):
         vals = self.rs.multinomial(100, [1.0 / 3, 2.0 / 3])
