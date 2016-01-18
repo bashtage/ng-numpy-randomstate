@@ -1,11 +1,16 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "Python.h"
+#include "numpy/npy_common.h"
+
 #ifdef _WIN32
+#include "src/common/stdint.h"
 typedef int bool;
 #define false 0
 #define true 1
 #else
+#include <stdint.h>
 #endif
 
 #ifndef min
@@ -121,20 +126,20 @@ extern unsigned long random_uint(aug_state* state);
 
 extern unsigned long random_interval(aug_state* state, unsigned long max);
 
-extern void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, int cnt, uint64_t *out);
+extern void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, npy_intp cnt, uint64_t *out);
 
-extern void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, int cnt,uint32_t *out);
+extern void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, npy_intp cnt, uint32_t *out);
 
-extern void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, int cnt, uint16_t *out);
+extern void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, npy_intp cnt, uint16_t *out);
 
-extern void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int cnt, uint8_t *out);
+extern void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, npy_intp cnt, uint8_t *out);
 
-extern void random_bool_fill(aug_state *state, int8_t off, int8_t rng, int cnt, int8_t *out);
+extern void random_bool_fill(aug_state *state, int8_t off, int8_t rng, npy_intp cnt, int8_t *out);
 
-extern void random_uniform_fill(aug_state* state, int count, double *out);
+extern void random_uniform_fill(aug_state* state, npy_intp count, double *out);
 
-extern void random_standard_exponential_fill(aug_state* state, int count, double *out);
+extern void random_standard_exponential_fill(aug_state* state, npy_intp count, double *out);
 
-extern void random_gauss_fill(aug_state* state, int count, double *out);
+extern void random_gauss_fill(aug_state* state, npy_intp count, double *out);
 
-extern void random_gauss_zig_julia_fill(aug_state *state, int count, double *out);
+extern void random_gauss_zig_julia_fill(aug_state *state, npy_intp count, double *out);

@@ -36,7 +36,7 @@ double random_standard_uniform(aug_state* state)
 }
 
 
-void random_uniform_fill(aug_state* state, int count, double *out)
+void random_uniform_fill(aug_state* state, npy_intp count, double *out)
 {
     int i;
     for (i=0; i < count; i++) {
@@ -50,7 +50,7 @@ double random_standard_exponential(aug_state* state)
     return -log(1.0 - random_double(state));
 }
 
-void random_standard_exponential_fill(aug_state* state, int count, double *out)
+void random_standard_exponential_fill(aug_state* state, npy_intp count, double *out)
 {
     int i;
     for (i=0; i < count; i++) {
@@ -87,7 +87,7 @@ double random_gauss(aug_state* state) {
     }
 }
 
-void random_gauss_fill(aug_state* state, int count, double *out) {
+void random_gauss_fill(aug_state* state, npy_intp count, double *out) {
     int i;
     double f, x1, x2, r2;
     for (i = 0; i< count; i++) {
@@ -1354,7 +1354,7 @@ double random_gauss_zig_julia(aug_state *state) {
 }
 
 
-void random_gauss_zig_julia_fill(aug_state *state, int count, double *out) {
+void random_gauss_zig_julia_fill(aug_state *state, npy_intp count, double *out) {
     uint64_t r;
     int64_t rabs;
     int idx, i;
@@ -1444,7 +1444,7 @@ static inline uint64_t gen_mask(uint64_t max)
  * Fills an array with cnt random npy_uint64 between off and off + rng
  * inclusive. The numbers wrap if rng is sufficiently large.
  */
-void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, int cnt, uint64_t *out)
+void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, npy_intp cnt, uint64_t *out)
 {
     uint64_t val, mask;
     int i;
@@ -1478,7 +1478,7 @@ void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, in
  * Fills an array with cnt random npy_uint32 between off and off + rng
  * inclusive. The numbers wrap if rng is sufficiently large.
  */
-void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, int cnt, uint32_t *out)
+void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, npy_intp cnt, uint32_t *out)
 {
     uint32_t val, mask = rng;
     int i;
@@ -1504,7 +1504,7 @@ void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, in
  * Fills an array with cnt random npy_uint16 between off and off + rng
  * inclusive. The numbers wrap if rng is sufficiently large.
  */
-void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, int cnt, uint16_t *out)
+void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, npy_intp cnt, uint16_t *out)
 {
     uint16_t val, mask;
     int i;
@@ -1541,7 +1541,7 @@ void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, in
  * Fills an array with cnt random npy_uint8 between off and off + rng
  * inclusive. The numbers wrap if rng is sufficiently large.
  */
-void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int cnt, uint8_t *out)
+void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, npy_intp cnt, uint8_t *out)
 {
     uint8_t val, mask = rng;
     int i;
@@ -1580,7 +1580,7 @@ void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, int c
  * inclusive.
  */
 /* TODO: This needs to use bools. See original */
-void random_bool_fill(aug_state *state, int8_t off, int8_t rng, int cnt, int8_t *out)
+void random_bool_fill(aug_state *state, int8_t off, int8_t rng, npy_intp cnt, int8_t *out)
 {
     int i;
     uint32_t buf = 0;

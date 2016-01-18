@@ -13,7 +13,7 @@ cdef object _rand_int64(low, high, size, aug_state *state, lock):
     cdef uint64_t off, rng, buf
     cdef uint64_t *out
     cdef np.ndarray array
-    cdef int cnt
+    cdef np.npy_intp cnt
 
     rng = <uint64_t>(high - low)
     off = <uint64_t>(<int64_t>low)
@@ -68,7 +68,7 @@ cdef object _rand_int32(low, high, size, aug_state *state, lock):
     cdef uint32_t off, rng, buf
     cdef uint32_t *out
     cdef np.ndarray array
-    cdef int cnt
+    cdef np.npy_intp cnt
 
     rng = <uint32_t>(high - low)
     off = <uint32_t>(<int32_t>low)
@@ -88,7 +88,7 @@ cdef object _rand_int16(low, high, size, aug_state *state, lock):
     cdef uint16_t off, rng, buf
     cdef uint16_t *out
     cdef np.ndarray array
-    cdef int cnt
+    cdef np.npy_intp cnt
 
     rng = <uint16_t>(high - low)
     off = <uint16_t>(<int16_t>low)
@@ -108,7 +108,7 @@ cdef object _rand_int8(low, high, size, aug_state *state, lock):
     cdef uint8_t off, rng, buf
     cdef uint8_t *out
     cdef np.ndarray array
-    cdef int cnt
+    cdef np.npy_intp cnt
 
     rng = <uint8_t>(high - low)
     off = <uint8_t>(<int8_t>low)
@@ -131,7 +131,7 @@ cdef object _rand_uint64(low, high, size, aug_state *state, lock):
     cdef uint64_t off, rng, buf
     cdef uint64_t *out
     cdef np.ndarray array
-    cdef int cnt
+    cdef np.npy_intp cnt
 
     rng = <uint64_t>(high - low)
     off = <uint64_t>low
@@ -151,7 +151,7 @@ cdef object _rand_uint32(low, high, size, aug_state *state, lock):
     cdef uint32_t off, rng, buf
     cdef uint32_t *out
     cdef np.ndarray array
-    cdef int cnt
+    cdef np.npy_intp cnt
 
     rng = <uint32_t>(high - low)
     off = <uint32_t>low
@@ -171,7 +171,7 @@ cdef object _rand_uint16(low, high, size, aug_state *state, lock):
     cdef uint16_t off, rng, buf
     cdef uint16_t *out
     cdef np.ndarray array
-    cdef int cnt
+    cdef np.npy_intp cnt
 
     rng = <uint16_t>(high - low)
     off = <uint16_t>low
@@ -191,7 +191,7 @@ cdef object _rand_uint8(low, high, size, aug_state *state, lock):
     cdef uint8_t off, rng, buf
     cdef uint8_t *out
     cdef np.ndarray array
-    cdef int cnt
+    cdef np.npy_intp cnt
 
     rng = <uint8_t>(high - low)
     off = <uint8_t>low
@@ -212,7 +212,7 @@ cdef object _rand_bool(low, high, size, aug_state *state, lock):
     cdef int8_t off, rng, buf
     cdef int8_t *out
     cdef np.ndarray array
-    cdef int cnt
+    cdef np.npy_intp cnt
 
     rng = <uint8_t>(high - low)
     off = <uint8_t>low
