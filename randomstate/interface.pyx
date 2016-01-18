@@ -4224,3 +4224,5 @@ dirichlet = _rand.dirichlet
 
 shuffle = _rand.shuffle
 permutation = _rand.permutation
+
+sample = ranf = random = random_sample
