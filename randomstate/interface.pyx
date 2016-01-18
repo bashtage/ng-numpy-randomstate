@@ -178,13 +178,13 @@ cdef class RandomState:
 
             Seed the generator.
 
-            This method is called when `RandomState` is initialized. It can be
-            called again to re-seed the generator. For details, see `RandomState`.
+            This method is called when ``RandomState`` is initialized. It can be
+            called again to re-seed the generator. For details, see ``RandomState``.
 
             Parameters
             ----------
             seed : int or array_like, optional
-                Seed for `RandomState`.
+                Seed for ``RandomState``.
                 Must be convertible to 32 bit unsigned integers.
 
             See Also
@@ -219,13 +219,13 @@ cdef class RandomState:
 
             Seed the generator.
 
-            This method is called when `RandomState` is initialized. It can be
-            called again to re-seed the generator. For details, see `RandomState`.
+            This method is called when ``RandomState`` is initialized. It can be
+            called again to re-seed the generator. For details, see ``RandomState``.
 
             Parameters
             ----------
             val : int, optional
-                Seed for `RandomState`.
+                Seed for ``RandomState``.
 
             Notes
             -----
@@ -253,13 +253,13 @@ cdef class RandomState:
 
             Seed the generator.
 
-            This method is called when `RandomState` is initialized. It can be
-            called again to re-seed the generator. For details, see `RandomState`.
+            This method is called when ``RandomState`` is initialized. It can be
+            called again to re-seed the generator. For details, see ``RandomState``.
 
             Parameters
             ----------
             val : int, optional
-                Seed for `RandomState`.
+                Seed for ``RandomState``.
             inc : int, optional
                 Increment to use for producing multiple streams
 
@@ -363,7 +363,7 @@ cdef class RandomState:
 
             Return a tuple representing the internal state of the generator.
 
-            For more details, see `set_state`.
+            For more details, see ``set_state``.
 
             Parameters
             ----------
@@ -386,7 +386,7 @@ cdef class RandomState:
 
             Notes
             -----
-            `set_state` and `get_state` are not needed to work with any of the
+            ``set_state`` and ``get_state`` are not needed to work with any of the
             random distributions in NumPy. If the internal state is manually altered,
             the user should know exactly what he/she is doing.
 
@@ -410,7 +410,7 @@ cdef class RandomState:
 
             Return a tuple representing the internal state of the generator.
 
-            For more details, see `set_state`.
+            For more details, see ``set_state``.
 
             Returns
             -------
@@ -428,7 +428,7 @@ cdef class RandomState:
 
             Notes
             -----
-            `set_state` and `get_state` are not needed to work with any of the
+            ``set_state`` and ``get_state`` are not needed to work with any of the
             random distributions in NumPy. If the internal state is manually altered,
             the user should know exactly what he/she is doing.
 
@@ -471,7 +471,7 @@ cdef class RandomState:
 
         Notes
         -----
-        `set_state` and `get_state` are not needed to work with any of the
+        ``set_state`` and ``get_state`` are not needed to work with any of the
         random distributions in NumPy. If the internal state is manually altered,
         the user should know exactly what he/she is doing.
 
@@ -559,7 +559,7 @@ cdef class RandomState:
 
         Results are from the "continuous uniform" distribution over the
         stated interval.  To sample :math:`Unif[a, b), b > a` multiply
-        the output of `random_sample` by `(b-a)` and add `a`::
+        the output of ``random_sample`` by `(b-a)` and add `a`::
 
           (b - a) * random_sample() + a
 

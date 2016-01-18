@@ -84,7 +84,7 @@ RandomState(seed=None)
 
 Container for the SIMD-based Mersenne Twister pseudo-random number generator.
 
-`dSFMT.RandomState` exposes a number of methods for generating random
+``dSFMT.RandomState`` exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the
 distribution-specific arguments, each method takes a keyword argument
 `size` that defaults to ``None``. If `size` is ``None``, then a single
@@ -105,7 +105,7 @@ Parameters
 seed : {None, int}, optional
     Random seed initializing the pseudo-random number generator.
     Can be an integer in [0, 2**32] or ``None`` (the default).
-    If `seed` is ``None``, then `dSFMT.RandomState` will try to read
+    If `seed` is ``None``, then ``dSFMT.RandomState`` will try to read
     entropy from ``/dev/urandom`` (or the Windows analogue) if available to
     produce a 64-bit seed. If unavailable, the a 64-bit hash of the time
     and process ID is used.
