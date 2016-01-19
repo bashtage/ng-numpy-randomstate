@@ -1,6 +1,7 @@
 # randomstate
-[![Build Status](https://travis-ci.org/bashtage/ng-numpy-randomstate.svg?branch=master)](https://travis-ci.org/bashtage/ng-numpy-randomstate) 
-[![Build status](https://ci.appveyor.com/api/projects/status/odc5c4ukhru5xicl/branch/master?svg=true)](https://ci.appveyor.com/project/bashtage/ng-numpy-randomstate/branch/master)
+
+[![Travis Build Status](https://travis-ci.org/bashtage/ng-numpy-randomstate.svg?branch=master)](https://travis-ci.org/bashtage/ng-numpy-randomstate) 
+[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/odc5c4ukhru5xicl/branch/master?svg=true)](https://ci.appveyor.com/project/bashtage/ng-numpy-randomstate/branch/master)
 
 This is a library and generic interface for alternative random generators 
 in Python and Numpy. 
@@ -73,6 +74,10 @@ identical sequence of random numbers for a given seed.
   * PC-BSD (FreeBSD) 64-bit, Python 2.7
   * OSX  64-bit, Python 2.7
   * Windows 32/64 bit (only tested on Python 2.7 and 3.5, but should work on 3.3/3.4)
+
+## Version
+The version matched the latest verion of NumPy where 
+`randomstate.prng.mt19937` passes all NumPy test.
 
 ## Documentation
 

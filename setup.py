@@ -2,11 +2,13 @@ import os
 import shutil
 import sys
 from os.path import join
+import subprocess
 
 import numpy
 from Cython.Build import cythonize
 from setuptools import setup, find_packages
 from setuptools.extension import Extension
+from setuptools.dist import Distribution
 
 FORCE_EMULATION = False
 
@@ -138,6 +140,14 @@ for rng in rngs:
 
     configs.append(config)
 
+class BinaryDistribution(Distribution):
+  def is_pure(self):
+    return False
+
+try:
+    subprocess.call(['pandoc','--from=markdown','--to=rst','--output=README.rst','README.md'])
+except:
+    pass
 # Generate files and extensions
 extensions = [Extension('randomstate.entropy',
                         sources=[join(mod_dir, 'entropy.pyx'),
@@ -172,16 +182,19 @@ for config in configs:
 ext_modules = cythonize(extensions)
 
 setup(name='randomstate',
-      version='0.1',
+      version='1.10',
       packages=find_packages(),
       package_dir={'randomstate': './randomstate'},
-      package_data={'randomstate.tests.data': ['*.csv', '*.dat']},
-      include_package_data=False,
+      package_data={'': ['*.c','*.h','*.pxi','*.pyx','*.pxd'],
+                    'randomstate.tests.data': ['*.csv']},
+      include_package_data=True,
       license='NSCA',
       author='Kevin Sheppard',
+      author_email='kevin.k.sheppard@gmail.com',
+      distclass=BinaryDistribution,
       description='Next-gen RandomState supporting multiple PRNGs',
       url='https://github.com/bashtage/ng-numpy-randomstate',
-      long_description=open('README.md').read(),
+      long_description=open('README.rst').read(),
       ext_modules=ext_modules,
       zip_safe=False)
 

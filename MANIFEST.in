@@ -1,0 +1,12 @@
+recursive-include randomstate *.c *.h *.pxi *.pxd *.pyx
+recursive-include randomstate/tests *.csv
+include *.md
+exclude randomstate/entropy.c
+exclude randomstate/dsfmt*
+exclude randomstate/mt19937*
+exclude randomstate/mlfg_1279_861*
+exclude randomstate/pcg32*
+exclude randomstate/pcg64*
+exclude randomstate/xorshift128*
+exclude randomstate/xorshift1024*
+
