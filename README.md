@@ -115,6 +115,14 @@ implementation for identical results. It also passes NumPy's test suite.
 python setup.py install
 ```
 
+### SSE2
+`dSFTM` makes use of SSE2 by default.  If you have a very old computer or are 
+building on non-x86, you can install using:
+
+```bash
+python setup.py install --no-sse2
+```
+
 ### Windows
 Either use a binary installer or if building from scratch using Python 3.5 and 
 the free Visual Studio 2015 Community Edition. It can also be build using 

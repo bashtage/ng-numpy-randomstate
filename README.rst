@@ -135,6 +135,16 @@ Installing
 
     python setup.py install
 
+SSE2
+~~~~
+
+``dSFTM`` makes use of SSE2 by default. If you have a very old computer
+or are building on non-x86, you can install using:
+
+.. code:: bash
+
+    python setup.py install --no-sse2
+
 Windows
 ~~~~~~~
 

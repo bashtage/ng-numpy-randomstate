@@ -11,6 +11,7 @@ from setuptools.extension import Extension
 from setuptools.dist import Distribution
 
 FORCE_EMULATION = False
+USE_SSE2 = True if not '--no-sse2' in sys.argv else False
 
 mod_dir = './randomstate'
 configs = []
@@ -23,6 +24,11 @@ compile_rngs = rngs[:]
 extra_defs = []
 extra_link_args = ['Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []
 base_extra_compile_args = [] if os.name == 'nt' else ['-std=c99']
+if USE_SSE2:
+    if os.name == 'nt':
+        base_extra_compile_args += ['/arch:SSE2']
+    else:
+        base_extra_compile_args += ['-msse2']
 
 
 def write_config(file_name, config):
@@ -35,10 +41,10 @@ def write_config(file_name, config):
                 val = '"' + val + '"'
             config.write('DEF ' + key + ' = ' + str(val) + '\n')
 
+
 base_include_dirs = [mod_dir] + [numpy.get_include()]
 if os.name == 'nt' and sys.version_info < (3, 5):
-    base_include_dirs  += [join(mod_dir, 'src', 'common')]
-
+    base_include_dirs += [join(mod_dir, 'src', 'common')]
 
 for rng in rngs:
     if rng not in compile_rngs:
@@ -120,13 +126,10 @@ for rng in rngs:
         sources += [join(mod_dir, 'src', 'dSFMT', 'dSFMT.c')]
         sources += [join(mod_dir, 'shims', 'dSFMT', 'dSFMT-shim.c')]
         # TODO: HAVE_SSE2 should only be for platforms that have SSE2
-        # TODO: But how to reliable detect?
-        defs = [('DSFMT_RNG', '1'),('DSFMT_MEXP','19937')]
-        defs += [('HAVE_SSE2', '1')]
-        if os.name == 'nt':
-            extra_compile_args = base_extra_compile_args + ['/arch:SSE2']
-        else:
-            extra_compile_args = base_extra_compile_args + ['-msse2']
+        # TODO: But how to reliably detect?
+        defs = [('DSFMT_RNG', '1'), ('DSFMT_MEXP', '19937')]
+        if USE_SSE2:
+            defs += [('HAVE_SSE2', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'dSFMT')]
 
@@ -140,12 +143,14 @@ for rng in rngs:
 
     configs.append(config)
 
+
 class BinaryDistribution(Distribution):
-  def is_pure(self):
-    return False
+    def is_pure(self):
+        return False
+
 
 try:
-    subprocess.call(['pandoc','--from=markdown','--to=rst','--output=README.rst','README.md'])
+    subprocess.call(['pandoc', '--from=markdown', '--to=rst', '--output=README.rst', 'README.md'])
 except:
     pass
 # Generate files and extensions
@@ -181,11 +186,36 @@ for config in configs:
 
 ext_modules = cythonize(extensions)
 
+classifiers = ['Development Status :: 5 - Production/Stable',
+               'Environment :: Console',
+               'Intended Audience :: End Users/Desktop',
+               'Intended Audience :: Financial and Insurance Industry',
+               'Intended Audience :: Information Technology',
+               'Intended Audience :: Science/Research',
+               'License :: OSI Approved',
+               'Operating System :: MacOS :: MacOS X',
+               'Operating System :: Microsoft :: Windows',
+               'Operating System :: POSIX :: Linux',
+               'Operating System :: Unix',
+               'Programming Language :: C',
+               'Programming Language :: Cython',
+               'Programming Language :: Python :: 2.6',
+               'Programming Language :: Python :: 2.7',
+               'Programming Language :: Python :: 3.3',
+               'Programming Language :: Python :: 3.4',
+               'Programming Language :: Python :: 3.5',
+               'Topic :: Adaptive Technologies',
+               'Topic :: Artistic Software',
+               'Topic :: Office/Business :: Financial',
+               'Topic :: Scientific/Engineering',
+               'Topic :: Security :: Cryptography']
+
 setup(name='randomstate',
       version='1.10',
+      classifiers=classifiers,
       packages=find_packages(),
       package_dir={'randomstate': './randomstate'},
-      package_data={'': ['*.c','*.h','*.pxi','*.pyx','*.pxd'],
+      package_data={'': ['*.c', '*.h', '*.pxi', '*.pyx', '*.pxd'],
                     'randomstate.tests.data': ['*.csv']},
       include_package_data=True,
       license='NSCA',
@@ -196,6 +226,8 @@ setup(name='randomstate',
       url='https://github.com/bashtage/ng-numpy-randomstate',
       long_description=open('README.rst').read(),
       ext_modules=ext_modules,
+      keywords=['pseudo random numbers', 'PRNG', 'RNG', 'RandomState', 'random', 'random numbers',
+                'parallel random numbers', 'PCG', 'XorShift', 'dSFMT', 'MT19937'],
       zip_safe=False)
 
 # Clean up generated files
