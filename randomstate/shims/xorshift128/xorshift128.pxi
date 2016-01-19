@@ -1,9 +1,5 @@
-DEF RNG_NAME = "xorshift-128+"
-DEF RNG_ADVANCEABLE = 0
-DEF RNG_JUMPABLE = 1
-DEF RNG_STATE_LEN = 4
-DEF RNG_SEED=1
-DEF NORMAL_METHOD = 'zig'
+DEF RS_RNG_NAME = "xorshift-128+"
+DEF RS_RNG_JUMPABLE = 1
 
 cdef extern from "distributions.h":
 

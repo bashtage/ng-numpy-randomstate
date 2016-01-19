@@ -22,21 +22,21 @@ typedef int bool;
 #define M_PI 3.14159265358979323846264338328
 #endif
 
-#if  defined(PCG_32_RNG)
+#if  defined(RS_PCG32)
 #include "shims/pcg-32/pcg-32-shim.h"
-#elif defined(PCG_64_RNG)
+#elif defined(RS_PCG64)
 #include "shims/pcg-64/pcg-64-shim.h"
-#elif defined(RANDOMKIT_RNG)
+#elif defined(RS_RANDOMKIT)
 #include "shims/random-kit/random-kit-shim.h"
-#elif defined(XORSHIFT128_RNG)
+#elif defined(RS_XORSHIFT128)
 #include "shims/xorshift128/xorshift128-shim.h"
-#elif defined(XORSHIFT1024_RNG)
+#elif defined(RS_XORSHIFT1024)
 #include "shims/xorshift1024/xorshift1024-shim.h"
-#elif defined(MRG32K3A_RNG)
+#elif defined(RS_MRG32K3A)
 #include "shims/mrg32k3a/mrg32k3a-shim.h"
-#elif defined(MLFG_1279_861_RNG)
+#elif defined(RS_MLFG_1279_861)
 #include "shims/mlfg-1279-861/mlfg-1279-861-shim.h"
-#elif defined(DSFMT_RNG)
+#elif defined(RS_DSFMT)
 #include "shims/dSFMT/dSFMT-shim.h"
 #else
 #error Unknown RNG!!!  Unknown RNG!!!  Unknown RNG!!!
