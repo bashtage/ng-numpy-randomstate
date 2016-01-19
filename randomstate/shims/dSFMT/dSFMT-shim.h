@@ -9,7 +9,9 @@
 
 #include "../../src/common/binomial.h"
 #include "../../src/common/entropy.h"
+#include "../../src/dSFMT/dSFMT-jump.h"
 #include "../../src/dSFMT/dSFMT.h"
+
 
 typedef struct s_aug_state {
     dsfmt_t *rng;
@@ -69,3 +71,4 @@ extern void set_seed_by_array(aug_state* state, uint32_t init_key[], int key_len
 
 extern void set_seed(aug_state* state, uint32_t seed);
 
+extern void jump_state(aug_state* state);

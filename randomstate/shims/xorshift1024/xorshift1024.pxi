@@ -50,7 +50,7 @@ RandomState(seed=None)
 Container for the xorshift1024* pseudo random number generator.
 
 xorshift1024* is a 64-bit implementation of Saito and Matsumoto's XSadd
-generator [1]_,[2]_,[3]_,[4]_. xorshift1024* has a period of 2**1024 - 1 and
+generator [1]_. xorshift1024* has a period of 2**1024 - 1 and
 supports jumping the sequence in increments of 2**512, which allow multiple
 non-overlapping sequences to be generated.
 
@@ -90,7 +90,8 @@ See xorshift128 for a faster implementation that has a smaller period.
 calling the method ``jump`` which advances the
 the state as-if :math:`2^{512}` random numbers have been generated. This
 allow the original sequence to be split so that distinct segments can be used
-on each worker process.
+on each worker process. All generators should be initialized with the same
+seed to ensure that the segments come from the same sequence.
 
 >>> import randomstate.prng.xorshift1024 as rnd
 >>> rs = [rnd.RandomState(1234) for _ in range(10)]

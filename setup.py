@@ -124,6 +124,7 @@ for rng in rngs:
 
     elif rng == 'RNG_DSFMT':
         sources += [join(mod_dir, 'src', 'dSFMT', 'dSFMT.c')]
+        sources += [join(mod_dir, 'src', 'dSFMT', 'dSFMT-jump.c')]
         sources += [join(mod_dir, 'shims', 'dSFMT', 'dSFMT-shim.c')]
         # TODO: HAVE_SSE2 should only be for platforms that have SSE2
         # TODO: But how to reliably detect?

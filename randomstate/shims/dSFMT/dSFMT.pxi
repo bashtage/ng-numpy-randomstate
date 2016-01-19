@@ -1,4 +1,5 @@
 DEF RS_RNG_NAME = 'dSFMT'
+DEF RS_RNG_JUMPABLE = 1
 DEF DSFMT_MEXP = 19937
 DEF DSFMT_N = 191 # ((DSFMT_MEXP - 128) / 104 + 1)
 DEF DSFMT_N_PLUS_1 = 192 # DSFMT_N + 1
@@ -37,6 +38,9 @@ cdef extern from "distributions.h":
     cdef void set_seed(aug_state* state, uint32_t seed)
 
     cdef void set_seed_by_array(aug_state* state, uint32_t init_key[], int key_length)
+
+    cdef void jump_state(aug_state* state)
+
 
 ctypedef dsfmt_t rng_t
 
@@ -80,8 +84,8 @@ RandomState(seed=None)
 Container for the SIMD-based Mersenne Twister pseudo-random number generator.
 
 ``dSFMT.RandomState`` exposes a number of methods for generating random
-numbers drawn from a variety of probability distributions. In addition to the
-distribution-specific arguments, each method takes a keyword argument
+numbers drawn from a variety of probability distributions [1]_ . In addition
+to the distribution-specific arguments, each method takes a keyword argument
 `size` that defaults to ``None``. If `size` is ``None``, then a single
 value is generated and returned. If `size` is an integer, then a 1-D
 array filled with generated values is returned. If `size` is a tuple,
@@ -113,4 +117,28 @@ pseudo-random number generator with a number of methods that are similar
 to the ones available in `RandomState`. `RandomState`, besides being
 NumPy-aware, has the advantage that it provides a much larger number
 of probability distributions to choose from.
+
+**Parallel Features**
+
+``dsfmt.RandomState`` can be used in parallel applications by
+calling the method ``jump`` which advances the the state as-if :math:`2^{128}`
+random numbers have been generated [2]_. This allow the original sequence to
+be split so that distinct segments can be used on each worker process.  All
+generators should be initialized with the same seed to ensure that the
+segments come from the same sequence.
+
+>>> from randomstate.entropy import random_entropy
+>>> import randomstate.prng.dsfmt as rnd
+>>> seed = random_entropy()
+>>> rs = [rnd.RandomState(seed) for _ in range(10)]
+# Advance rs[i] by i jumps
+>>> for i in range(10):
+        rs[i].jump(i)
+
+.. [1] Mutsuo Saito and Makoto Matsumoto, "SIMD-oriented Fast Mersenne
+       Twister: a 128-bit Pseudorandom Number Generator." Monte Carlo
+       and Quasi-Monte Carlo Methods 2006, Springer, pp. 607 -- 622, 2008.
+.. [2] Hiroshi Haramoto, Makoto Matsumoto, and Pierre L'Ecuyer, "A Fast
+       Jump Ahead Algorithm for Linear Recurrences in a Polynomial Space",
+       Sequences and Their Applications - SETA, 290--298, 2008.
 """

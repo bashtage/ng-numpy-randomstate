@@ -49,7 +49,7 @@ extern "C" {
 		  UINT64_C(0x3ffafa9bfbd5d55d),
 		  UINT64_C(0x0470470470573573),
 		  UINT64_C(0x0250250251259259)}},
-	{0, {}}
+	{0}
     };
 
     inline static void next_state(dsfmt_t * dsfmt);
@@ -150,11 +150,13 @@ extern "C" {
 	dsfmt_t work;
 	int index = dsfmt->idx;
 	int bits;
+	int i;
+	int j;
 	memset(&work, 0, sizeof(dsfmt_t));
 	add_fix(dsfmt);
 	dsfmt->idx = DSFMT_N64;
 
-	for (int i = 0; jump_string[i] != '\0'; i++) {
+	for (i = 0; jump_string[i] != '\0'; i++) {
 	    bits = jump_string[i];
 	    assert(isxdigit(bits));
 	    bits = tolower(bits);
@@ -164,7 +166,7 @@ extern "C" {
 		bits = bits - '0';
 	    }
 	    bits = bits & 0x0f;
-	    for (int j = 0; j < 4; j++) {
+	    for (j = 0; j < 4; j++) {
 		if ((bits & 1) != 0) {
 		    add(&work, dsfmt);
 		}
