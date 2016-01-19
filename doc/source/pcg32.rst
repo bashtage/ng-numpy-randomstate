@@ -16,6 +16,12 @@ Random generator
    get_state
    set_state
 
+Parallel generation
+===================
+.. autosummary::
+   :toctree: generated/
+
+   advance
 
 Simple random data
 ==================
