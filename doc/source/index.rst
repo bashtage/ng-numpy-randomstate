@@ -68,7 +68,7 @@ RandomState Pseudo Random Number Generator Documentation:
    PCG-64 <pcg64>
    MLFG <mlfg>
    MRG32K3A <mrg32k3a>
-   Readying System Entropy <entropy>
+   Reading System Entropy <entropy>
 
 
 Indices and tables

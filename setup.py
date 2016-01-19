@@ -184,6 +184,11 @@ for config in configs:
                     extra_link_args=extra_link_args)
     extensions.append(ext)
 
+# Do not run cythonize if clean
+if 'clean' in sys.argv:
+    def cythonize(e):
+        return e
+
 ext_modules = cythonize(extensions)
 
 classifiers = ['Development Status :: 5 - Production/Stable',
@@ -231,7 +236,9 @@ setup(name='randomstate',
       zip_safe=False)
 
 # Clean up generated files
+exts = ('.pyx', '-config.pxi', '.c')
 for config in configs:
-    os.unlink(join(mod_dir, config['file_name'] + '.pyx'))
-    os.unlink(join(mod_dir, config['file_name'] + '-config.pxi'))
-    os.unlink(join(mod_dir, config['file_name'] + '.c'))
+    for ext in exts:
+        file_path = join(mod_dir, config['file_name'] + ext)
+        if os.path.exists(file_path):
+            os.unlink(file_path)

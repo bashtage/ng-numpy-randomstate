@@ -54,9 +54,9 @@ RandomState(seed=None)
 Container for the xorshift1024* pseudo random number generator.
 
 xorshift1024* is a 64-bit implementation of Saito and Matsumoto's XSadd
-generator [1]_. xorshift1024* has a period of 2**1024 - 1 and supports jumping
-the sequence in increments of 2**512, which allow multiple non-overlapping
-sequences to be generated.
+generator [1]_,[2]_,[3]_,[4]_. xorshift1024* has a period of 2**1024 - 1 and
+supports jumping the sequence in increments of 2**512, which allow multiple
+non-overlapping sequences to be generated.
 
 ``xorshift1024.RandomState`` exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the
@@ -88,11 +88,13 @@ Notes
 -----
 See xorshift128 for a faster implementation that has a smaller period.
 
-** Parallel Features **
+**Parallel Features**
 
 ``xorshift1024.RandomState`` can be used in parallel applications by
-invoking the ``xorshift1024.RandomState.jump`` which will advance the
-the state as-if :math:`2^512` random numbers have been generated.
+calling the method ``jump`` which advances the
+the state as-if :math:`2^{512}` random numbers have been generated. This
+allow the original sequence to be split so that distinct segments can be used
+on each worker process.
 
 >>> import randomstate.prng.xorshift1024 as rnd
 >>> rs = [rnd.RandomState(1234) for _ in range(10)]
@@ -104,4 +106,10 @@ References
 ----------
 .. [1] "xorshift*/xorshift+ generators and the PRNG shootout",
        http://xorshift.di.unimi.it/
+.. [2] Marsaglia, George. "Xorshift RNGs." Journal of Statistical Software
+       [Online], 8.14, pp. 1 - 6, .2003.
+.. [3] Sebastiano Vigna. "An experimental exploration of Marsaglia's xorshift
+       generators, scrambled." CoRR, abs/1402.6246, 2014.
+.. [4] Sebastiano Vigna. "Further scramblings of Marsaglia's xorshift
+       generators." CoRR, abs/1403.0930, 2014.
 """

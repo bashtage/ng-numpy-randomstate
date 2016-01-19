@@ -50,9 +50,9 @@ cdef object _set_state(aug_state *state, object state_info):
 DEF CLASS_DOCSTRING = """
 RandomState(seed=None)
 
-Container for a multiplicative lagged fibonacci generator (MLFG).
+Container for a Multiplicative Lagged Fibonacci Generator (MLFG).
 
-MLFG(1279, 861, \*) is a 64-bit implementation of a MLFG that uses lags 1279 and
+LFG(1279, 861, \*) is a 64-bit implementation of a MLFG that uses lags 1279 and
 861 where random numbers are determined by
 
 .. math::

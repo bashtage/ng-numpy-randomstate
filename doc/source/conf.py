@@ -129,7 +129,9 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {'bootswatch_theme': 'flatly'}
+html_theme_options = {'bootswatch_theme': 'yeti',
+                      # Render the next and previous page links in navbar. (Default: true)
+                      'navbar_sidebarrel': False,}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
