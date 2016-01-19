@@ -18,7 +18,7 @@ void entropy_init(aug_state* state)
     xorshift128_seed(state->rng, seed[0]);
 }
 
-void jump(aug_state* state)
+void jump_state(aug_state* state)
 {
     xorshift128_jump(state->rng);
 }

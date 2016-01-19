@@ -51,6 +51,6 @@ inline double random_double(aug_state* state)
 
 extern void set_seed(aug_state* state, uint64_t seed);
 
-extern void jump(aug_state* state);
+extern void jump_state(aug_state* state);
 
 extern void entropy_init(aug_state* state);

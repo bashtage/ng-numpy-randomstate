@@ -316,11 +316,11 @@ cdef class RandomState:
             """
             IF RNG_NAME == 'pcg64':
                 IF PCG128_EMULATED:
-                    advance(&self.rng_state, pcg128_from_pylong(delta))
+                    advance_state(&self.rng_state, pcg128_from_pylong(delta))
                 ELSE:
-                    advance(&self.rng_state, delta)
+                    advance_state(&self.rng_state, delta)
             ELSE:
-                advance(&self.rng_state, delta)
+                advance_state(&self.rng_state, delta)
 
             self.rng_state.has_gauss = 0
             self.rng_state.gauss = 0.0
@@ -351,7 +351,7 @@ cdef class RandomState:
             """
             cdef Py_ssize_t i;
             for i in range(iter):
-                jump(&self.rng_state)
+                jump_state(&self.rng_state)
             self.rng_state.has_gauss = 0
             self.rng_state.gauss = 0.0
             return None
@@ -4226,3 +4226,8 @@ shuffle = _rand.shuffle
 permutation = _rand.permutation
 
 sample = ranf = random = random_sample
+
+IF RNG_JUMPABLE:
+    jump = _rand.jump
+IF RNG_ADVANCEABLE:
+    advance = _rand.advance

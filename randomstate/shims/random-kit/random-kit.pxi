@@ -62,7 +62,8 @@ value is generated and returned. If `size` is an integer, then a 1-D
 array filled with generated values is returned. If `size` is a tuple,
 then an array with that shape is filled and returned.
 
-*Compatibility Guarantee*
+**Compatibility Guarantee**
+
 ``mt19937.RandomState`` is identical to ``numpy.random.RandomState`` and
 makes the same compatability guarantee. A fixed seed and a fixed series of
 calls to ``mt19937.RandomState`` methods using the same parameters will always

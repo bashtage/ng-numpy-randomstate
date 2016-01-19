@@ -31,7 +31,7 @@ cdef extern from "distributions.h":
 
     ctypedef s_aug_state aug_state
 
-    cdef void advance(aug_state* state, pcg128_t delta)
+    cdef void advance_state(aug_state* state, pcg128_t delta)
 
     cdef void set_seed(aug_state* state, pcg128_t seed, pcg128_t inc)
 

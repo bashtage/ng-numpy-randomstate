@@ -26,7 +26,7 @@ cdef extern from "distributions.h":
 
     cdef void set_seed(aug_state* state, uint64_t seed)
 
-    cdef void jump(aug_state* state)
+    cdef void jump_state(aug_state* state)
 
     cdef void init_state(aug_state* state, uint64_t* state_vals)
 
@@ -66,7 +66,8 @@ value is generated and returned. If `size` is an integer, then a 1-D
 array filled with generated values is returned. If `size` is a tuple,
 then an array with that shape is filled and returned.
 
-*No Compatibility Guarantee*
+**No Compatibility Guarantee**
+
 ``xorshift1024.RandomState`` does not make a guarantee that a fixed seed and a
 fixed series of calls to ``xorshift1024.RandomState`` methods using the same
 parameters will always produce the same results. This is different from
@@ -86,6 +87,18 @@ seed : {None, int}, optional
 Notes
 -----
 See xorshift128 for a faster implementation that has a smaller period.
+
+** Parallel Features **
+
+``xorshift1024.RandomState`` can be used in parallel applications by
+invoking the ``xorshift1024.RandomState.jump`` which will advance the
+the state as-if :math:`2^512` random numbers have been generated.
+
+>>> import randomstate.prng.xorshift1024 as rnd
+>>> rs = [rnd.RandomState(1234) for _ in range(10)]
+# Advance rs[i] by i jumps
+>>> for i in range(10):
+        rs[i].jump(i)
 
 References
 ----------

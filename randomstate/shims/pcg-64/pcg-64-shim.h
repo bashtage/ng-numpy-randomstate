@@ -45,7 +45,7 @@ inline void set_seed(aug_state* state, pcg128_t seed, pcg128_t inc)
     pcg64_srandom_r(state->rng, seed, inc);
 }
 
-inline void advance(aug_state* state, pcg128_t delta)
+inline void advance_state(aug_state* state, pcg128_t delta)
 {
     pcg64_advance_r(state->rng, delta);
 }

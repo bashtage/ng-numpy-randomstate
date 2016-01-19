@@ -63,7 +63,8 @@ value is generated and returned. If `size` is an integer, then a 1-D
 array filled with generated values is returned. If `size` is a tuple,
 then an array with that shape is filled and returned.
 
-*No Compatibility Guarantee*
+**No Compatibility Guarantee**
+
 ``mrg32k3a.RandomState`` does not make a guarantee that a fixed seed and a
 fixed series of calls to ``mrg32k3a.RandomState`` methods using the same
 parameters will always produce the same results. This is different from
