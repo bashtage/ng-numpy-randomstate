@@ -1,9 +1,37 @@
-# ng-numpy-randomstate
+# randomstate
 [![Build Status](https://travis-ci.org/bashtage/ng-numpy-randomstate.svg?branch=master)](https://travis-ci.org/bashtage/ng-numpy-randomstate) 
 [![Build status](https://ci.appveyor.com/api/projects/status/odc5c4ukhru5xicl/branch/master?svg=true)](https://ci.appveyor.com/project/bashtage/ng-numpy-randomstate/branch/master)
 
 This is a library and generic interface for alternative random generators 
-in Python and Numpy. This modules includes a number of alternative random 
+in Python and Numpy. 
+
+Features
+
+* Immediate drop in replacement for Numy's RandomState
+
+```python
+# import numpy.random as rnd
+import randomstate as rnd
+x = rnd.standard_normal(100)
+y = rnd.random_sample(100)
+z = rnd.randn(10,10)
+```
+
+* Default random generator is identical to NumPy's RandomState (i.e., same 
+seed, same random numbers).
+* Support for random number generators that support independent streams and 
+jumping ahead so that substreams can be generated
+* Faster ranomd number generations, especially for Normals using the Ziggurat 
+method 
+
+```python
+import randomstate as rnd
+w = rnd.standard_normal(10000, method='zig')
+```
+
+## Included Pseudo Random Number Generators
+
+This modules includes a number of alternative random 
 number generators in addition to the MT19937 that is included in NumPy. 
 The RNGs include:
 
@@ -17,11 +45,23 @@ version of the MT19937 generator that is especially fast at generating doubles
 * [MRG32K3A](http://simul.iro.umontreal.ca/rng)
 * A multiplicative lagged fibonacci generator (LFG(31, 1279, 861, *))
 
-## Rationale
-The main reason for this project is to include other PRNGs that support 
-important features when working in parallel such as the ability to produce 
-multiple independent streams, to quickly advance the generator, or to jump 
-ahead.
+## Differences from `numpy.random.RandomState`
+
+### New Features
+* `stanard_normal`, `normal`, `randn` and `multivariate_normal` all support 
+an additional `method` keyword argument which can be `inv` or `zig` where 
+`inv` corresponds to the current method and `zig` uses tha much faster 
+(100%+) ziggurat method.
+
+### New Functions
+
+* `random_entropy` - Read from the system entropy provider, which is commonly 
+used in cryptographic applications
+* `random_uintegers` - unsigned integers `[0, 2**64-1]` 
+* `jump` - Jumps RNGs that support it.  `jump` moves the state a great 
+distance. _Only available if supported by the RNG._
+* `advance` - Advanced the core RNG 'as-if' a number of draws were made, 
+without actually drawing the numbers. _Only available if supported by the RNG._
 
 ## Status
 
@@ -33,15 +73,14 @@ identical sequence of random numbers for a given seed.
   * PC-BSD (FreeBSD) 64-bit, Python 2.7
   * OSX  64-bit, Python 2.7
   * Windows 32/64 bit (only tested on Python 2.7 and 3.5, but should work on 3.3/3.4)
-* There is no documentation for the core RNGs.
 
 ## Documentation
 
-A occasionally update build of the documentation is available on
+A occasionally updated build of the documentation is available on
 [my github pages](http://bashtage.github.io/ng-numpy-randomstate/).
 
 ## Plans
-It is essentially complete.  There are a few rough edges that need to be smoothed.
+This module is essentially complete.  There are a few rough edges that need to be smoothed.
   
   * Stream support for MLFG and MRG32K3A
   * Creation of additional streams from a RandomState where supported (i.e. 
@@ -71,15 +110,11 @@ implementation for identical results. It also passes NumPy's test suite.
 python setup.py install
 ```
 
-## Building for Testing Purposes
-
-This command will build a single module containining xorshift128 called
-`interface`.  
-
-```bash
-cd randomstate
-python setup-basic.py build_ext --inplace
-```
+### Windows
+Either use a binary installer or if building from scratch using Python 3.5 and 
+the free Visual Studio 2015 Community Edition. It can also be build using 
+Microsoft Visual C++ Compiler for Python 2.7 and Python 2.7, although some
+modifications are needed to distutils to find the compiler.
 
 ## Using
 
@@ -99,7 +134,7 @@ rs.random_sample(100)
 ```
 
 Like NumPy, `randomstate` also exposes a single instance of the `mt19937` 
-generator directly at the moduel level so that commands like
+generator directly at the module level so that commands like
 
 ```python
 import randomstate
@@ -109,15 +144,6 @@ randomstate.exponential(1.0, 1.0, size=10)
 
 will work.
 
-If you use `setup-basic.py`, 
-
-```python
-import interface
-
-rs = interface.RandomState()
-rs.random_sample(100)
-```
-
 ## License
 Standard NCSA, plus sub licenses for components.
 
@@ -125,54 +151,25 @@ Standard NCSA, plus sub licenses for components.
 Performance is promising, and even the mt19937 seems to be faster than NumPy's mt19937. 
 
 ```
-Time to produce 1,000,000 Standard normals
+Speed-up relative to NumPy (Slow Normals)
 ************************************************************
-numpy-random-standard_normal                      58.34 ms
-randomstate.prng-mlfg_1279_861-standard_normal    46.20 ms
-randomstate.prng-mrg32k3a-standard_normal         75.95 ms
-randomstate.prng-mt19937-standard_normal          52.68 ms
-randomstate.prng-pcg32-standard_normal            48.38 ms
-randomstate.prng-pcg64-standard_normal            46.27 ms
-randomstate.prng-xorshift1024-standard_normal     45.53 ms
-randomstate.prng-xorshift128-standard_normal      45.57 ms
+randomstate.prng-dsfmt-standard_normal            107.2%
+randomstate.prng-mlfg_1279_861-standard_normal     51.2%
+randomstate.prng-mrg32k3a-standard_normal         -11.8%
+randomstate.prng-mt19937-standard_normal           44.0%
+randomstate.prng-pcg32-standard_normal             51.2%
+randomstate.prng-pcg64-standard_normal             51.1%
+randomstate.prng-xorshift1024-standard_normal      50.5%
+randomstate.prng-xorshift128-standard_normal       52.1%
 
-Standard normals per second
+Speed-up relative to NumPy (Ziggural Normals)
 ************************************************************
-numpy-random-standard_normal                      17.14 million
-randomstate.prng-mlfg_1279_861-standard_normal    21.65 million
-randomstate.prng-mrg32k3a-standard_normal         13.17 million
-randomstate.prng-mt19937-standard_normal          18.98 million
-randomstate.prng-pcg32-standard_normal            20.67 million
-randomstate.prng-pcg64-standard_normal            21.61 million
-randomstate.prng-xorshift1024-standard_normal     21.96 million
-randomstate.prng-xorshift128-standard_normal      21.94 million
-
-Speed-up relative to NumPy
-************************************************************
-randomstate.prng-mlfg_1279_861-standard_normal     26.3%
-randomstate.prng-mrg32k3a-standard_normal         -23.2%
-randomstate.prng-mt19937-standard_normal           10.8%
-randomstate.prng-pcg32-standard_normal             20.6%
-randomstate.prng-pcg64-standard_normal             26.1%
-randomstate.prng-xorshift1024-standard_normal      28.1%
-randomstate.prng-xorshift128-standard_normal       28.0%
-
---------------------------------------------------------------------------------
+randomstate.prng-dsfmt-standard_normal            283.7%
+randomstate.prng-mlfg_1279_861-standard_normal    217.4%
+randomstate.prng-mrg32k3a-standard_normal          16.6%
+randomstate.prng-mt19937-standard_normal          201.3%
+randomstate.prng-pcg32-standard_normal            274.9%
+randomstate.prng-pcg64-standard_normal            310.8%
+randomstate.prng-xorshift1024-standard_normal     336.3%
+randomstate.prng-xorshift128-standard_normal      425.1%
 ```
-
-## Differences from `numpy.random.RandomState`
-
-### New Features
-* `stanard_normal` and `normal` support an additional `method` keyword 
-argument which can be `inv` or `zig` where `inv` corresponds to the 
-current method and `zig` uses tha much faster (100%+) ziggurat method.
-
-### New Functions
-
-* `random_entropy` - Read from the system entropy provider, which is commonly 
-used in cryptographic applications
-* `random_uintegers` - unsigned integers `[0, 2**64-1]` 
-* `jump` - Jumps RNGs that support it.  `jump` moves the state a great 
-distance. _Only available if supported by the RNG._
-* `advance` - Advanced the core RNG 'as-if' a number of draws were made, 
-without actually drawing the numbers. _Only available if supported by the RNG._
