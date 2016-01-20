@@ -23,28 +23,29 @@ from cython_overrides cimport PyFloat_AsDouble, PyInt_AsLong, PyErr_Occurred, Py
 np.import_array()
 
 include "config.pxi"
+include "defaults.pxi"
 
-IF RNG_MOD_NAME == 'pcg32':
+IF RS_RNG_MOD_NAME == 'pcg32':
     include "shims/pcg-32/pcg-32.pxi"
-IF RNG_MOD_NAME == 'pcg64':
-    IF PCG128_EMULATED:
+IF RS_RNG_MOD_NAME == 'pcg64':
+    IF RS_PCG128_EMULATED:
         include "shims/pcg-64/pcg-64-emulated.pxi"
     ELSE:
         include "shims/pcg-64/pcg-64.pxi"
-IF RNG_MOD_NAME == 'mt19937':
+IF RS_RNG_MOD_NAME == 'mt19937':
     include "shims/random-kit/random-kit.pxi"
-IF RNG_MOD_NAME == 'xorshift128':
+IF RS_RNG_MOD_NAME == 'xorshift128':
     include "shims/xorshift128/xorshift128.pxi"
-IF RNG_MOD_NAME == 'xorshift1024':
+IF RS_RNG_MOD_NAME == 'xorshift1024':
     include "shims/xorshift1024/xorshift1024.pxi"
-IF RNG_MOD_NAME == 'mrg32k3a':
+IF RS_RNG_MOD_NAME == 'mrg32k3a':
     include "shims/mrg32k3a/mrg32k3a.pxi"
-IF RNG_MOD_NAME == 'mlfg_1279_861':
+IF RS_RNG_MOD_NAME == 'mlfg_1279_861':
     include "shims/mlfg-1279-861/mlfg-1279-861.pxi"
-IF RNG_MOD_NAME == 'dsfmt':
+IF RS_RNG_MOD_NAME == 'dsfmt':
     include "shims/dSFMT/dSFMT.pxi"
 
-IF NORMAL_METHOD == 'inv':
+IF RS_NORMAL_METHOD == 'inv':
     __normal_method = 'inv'
 ELSE:
     __normal_method = 'zig'
@@ -139,11 +140,11 @@ cdef class RandomState:
     poisson_lam_max = POISSON_LAM_MAX
     __MAXSIZE = <uint64_t>sys.maxsize
 
-    IF RNG_SEED==1:
+    IF RS_RNG_SEED==1:
         def __init__(self, seed=None):
             self.rng_state.rng = <rng_t *>PyArray_malloc_aligned(sizeof(rng_t))
             self.rng_state.binomial = &self.binomial_info
-            IF RNG_MOD_NAME == 'dsfmt':
+            IF RS_RNG_MOD_NAME == 'dsfmt':
                 self.rng_state.buffered_uniforms = <double *>PyArray_malloc_aligned(2 * DSFMT_N * sizeof(double))
             self.lock = Lock()
             self._reset_state_variables()
@@ -158,7 +159,7 @@ cdef class RandomState:
 
     def __dealloc__(self):
         PyArray_free_aligned(self.rng_state.rng)
-        IF RNG_MOD_NAME == 'dsfmt':
+        IF RS_RNG_MOD_NAME == 'dsfmt':
             PyArray_free_aligned(self.rng_state.buffered_uniforms)
 
     # Pickling support:
@@ -169,9 +170,9 @@ cdef class RandomState:
         self.set_state(state)
 
     def __reduce__(self):
-        return (randomstate.prng.__generic_ctor, (RNG_MOD_NAME,), self.get_state())
+        return (randomstate.prng.__generic_ctor, (RS_RNG_MOD_NAME,), self.get_state())
 
-    IF RNG_NAME == 'mt19937':
+    IF RS_RNG_NAME == 'mt19937':
         def seed(self, seed=None):
             """
             seed(seed=None)
@@ -212,7 +213,7 @@ cdef class RandomState:
                     set_seed_by_array(&self.rng_state, <unsigned long *>np.PyArray_DATA(obj), np.PyArray_DIM(obj, 0))
             self._reset_state_variables()
 
-    ELIF RNG_SEED==1:
+    ELIF RS_RNG_SEED==1:
         def seed(self, val=None):
             """
             seed(seed=None)
@@ -272,8 +273,8 @@ cdef class RandomState:
                     raise ValueError('val < 0')
                 if inc < 0:
                     raise ValueError('inc < 0')
-                IF RNG_NAME == 'pcg64':
-                    IF PCG128_EMULATED:
+                IF RS_RNG_NAME == 'pcg64':
+                    IF RS_PCG128_EMULATED:
                         set_seed(&self.rng_state,
                                  pcg128_from_pylong(val),
                                  pcg128_from_pylong(inc))
@@ -292,7 +293,7 @@ cdef class RandomState:
         self.rng_state.uinteger = 0
         self.rng_state.binomial.has_binomial = 0
 
-    IF RNG_ADVANCEABLE:
+    IF RS_RNG_ADVANCEABLE:
         def advance(self, delta):
             """
             advance(delta)
@@ -314,8 +315,8 @@ cdef class RandomState:
             Advancing the prng state resets any pre-computed random numbers.
             This is required to ensure exact reproducibility.
             """
-            IF RNG_NAME == 'pcg64':
-                IF PCG128_EMULATED:
+            IF RS_RNG_NAME == 'pcg64':
+                IF RS_PCG128_EMULATED:
                     advance_state(&self.rng_state, pcg128_from_pylong(delta))
                 ELSE:
                     advance_state(&self.rng_state, delta)
@@ -326,7 +327,7 @@ cdef class RandomState:
             self.rng_state.gauss = 0.0
             return None
 
-    IF RNG_JUMPABLE:
+    IF RS_RNG_JUMPABLE:
         def jump(self, uint32_t iter = 1):
             """
             jump(iter = 1)
@@ -356,7 +357,7 @@ cdef class RandomState:
             self.rng_state.gauss = 0.0
             return None
 
-    IF RNG_NAME == 'mt19937':
+    IF RS_RNG_NAME == 'mt19937':
         def get_state(self, legacy=False):
             """
             get_state()
@@ -394,11 +395,11 @@ cdef class RandomState:
             component, see the class documentation.
             """
             if legacy:
-                return (RNG_NAME,) \
+                return (RS_RNG_NAME,) \
                        + _get_state(self.rng_state) \
                        + (self.rng_state.has_gauss, self.rng_state.gauss)
 
-            return  {'name': RNG_NAME,
+            return  {'name': RS_RNG_NAME,
                      'state': _get_state(self.rng_state),
                      'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
                      'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger}
@@ -435,7 +436,7 @@ cdef class RandomState:
             For information about the specific structure of the PRNG-specific
             component, see the class documentation.
             """
-            return  {'name': RNG_NAME,
+            return  {'name': RS_RNG_NAME,
                      'state': _get_state(self.rng_state),
                      'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
                      'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger}
@@ -478,8 +479,8 @@ cdef class RandomState:
         For information about the specific structure of the PRNG-specific
         component, see the class documentation.
         """
-        rng_name = RNG_NAME
-        IF RNG_NAME == 'mt19937':
+        rng_name = RS_RNG_NAME
+        IF RS_RNG_NAME == 'mt19937':
             if isinstance(state, tuple):
                 if state[0] != 'MT19937':
                     raise ValueError('Not a ' + rng_name + ' RNG state')
@@ -4227,7 +4228,7 @@ permutation = _rand.permutation
 
 sample = ranf = random = random_sample
 
-IF RNG_JUMPABLE:
+IF RS_RNG_JUMPABLE:
     jump = _rand.jump
-IF RNG_ADVANCEABLE:
+IF RS_RNG_ADVANCEABLE:
     advance = _rand.advance

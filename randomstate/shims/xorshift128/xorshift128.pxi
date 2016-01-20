@@ -1,9 +1,5 @@
-DEF RNG_NAME = "xorshift-128+"
-DEF RNG_ADVANCEABLE = 0
-DEF RNG_JUMPABLE = 1
-DEF RNG_STATE_LEN = 4
-DEF RNG_SEED=1
-DEF NORMAL_METHOD = 'zig'
+DEF RS_RNG_NAME = "xorshift-128+"
+DEF RS_RNG_JUMPABLE = 1
 
 cdef extern from "distributions.h":
 
@@ -49,7 +45,7 @@ RandomState(seed=None)
 Container for the xorshift128+ pseudo random number generator.
 
 xorshift128+ is a 64-bit implementation of Saito and Matsumoto's XSadd
-generator [1]_,[2]_,[3]_,[4]_. xorshift128+ has a period of 2**128 - 1 and
+generator [1]_. xorshift128+ has a period of 2**128 - 1 and
 supports jumping the sequence in increments of 2**64, which allow multiple
 non-overlapping sequences to be generated.
 
@@ -90,7 +86,8 @@ See xorshift1024 for an implementation with a larger period
 calling the method ``jump`` which advances the
 the state as-if :math:`2^{64}` random numbers have been generated. This
 allow the original sequence to be split so that distinct segments can be used
-on each worker process.
+on each worker process. All generators should be initialized with the same
+seed to ensure that the segments come from the same sequence.
 
 >>> import randomstate.prng.xorshift128 as rnd
 >>> rs = [rnd.RandomState(1234) for _ in range(10)]

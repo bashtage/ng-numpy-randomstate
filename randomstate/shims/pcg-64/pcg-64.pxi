@@ -1,9 +1,7 @@
-DEF RNG_NAME = 'pcg64'
-DEF RNG_ADVANCEABLE = 1
-DEF RNG_JUMPABLE = 0
-DEF RNG_STATE_LEN = 4
-DEF RNG_SEED=2
-DEF NORMAL_METHOD = 'zig'
+DEF RS_RNG_NAME = 'pcg64'
+DEF RS_RNG_ADVANCEABLE = 1
+DEF RS_RNG_SEED=2
+DEF RS_PCG128_EMULATED = 0
 
 cdef extern from "inttypes.h":
     ctypedef unsigned long long __uint128_t

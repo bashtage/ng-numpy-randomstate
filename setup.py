@@ -51,7 +51,7 @@ for rng in rngs:
         continue
 
     file_name = rng.lower().replace('rng_', '')
-    flags = {'RNG_MOD_NAME': file_name}
+    flags = {'RS_RNG_MOD_NAME': file_name}
     sources = [join(mod_dir, file_name + '.pyx'),
                join(mod_dir, 'src', 'common', 'entropy.c'),
                join(mod_dir, 'distributions.c'),
@@ -63,7 +63,7 @@ for rng in rngs:
         sources += [join(mod_dir, 'src', 'pcg', 'pcg32.c')]
         sources += [join(mod_dir, 'shims/pcg-32', 'pcg-32-shim.c')]
 
-        defs = [('PCG_32_RNG', '1')]
+        defs = [('RS_PCG32', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'pcg')]
 
@@ -71,12 +71,12 @@ for rng in rngs:
         sources += [join(mod_dir, 'src', 'pcg64-compat', p) for p in ('pcg64.c',)]
         sources += [join(mod_dir, 'shims/pcg-64', 'pcg-64-shim.c')]
 
-        defs = [('PCG_64_RNG', '1')]
-        flags['PCG128_EMULATED'] = 0
+        defs = [('RS_PCG64', '1')]
+        flags['RS_PCG128_EMULATED'] = 0
         if sys.maxsize < 2 ** 32 or os.name == 'nt' or FORCE_EMULATION:
             # Force emulated mode here
             defs += [('PCG_FORCE_EMULATED_128BIT_MATH', '1')]
-            flags['PCG128_EMULATED'] = 1
+            flags['RS_PCG128_EMULATED'] = 1
         else:
             # TODO: This isn't really right - should test for this and only
             # TODO: use this path if the compiler defines this. For now, an assumption.
@@ -88,7 +88,7 @@ for rng in rngs:
         sources += [join(mod_dir, 'src', 'random-kit', p) for p in ('random-kit.c',)]
         sources += [join(mod_dir, 'shims', 'random-kit', 'random-kit-shim.c')]
 
-        defs = [('RANDOMKIT_RNG', '1')]
+        defs = [('RS_RANDOMKIT', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'random-kit')]
 
@@ -96,21 +96,21 @@ for rng in rngs:
         sources += [join(mod_dir, 'src', 'xorshift128', 'xorshift128.c')]
         sources += [join(mod_dir, 'shims', 'xorshift128', 'xorshift128-shim.c')]
 
-        defs = [('XORSHIFT128_RNG', '1')]
+        defs = [('RS_XORSHIFT128', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'xorshift128')]
     elif rng == 'RNG_XORSHIFT1024':
         sources += [join(mod_dir, 'src', 'xorshift1024', 'xorshift1024.c')]
         sources += [join(mod_dir, 'shims', 'xorshift1024', 'xorshift1024-shim.c')]
 
-        defs = [('XORSHIFT1024_RNG', '1')]
+        defs = [('RS_XORSHIFT1024', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'xorshift1024')]
     elif rng == 'RNG_MRG32K3A':
         sources += [join(mod_dir, 'src', 'mrg32k3a', 'mrg32k3a.c')]
         sources += [join(mod_dir, 'shims', 'mrg32k3a', 'mrg32k3a-shim.c')]
 
-        defs = [('MRG32K3A_RNG', '1')]
+        defs = [('RS_MRG32K3A', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'mrg32k3a')]
 
@@ -118,16 +118,17 @@ for rng in rngs:
         sources += [join(mod_dir, 'src', 'mlfg-1279-861', 'mlfg-1279-861.c')]
         sources += [join(mod_dir, 'shims', 'mlfg-1279-861', 'mlfg-1279-861-shim.c')]
 
-        defs = [('MLFG_1279_861_RNG', '1')]
+        defs = [('RS_MLFG_1279_861', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'mlfg_1279_861')]
 
     elif rng == 'RNG_DSFMT':
         sources += [join(mod_dir, 'src', 'dSFMT', 'dSFMT.c')]
+        sources += [join(mod_dir, 'src', 'dSFMT', 'dSFMT-jump.c')]
         sources += [join(mod_dir, 'shims', 'dSFMT', 'dSFMT-shim.c')]
         # TODO: HAVE_SSE2 should only be for platforms that have SSE2
         # TODO: But how to reliably detect?
-        defs = [('DSFMT_RNG', '1'), ('DSFMT_MEXP', '19937')]
+        defs = [('RS_DSFMT', '1'), ('DSFMT_MEXP', '19937')]
         if USE_SSE2:
             defs += [('HAVE_SSE2', '1')]
 
