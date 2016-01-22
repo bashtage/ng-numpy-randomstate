@@ -6,7 +6,7 @@ that change the core random number generator.
 What's New or Different
 =======================
 * ``random_uintegers`` produces either 32-bit or 64-bit unsigned integers.
-  These are at thte core of most PRNGs and so they are directly exposed.
+  These are at the core of most PRNGs and so they are directly exposed.
 * ``randomstate.entropy.random_entropy`` provides access to the system
   source of randomness that is used in cryptographic applications (e.g.,
   ``/dev/urandom`` on Unix).
@@ -21,7 +21,7 @@ What's New or Different
 
 Supported Generators
 ====================
-The main innovation is the includion of a number of alterntive pseudo random number
+The main innovation is the inclusion of a number of alternative pseudo random number
 generators, 'in addition' to the standard PRNG in NumPy.  The included PRNGs are:
 
 * MT19937 - The standard NumPy generator.  Produces identical results to NumPy
@@ -39,8 +39,8 @@ generators, 'in addition' to the standard PRNG in NumPy.  The included PRNGs are
   :meth:`randomstate.prng.pcg64.advance`.  PCG-32 only as a period of
   :math:`2^{64}` while PCG-64 has a period of :math:`2^{128}`. See the
   `PCG author's page`_ for more details about this class of PRNG.
-* Multiplicative Lagged Fibbonacci Generator MLFG(1279, 861, \*) - A directly
-  implemented multiplicative lagged fibbonacci generator with a very large
+* Multiplicative Lagged Fibonacci Generator MLFG(1279, 861, \*) - A directly
+  implemented multiplicative lagged Fibonacci generator with a very large
   period and good performance. Future plans include multiple stream support.
   See the `wiki page on Fibonacci generators`_.
 * MRG32K3A - a classic and popular generator by L'Ecuyer. Future plans

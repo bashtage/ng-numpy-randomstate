@@ -4,8 +4,8 @@ RandomState(seed=None)
 Container for the PCG-64 pseudo random number generator.
 
 PCG-64 is a 128-bit implementation of O'Neill's permutation congruential
-generator ([1]_, [2]_). PCG-64 has a period of 2**128 and supports advancing
-an arbitrary number of steps as well as 2**127 streams.
+generator ([1]_, [2]_). PCG-64 has a period of :math:`2^128` and supports advancing
+an arbitrary number of steps as well as :math:`2^127` streams.
 
 ``pcg64.RandomState`` exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the

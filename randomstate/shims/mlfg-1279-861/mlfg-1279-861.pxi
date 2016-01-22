@@ -68,9 +68,9 @@ then an array with that shape is filled and returned.
 **No Compatibility Guarantee**
 
 ``mlfg_1279_861.RandomState`` does not make a guarantee that a fixed seed and a
-fixed series of calls to 'mlfg_1279_861.RandomState' methods using the same
+fixed series of calls to ``mlfg_1279_861.RandomState`` methods using the same
 parameters will always produce the same results. This is different from
-'numpy.random.RandomState' guarantee. This is done to simplify improving
+``numpy.random.RandomState`` guarantee. This is done to simplify improving
 random number generators.  To ensure identical results, you must use the
 same release version.
 
@@ -79,10 +79,10 @@ Parameters
 seed : {None, int}, optional
     Random seed initializing the pseudo-random number generator.
     Can be an integer in [0, 2**64] or ``None`` (the default).
-    If ``seed`` is ``None``, then `mlfg_1279_861.RandomState` will try to read
-    entropy from ``/dev/urandom`` (or the Windows analogue) if available to
-    produce a 64-bit seed. If unavailable, the a 64-bit hash of the time
-    (and process ID on Unix) is used.
+    If ``seed`` is ``None``, then ``mlfg_1279_861.RandomState`` will try to
+    read entropy from ``/dev/urandom`` (or the Windows analogue) if available
+    to produce a 64-bit seed. If unavailable, the a 64-bit hash of the time
+    and process ID is used.
 
 Notes
 -----

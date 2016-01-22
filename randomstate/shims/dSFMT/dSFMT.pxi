@@ -93,10 +93,10 @@ then an array with that shape is filled and returned.
 
 **No Compatibility Guarantee**
 
-'dSFMT.RandomState' does not make a guarantee that a fixed seed and a
-fixed series of calls to 'dSFMT.RandomState' methods using the same
+``dSFMT.RandomState`` does not make a guarantee that a fixed seed and a
+fixed series of calls to ``dSFMT.RandomState`` methods using the same
 parameters will always produce the same results. This is different from
-'numpy.random.RandomState' guarantee. This is done to simplify improving
+``numpy.random.RandomState`` guarantee. This is done to simplify improving
 random number generators.  To ensure identical results, you must use the
 same release version.
 
@@ -114,9 +114,9 @@ Notes
 -----
 The Python stdlib module "random" also contains a Mersenne Twister
 pseudo-random number generator with a number of methods that are similar
-to the ones available in `RandomState`. `RandomState`, besides being
-NumPy-aware, has the advantage that it provides a much larger number
-of probability distributions to choose from.
+to the ones available in ``RandomState``. The `RandomState` object, besides
+being NumPy-aware, also has the advantage that it provides a much larger
+number of probability distributions to choose from.
 
 **Parallel Features**
 
@@ -138,7 +138,7 @@ segments come from the same sequence.
 .. [1] Mutsuo Saito and Makoto Matsumoto, "SIMD-oriented Fast Mersenne
        Twister: a 128-bit Pseudorandom Number Generator." Monte Carlo
        and Quasi-Monte Carlo Methods 2006, Springer, pp. 607 -- 622, 2008.
-.. [2] Hiroshi Haramoto, Makoto Matsumoto, and Pierre L'Ecuyer, "A Fast
+.. [2] Hiroshi Haramoto, Makoto Matsumoto, and Pierre L\'Ecuyer, "A Fast
        Jump Ahead Algorithm for Linear Recurrences in a Polynomial Space",
        Sequences and Their Applications - SETA, 290--298, 2008.
 """

@@ -61,7 +61,7 @@ then an array with that shape is filled and returned.
 **Compatibility Guarantee**
 
 ``mt19937.RandomState`` is identical to ``numpy.random.RandomState`` and
-makes the same compatability guarantee. A fixed seed and a fixed series of
+makes the same compatibility guarantee. A fixed seed and a fixed series of
 calls to ``mt19937.RandomState`` methods using the same parameters will always
 produce the same results up to roundoff error except when the values were
 incorrect. Incorrect values will be fixed and the version in which the fix
