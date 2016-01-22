@@ -11,6 +11,8 @@ except:
 import numpy as np
 cimport numpy as np
 cimport cython
+
+from libc cimport string
 from libc.stdint cimport (uint8_t, uint16_t, uint32_t, uint64_t, int8_t,
                           int16_t, int32_t, int64_t, intptr_t)
 from cpython cimport Py_INCREF
@@ -129,6 +131,13 @@ cdef double kahan_sum(double *darr, np.npy_intp n):
         sum = t
     return sum
 
+cdef object _ensure_string(object s):
+    try:
+        return ''.join(map(chr, s))
+    except:
+        return s
+
+
 cdef class RandomState:
     CLASS_DOCSTRING
 
@@ -139,6 +148,7 @@ cdef class RandomState:
     cdef object lock
     poisson_lam_max = POISSON_LAM_MAX
     __MAXSIZE = <uint64_t>sys.maxsize
+
 
     IF RS_RNG_SEED==1:
         def __init__(self, seed=None):
@@ -162,17 +172,7 @@ cdef class RandomState:
         IF RS_RNG_MOD_NAME == 'dsfmt':
             PyArray_free_aligned(self.rng_state.buffered_uniforms)
 
-    # Pickling support:
-    def __getstate__(self):
-        return self.get_state()
-
-    def __setstate__(self, state):
-        self.set_state(state)
-
-    def __reduce__(self):
-        return (randomstate.prng.__generic_ctor, (RS_RNG_MOD_NAME,), self.get_state())
-
-    IF RS_RNG_NAME == 'mt19937':
+    IF RS_RNG_MOD_NAME == 'mt19937':
         def seed(self, seed=None):
             """
             seed(seed=None)
@@ -273,7 +273,7 @@ cdef class RandomState:
                     raise ValueError('val < 0')
                 if inc < 0:
                     raise ValueError('inc < 0')
-                IF RS_RNG_NAME == 'pcg64':
+                IF RS_RNG_MOD_NAME == 'pcg64':
                     IF RS_PCG128_EMULATED:
                         set_seed(&self.rng_state,
                                  pcg128_from_pylong(val),
@@ -315,7 +315,7 @@ cdef class RandomState:
             Advancing the prng state resets any pre-computed random numbers.
             This is required to ensure exact reproducibility.
             """
-            IF RS_RNG_NAME == 'pcg64':
+            IF RS_RNG_MOD_NAME == 'pcg64':
                 IF RS_PCG128_EMULATED:
                     advance_state(&self.rng_state, pcg128_from_pylong(delta))
                 ELSE:
@@ -357,7 +357,7 @@ cdef class RandomState:
             self.rng_state.gauss = 0.0
             return None
 
-    IF RS_RNG_NAME == 'mt19937':
+    IF RS_RNG_MOD_NAME == 'mt19937':
         def get_state(self, legacy=False):
             """
             get_state()
@@ -394,12 +394,13 @@ cdef class RandomState:
             For information about the specific structure of the PRNG-specific
             component, see the class documentation.
             """
+            rng_name = _ensure_string(RS_RNG_NAME)
             if legacy:
-                return (RS_RNG_NAME,) \
+                return (rng_name.upper(),) \
                        + _get_state(self.rng_state) \
                        + (self.rng_state.has_gauss, self.rng_state.gauss)
 
-            return  {'name': RS_RNG_NAME,
+            return  {'name': rng_name,
                      'state': _get_state(self.rng_state),
                      'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
                      'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger}
@@ -436,7 +437,8 @@ cdef class RandomState:
             For information about the specific structure of the PRNG-specific
             component, see the class documentation.
             """
-            return  {'name': RS_RNG_NAME,
+            rng_name = _ensure_string(RS_RNG_NAME)
+            return  {'name': rng_name,
                      'state': _get_state(self.rng_state),
                      'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
                      'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger}
@@ -479,14 +481,18 @@ cdef class RandomState:
         For information about the specific structure of the PRNG-specific
         component, see the class documentation.
         """
-        rng_name = RS_RNG_NAME
-        IF RS_RNG_NAME == 'mt19937':
+        rng_name = _ensure_string(RS_RNG_NAME)
+        IF RS_RNG_MOD_NAME == 'mt19937':
             if isinstance(state, tuple):
                 if state[0] != 'MT19937':
                     raise ValueError('Not a ' + rng_name + ' RNG state')
                 _set_state(&self.rng_state, (state[1], state[2]))
-                self.rng_state.has_gauss = state[3]
-                self.rng_state.gauss = state[4]
+                if len(state) > 3:
+                    self.rng_state.has_gauss = state[3]
+                    self.rng_state.gauss = state[4]
+                else:
+                    self.rng_state.has_gauss = 0
+                    self.rng_state.gauss = 0.0
                 self.rng_state.has_uint32 = 0
                 self.rng_state.uinteger = 0
                 return None
@@ -552,6 +558,17 @@ cdef class RandomState:
         else:
             raise ValueError('Unknown value of bits.  Must be either 32 or 64.')
 
+    # Pickling support:
+    def __getstate__(self):
+        return self.get_state()
+
+    def __setstate__(self, state):
+        self.set_state(state)
+
+    def __reduce__(self):
+        return (randomstate.prng.__generic_ctor, (RS_RNG_MOD_NAME,), self.get_state())
+
+    # Basic distributions:
     def random_sample(self, size=None):
         """
         random_sample(size=None)
@@ -595,17 +612,6 @@ cdef class RandomState:
 
         """
         return double_fill(&self.rng_state, &random_uniform_fill, size, self.lock)
-        # cdef double out
-        # cdef double [::1] out_array
-        # cdef Py_ssize_t n
-        # if size is None:
-        #     random_uniform_fill(&self.rng_state, 1, &out)
-        #     return out
-        # else:
-        #     n = compute_numel(size)
-        #     out_array = np.empty(n, np.double)
-        #     random_uniform_fill(&self.rng_state, n, &out_array[0])
-        #     return np.asarray(out_array).reshape(size)
 
     def tomaxint(self, size=None):
         """
@@ -652,17 +658,20 @@ cdef class RandomState:
                 [ True,  True]]], dtype=bool)
 
         """
-        cdef Py_ssize_t n
-        cdef np.int_t [::1] randoms
+        cdef np.npy_intp n
+        cdef np.ndarray randoms
+        cdef long *randoms_data
 
         if size is None:
             return random_positive_int(&self.rng_state)
 
-        n = compute_numel(size)
-        randoms = np.empty(n, np.int)
+        randoms = <np.ndarray>np.empty(size, dtype=np.int)
+        randoms_data = <long*>np.PyArray_DATA(randoms)
+        n = np.PyArray_SIZE(randoms)
+
         for i in range(n):
-            randoms[i] = random_positive_int(&self.rng_state)
-        return np.asarray(randoms).reshape(size)
+            randoms_data[i] = random_positive_int(&self.rng_state)
+        return randoms
 
     def randint(self, low, high=None, size=None, dtype='l'):
         """
@@ -757,7 +766,7 @@ cdef class RandomState:
         elif key == 'bool':
             return _rand_bool(low, high - 1, size, &self.rng_state, self.lock)
 
-    def bytes(self, Py_ssize_t length):
+    def bytes(self, np.npy_intp length):
         """
         bytes(length)
 
@@ -3200,7 +3209,7 @@ cdef class RandomState:
         """
         return disc(&self.rng_state, &random_binomial, size, self.lock, 1, 1,
                     p, 'p', CONS_BOUNDED_0_1_NOTNAN,
-                    n, 'n', CONS_POSITIVE,
+                    n, 'n', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE)
 
     def negative_binomial(self, n, p, size=None):
@@ -3466,7 +3475,6 @@ cdef class RandomState:
         0.34889999999999999 #random
 
         """
-
         return disc(&self.rng_state, &random_geometric, size, self.lock, 1, 0,
                         p, 'p', CONS_BOUNDED_0_1,
                         0.0, '', CONS_NONE,
@@ -3800,8 +3808,8 @@ cdef class RandomState:
         # standard normally distributed random numbers. The matrix has rows
         # with the same length as mean and as many rows are necessary to
         # form a matrix of shape final_shape.
-        final_shape = tuple(shape[:])
-        final_shape += (mean.shape[0],)
+        final_shape = list(shape[:])
+        final_shape.append(mean.shape[0])
         x = self.standard_normal(final_shape, method=method).reshape(-1, mean.shape[0])
 
         # Transform matrix of standard normals into matrix where each row
@@ -3912,7 +3920,7 @@ cdef class RandomState:
         cdef double Sum
 
         d = len(pvals)
-        parr = <np.ndarray>np.PyArray_ContiguousFromObject(pvals, np.NPY_DOUBLE, 1, 1)
+        parr = <np.ndarray>np.PyArray_FROM_OTF(pvals, np.NPY_DOUBLE, np.NPY_ALIGNED)
         pix = <double*>np.PyArray_DATA(parr)
 
         if kahan_sum(pix, d-1) > (1.0 + 1e-12):
@@ -3944,6 +3952,7 @@ cdef class RandomState:
                     Sum = Sum - pix[j]
                 if dn > 0:
                     mnix[i+d-1] = dn
+
                 i = i + d
 
         return multin
@@ -4102,34 +4111,53 @@ cdef class RandomState:
                [0, 1, 2]])
 
         """
-        cdef Py_ssize_t i
-        cdef long j
+        cdef:
+            np.npy_intp i, j, n = len(x), stride, itemsize
+            char* x_ptr
+            char* buf_ptr
 
-        i = len(x) - 1
-
-        # Logic adapted from random.shuffle()
-        if isinstance(x, np.ndarray) and \
-           (x.ndim > 1 or x.dtype.fields is not None):
-            # For a multi-dimensional ndarray, indexing returns a view onto
-            # each row. So we can't just use ordinary assignment to swap the
-            # rows; we need a bounce buffer.
+        if type(x) is np.ndarray and x.ndim == 1 and x.size:
+            # Fast, statically typed path: shuffle the underlying buffer.
+            # Only for non-empty, 1d objects of class ndarray (subclasses such
+            # as MaskedArrays may not support this approach).
+            x_ptr = <char*><size_t>x.ctypes.data
+            stride = x.strides[0]
+            itemsize = x.dtype.itemsize
+            buf = np.empty_like(x[0])  # GC'd at function exit
+            buf_ptr = <char*><size_t>buf.ctypes.data
+            with self.lock:
+                # We trick gcc into providing a specialized implementation for
+                # the most common case, yielding a ~33% performance improvement.
+                # Note that apparently, only one branch can ever be specialized.
+                if itemsize == sizeof(np.npy_intp):
+                    self._shuffle_raw(n, sizeof(np.npy_intp), stride, x_ptr, buf_ptr)
+                else:
+                    self._shuffle_raw(n, itemsize, stride, x_ptr, buf_ptr)
+        elif isinstance(x, np.ndarray) and x.ndim > 1 and x.size:
+            # Multidimensional ndarrays require a bounce buffer.
             buf = np.empty_like(x[0])
             with self.lock:
-                while i > 0:
+                for i in reversed(range(1, n)):
                     j = random_interval(&self.rng_state, i)
                     buf[...] = x[j]
                     x[j] = x[i]
                     x[i] = buf
-                    i = i - 1
         else:
-            # For single-dimensional arrays, lists, and any other Python
-            # sequence types, indexing returns a real object that's
-            # independent of the array contents, so we can just swap directly.
+            # Untyped path.
             with self.lock:
-                while i > 0:
+                for i in reversed(range(1, n)):
                     j = random_interval(&self.rng_state, i)
                     x[i], x[j] = x[j], x[i]
-                    i = i - 1
+
+    cdef inline _shuffle_raw(self, np.npy_intp n, np.npy_intp itemsize,
+                             np.npy_intp stride, char* data, char* buf):
+        cdef np.npy_intp i, j
+        for i in reversed(range(1, n)):
+            j = random_interval(&self.rng_state, i)
+            string.memcpy(buf, data + j * stride, itemsize)
+            string.memcpy(data + j * stride, data + i * stride, itemsize)
+            string.memcpy(data + i * stride, buf, itemsize)
+
 
     def permutation(self, object x):
         """

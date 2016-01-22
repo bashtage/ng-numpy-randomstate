@@ -45,8 +45,8 @@ RandomState(seed=None)
 Container for the xorshift128+ pseudo random number generator.
 
 xorshift128+ is a 64-bit implementation of Saito and Matsumoto's XSadd
-generator [1]_. xorshift128+ has a period of 2**128 - 1 and
-supports jumping the sequence in increments of 2**64, which allow multiple
+generator [1]_. xorshift128+ has a period of :math:`2^128 - 1` and
+supports jumping the sequence in increments of :math:`2^64`, which allow multiple
 non-overlapping sequences to be generated.
 
 ``xorshift128.RandomState`` exposes a number of methods for generating random
@@ -78,7 +78,7 @@ seed : {None, int}, optional
 Notes
 -----
 See xorshift1024 for an implementation with a larger period
-(2**1024 - 1) and jump size.
+:math:`2^1024 - 1` and jump size.
 
 **Parallel Features**
 

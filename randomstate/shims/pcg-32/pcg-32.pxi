@@ -41,8 +41,8 @@ RandomState(seed=None)
 Container for the PCG-32 pseudo random number generator.
 
 PCG-32 is a 64-bit implementation of O'Neill's permutation congruential 
-generator ([1]_, [2]_). PCG-32 has a period of 2**64 and supports advancing 
-an arbitrary number of steps as well as 2**63 streams.
+generator ([1]_, [2]_). PCG-32 has a period of :math:`2^64` and supports advancing
+an arbitrary number of steps as well as :math:`2^63` streams.
 
 ``pcg32.RandomState`` exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the
@@ -97,7 +97,7 @@ produce non-overlapping sequences.
 >>> import randomstate.prng.pcg32 as rnd
 >>> rs = [rng.RandomState(1234, 1) for _ in range(10)]
 >>> for i in range(10):
-        rs[i].advance(i * 2**32)
+        rs[i].advance(i * :math:`2^{32}`)
 
 *Note*: Due to the limited period of ``pcg32.RandomState``  using ``advance``
 in parallel applications is not recommended.

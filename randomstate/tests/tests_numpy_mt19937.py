@@ -4,12 +4,13 @@ import sys
 import warnings
 
 import numpy as np
-from numpy import random
+# from numpy import random
 from numpy.compat import asbytes
 from numpy.testing import (
     TestCase, run_module_suite, assert_, assert_raises, assert_equal,
     assert_warns, decorators)
 
+import randomstate as random
 from randomstate.prng.mt19937 import mt19937
 
 
@@ -91,7 +92,9 @@ class TestSetState(TestCase):
     def setUp(self):
         self.seed = 1234567890
         self.prng = random.RandomState(self.seed)
+        # Use legacy to get old NumPy state
         self.state = self.prng.get_state()
+        self.legacy_state = self.prng.get_state(legacy=True)
 
     def test_basic(self):
         old = self.prng.tomaxint(16)
@@ -120,7 +123,8 @@ class TestSetState(TestCase):
     def test_backwards_compatibility(self):
         # Make sure we can accept old state tuples that do not have the
         # cached Gaussian value.
-        old_state = self.state[:-2]
+        old_state = self.legacy_state[:-2]
+        print(old_state)
         x1 = self.prng.standard_normal(size=16)
         self.prng.set_state(old_state)
         x2 = self.prng.standard_normal(size=16)
@@ -170,10 +174,10 @@ class TestRandint(TestCase):
         mt19937.seed()
         for dt in self.itype[1:]:
             for ubnd in [4, 8, 16]:
-                vals = self.rfunc(2, ubnd, size=2 ** 16, dtype=dt)
+                vals = self.rfunc(2, ubnd, size=2**16, dtype=dt)
                 assert_(vals.max() < ubnd)
                 assert_(vals.min() >= 2)
-        vals = self.rfunc(0, 2, size=2 ** 16, dtype=np.bool)
+        vals = self.rfunc(0, 2, size=2**16, dtype=np.bool)
         assert_(vals.max() < 2)
         assert_(vals.min() >= 0)
 
@@ -372,11 +376,21 @@ class TestRandomDist(TestCase):
         np.testing.assert_equal(actual, desired)
 
     def test_shuffle(self):
-        # Test lists, arrays, and multidimensional versions of both:
-        for conv in [lambda x: x,
-                     np.asarray,
+        # Test lists, arrays (of various dtypes), and multidimensional versions
+        # of both, c-contiguous or not:
+        for conv in [lambda x: np.array([]),
+                     lambda x: x,
+                     lambda x: np.asarray(x).astype(np.int8),
+                     lambda x: np.asarray(x).astype(np.float32),
+                     lambda x: np.asarray(x).astype(np.complex64),
+                     lambda x: np.asarray(x).astype(object),
                      lambda x: [(i, i) for i in x],
-                     lambda x: np.asarray([(i, i) for i in x])]:
+                     lambda x: np.asarray([[i, i] for i in x]),
+                     lambda x: np.vstack([x, x]).T,
+                     # gh-4270
+                     lambda x: np.asarray([(i, i) for i in x],
+                                          [("a", object, 1),
+                                           ("b", np.int32, 1)])]:
             mt19937.seed(self.seed)
             alist = conv([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
             mt19937.shuffle(alist)
@@ -397,15 +411,17 @@ class TestRandomDist(TestCase):
 
     def test_shuffle_masked(self):
         # gh-3263
-        a = np.ma.masked_values(np.reshape(range(20), (5, 4)) % 3 - 1, -1)
+        a = np.ma.masked_values(np.reshape(range(20), (5,4)) % 3 - 1, -1)
         b = np.ma.masked_values(np.arange(20) % 3 - 1, -1)
-        ma = np.ma.count_masked(a)
-        mb = np.ma.count_masked(b)
+        a_orig = a.copy()
+        b_orig = b.copy()
         for i in range(50):
             mt19937.shuffle(a)
-            self.assertEqual(ma, np.ma.count_masked(a))
+            assert_equal(
+                sorted(a.data[~a.mask]), sorted(a_orig.data[~a_orig.mask]))
             mt19937.shuffle(b)
-            self.assertEqual(mb, np.ma.count_masked(b))
+            assert_equal(
+                sorted(b.data[~b.mask]), sorted(b_orig.data[~b_orig.mask]))
 
     def test_beta(self):
         mt19937.seed(self.seed)
@@ -821,20 +837,17 @@ class TestThread(object):
     def test_normal(self):
         def gen_random(state, out):
             out[...] = state.normal(size=10000)
-
         self.check_function(gen_random, sz=(10000,))
 
     def test_exp(self):
         def gen_random(state, out):
             out[...] = state.exponential(scale=np.ones((100, 1000)))
-
         self.check_function(gen_random, sz=(100, 1000))
 
     def test_multinomial(self):
         def gen_random(state, out):
-            out[...] = state.multinomial(10, [1 / 6.] * 6, size=10000)
-
-        self.check_function(gen_random, sz=(10000, 6))
+            out[...] = state.multinomial(10, [1/6.]*6, size=10000)
+        self.check_function(gen_random, sz=(10000,6))
 
 
 if __name__ == "__main__":

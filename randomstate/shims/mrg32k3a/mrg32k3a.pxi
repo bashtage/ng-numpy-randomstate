@@ -44,7 +44,7 @@ cdef object _set_state(aug_state *state, object state_info):
 DEF CLASS_DOCSTRING = """
 RandomState(seed=None)
 
-Container for L'Ecuyer MRG32K3A pseudo random number generator.
+Container for L\'Ecuyer MRG32K3A pseudo random number generator.
 
 MRG32K3A is a 32-bit implementation of L'Ecuyer's combined multiple
 recursive generator ([1]_, [2]_). MRG32K3A has a period of 2**191 and
@@ -81,7 +81,7 @@ Notes
 The state of the MRG32KA PRNG is represented by 6 64-bit integers.
 
 This implementation is integer based and produces integers in the interval
-[0, 2**32-209+1].  These are treated as if they 32-bit random integers.
+:math:`[0, 2^{32}-209+1]`.  These are treated as if they 32-bit random integers.
 
 References
 ----------
