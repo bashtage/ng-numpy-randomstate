@@ -4,12 +4,9 @@ DEF RS_RNG_JUMPABLE = 1
 cdef extern from "distributions.h":
 
     cdef struct s_mrg32k3a_state:
-        int64_t s10
-        int64_t s11
-        int64_t s12
-        int64_t s20
-        int64_t s21
-        int64_t s22
+        int64_t s1[3]
+        int64_t s2[3]
+        int loc
 
     ctypedef s_mrg32k3a_state mrg32k3a_state
 
@@ -31,16 +28,18 @@ ctypedef mrg32k3a_state rng_t
 ctypedef uint64_t rng_state_t
 
 cdef object _get_state(aug_state state):
-    return (state.rng.s10, state.rng.s11, state.rng.s12,
-            state.rng.s20, state.rng.s21, state.rng.s22)
+    return (state.rng.s1[0], state.rng.s1[1], state.rng.s1[2],
+            state.rng.s2[0], state.rng.s2[1], state.rng.s2[2],
+            state.rng.loc)
 
 cdef object _set_state(aug_state *state, object state_info):
-    state.rng.s10 = state_info[0]
-    state.rng.s11 = state_info[1]
-    state.rng.s12 = state_info[2]
-    state.rng.s20 = state_info[3]
-    state.rng.s21 = state_info[4]
-    state.rng.s22 = state_info[5]
+    state.rng.s1[0] = state_info[0]
+    state.rng.s1[1] = state_info[1]
+    state.rng.s1[2] = state_info[2]
+    state.rng.s2[0] = state_info[3]
+    state.rng.s2[1] = state_info[4]
+    state.rng.s2[2] = state_info[5]
+    state.rng.loc = state_info[6]
 
 cdef object matrix_power_127(x, m):
     n = x.shape[0]
@@ -68,21 +67,39 @@ A2_127 = matrix_power_127(A2p, m2)
 
 cdef void jump_state(aug_state* state):
     # vectors s1 and s2
-    s1 = np.array([state.rng.s10,state.rng.s11,state.rng.s12], dtype=np.uint64)
-    s2 = np.array([state.rng.s20,state.rng.s21,state.rng.s22], dtype=np.uint64)
+    loc = state.rng.loc
+
+    if loc == 0:
+        loc_m1 = 2
+        loc_m2 = 1
+    elif loc == 1:
+        loc_m1 = 0
+        loc_m2 = 2
+    else:
+        loc_m1 = 1
+        loc_m2 = 0
+
+    s1 = np.array([state.rng.s1[loc_m2],
+                   state.rng.s1[loc_m1],
+                   state.rng.s1[loc]], dtype=np.uint64)
+    s2 = np.array([state.rng.s2[loc_m2],
+                   state.rng.s2[loc_m1],
+                   state.rng.s2[loc]], dtype=np.uint64)
 
     # Advance the state
     s1 = np.mod(A1_127.dot(s1), m1)
     s2 = np.mod(A1_127.dot(s2), m2)
 
     # Restore state
-    state.rng.s10 = s1[0]
-    state.rng.s11 = s1[1]
-    state.rng.s12 = s1[2]
+    state.rng.s1[0] = s1[0]
+    state.rng.s1[1] = s1[1]
+    state.rng.s1[2] = s1[2]
 
-    state.rng.s20 = s2[0]
-    state.rng.s21 = s2[1]
-    state.rng.s22 = s2[2]
+    state.rng.s2[0] = s2[0]
+    state.rng.s2[1] = s2[1]
+    state.rng.s2[2] = s2[2]
+
+    state.rng.loc = 2
 
 DEF CLASS_DOCSTRING = """
 RandomState(seed=None)

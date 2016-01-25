@@ -32,11 +32,12 @@ void set_seed(aug_state* state, uint64_t val)
 
 void init_state(aug_state* state, int64_t vals[6])
 {
-    state->rng->s10 =  vals[0];
-    state->rng->s11 =  vals[1];
-    state->rng->s12 =  vals[2];
-    state->rng->s20 =  vals[3];
-    state->rng->s21 =  vals[4];
-    state->rng->s22 =  vals[5];
+    state->rng->s1[0] =  vals[0];
+    state->rng->s1[1] =  vals[1];
+    state->rng->s1[2] =  vals[2];
+    state->rng->s2[0] =  vals[3];
+    state->rng->s2[1] =  vals[4];
+    state->rng->s2[2] =  vals[5];
+    state->rng->loc = 2;
 }
 
