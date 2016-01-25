@@ -87,11 +87,11 @@ cdef void jump_state(aug_state* state):
 DEF CLASS_DOCSTRING = """
 RandomState(seed=None)
 
-Container for L\'Ecuyer MRG32K3A pseudo random number generator.
+Container for L'Ecuyer MRG32K3A pseudo random number generator.
 
 MRG32K3A is a 32-bit implementation of L'Ecuyer's combined multiple
-recursive generator ([1]_, [2]_). MRG32K3A has a period of 2**191 and
-supports multiple streams (NOT IMPLEMENTED YET).
+recursive generator [1]_, [2]_. MRG32K3A has a period of :math:`2^{191}`,
+supports jumping ahead and is suitable for parallel applications.
 
 ``mrg32k3a.RandomState`` exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the
@@ -116,8 +116,8 @@ seed : {None, int}, optional
     Random seed initializing the pseudo-random number generator.
     Can be an integer in [0, 2**64] or ``None`` (the default).
     If `seed` is ``None``, then ``mrg32k3a.RandomState`` will try to read data
-    from ``/dev/urandom`` (or the Windows analogue) if available or seed from
-    the clock otherwise.
+    from ``/dev/urandom`` (or the Windows analogue) if available. If
+    unavailable, a 64-bit hash of the time and process ID is used.
 
 Notes
 -----

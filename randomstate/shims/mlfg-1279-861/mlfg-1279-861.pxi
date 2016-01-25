@@ -81,7 +81,7 @@ seed : {None, int}, optional
     Can be an integer in [0, 2**64] or ``None`` (the default).
     If ``seed`` is ``None``, then ``mlfg_1279_861.RandomState`` will try to
     read entropy from ``/dev/urandom`` (or the Windows analogue) if available
-    to produce a 64-bit seed. If unavailable, the a 64-bit hash of the time
+    to produce a 64-bit seed. If unavailable, a 64-bit hash of the time
     and process ID is used.
 
 Notes

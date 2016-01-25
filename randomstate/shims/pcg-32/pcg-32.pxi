@@ -67,8 +67,8 @@ seed : {None, long}, optional
     Random seed initializing the pseudo-random number generator.
     Can be an integer in [0, 2**64] or ``None`` (the default).
     If `seed` is ``None``, then ``pcg32.RandomState`` will try to read data
-    from ``/dev/urandom`` (or the Windows analogue) if available or seed from
-    the clock otherwise.  
+    from ``/dev/urandom`` (or the Windows analogue) if available. If
+    unavailable, a 64-bit hash of the time and process ID is used.
 inc : {None, int}, optional
     Stream to return.  
     Can be an integer in [0, 2**64] or ``None`` (the default).  If `inc` is 
