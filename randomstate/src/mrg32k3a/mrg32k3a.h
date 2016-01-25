@@ -30,7 +30,7 @@ inline uint32_t mrg32k3a_random(mrg32k3a_state* state)
     p1 = a12 * state->s11 - a13n * state->s10;
     k = p1 / m1;
     p1 -= k * m1;
-    if (p1 < 0.0)
+    if (p1 < 0)
         p1 += m1;
     state->s10 = state->s11;
     state->s11 = state->s12;
@@ -40,7 +40,7 @@ inline uint32_t mrg32k3a_random(mrg32k3a_state* state)
     p2 = a21 * state->s22 - a23n * state->s20;
     k = p2 / m2;
     p2 -= k * m2;
-    if (p2 < 0.0)
+    if (p2 < 0)
         p2 += m2;
     state->s20 = state->s21;
     state->s21 = state->s22;
