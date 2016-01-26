@@ -21,12 +21,10 @@ def __generic_ctor(mod_name='mt19937'):
     rs: RandomState
         RandomState from the module randomstate.prng.mod_name
     """
-    print(mod_name)
     try:
         mod_name = mod_name.decode('ascii')
     except AttributeError:
         pass
-    print(mod_name)
     if mod_name == 'mt19937':
         mod = mt19937
     elif mod_name == 'mlfg_1279_861':

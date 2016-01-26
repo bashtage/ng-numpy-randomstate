@@ -510,7 +510,6 @@ class TestAgainstNumpy(unittest.TestCase):
     def test_dir(self):
         nprs_d = dir(self.nprs)
         rs_d = dir(self.rs)
-        print(set(nprs_d).difference(rs_d))
         assert(len(set(nprs_d).difference(rs_d)) == 0)
 
         npmod = dir(numpy.random)
@@ -519,7 +518,6 @@ class TestAgainstNumpy(unittest.TestCase):
                           '__RandomState_ctor', 'mtrand', 'test',
                           '__warningregistry__']
         mod += known_exlcuded
-        print(set(npmod).difference(mod))
         assert(len(set(npmod).difference(mod)) == 0)
 
 

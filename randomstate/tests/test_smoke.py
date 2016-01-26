@@ -429,11 +429,15 @@ class RNG(object):
         pick = pickle.dumps(self.rs)
         unpick = pickle.loads(pick)
         assert (type(self.rs) == type(unpick))
+        print(self.rs.get_state())
+        print(unpick.get_state())
         assert comp_state(self.rs.get_state(), unpick.get_state())
 
         pick = cPickle.dumps(self.rs)
         unpick = cPickle.loads(pick)
         assert (type(self.rs) == type(unpick))
+        print(self.rs.get_state())
+        print(unpick.get_state())
         assert comp_state(self.rs.get_state(), unpick.get_state())
 
 
