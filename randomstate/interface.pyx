@@ -499,7 +499,7 @@ cdef class RandomState:
 
         if state['name'] != rng_name:
             raise ValueError('Not a ' + rng_name + ' RNG state')
-        print(state['state'])
+
         _set_state(&self.rng_state, state['state'])
         self.rng_state.has_gauss = state['gauss']['has_gauss']
         self.rng_state.gauss = state['gauss']['gauss']

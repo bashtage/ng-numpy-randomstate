@@ -38,10 +38,11 @@ void mrg32k3a_seed(mrg32k3a_state* state, uint64_t seed)
         seeds[i] = draw;
     }
 
-    state->s10 = seeds[0];
-    state->s11 = seeds[1];
-    state->s12 = seeds[2];
-    state->s20 = seeds[3];
-    state->s21 = seeds[4];
-    state->s22 = seeds[5];
+    state->s1[0] = seeds[0];
+    state->s1[1] = seeds[1];
+    state->s1[2] = seeds[2];
+    state->s2[0] = seeds[3];
+    state->s2[1] = seeds[4];
+    state->s2[2] = seeds[5];
+    state->loc = 2;
 }

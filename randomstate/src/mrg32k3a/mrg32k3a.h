@@ -14,43 +14,41 @@
 
 typedef struct s_mrg32k3a_state
 {
-    int64_t s10;
-    int64_t s11;
-    int64_t s12;
-    int64_t s20;
-    int64_t s21;
-    int64_t s22;
+    int64_t s1[3];
+    int64_t s2[3];
+    int loc;
 } mrg32k3a_state;
 
 inline uint32_t mrg32k3a_random(mrg32k3a_state* state)
 {
-    int64_t k;
     int64_t p1, p2;
     /* Component 1 */
-    p1 = a12 * state->s11 - a13n * state->s10;
-    k = p1 / m1;
-    p1 -= k * m1;
-    if (p1 < 0)
-        p1 += m1;
-    state->s10 = state->s11;
-    state->s11 = state->s12;
-    state->s12 = p1;
+    switch (state->loc) {
+        case 0:
+            p1 = a12 * state->s1[2] - a13n * state->s1[1];
+            p2 = a21 * state->s2[0] - a23n * state->s2[1];
+            state->loc = 1;
+            break;
+        case 1:
+            p1 = a12 * state->s1[0] - a13n * state->s1[2];
+            p2 = a21 * state->s2[1] - a23n * state->s2[2];
+            state->loc = 2;
+            break;
+        case 2:
+            p1 = a12 * state->s1[1] - a13n * state->s1[0];
+            p2 = a21 * state->s2[2] - a23n * state->s2[0];
+            state->loc = 0;
+            break;
+    }
 
+    p1 -= (p1 >= 0) ?  (p1 / m1) * m1 : (p1 / m1) * m1 - m1;
+    state->s1[state->loc] = p1;
     /* Component 2 */
-    p2 = a21 * state->s22 - a23n * state->s20;
-    k = p2 / m2;
-    p2 -= k * m2;
-    if (p2 < 0)
-        p2 += m2;
-    state->s20 = state->s21;
-    state->s21 = state->s22;
-    state->s22 = p2;
+    p2 -= (p2 >= 0) ? (p2 / m2) * m2 : (p2 / m2) * m2 - m2;
+    state->s2[state->loc] = p2;
 
     /* Combination */
-    if (p1 <= p2)
-        return (uint32_t)(p1 - p2 + m1);
-    else
-        return (uint32_t)(p1 - p2);
+    return (uint32_t)((p1 <= p2) ? (p1 - p2 + m1) : (p1 - p2));
 }
 
 void mrg32k3a_seed(mrg32k3a_state* state, uint64_t seed);
