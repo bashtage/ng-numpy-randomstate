@@ -2,6 +2,7 @@ DEF RS_RNG_NAME = 'pcg64'
 DEF RS_RNG_ADVANCEABLE = 1
 DEF RS_RNG_SEED=2
 DEF RS_PCG128_EMULATED = 1
+DEF RS_SEED_NBYTES = 4
 
 from cpython cimport PyLong_FromUnsignedLongLong, PyLong_AsUnsignedLongLong
 

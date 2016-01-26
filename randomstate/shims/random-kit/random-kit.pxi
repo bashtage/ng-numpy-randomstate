@@ -1,6 +1,7 @@
 DEF RS_RNG_NAME = 'mt19937'
 DEF RS_NORMAL_METHOD = 'inv'
 DEF RK_STATE_LEN = 624
+DEF RS_SEED_NBYTES = 1
 
 ctypedef uint32_t rng_state_t
 

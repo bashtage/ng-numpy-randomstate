@@ -65,7 +65,6 @@ def random_entropy(size=None, source='system'):
     else:
         n = compute_numel(size)
         randoms = np.zeros(n, dtype=np.uint32)
-        print(n)
         if source == 'system':
             success = entropy_getbytes(<void *>(&randoms[0]), 4 * n)
         else:

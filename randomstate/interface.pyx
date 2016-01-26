@@ -21,6 +21,7 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Free
 import randomstate
 from binomial cimport binomial_t
 from cython_overrides cimport PyFloat_AsDouble, PyInt_AsLong, PyErr_Occurred, PyErr_Clear
+from randomstate.entropy import random_entropy
 
 np.import_array()
 
@@ -119,6 +120,20 @@ include "array_utilities.pxi"
 include "bounded_integers.pxi"
 include "aligned_malloc.pxi"
 
+cdef object _generate_seed(nbytes):
+    try:
+        seeds = random_entropy(nbytes)
+    except:
+        seeds = random_entropy(nbytes, 'fallback')
+    if nbytes == 1:
+        return seeds[0]
+
+    seed = long(0)
+    for i in range(nbytes):
+        scale = 2 ** (32 * i)
+        seed += scale * long(seeds[i])
+    return seed
+
 cdef double kahan_sum(double *darr, np.npy_intp n):
     cdef double c, y, t, sum
     cdef np.npy_intp i
@@ -148,7 +163,8 @@ cdef class RandomState:
     cdef object lock
     poisson_lam_max = POISSON_LAM_MAX
     __MAXSIZE = <uint64_t>sys.maxsize
-
+    cdef object __seed
+    cdef object __stream
 
     IF RS_RNG_SEED==1:
         def __init__(self, seed=None):
@@ -157,15 +173,22 @@ cdef class RandomState:
             IF RS_RNG_MOD_NAME == 'dsfmt':
                 self.rng_state.buffered_uniforms = <double *>PyArray_malloc_aligned(2 * DSFMT_N * sizeof(double))
             self.lock = Lock()
+            self.__seed = seed
+            self.__stream = None
+
             self._reset_state_variables()
             self.seed(seed)
     ELSE:
-        def __init__(self, seed=None, inc=None):
+        def __init__(self, seed=None, stream=None):
             self.rng_state.rng = <rng_t *>PyArray_malloc_aligned(sizeof(rng_t))
             self.rng_state.binomial = &self.binomial_info
             self.lock = Lock()
+            self.__seed = seed
+            self.__stream = stream
+
             self._reset_state_variables()
-            self.seed(seed, inc)
+            self.seed(seed, stream)
+
 
     def __dealloc__(self):
         PyArray_free_aligned(self.rng_state.rng)
@@ -196,8 +219,9 @@ cdef class RandomState:
             # cdef ndarray obj "arrayObject_obj"
             try:
                 if seed is None:
+                    self.__seed = seed = _generate_seed(1)
                     with self.lock:
-                        entropy_init(&self.rng_state)
+                        set_seed(&self.rng_state, seed)
                 else:
                     idx = operator.index(seed)
                     if idx > int(2**32 - 1) or idx < 0:
@@ -214,7 +238,7 @@ cdef class RandomState:
             self._reset_state_variables()
 
     ELIF RS_RNG_SEED==1:
-        def seed(self, val=None):
+        def seed(self, seed=None):
             """
             seed(seed=None)
 
@@ -225,7 +249,7 @@ cdef class RandomState:
 
             Parameters
             ----------
-            val : int, optional
+            seed : int, optional
                 Seed for ``RandomState``.
 
             Notes
@@ -239,18 +263,18 @@ cdef class RandomState:
             --------
             RandomState
             """
-            if val is not None:
-                if val < 0:
-                    raise ValueError('val < 0')
-                set_seed(&self.rng_state, val)
+            if seed is not None:
+                if seed < 0:
+                    raise ValueError('seed < 0')
             else:
-                entropy_init(&self.rng_state)
+                self.__seed = seed = _generate_seed(RS_SEED_NBYTES)
+            set_seed(&self.rng_state, seed)
             self._reset_state_variables()
 
     ELSE:
-        def seed(self, val=None, inc=None):
+        def seed(self, seed=None, stream=None):
             """
-            seed(val=None, inc=None)
+            seed(seed=None, stream=None)
 
             Seed the generator.
 
@@ -259,31 +283,33 @@ cdef class RandomState:
 
             Parameters
             ----------
-            val : int, optional
+            seed : int, optional
                 Seed for ``RandomState``.
-            inc : int, optional
-                Increment to use for producing multiple streams
+            stream : int, optional
+                Generator stream to use
 
             See Also
             --------
             RandomState
             """
-            if val is not None and inc is not None:
-                if val < 0:
-                    raise ValueError('val < 0')
-                if inc < 0:
-                    raise ValueError('inc < 0')
-                IF RS_RNG_MOD_NAME == 'pcg64':
-                    IF RS_PCG128_EMULATED:
-                        set_seed(&self.rng_state,
-                                 pcg128_from_pylong(val),
-                                 pcg128_from_pylong(inc))
-                    ELSE:
-                        set_seed(&self.rng_state, val, inc)
+            if seed is None:
+                self.__seed = seed = _generate_seed(RS_SEED_NBYTES)
+            elif seed < 0:
+                raise ValueError('seed < 0')
+            if stream is None:
+                self.__stream = stream = 1
+            elif stream < 0:
+                raise ValueError('stream < 0')
+
+            IF RS_RNG_MOD_NAME == 'pcg64':
+                IF RS_PCG128_EMULATED:
+                    set_seed(&self.rng_state,
+                             pcg128_from_pylong(seed),
+                             pcg128_from_pylong(stream))
                 ELSE:
-                    set_seed(&self.rng_state, val, inc)
-            else:
-                entropy_init(&self.rng_state)
+                    set_seed(&self.rng_state, seed, stream)
+            ELSE:
+                set_seed(&self.rng_state, seed, stream)
             self._reset_state_variables()
 
     def _reset_state_variables(self):
@@ -400,11 +426,14 @@ cdef class RandomState:
                        + _get_state(self.rng_state) \
                        + (self.rng_state.has_gauss, self.rng_state.gauss)
 
-            return  {'name': rng_name,
+            state = {'name': rng_name,
                      'state': _get_state(self.rng_state),
                      'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
-                     'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger}
-                     }
+                     'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger},
+                     'seed': self.__seed}
+            if self.__stream is not None:
+                state['stream'] = self.__stream
+            return state
     ELSE:
         def get_state(self):
             """
@@ -438,11 +467,14 @@ cdef class RandomState:
             component, see the class documentation.
             """
             rng_name = _ensure_string(RS_RNG_NAME)
-            return  {'name': rng_name,
+            state = {'name': rng_name,
                      'state': _get_state(self.rng_state),
                      'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
-                     'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger}
-                     }
+                     'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger},
+                     'seed': self.__seed}
+            if self.__stream is not None:
+                state['stream'] = self.__stream
+            return state
 
     def set_state(self, state):
         """
@@ -505,6 +537,8 @@ cdef class RandomState:
         self.rng_state.gauss = state['gauss']['gauss']
         self.rng_state.has_uint32 = state['uint32']['has_uint32']
         self.rng_state.uinteger = state['uint32']['uint32']
+        self.__seed = state['seed']
+        self.__stream = state['stream'] if 'stream' in state else None
 
     def random_uintegers(self, size=None, int bits=64):
         """
@@ -566,7 +600,9 @@ cdef class RandomState:
         self.set_state(state)
 
     def __reduce__(self):
-        return (randomstate.prng.__generic_ctor, (RS_RNG_MOD_NAME,), self.get_state())
+        return (randomstate.prng.__generic_ctor,
+                (_ensure_string(RS_RNG_MOD_NAME),),
+                self.get_state())
 
     # Basic distributions:
     def random_sample(self, size=None):

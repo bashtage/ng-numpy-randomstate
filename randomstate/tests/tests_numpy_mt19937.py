@@ -124,7 +124,6 @@ class TestSetState(TestCase):
         # Make sure we can accept old state tuples that do not have the
         # cached Gaussian value.
         old_state = self.legacy_state[:-2]
-        print(old_state)
         x1 = self.prng.standard_normal(size=16)
         self.prng.set_state(old_state)
         x2 = self.prng.standard_normal(size=16)
