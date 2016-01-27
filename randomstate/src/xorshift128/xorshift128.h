@@ -17,6 +17,8 @@ void xorshift128_jump(xorshift128_state* state);
 
 void xorshift128_seed(xorshift128_state* state, uint64_t seed);
 
+void xorshift128_seed_by_array(xorshift128_state* state, uint64_t *seed_array, int count);
+
 void xorshift128_init_state(xorshift128_state* state, uint64_t seed, uint64_t inc);
 
 inline uint64_t xorshift128_next(xorshift128_state* state) {

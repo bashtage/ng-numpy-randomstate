@@ -11,6 +11,12 @@ inline void set_seed(aug_state* state, uint64_t seed)
     xorshift128_seed(state->rng, seed);
 }
 
+void set_seed_by_array(aug_state* state, uint64_t *vals, int count)
+{
+    xorshift128_seed_by_array(state->rng, vals, count);
+}
+
+
 void entropy_init(aug_state* state)
 {
     uint64_t seed[1];

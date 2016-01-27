@@ -39,6 +39,8 @@ inline double random_double(aug_state* state)
 
 extern void set_seed(aug_state* state, uint64_t val);
 
+extern void set_seed_by_array(aug_state* state, uint64_t *vals, int count);
+
 extern void init_state(aug_state* state, int64_t vals[6]);
 
 extern void entropy_init(aug_state* state);

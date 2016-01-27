@@ -27,4 +27,6 @@ void xorshift1024_jump(xorshift1024_state* state);
 
 void xorshift1024_seed(xorshift1024_state* state, uint64_t seed);
 
+void xorshift1024_seed_by_array(xorshift1024_state* state, uint64_t *seed_array, int count);
+
 void xorshift1024_init_state(xorshift1024_state* state, uint64_t* seeds);

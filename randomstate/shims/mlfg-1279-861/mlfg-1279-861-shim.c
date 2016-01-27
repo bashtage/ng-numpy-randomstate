@@ -11,6 +11,11 @@ void set_seed(aug_state* state, uint64_t val)
     mlfg_seed(state->rng, val);
 }
 
+void set_seed_by_array(aug_state* state, uint64_t *vals, int count)
+{
+    mlfg_seed_by_array(state->rng, vals, count);
+}
+
 void entropy_init(aug_state* state)
 {
     uint64_t seeds[1];

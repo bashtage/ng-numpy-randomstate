@@ -17,6 +17,8 @@ typedef struct s_mlfg_state
 
 void mlfg_seed(mlfg_state* state, uint64_t seed);
 
+void mlfg_seed_by_array(mlfg_state* state, uint64_t *seed_array, int count);
+
 void mlfg_init_state(mlfg_state *state, uint64_t seeds[K]);
 
 /*

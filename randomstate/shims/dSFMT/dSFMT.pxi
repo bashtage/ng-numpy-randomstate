@@ -4,6 +4,8 @@ DEF DSFMT_MEXP = 19937
 DEF DSFMT_N = 191 # ((DSFMT_MEXP - 128) / 104 + 1)
 DEF DSFMT_N_PLUS_1 = 192 # DSFMT_N + 1
 DEF RS_SEED_NBYTES = 1
+DEF RS_SEED_ARRAY_BITS = 32
+
 
 ctypedef uint32_t rng_state_t
 
@@ -103,11 +105,12 @@ same release version.
 
 Parameters
 ----------
-seed : {None, int}, optional
+seed : {None, int, array_like}, optional
     Random seed initializing the pseudo-random number generator.
-    Can be an integer in [0, 2**32] or ``None`` (the default).
-    If `seed` is ``None``, then ``dSFMT.RandomState`` will try to read
-    entropy from ``/dev/urandom`` (or the Windows analogue) if available to
+    Can be an integer in [0, 2**32-1], array of integers in
+    [0, 2**32-1] or ``None`` (the default). If `seed` is ``None``,
+    then ``dSFMT.RandomState`` will try to read entropy from
+    ``/dev/urandom`` (or the Windows analogue) if available to
     produce a 64-bit seed. If unavailable, the a 64-bit hash of the time
     and process ID is used.
 
@@ -135,6 +138,20 @@ segments come from the same sequence.
 # Advance rs[i] by i jumps
 >>> for i in range(10):
         rs[i].jump(i)
+
+**State and Seeding**
+The ``dsfmt.RandomState`` state vector consists of a 764 element array of
+32-bit unsigned integers plus a single integer value between 0 and 382
+indicating  the current position within the main array. The implementation
+used here augments this with a 384 element array of doubles which are used
+to efficiently access the random numbers produced by the dSFMT generator.
+
+``dsfmt.RandomState`` is seeded using either a single 32-bit unsigned integer
+or a vector of 32-bit unsigned integers.  In either case the input seed is
+used as an input (or inputs) for a hashing function, and the output of the
+hashing function is used as the initial state. Using a single 32-bit value
+for the seed can only initialize a small range of the possible initial
+state values.
 
 .. [1] Mutsuo Saito and Makoto Matsumoto, "SIMD-oriented Fast Mersenne
        Twister: a 128-bit Pseudorandom Number Generator." Monte Carlo

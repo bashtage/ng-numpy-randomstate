@@ -22,6 +22,8 @@ cdef extern from "distributions.h":
 
     cdef void set_seed(aug_state* state, uint64_t seed)
 
+    cdef void set_seed_by_array(aug_state* state, uint64_t *seed, int count)
+
     cdef void jump_state(aug_state* state)
 
     cdef void init_state(aug_state* state, uint64_t* state_vals)
@@ -73,11 +75,12 @@ same release version.
 
 Parameters
 ----------
-seed : {None, int}, optional
+seed : {None, int, array_like}, optional
     Random seed initializing the pseudo-random number generator.
-    Can be an integer in [0, 2**64] or ``None`` (the default).
-    If `seed` is ``None``, then ``xorshift1024.RandomState`` will try to read
-    data from ``/dev/urandom`` (or the Windows analogue) if available.  If
+    Can be an integer in [0, 2**64-1], array of integers in
+    [0, 2**64-1] or ``None`` (the default). If `seed` is ``None``,
+    then ``xorshift1024.RandomState`` will try to read data from
+    ``/dev/urandom`` (or the Windows analogue) if available.  If
     unavailable, a 64-bit hash of the time and process ID is used.
 
 Notes

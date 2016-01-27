@@ -22,6 +22,8 @@ cdef extern from "distributions.h":
 
     cdef void set_seed(aug_state* state, uint64_t seed)
 
+    cdef void set_seed_by_array(aug_state* state, uint64_t *seed, int count)
+
 ctypedef uint64_t rng_state_t
 
 ctypedef mlfg_state rng_t
@@ -76,12 +78,13 @@ same release version.
 
 Parameters
 ----------
-seed : {None, int}, optional
+seed : {None, int, array_like}, optional
     Random seed initializing the pseudo-random number generator.
-    Can be an integer in [0, 2**64] or ``None`` (the default).
-    If ``seed`` is ``None``, then ``mlfg_1279_861.RandomState`` will try to
-    read entropy from ``/dev/urandom`` (or the Windows analogue) if available
-    to produce a 64-bit seed. If unavailable, a 64-bit hash of the time
+    Can be an integer in [0, 2**64-1], array of integers in
+    [0, 2**64-1] or ``None`` (the default). If `seed` is ``None``,
+    then ``mlfg_1279_861.RandomState`` will try to read entropy from
+    ``/dev/urandom`` (or the Windows analogue) if available to
+    produce a 64-bit seed. If unavailable, a 64-bit hash of the time
     and process ID is used.
 
 Notes
@@ -89,4 +92,21 @@ Notes
 The state of the MLFG(1279,861,*) PRNG is represented by 1279 64-bit unsigned
 integers as well as a two 32-bit integers representing the location in the
 state array of the current and lagged values.
+
+**State and Seeding**
+The ``dsfmt.mlfg_1279_861`` state vector consists of a 1279 element array of
+64-bit unsigned integers plus a two integers value between 0 and 1278
+indicating  the current position and the lagged value within the main array
+required to produce the next random.
+
+``dsfmt.mlfg_1279_861`` is seeded using either a single 64-bit unsigned integer
+or a vector of 64-bit unsigned integers.  In either case the input seed is
+used as an input (or inputs) for another simple random number generator,
+Splitmix64, and the output of this PRNG function is used as the initial state.
+Using a single 64-bit value for the seed can only initialize a small range of
+the possible initial state values.  When using an array, the SplitMix64 state
+for producing the ith component of the initial state is XORd with the ith
+value of the seed array until the seed array is exhausted. When using an array
+the initial state for the SplitMix64 state is 0 so that using a single element
+array and using a single scalar value will produce the same initial state.
 """
