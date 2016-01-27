@@ -18,22 +18,22 @@ from randomstate.prng.pcg64 import pcg64
 from randomstate.prng.xorshift1024 import xorshift1024
 from randomstate.prng.xorshift128 import xorshift128
 from randomstate.prng.dsfmt import dsfmt
-from numpy.testing import assert_almost_equal, assert_equal
+from numpy.testing import assert_almost_equal, assert_equal, assert_raises, assert_
 
 from nose import SkipTest
 
 
 def params_0(f):
     val = f()
-    assert np.isscalar(val)
+    assert_(np.isscalar(val))
     val = f(10)
-    assert val.shape == (10,)
+    assert_(val.shape == (10,))
     val = f((10, 10))
-    assert val.shape == (10, 10)
+    assert_(val.shape == (10, 10))
     val = f((10, 10, 10))
-    assert val.shape == (10, 10, 10)
+    assert_(val.shape == (10, 10, 10))
     val = f(size=(5, 5))
-    assert val.shape == (5, 5)
+    assert_(val.shape == (5, 5))
 
 
 def params_1(f, bounded=False):
@@ -99,13 +99,13 @@ class RNG(object):
         rs.random_uintegers(1)
         rs.set_state(state)
         new_state = rs.get_state()
-        assert comp_state(state, new_state)
+        assert_(comp_state(state, new_state))
 
     def test_advance(self):
         state = self.rs.get_state()
         if hasattr(self.rs, 'advance'):
             self.rs.advance(self.advance)
-            assert not comp_state(state, self.rs.get_state())
+            assert_(not comp_state(state, self.rs.get_state()))
         else:
             raise SkipTest
 
@@ -113,83 +113,83 @@ class RNG(object):
         state = self.rs.get_state()
         if hasattr(self.rs, 'jump'):
             self.rs.jump()
-            assert not comp_state(state, self.rs.get_state())
+            assert_(not comp_state(state, self.rs.get_state()))
         else:
             raise SkipTest
 
     def test_random_uintegers(self):
-        assert len(self.rs.random_uintegers(10)) == 10
+        assert_(len(self.rs.random_uintegers(10)) == 10)
 
     def test_uniform(self):
         r = self.rs.uniform(-1.0, 0.0, size=10)
-        assert len(r) == 10
-        assert (r > -1).all()
-        assert (r <= 0).all()
+        assert_(len(r) == 10)
+        assert_((r > -1).all())
+        assert_((r <= 0).all())
 
     def test_uniform_array(self):
         r = self.rs.uniform(np.array([-1.0] * 10), 0.0, size=10)
-        assert len(r) == 10
-        assert (r > -1).all()
-        assert (r <= 0).all()
+        assert_(len(r) == 10)
+        assert_((r > -1).all())
+        assert_((r <= 0).all())
         r = self.rs.uniform(np.array([-1.0] * 10), np.array([0.0] * 10), size=10)
-        assert len(r) == 10
-        assert (r > -1).all()
-        assert (r <= 0).all()
+        assert_(len(r) == 10)
+        assert_((r > -1).all())
+        assert_((r <= 0).all())
         r = self.rs.uniform(-1.0, np.array([0.0] * 10), size=10)
-        assert len(r) == 10
-        assert (r > -1).all()
-        assert (r <= 0).all()
+        assert_(len(r) == 10)
+        assert_((r > -1).all())
+        assert_((r <= 0).all())
 
     def test_random_sample(self):
-        assert len(self.rs.random_sample(10)) == 10
+        assert_(len(self.rs.random_sample(10)) == 10)
         params_0(self.rs.random_sample)
 
     def test_standard_normal_zig(self):
-        assert len(self.rs.standard_normal(10, method='zig')) == 10
+        assert_(len(self.rs.standard_normal(10, method='zig')) == 10)
 
     def test_standard_normal(self):
-        assert len(self.rs.standard_normal(10)) == 10
+        assert_(len(self.rs.standard_normal(10)) == 10)
         params_0(self.rs.standard_normal)
 
     def test_standard_gamma(self):
-        assert len(self.rs.standard_gamma(10, 10)) == 10
-        assert len(self.rs.standard_gamma(np.array([10] * 10), 10)) == 10
+        assert_(len(self.rs.standard_gamma(10, 10)) == 10)
+        assert_(len(self.rs.standard_gamma(np.array([10] * 10), 10)) == 10)
         params_1(self.rs.standard_gamma)
 
     def test_standard_exponential(self):
-        assert len(self.rs.standard_exponential(10)) == 10
+        assert_(len(self.rs.standard_exponential(10)) == 10)
         params_0(self.rs.standard_exponential)
 
     def test_standard_cauchy(self):
-        assert len(self.rs.standard_cauchy(10)) == 10
+        assert_(len(self.rs.standard_cauchy(10)) == 10)
         params_0(self.rs.standard_cauchy)
 
     def test_standard_t(self):
-        assert len(self.rs.standard_t(10, 10)) == 10
+        assert_(len(self.rs.standard_t(10, 10)) == 10)
         params_1(self.rs.standard_t)
 
     def test_binomial(self):
-        assert self.rs.binomial(10, .5) >= 0
-        assert self.rs.binomial(1000, .5) >= 0
+        assert_(self.rs.binomial(10, .5) >= 0)
+        assert_(self.rs.binomial(1000, .5) >= 0)
 
     def test_reset_state(self):
         state = self.rs.get_state()
         int_1 = self.rs.random_uintegers(1)
         self.rs.set_state(state)
         int_2 = self.rs.random_uintegers(1)
-        assert int_1 == int_2
+        assert_(int_1 == int_2)
 
     def test_entropy_init(self):
         rs = self.mod.RandomState()
         rs2 = self.mod.RandomState()
         s1 = rs.get_state()
         s2 = rs2.get_state()
-        assert not comp_state(rs.get_state(), rs2.get_state())
+        assert_(not comp_state(rs.get_state(), rs2.get_state()))
 
     def test_seed(self):
         rs = self.mod.RandomState(*self.seed)
         rs2 = self.mod.RandomState(*self.seed)
-        assert comp_state(rs.get_state(), rs2.get_state())
+        assert_(comp_state(rs.get_state(), rs2.get_state()))
 
     def test_reset_state_gauss(self):
         rs = self.mod.RandomState(*self.seed)
@@ -199,7 +199,7 @@ class RNG(object):
         rs2 = self.mod.RandomState()
         rs2.set_state(state)
         n2 = rs2.standard_normal(size=10)
-        assert (n1 == n2).all()
+        assert_((n1 == n2).all())
 
     def test_reset_state_uint32(self):
         rs = self.mod.RandomState(*self.seed)
@@ -209,17 +209,17 @@ class RNG(object):
         rs2 = self.mod.RandomState()
         rs2.set_state(state)
         n2 = rs2.random_uintegers(bits=32, size=10)
-        assert (n1 == n2).all()
+        assert_((n1 == n2).all())
 
     def test_shuffle(self):
         original = np.arange(200, 0, -1)
         permuted = self.rs.permutation(original)
-        assert (original != permuted).any()
+        assert_((original != permuted).any())
 
     def test_permutation(self):
         original = np.arange(200, 0, -1)
         permuted = self.rs.permutation(original)
-        assert (original != permuted).any()
+        assert_((original != permuted).any())
 
     def test_tomaxint(self):
         vals = self.rs.tomaxint(size=100000)
@@ -232,75 +232,75 @@ class RNG(object):
             except:
                 maxsize = sys.maxsize
         if maxsize < 2 ** 32:
-            assert (vals < sys.maxsize).all()
+            assert_((vals < sys.maxsize).all())
         else:
-            assert (vals >= 2 ** 32).any()
+            assert_((vals >= 2 ** 32).any())
 
     def test_beta(self):
         vals = self.rs.beta(2.0, 2.0, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         vals = self.rs.beta(np.array([2.0] * 10), 2.0)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         vals = self.rs.beta(2.0, np.array([2.0] * 10))
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         vals = self.rs.beta(np.array([2.0] * 10), np.array([2.0] * 10))
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         vals = self.rs.beta(np.array([2.0] * 10), np.array([[2.0]] * 10))
-        assert vals.shape == (10, 10)
+        assert_(vals.shape == (10, 10))
 
     def test_bytes(self):
         vals = self.rs.bytes(10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_chisquare(self):
         vals = self.rs.chisquare(2.0, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         params_1(self.rs.chisquare)
 
     def test_exponential(self):
         vals = self.rs.exponential(2.0, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         params_1(self.rs.exponential)
 
     def test_f(self):
         vals = self.rs.f(3, 1000, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_gamma(self):
         vals = self.rs.gamma(3, 2, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_geometric(self):
         vals = self.rs.geometric(0.5, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         params_1(self.rs.exponential, bounded=True)
 
     def test_gumbel(self):
         vals = self.rs.gumbel(2.0, 2.0, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_laplace(self):
         vals = self.rs.laplace(2.0, 2.0, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_logitic(self):
         vals = self.rs.logistic(2.0, 2.0, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_logseries(self):
         vals = self.rs.logseries(0.5, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_negative_binomial(self):
         vals = self.rs.negative_binomial(10, 0.2, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_rand(self):
         state = self.rs.get_state()
         vals = self.rs.rand(10, 10, 10)
         self.rs.set_state(state)
-        assert (vals == self.rs.random_sample((10, 10, 10))).all()
-        assert vals.shape == (10, 10, 10)
+        assert_((vals == self.rs.random_sample((10, 10, 10))).all())
+        assert_(vals.shape == (10, 10, 10))
 
     def test_randn(self):
         state = self.rs.get_state()
@@ -318,35 +318,35 @@ class RNG(object):
         vals_inv = self.rs.randn(10, 10, 10, method='inv')
         self.rs.set_state(state)
         vals_zig = self.rs.randn(10, 10, 10, method='zig')
-        assert (vals_zig != vals_inv).any()
+        assert_((vals_zig != vals_inv).any())
 
     def test_noncentral_chisquare(self):
         vals = self.rs.noncentral_chisquare(10, 2, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_noncentral_f(self):
         vals = self.rs.noncentral_f(3, 1000, 2, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         vals = self.rs.noncentral_f(np.array([3] * 10), 1000, 2)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         vals = self.rs.noncentral_f(3, np.array([1000] * 10), 2)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         vals = self.rs.noncentral_f(3, 1000, np.array([2] * 10))
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_normal(self):
         vals = self.rs.normal(10, 0.2, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_pareto(self):
         vals = self.rs.pareto(3.0, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_poisson(self):
         vals = self.rs.poisson(10, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         vals = self.rs.poisson(np.array([10] * 10))
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         params_1(self.rs.poisson)
 
     def test_poisson_lam_max(self):
@@ -355,90 +355,146 @@ class RNG(object):
 
     def test_power(self):
         vals = self.rs.power(0.2, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_randint(self):
         vals = self.rs.randint(10, 20, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_random_integers(self):
         vals = self.rs.random_integers(10, 20, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_rayleigh(self):
         vals = self.rs.rayleigh(0.2, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         params_1(self.rs.rayleigh, bounded=True)
 
     def test_vonmises(self):
         vals = self.rs.vonmises(10, 0.2, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_wald(self):
         vals = self.rs.wald(1.0, 1.0, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_weibull(self):
         vals = self.rs.weibull(1.0, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
 
     def test_zipf(self):
         vals = self.rs.zipf(10, 10)
-        assert len(vals) == 10
+        assert_(len(vals) == 10)
         vals = self.rs.zipf(self.vec_1d)
-        assert len(vals) == 100
+        assert_(len(vals) == 100)
         vals = self.rs.zipf(self.vec_2d)
-        assert vals.shape == (1, 100)
+        assert_(vals.shape == (1, 100))
         vals = self.rs.zipf(self.mat)
-        assert vals.shape == (100, 100)
+        assert_(vals.shape == (100, 100))
 
     def test_hypergeometric(self):
         vals = self.rs.hypergeometric(25, 25, 20)
-        assert np.isscalar(vals)
+        assert_(np.isscalar(vals))
         vals = self.rs.hypergeometric(np.array([25] * 10), 25, 20)
-        assert vals.shape == (10,)
+        assert_(vals.shape == (10,))
 
     def test_triangular(self):
         vals = self.rs.triangular(-5, 0, 5)
-        assert np.isscalar(vals)
+        assert_(np.isscalar(vals))
         vals = self.rs.triangular(-5, np.array([0] * 10), 5)
-        assert vals.shape == (10,)
+        assert_(vals.shape == (10,))
 
     def test_multivariate_normal(self):
         mean = [0, 0]
         cov = [[1, 0], [0, 100]]  # diagonal covariance
         x = self.rs.multivariate_normal(mean, cov, 5000)
-        assert x.shape == (5000, 2)
+        assert_(x.shape == (5000, 2))
         x_zig = self.rs.multivariate_normal(mean, cov, 5000, method='zig')
-        assert x.shape == (5000, 2)
+        assert_(x.shape == (5000, 2))
         x_inv = self.rs.multivariate_normal(mean, cov, 5000, method='inv')
-        assert x.shape == (5000, 2)
-        assert (x_zig != x_inv).any()
+        assert_(x.shape == (5000, 2))
+        assert_((x_zig != x_inv).any())
 
     def test_multinomial(self):
         vals = self.rs.multinomial(100, [1.0 / 3, 2.0 / 3])
-        assert vals.shape == (2,)
+        assert_(vals.shape == (2,))
         vals = self.rs.multinomial(100, [1.0 / 3, 2.0 / 3], size=10)
-        assert vals.shape == (10, 2)
+        assert_(vals.shape == (10, 2))
 
     def test_dirichlet(self):
         s = self.rs.dirichlet((10, 5, 3), 20)
-        assert s.shape == (20, 3)
+        assert_(s.shape == (20, 3))
 
     def test_pickle(self):
         pick = pickle.dumps(self.rs)
         unpick = pickle.loads(pick)
-        assert (type(self.rs) == type(unpick))
+        assert_((type(self.rs) == type(unpick)))
         print(self.rs.get_state())
         print(unpick.get_state())
-        assert comp_state(self.rs.get_state(), unpick.get_state())
+        assert_(comp_state(self.rs.get_state(), unpick.get_state()))
 
         pick = cPickle.dumps(self.rs)
         unpick = cPickle.loads(pick)
-        assert (type(self.rs) == type(unpick))
+        assert_((type(self.rs) == type(unpick)))
         print(self.rs.get_state())
         print(unpick.get_state())
-        assert comp_state(self.rs.get_state(), unpick.get_state())
+        assert_(comp_state(self.rs.get_state(), unpick.get_state()))
+
+    def test_seed_array(self):
+        if self.seed_vector_bits is None:
+            raise SkipTest
+
+        if self.seed_vector_bits == 32:
+            dtype = np.uint32
+        else:
+            dtype = np.uint64
+        seed = np.array([1], dtype=dtype)
+        self.rs.seed(seed)
+        state1 = self.rs.get_state()
+        self.rs.seed(1)
+        state2 = self.rs.get_state()
+        assert_(comp_state(state1, state2))
+
+        seed = np.arange(4, dtype=dtype)
+        self.rs.seed(seed)
+        state1 = self.rs.get_state()
+        self.rs.seed(seed[0])
+        state2 = self.rs.get_state()
+        assert_(not comp_state(state1, state2))
+
+        seed = np.arange(1500, dtype=dtype)
+        self.rs.seed(seed)
+        state1 = self.rs.get_state()
+        self.rs.seed(seed[0])
+        state2 = self.rs.get_state()
+        assert_(not comp_state(state1, state2))
+
+        seed = 2 ** np.mod(np.arange(1500, dtype=dtype), self.seed_vector_bits - 1) + 1
+        self.rs.seed(seed)
+        state1 = self.rs.get_state()
+        self.rs.seed(seed[0])
+        state2 = self.rs.get_state()
+        assert_(not comp_state(state1, state2))
+
+    def test_seed_array_error(self):
+        if self.seed_vector_bits == 32:
+            dtype = np.uint32
+            out_of_bounds = 2**32
+        else:
+            dtype = np.uint64
+            out_of_bounds = 2**64
+
+        seed = -1
+        assert_raises(ValueError, self.rs.seed, seed)
+
+        seed = np.array([-1], dtype=np.int32)
+        assert_raises(ValueError, self.rs.seed, seed)
+
+        seed = np.array([1, 2, 3, -5], dtype=np.int32)
+        assert_raises(ValueError, self.rs.seed, seed)
+
+        seed = np.array([1, 2, 3, out_of_bounds])
+        assert_raises(ValueError, self.rs.seed, seed)
 
 
 class TestMT19937(RNG):
@@ -449,6 +505,7 @@ class TestMT19937(RNG):
         cls.seed = [2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls.seed_vector_bits = 32
         cls._extra_setup()
 
     def test_numpy_state(self):
@@ -457,10 +514,10 @@ class TestMT19937(RNG):
         state = nprs.get_state()
         self.rs.set_state(state)
         state2 = self.rs.get_state()
-        assert (state[1] == state2['state'][0]).all()
-        assert (state[2] == state2['state'][1])
-        assert (state[3] == state2['gauss']['has_gauss'])
-        assert (state[4] == state2['gauss']['gauss'])
+        assert_((state[1] == state2['state'][0]).all())
+        assert_((state[2] == state2['state'][1]))
+        assert_((state[3] == state2['gauss']['has_gauss']))
+        assert_((state[4] == state2['gauss']['gauss']))
 
 
 class TestPCG32(RNG, unittest.TestCase):
@@ -471,6 +528,7 @@ class TestPCG32(RNG, unittest.TestCase):
         cls.seed = [2 ** 48 + 2 ** 21 + 2 ** 16 + 2 ** 5 + 1, 2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls.seed_vector_bits = None
         cls._extra_setup()
 
 
@@ -483,6 +541,7 @@ class TestPCG64(RNG, unittest.TestCase):
                     2 ** 21 + 2 ** 16 + 2 ** 5 + 1]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls.seed_vector_bits = None
         cls._extra_setup()
 
 
@@ -494,6 +553,7 @@ class TestXorShift128(RNG, unittest.TestCase):
         cls.seed = [12345]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls.seed_vector_bits = 64
         cls._extra_setup()
 
 
@@ -505,6 +565,7 @@ class TestXorShift1024(RNG, unittest.TestCase):
         cls.seed = [12345]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls.seed_vector_bits = 64
         cls._extra_setup()
 
 
@@ -516,6 +577,7 @@ class TestMLFG(RNG, unittest.TestCase):
         cls.seed = [12345]
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
+        cls.seed_vector_bits = 64
         cls._extra_setup()
 
 
@@ -528,6 +590,7 @@ class TestMRG32k3A(RNG, unittest.TestCase):
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
         cls._extra_setup()
+        cls.seed_vector_bits = 64
 
 
 class TestDSFMT(RNG, unittest.TestCase):
@@ -539,25 +602,26 @@ class TestDSFMT(RNG, unittest.TestCase):
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
         cls._extra_setup()
+        cls.seed_vector_bits = 32
 
 
 class TestEntropy(unittest.TestCase):
     def test_entropy(self):
         e1 = entropy.random_entropy()
         e2 = entropy.random_entropy()
-        assert (e1 != e2)
+        assert_((e1 != e2))
         e1 = entropy.random_entropy(10)
         e2 = entropy.random_entropy(10)
-        assert (e1 != e2).all()
+        assert_((e1 != e2).all())
         e1 = entropy.random_entropy(10, source='system')
         e2 = entropy.random_entropy(10, source='system')
-        assert (e1 != e2).all()
+        assert_((e1 != e2).all())
 
     def test_fallback(self):
         e1 = entropy.random_entropy(source='fallback')
         time.sleep(0.1)
         e2 = entropy.random_entropy(source='fallback')
-        assert (e1 != e2)
+        assert_((e1 != e2))
 
 
 if __name__ == '__main__':

@@ -13,14 +13,14 @@ cimport numpy as np
 cimport cython
 
 from libc cimport string
-from libc.stdint cimport (uint8_t, uint16_t, uint32_t, uint64_t, int8_t,
-                          int16_t, int32_t, int64_t, intptr_t)
+from libc.stdint cimport (uint8_t, uint16_t, uint32_t, uint64_t,
+                          int8_t, int16_t, int32_t, int64_t, intptr_t)
+
 from cpython cimport Py_INCREF
-from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
 import randomstate
 from binomial cimport binomial_t
-from cython_overrides cimport PyFloat_AsDouble, PyInt_AsLong, PyErr_Occurred, PyErr_Clear
+from cython_overrides cimport PyFloat_AsDouble, PyInt_AsLong
 from randomstate.entropy import random_entropy
 
 np.import_array()
@@ -234,7 +234,9 @@ cdef class RandomState:
                     raise ValueError("Seed must be between 0 and 4294967295")
                 obj = obj.astype('L', casting='unsafe')
                 with self.lock:
-                    set_seed_by_array(&self.rng_state, <unsigned long *>np.PyArray_DATA(obj), np.PyArray_DIM(obj, 0))
+                    set_seed_by_array(&self.rng_state,
+                                      <unsigned long *>np.PyArray_DATA(obj),
+                                      np.PyArray_DIM(obj, 0))
             self._reset_state_variables()
 
     ELIF RS_RNG_SEED==1:
@@ -263,12 +265,36 @@ cdef class RandomState:
             --------
             RandomState
             """
-            if seed is not None:
-                if seed < 0:
-                    raise ValueError('seed < 0')
-            else:
-                self.__seed = seed = _generate_seed(RS_SEED_NBYTES)
-            set_seed(&self.rng_state, seed)
+            try:
+                if seed is not None:
+                    idx = operator.index(seed)
+                    if idx < 0:
+                        raise ValueError('seed < 0')
+                else:
+                    self.__seed = seed = _generate_seed(RS_SEED_NBYTES)
+                set_seed(&self.rng_state, seed)
+            except TypeError:
+                IF RS_SEED_ARRAY_BITS == 32:
+                    seed = np.asarray(seed).astype(np.int64, casting='safe')
+                    if ((seed > int(2**32 - 1)) | (seed < 0)).any():
+                        raise ValueError("Seed values must be between 0 and "
+                                         "4294967295  (2**32-1)")
+                    seed = seed.astype(np.uint32, casting='unsafe')
+                    with self.lock:
+                        set_seed_by_array(&self.rng_state,
+                                          <uint32_t *>np.PyArray_DATA(seed),
+                                          np.PyArray_DIM(seed, 0))
+                ELSE:
+                    seed = np.asarray(seed).astype(np.object, casting='safe')
+                    if ((seed > int(2**64 - 1)) | (seed < 0)).any():
+                        raise ValueError("Seed values must be between 0 and "
+                                         "18446744073709551616 (2**64-1)")
+                    seed = seed.astype(np.uint64, casting='unsafe')
+                    with self.lock:
+                        set_seed_by_array(&self.rng_state,
+                                          <uint64_t *>np.PyArray_DATA(seed),
+                                          np.PyArray_DIM(seed, 0))
+                self.__seed = seed
             self._reset_state_variables()
 
     ELSE:

@@ -30,6 +30,12 @@ void set_seed(aug_state* state, uint64_t val)
     mrg32k3a_seed(state->rng, val);
 }
 
+void set_seed_by_array(aug_state* state, uint64_t *vals, int count)
+{
+    mrg32k3a_seed_by_array(state->rng, vals, count);
+}
+
+
 void init_state(aug_state* state, int64_t vals[6])
 {
     state->rng->s1[0] =  vals[0];

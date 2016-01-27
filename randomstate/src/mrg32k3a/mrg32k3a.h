@@ -21,7 +21,8 @@ typedef struct s_mrg32k3a_state
 
 inline uint32_t mrg32k3a_random(mrg32k3a_state* state)
 {
-    int64_t p1, p2;
+    int64_t p1 = 0;
+    int64_t p2 = 0;
     /* Component 1 */
     switch (state->loc) {
         case 0:
@@ -52,3 +53,5 @@ inline uint32_t mrg32k3a_random(mrg32k3a_state* state)
 }
 
 void mrg32k3a_seed(mrg32k3a_state* state, uint64_t seed);
+
+void mrg32k3a_seed_by_array(mrg32k3a_state* state, uint64_t *seed, int count);

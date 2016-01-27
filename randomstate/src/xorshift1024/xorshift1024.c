@@ -37,12 +37,29 @@ void xorshift1024_seed(xorshift1024_state* state, uint64_t seed)
         initial_state[i] = splitmix64_next(&seed_copy);
     }
     xorshift1024_init_state(state, initial_state);
-    state->p = 0;
 }
 
 void xorshift1024_init_state(xorshift1024_state* state, uint64_t* seeds)
 {
     memcpy(&(state->s), seeds, sizeof(state->s));
+    state->p = 0;
 }
 
 
+void xorshift1024_seed_by_array(xorshift1024_state* state, uint64_t *seed_array, int count)
+{
+    uint64_t initial_state[16] = {0};
+    uint64_t seed_copy = 0;
+    int iter_bound = 16>=count ? 16 : count;
+    int i, loc = 0;
+    for (i = 0; i < iter_bound; i++)
+    {
+        if (i < count)
+            seed_copy ^= seed_array[i];
+        initial_state[loc] = splitmix64_next(&seed_copy);
+        loc ++;
+        if (loc == 16)
+            loc = 0;
+    }
+    xorshift1024_init_state(state, initial_state);
+}
