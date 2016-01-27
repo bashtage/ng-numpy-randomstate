@@ -242,4 +242,4 @@ for config in configs:
     for ext in exts:
         file_path = join(mod_dir, config['file_name'] + ext)
         if os.path.exists(file_path):
-            pass # os.unlink(file_path)
+            os.unlink(file_path)

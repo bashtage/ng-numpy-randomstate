@@ -1084,11 +1084,12 @@ cdef class RandomState:
         cdef double _low, _high, range
         cdef object temp
 
-        _low = PyFloat_AsDouble(low)
-        _high = PyFloat_AsDouble(high)
-        if _low == -1.0 or _high == -1.0:
-            is_scalar = not PyErr_Occurred()
-        if is_scalar:
+        alow = <np.ndarray>np.PyArray_FROM_OTF(low, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        ahigh = <np.ndarray>np.PyArray_FROM_OTF(high, np.NPY_DOUBLE, np.NPY_ALIGNED)
+
+        if np.PyArray_NDIM(alow) == np.PyArray_NDIM(ahigh) == 0:
+            _low = PyFloat_AsDouble(low)
+            _high = PyFloat_AsDouble(high)
             range = _high - _low
             if not np.isfinite(range):
                 raise OverflowError('Range exceeds valid bounds')
@@ -1098,9 +1099,6 @@ cdef class RandomState:
                         range, '', CONS_NONE,
                         0.0, '', CONS_NONE)
 
-        PyErr_Clear()
-        alow = <np.ndarray>np.PyArray_FROM_OTF(low, np.NPY_DOUBLE, np.NPY_ALIGNED)
-        ahigh = <np.ndarray>np.PyArray_FROM_OTF(high, np.NPY_DOUBLE, np.NPY_ALIGNED)
         temp = np.subtract(ahigh, alow)
         Py_INCREF(temp)  # needed to get around Pyrex's automatic reference-counting
                          # rules because EnsureArray steals a reference
@@ -3124,15 +3122,15 @@ cdef class RandomState:
         cdef double fleft, fmode, fright
         cdef np.ndarray oleft, omode, oright
 
-        fleft = PyFloat_AsDouble(left)
-        fright = PyFloat_AsDouble(right)
-        fmode = PyFloat_AsDouble(mode)
-        if fleft == -1.0 or fright == -1.0 or fmode == -1.0:
-            if PyErr_Occurred():
-                PyErr_Clear()
-                is_scalar = False
+        oleft = <np.ndarray>np.PyArray_FROM_OTF(left, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        omode = <np.ndarray>np.PyArray_FROM_OTF(mode, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        oright = <np.ndarray>np.PyArray_FROM_OTF(right, np.NPY_DOUBLE, np.NPY_ALIGNED)
 
-        if is_scalar:
+        if np.PyArray_NDIM(oleft) == np.PyArray_NDIM(omode) == np.PyArray_NDIM(oright) == 0:
+            fleft = PyFloat_AsDouble(left)
+            fright = PyFloat_AsDouble(right)
+            fmode = PyFloat_AsDouble(mode)
+
             if fleft > fmode:
                 raise ValueError("left > mode")
             if fmode > fright:
@@ -3143,10 +3141,6 @@ cdef class RandomState:
                         fleft, '', CONS_NONE,
                         fmode, '', CONS_NONE,
                         fright, '', CONS_NONE)
-
-        oleft = <np.ndarray>np.PyArray_FROM_OTF(left, np.NPY_DOUBLE, np.NPY_ALIGNED)
-        omode = <np.ndarray>np.PyArray_FROM_OTF(mode, np.NPY_DOUBLE, np.NPY_ALIGNED)
-        oright = <np.ndarray>np.PyArray_FROM_OTF(right, np.NPY_DOUBLE, np.NPY_ALIGNED)
 
         if np.any(np.greater(oleft, omode)):
             raise ValueError("left > mode")
@@ -3606,15 +3600,16 @@ cdef class RandomState:
         cdef np.ndarray ongood, onbad, onsample
         cdef long lngood, lnbad, lnsample
 
-        lngood = PyInt_AsLong(ngood)
-        lnbad = PyInt_AsLong(nbad)
-        lnsample = PyInt_AsLong(nsample)
-        if lngood == -1 or lnbad == -1 or lnsample == -1:
-            if PyErr_Occurred():
-                PyErr_Clear()
-                is_scalar = False
+        ongood = <np.ndarray>np.PyArray_FROM_OTF(ngood, np.NPY_LONG, np.NPY_ALIGNED)
+        onbad = <np.ndarray>np.PyArray_FROM_OTF(nbad, np.NPY_LONG, np.NPY_ALIGNED)
+        onsample = <np.ndarray>np.PyArray_FROM_OTF(nsample, np.NPY_LONG, np.NPY_ALIGNED)
 
-        if is_scalar:
+        if np.PyArray_NDIM(ongood) == np.PyArray_NDIM(onbad) == np.PyArray_NDIM(onsample) == 0:
+
+            lngood = PyInt_AsLong(ngood)
+            lnbad = PyInt_AsLong(nbad)
+            lnsample = PyInt_AsLong(nsample)
+
             if lngood < 0:
                 raise ValueError("ngood < 0")
             if lnbad < 0:
@@ -3627,12 +3622,6 @@ cdef class RandomState:
                         lngood, 'ngood', CONS_NON_NEGATIVE,
                         lnbad, 'nbad', CONS_NON_NEGATIVE,
                         lnsample, 'nsample', CONS_GTE_1)
-
-        PyErr_Clear()
-
-        ongood = <np.ndarray>np.PyArray_FROM_OTF(ngood, np.NPY_LONG, np.NPY_ALIGNED)
-        onbad = <np.ndarray>np.PyArray_FROM_OTF(nbad, np.NPY_LONG, np.NPY_ALIGNED)
-        onsample = <np.ndarray>np.PyArray_FROM_OTF(nsample, np.NPY_LONG, np.NPY_ALIGNED)
 
         if np.any(np.less(np.add(ongood, onbad),onsample)):
             raise ValueError("ngood + nbad < nsample")
