@@ -101,15 +101,14 @@ cdef int check_constraint(double val, object name, constraint_type cons) except 
     return 0
 
 cdef object cont_broadcast_1(aug_state* state, void* func, object size, object lock,
-                             object a, object a_name, constraint_type a_constraint):
+                             np.ndarray a_arr, object a_name, constraint_type a_constraint):
 
-    cdef np.ndarray a_arr, randoms
+    cdef np.ndarray randoms
     cdef double *randoms_data
     cdef np.broadcast it
     cdef random_double_1 f = (<random_double_1>func)
     cdef np.npy_intp i, n
 
-    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if a_constraint != CONS_NONE:
         check_array_constraint(a_arr, a_name, a_constraint)
 
@@ -132,19 +131,17 @@ cdef object cont_broadcast_1(aug_state* state, void* func, object size, object l
     return randoms
 
 cdef object cont_broadcast_2(aug_state* state, void* func, object size, object lock,
-                 object a, object a_name, constraint_type a_constraint,
-                 object b, object b_name, constraint_type b_constraint):
-    cdef np.ndarray a_arr, b_arr, randoms
+                 np.ndarray a_arr, object a_name, constraint_type a_constraint,
+                 np.ndarray b_arr, object b_name, constraint_type b_constraint):
+    cdef np.ndarray randoms
     cdef double *randoms_data
     cdef np.broadcast it
     cdef random_double_2 f = (<random_double_2>func)
     cdef np.npy_intp i, n
 
-    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if a_constraint != CONS_NONE:
         check_array_constraint(a_arr, a_name, a_constraint)
 
-    b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if b_constraint != CONS_NONE:
         check_array_constraint(b_arr, b_name, b_constraint)
 
@@ -171,24 +168,21 @@ cdef object cont_broadcast_2(aug_state* state, void* func, object size, object l
     return randoms
 
 cdef object cont_broadcast_3(aug_state* state, void* func, object size, object lock,
-                 object a, object a_name, constraint_type a_constraint,
-                 object b, object b_name, constraint_type b_constraint,
-                 object c, object c_name, constraint_type c_constraint):
-    cdef np.ndarray a_arr, b_arr, c_arr, randoms
+                             np.ndarray a_arr, object a_name, constraint_type a_constraint,
+                             np.ndarray b_arr, object b_name, constraint_type b_constraint,
+                             np.ndarray c_arr, object c_name, constraint_type c_constraint):
+    cdef np.ndarray randoms
     cdef double *randoms_data
     cdef np.broadcast it
     cdef random_double_3 f = (<random_double_3>func)
     cdef np.npy_intp i, n
 
-    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if a_constraint != CONS_NONE:
         check_array_constraint(a_arr, a_name, a_constraint)
 
-    b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if b_constraint != CONS_NONE:
         check_array_constraint(b_arr, b_name, b_constraint)
 
-    c_arr = <np.ndarray>np.PyArray_FROM_OTF(c, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if c_constraint != CONS_NONE:
         check_array_constraint(c_arr, c_name, c_constraint)
 
@@ -219,43 +213,45 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
                  object b, object b_name, constraint_type b_constraint,
                  object c, object c_name, constraint_type c_constraint):
 
+    cdef np.ndarray a_arr, b_arr, c_arr
     cdef double _a = 0.0, _b = 0.0, _c = 0.0
     cdef bint is_scalar = True
     if narg > 0:
-        _a = PyFloat_AsDouble(a)
-        if _a == -1.0:
-            if PyErr_Occurred():
-                is_scalar = False
-        if a_constraint != CONS_NONE and is_scalar:
-            check_constraint(_a, a_name, a_constraint)
-    if narg > 1 and is_scalar:
-        _b = PyFloat_AsDouble(b)
-        if _b == -1.0:
-            if PyErr_Occurred():
-                is_scalar = False
-        if b_constraint != CONS_NONE and is_scalar:
-            check_constraint(_b, b_name, b_constraint)
-    if narg == 3 and is_scalar:
-        _c = PyFloat_AsDouble(c)
-        if _c == -1.0:
-            if PyErr_Occurred():
-                is_scalar = False
-        if c_constraint != CONS_NONE and is_scalar:
-            check_constraint(_c, c_name, c_constraint)
+        a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        is_scalar = is_scalar and np.PyArray_NDIM(a_arr) == 0
+    if narg > 1:
+        b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        is_scalar = is_scalar and np.PyArray_NDIM(b_arr) == 0
+    if narg == 3:
+        c_arr = <np.ndarray>np.PyArray_FROM_OTF(c, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        is_scalar = is_scalar and np.PyArray_NDIM(c_arr) == 0
+
     if not is_scalar:
-        PyErr_Clear()
         if narg == 1:
             return cont_broadcast_1(state, func, size, lock,
-                                    a, a_name, a_constraint)
+                                    a_arr, a_name, a_constraint)
         elif narg == 2:
             return cont_broadcast_2(state, func, size, lock,
-                                    a, a_name, a_constraint,
-                                    b, b_name, b_constraint)
+                                    a_arr, a_name, a_constraint,
+                                    b_arr, b_name, b_constraint)
         else:
             return cont_broadcast_3(state, func, size, lock,
-                                    a, a_name, a_constraint,
-                                    b, b_name, b_constraint,
-                                    c, c_name, c_constraint)
+                                    a_arr, a_name, a_constraint,
+                                    b_arr, b_name, b_constraint,
+                                    c_arr, c_name, c_constraint)
+
+    if narg > 0:
+        _a = PyFloat_AsDouble(a)
+        if a_constraint != CONS_NONE and is_scalar:
+            check_constraint(_a, a_name, a_constraint)
+    if narg > 1:
+        _b = PyFloat_AsDouble(b)
+        if b_constraint != CONS_NONE:
+            check_constraint(_b, b_name, b_constraint)
+    if narg == 3:
+        _c = PyFloat_AsDouble(c)
+        if c_constraint != CONS_NONE and is_scalar:
+            check_constraint(_c, c_name, c_constraint)
 
     if size is None:
         if narg == 0:
@@ -296,15 +292,14 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
     return np.asarray(randoms).reshape(size)
 
 cdef object discrete_broadcast_d(aug_state* state, void* func, object size, object lock,
-                                 object a, object a_name, constraint_type a_constraint):
+                                 np.ndarray a_arr, object a_name, constraint_type a_constraint):
 
-    cdef np.ndarray a_arr, randoms
+    cdef np.ndarray randoms
     cdef long *randoms_data
     cdef np.broadcast it
     cdef random_uint_d f = (<random_uint_d>func)
     cdef np.npy_intp i, n
 
-    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if a_constraint != CONS_NONE:
         check_array_constraint(a_arr, a_name, a_constraint)
 
@@ -328,18 +323,16 @@ cdef object discrete_broadcast_d(aug_state* state, void* func, object size, obje
     return randoms
 
 cdef object discrete_broadcast_dd(aug_state* state, void* func, object size, object lock,
-                                  object a, object a_name, constraint_type a_constraint,
-                                  object b, object b_name, constraint_type b_constraint):
-    cdef np.ndarray a_arr, b_arr, randoms
+                                  np.ndarray a_arr, object a_name, constraint_type a_constraint,
+                                  np.ndarray b_arr, object b_name, constraint_type b_constraint):
+    cdef np.ndarray randoms
     cdef long *randoms_data
     cdef np.broadcast it
     cdef random_uint_dd f = (<random_uint_dd>func)
     cdef np.npy_intp i, n
 
-    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if a_constraint != CONS_NONE:
         check_array_constraint(a_arr, a_name, a_constraint)
-    b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if b_constraint != CONS_NONE:
         check_array_constraint(b_arr, b_name, b_constraint)
 
@@ -365,20 +358,18 @@ cdef object discrete_broadcast_dd(aug_state* state, void* func, object size, obj
     return randoms
 
 cdef object discrete_broadcast_di(aug_state* state, void* func, object size, object lock,
-                                  object a, object a_name, constraint_type a_constraint,
-                                  object b, object b_name, constraint_type b_constraint):
-    cdef np.ndarray a_arr, b_arr, randoms
+                                  np.ndarray a_arr, object a_name, constraint_type a_constraint,
+                                  np.ndarray b_arr, object b_name, constraint_type b_constraint):
+    cdef np.ndarray randoms
     cdef long *randoms_data
     cdef np.broadcast it
     cdef random_uint_di f = (<random_uint_di>func)
     cdef np.npy_intp i, n
 
 
-    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
     if a_constraint != CONS_NONE:
         check_array_constraint(a_arr, a_name, a_constraint)
 
-    b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_LONG, np.NPY_ALIGNED)
     if b_constraint != CONS_NONE:
         check_array_constraint(b_arr, b_name, b_constraint)
 
@@ -403,24 +394,21 @@ cdef object discrete_broadcast_di(aug_state* state, void* func, object size, obj
     return randoms
 
 cdef object discrete_broadcast_iii(aug_state* state, void* func, object size, object lock,
-                                  object a, object a_name, constraint_type a_constraint,
-                                  object b, object b_name, constraint_type b_constraint,
-                                  object c, object c_name, constraint_type c_constraint):
-    cdef np.ndarray a_arr, b_arr, c_arr, randoms
+                                  np.ndarray a_arr, object a_name, constraint_type a_constraint,
+                                  np.ndarray b_arr, object b_name, constraint_type b_constraint,
+                                  np.ndarray c_arr, object c_name, constraint_type c_constraint):
+    cdef np.ndarray randoms
     cdef long *randoms_data
     cdef np.broadcast it
     cdef random_uint_iii f = (<random_uint_iii>func)
     cdef np.npy_intp i, n
 
-    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_LONG, np.NPY_ALIGNED)
     if a_constraint != CONS_NONE:
         check_array_constraint(a_arr, a_name, a_constraint)
 
-    b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_LONG, np.NPY_ALIGNED)
     if b_constraint != CONS_NONE:
         check_array_constraint(b_arr, b_name, b_constraint)
 
-    c_arr = <np.ndarray>np.PyArray_FROM_OTF(c, np.NPY_LONG, np.NPY_ALIGNED)
     if c_constraint != CONS_NONE:
         check_array_constraint(c_arr, c_name, c_constraint)
 
@@ -446,14 +434,13 @@ cdef object discrete_broadcast_iii(aug_state* state, void* func, object size, ob
     return randoms
 
 cdef object discrete_broadcast_i(aug_state* state, void* func, object size, object lock,
-                                  object a, object a_name, constraint_type a_constraint):
-    cdef np.ndarray a_arr, randoms
+                                  np.ndarray a_arr, object a_name, constraint_type a_constraint):
+    cdef np.ndarray randoms
     cdef long *randoms_data
     cdef np.broadcast it
     cdef random_uint_i f = (<random_uint_i>func)
     cdef np.npy_intp i, n
 
-    a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_LONG, np.NPY_ALIGNED)
     if a_constraint != CONS_NONE:
         check_array_constraint(a_arr, a_name, a_constraint)
 
@@ -486,70 +473,72 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
     cdef long _ia = 0, _ib = 0 , _ic = 0
     cdef bint is_scalar = True
     if narg_double > 0:
+        a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        is_scalar = is_scalar and np.PyArray_NDIM(a_arr) == 0
+        if narg_double > 1:
+            b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_DOUBLE, np.NPY_ALIGNED)
+            is_scalar = is_scalar and np.PyArray_NDIM(b_arr) == 0
+        elif narg_long == 1:
+            b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_LONG, np.NPY_ALIGNED)
+            is_scalar = is_scalar and np.PyArray_NDIM(b_arr) == 0
+    else:
+        if narg_long > 0:
+            a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_LONG, np.NPY_ALIGNED)
+            is_scalar = is_scalar and np.PyArray_NDIM(a_arr) == 0
+        if narg_long > 1:
+            b_arr = <np.ndarray>np.PyArray_FROM_OTF(b, np.NPY_LONG, np.NPY_ALIGNED)
+            is_scalar = is_scalar and np.PyArray_NDIM(b_arr) == 0
+        if narg_long > 2 :
+            c_arr = <np.ndarray>np.PyArray_FROM_OTF(c, np.NPY_LONG, np.NPY_ALIGNED)
+            is_scalar = is_scalar and np.PyArray_NDIM(c_arr) == 0
+
+    if not is_scalar:
+        if narg_long == 0:
+            if narg_double == 1:
+                return discrete_broadcast_d(state, func, size, lock,
+                                            a_arr, a_name, a_constraint)
+            elif narg_double == 2:
+                return discrete_broadcast_dd(state, func, size, lock,
+                                             a_arr, a_name, a_constraint,
+                                             b_arr, b_name, b_constraint)
+        elif narg_long == 1:
+            if narg_double == 0:
+                return discrete_broadcast_i(state, func, size, lock,
+                                            a_arr, a_name, a_constraint)
+            elif narg_double == 1:
+                return discrete_broadcast_di(state, func, size, lock,
+                                             a_arr, a_name, a_constraint,
+                                             b_arr, b_name, b_constraint)
+        else:
+            raise NotImplementedError("No vector path available")
+
+
+    if narg_double > 0:
         _da = PyFloat_AsDouble(a)
-        if _da == -1.0:
-            if PyErr_Occurred():
-                is_scalar = False
         if a_constraint != CONS_NONE and is_scalar:
             check_constraint(_da, a_name, a_constraint)
 
-        if narg_double > 1 and is_scalar:
+        if narg_double > 1:
             _db = PyFloat_AsDouble(b)
-            if _db == -1.0:
-                if PyErr_Occurred():
-                    is_scalar = False
             if b_constraint != CONS_NONE and is_scalar:
                 check_constraint(_db, b_name, b_constraint)
-        if narg_long == 1 and is_scalar:
+        elif narg_long == 1:
             _ib = PyInt_AsLong(b)
-            if _ib == -1:
-                if PyErr_Occurred():
-                    is_scalar = False
             if b_constraint != CONS_NONE and is_scalar:
                 check_constraint(<double>_ib, b_name, b_constraint)
     else:
         if narg_long > 0:
             _ia = PyInt_AsLong(a)
-            if _ia == -1:
-                if PyErr_Occurred():
-                    is_scalar = False
-            elif a_constraint != CONS_NONE and is_scalar:
+            if a_constraint != CONS_NONE and is_scalar:
                 check_constraint(<double>_ia, a_name, a_constraint)
-        if narg_long > 1 and is_scalar:
+        if narg_long > 1:
             _ib = PyInt_AsLong(b)
-            if _ib == -1:
-                if PyErr_Occurred():
-                    is_scalar = False
-            elif b_constraint != CONS_NONE and is_scalar:
+            if b_constraint != CONS_NONE and is_scalar:
                 check_constraint(<double>_ib, b_name, b_constraint)
-        if narg_long > 2 and is_scalar:
+        if narg_long > 2 :
             _ic = PyInt_AsLong(c)
-            if _ic == -1:
-                if PyErr_Occurred():
-                    is_scalar = False
-            elif c_constraint != CONS_NONE and is_scalar:
+            if c_constraint != CONS_NONE and is_scalar:
                 check_constraint(<double>_ic, c_name, c_constraint)
-
-    if not is_scalar:
-        PyErr_Clear()
-        if narg_long == 0:
-            if narg_double == 1:
-                return discrete_broadcast_d(state, func, size, lock,
-                                            a, a_name, a_constraint)
-            elif narg_double == 2:
-                return discrete_broadcast_dd(state, func, size, lock,
-                                             a, a_name, a_constraint,
-                                             b, b_name, b_constraint)
-        elif narg_long == 1:
-            if narg_double == 0:
-                return discrete_broadcast_i(state, func, size, lock,
-                                            a, a_name, a_constraint)
-            elif narg_double == 1:
-                return discrete_broadcast_di(state, func, size, lock,
-                                             a, a_name, a_constraint,
-                                             b, b_name, b_constraint)
-        else:
-            raise NotImplementedError("No vector path available")
 
     if size is None:
         if narg_long == 0:
@@ -575,7 +564,6 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
     cdef random_uint_di fdi;
     cdef random_uint_i fi;
     cdef random_uint_iii fiii;
-
 
     with lock, nogil:
         if narg_long == 0:
