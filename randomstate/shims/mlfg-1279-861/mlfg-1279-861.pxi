@@ -94,12 +94,14 @@ integers as well as a two 32-bit integers representing the location in the
 state array of the current and lagged values.
 
 **State and Seeding**
-The ``dsfmt.mlfg_1279_861`` state vector consists of a 1279 element array of
-64-bit unsigned integers plus a two integers value between 0 and 1278
-indicating  the current position and the lagged value within the main array
-required to produce the next random.
 
-``dsfmt.mlfg_1279_861`` is seeded using either a single 64-bit unsigned integer
+The ``mlfg_1279_861.RandomState`` state vector consists of a 1279 element array
+of 64-bit unsigned integers plus a two integers value between 0 and 1278
+indicating  the current position and the position of the lagged value within
+the main array required to produce the next random. All elements of the 1279
+element state array must be odd.
+
+``mlfg_1279_861.RandomState`` is seeded using either a single 64-bit unsigned integer
 or a vector of 64-bit unsigned integers.  In either case the input seed is
 used as an input (or inputs) for another simple random number generator,
 Splitmix64, and the output of this PRNG function is used as the initial state.
@@ -108,5 +110,5 @@ the possible initial state values.  When using an array, the SplitMix64 state
 for producing the ith component of the initial state is XORd with the ith
 value of the seed array until the seed array is exhausted. When using an array
 the initial state for the SplitMix64 state is 0 so that using a single element
-array and using a single scalar value will produce the same initial state.
+array and using the same value as a scalar will produce the same initial state.
 """

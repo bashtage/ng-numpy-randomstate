@@ -140,6 +140,7 @@ segments come from the same sequence.
         rs[i].jump(i)
 
 **State and Seeding**
+
 The ``dsfmt.RandomState`` state vector consists of a 764 element array of
 32-bit unsigned integers plus a single integer value between 0 and 382
 indicating  the current position within the main array. The implementation

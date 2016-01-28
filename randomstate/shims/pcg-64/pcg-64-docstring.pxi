@@ -62,6 +62,14 @@ produce non-overlapping sequences.
 >>> for i in range(10):
         rs[i].advance(i * 2**64)
 
+**State and Seeding**
+
+The ``pcg64.RandomState`` state vector consists of 2 unsigned 128 bit values,
+which are represented externally as python longs (2.x) or ints (Python 3+).
+``pcg64.RandomState` is seeded using a single 128-bit unsigned integer
+(Python long/int). In addition, a second 128-bit unsigned integer is used
+to set the stream.
+
 References
 ----------
 .. [1] "PCG, A Family of Better Random Number Generators",

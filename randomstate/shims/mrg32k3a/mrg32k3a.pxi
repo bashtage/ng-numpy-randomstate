@@ -161,6 +161,24 @@ seed to ensure that the segments come from the same sequence.
 >>> for i in range(10):
         rs[i].jump(i)
 
+**State and Seeding**
+
+The ``mrg32k3a.RandomState`` state vector consists of a 6 element array
+of 64-bit signed integers plus a single integers value between 0 and 2
+indicating  the current position within the state vector.  The first three
+elements of the state vector are in [0, 4294967087) and the second 3 are
+in [0, 4294944443).
+
+``mrg32k3a.RandomState`` is seeded using either a single 64-bit unsigned integer
+or a vector of 64-bit unsigned integers.  In either case the input seed is
+used as an input (or inputs) for another simple random number generator,
+Splitmix64, and the output of this PRNG function is used as the initial state.
+Using a single 64-bit value for the seed can only initialize a small range of
+the possible initial state values.  When using an array, the SplitMix64 state
+for producing the ith component of the initial state is XORd with the ith
+value of the seed array until the seed array is exhausted. When using an array
+the initial state for the SplitMix64 state is 0 so that using a single element
+array and using the same value as a scalar will produce the same initial state.
 
 References
 ----------
