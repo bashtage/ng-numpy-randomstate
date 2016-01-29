@@ -18,12 +18,12 @@ with open('config.pxi', 'w') as config:
 
 pwd = getcwd()
 
-sources = [join(pwd, 'interface.pyx'),
+sources = [join(pwd, 'randomstate.pyx'),
            join(pwd, 'src', 'common', 'entropy.c'),
            join(pwd, 'distributions.c')]
 
 sources += [join(pwd, 'src', 'xorshift128', p) for p in ('xorshift128.c',)]
-sources += [join(pwd, 'shims', 'xorshift128', 'xorshift128-shim.c')]
+sources += [join(pwd, 'interface', 'xorshift128', 'xorshift128-shim.c')]
 
 defs = [('XORSHIFT128_RNG', '1')]
 
