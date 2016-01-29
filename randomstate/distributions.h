@@ -23,21 +23,21 @@ typedef int bool;
 #endif
 
 #if  defined(RS_PCG32)
-#include "shims/pcg-32/pcg-32-shim.h"
+#include "interface/pcg-32/pcg-32-shim.h"
 #elif defined(RS_PCG64)
-#include "shims/pcg-64/pcg-64-shim.h"
+#include "interface/pcg-64/pcg-64-shim.h"
 #elif defined(RS_RANDOMKIT)
-#include "shims/random-kit/random-kit-shim.h"
+#include "interface/random-kit/random-kit-shim.h"
 #elif defined(RS_XORSHIFT128)
-#include "shims/xorshift128/xorshift128-shim.h"
+#include "interface/xorshift128/xorshift128-shim.h"
 #elif defined(RS_XORSHIFT1024)
-#include "shims/xorshift1024/xorshift1024-shim.h"
+#include "interface/xorshift1024/xorshift1024-shim.h"
 #elif defined(RS_MRG32K3A)
-#include "shims/mrg32k3a/mrg32k3a-shim.h"
+#include "interface/mrg32k3a/mrg32k3a-shim.h"
 #elif defined(RS_MLFG_1279_861)
-#include "shims/mlfg-1279-861/mlfg-1279-861-shim.h"
+#include "interface/mlfg-1279-861/mlfg-1279-861-shim.h"
 #elif defined(RS_DSFMT)
-#include "shims/dSFMT/dSFMT-shim.h"
+#include "interface/dSFMT/dSFMT-shim.h"
 #else
 #error Unknown RNG!!!  Unknown RNG!!!  Unknown RNG!!!
 #endif

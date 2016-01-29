@@ -29,24 +29,24 @@ include "config.pxi"
 include "defaults.pxi"
 
 IF RS_RNG_MOD_NAME == 'pcg32':
-    include "shims/pcg-32/pcg-32.pxi"
+    include "interface/pcg-32/pcg-32.pxi"
 IF RS_RNG_MOD_NAME == 'pcg64':
     IF RS_PCG128_EMULATED:
-        include "shims/pcg-64/pcg-64-emulated.pxi"
+        include "interface/pcg-64/pcg-64-emulated.pxi"
     ELSE:
-        include "shims/pcg-64/pcg-64.pxi"
+        include "interface/pcg-64/pcg-64.pxi"
 IF RS_RNG_MOD_NAME == 'mt19937':
-    include "shims/random-kit/random-kit.pxi"
+    include "interface/random-kit/random-kit.pxi"
 IF RS_RNG_MOD_NAME == 'xorshift128':
-    include "shims/xorshift128/xorshift128.pxi"
+    include "interface/xorshift128/xorshift128.pxi"
 IF RS_RNG_MOD_NAME == 'xorshift1024':
-    include "shims/xorshift1024/xorshift1024.pxi"
+    include "interface/xorshift1024/xorshift1024.pxi"
 IF RS_RNG_MOD_NAME == 'mrg32k3a':
-    include "shims/mrg32k3a/mrg32k3a.pxi"
+    include "interface/mrg32k3a/mrg32k3a.pxi"
 IF RS_RNG_MOD_NAME == 'mlfg_1279_861':
-    include "shims/mlfg-1279-861/mlfg-1279-861.pxi"
+    include "interface/mlfg-1279-861/mlfg-1279-861.pxi"
 IF RS_RNG_MOD_NAME == 'dsfmt':
-    include "shims/dSFMT/dSFMT.pxi"
+    include "interface/dSFMT/dSFMT.pxi"
 
 IF RS_NORMAL_METHOD == 'inv':
     __normal_method = 'inv'

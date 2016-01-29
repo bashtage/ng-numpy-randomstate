@@ -61,7 +61,7 @@ for rng in rngs:
 
     if rng == 'RNG_PCG32':
         sources += [join(mod_dir, 'src', 'pcg', 'pcg32.c')]
-        sources += [join(mod_dir, 'shims/pcg-32', 'pcg-32-shim.c')]
+        sources += [join(mod_dir, 'interface/pcg-32', 'pcg-32-shim.c')]
 
         defs = [('RS_PCG32', '1')]
 
@@ -69,7 +69,7 @@ for rng in rngs:
 
     elif rng == 'RNG_PCG64':
         sources += [join(mod_dir, 'src', 'pcg64-compat', p) for p in ('pcg64.c',)]
-        sources += [join(mod_dir, 'shims/pcg-64', 'pcg-64-shim.c')]
+        sources += [join(mod_dir, 'interface/pcg-64', 'pcg-64-shim.c')]
 
         defs = [('RS_PCG64', '1')]
         flags['RS_PCG128_EMULATED'] = 0
@@ -86,7 +86,7 @@ for rng in rngs:
 
     elif rng == 'RNG_MT19937':
         sources += [join(mod_dir, 'src', 'random-kit', p) for p in ('random-kit.c',)]
-        sources += [join(mod_dir, 'shims', 'random-kit', 'random-kit-shim.c')]
+        sources += [join(mod_dir, 'interface', 'random-kit', 'random-kit-shim.c')]
 
         defs = [('RS_RANDOMKIT', '1')]
 
@@ -94,21 +94,21 @@ for rng in rngs:
 
     elif rng == 'RNG_XORSHIFT128':
         sources += [join(mod_dir, 'src', 'xorshift128', 'xorshift128.c')]
-        sources += [join(mod_dir, 'shims', 'xorshift128', 'xorshift128-shim.c')]
+        sources += [join(mod_dir, 'interface', 'xorshift128', 'xorshift128-shim.c')]
 
         defs = [('RS_XORSHIFT128', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'xorshift128')]
     elif rng == 'RNG_XORSHIFT1024':
         sources += [join(mod_dir, 'src', 'xorshift1024', 'xorshift1024.c')]
-        sources += [join(mod_dir, 'shims', 'xorshift1024', 'xorshift1024-shim.c')]
+        sources += [join(mod_dir, 'interface', 'xorshift1024', 'xorshift1024-shim.c')]
 
         defs = [('RS_XORSHIFT1024', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'xorshift1024')]
     elif rng == 'RNG_MRG32K3A':
         sources += [join(mod_dir, 'src', 'mrg32k3a', 'mrg32k3a.c')]
-        sources += [join(mod_dir, 'shims', 'mrg32k3a', 'mrg32k3a-shim.c')]
+        sources += [join(mod_dir, 'interface', 'mrg32k3a', 'mrg32k3a-shim.c')]
 
         defs = [('RS_MRG32K3A', '1')]
 
@@ -116,7 +116,7 @@ for rng in rngs:
 
     elif rng == 'RNG_MLFG_1279_861':
         sources += [join(mod_dir, 'src', 'mlfg-1279-861', 'mlfg-1279-861.c')]
-        sources += [join(mod_dir, 'shims', 'mlfg-1279-861', 'mlfg-1279-861-shim.c')]
+        sources += [join(mod_dir, 'interface', 'mlfg-1279-861', 'mlfg-1279-861-shim.c')]
 
         defs = [('RS_MLFG_1279_861', '1')]
 
@@ -125,7 +125,7 @@ for rng in rngs:
     elif rng == 'RNG_DSFMT':
         sources += [join(mod_dir, 'src', 'dSFMT', 'dSFMT.c')]
         sources += [join(mod_dir, 'src', 'dSFMT', 'dSFMT-jump.c')]
-        sources += [join(mod_dir, 'shims', 'dSFMT', 'dSFMT-shim.c')]
+        sources += [join(mod_dir, 'interface', 'dSFMT', 'dSFMT-shim.c')]
         # TODO: HAVE_SSE2 should only be for platforms that have SSE2
         # TODO: But how to reliably detect?
         defs = [('RS_DSFMT', '1'), ('DSFMT_MEXP', '19937')]
@@ -166,16 +166,16 @@ extensions = [Extension('randomstate.entropy',
 for config in configs:
     config_file_name = mod_dir + '/' + config['file_name'] + '-config.pxi'
     # Rewrite core_rng to replace generic #include "config.pxi"
-    with open(join(mod_dir, 'interface.pyx'), 'r') as original:
+    with open(join(mod_dir, 'randomstate.pyx'), 'r') as original:
         with open(join(mod_dir, config['file_name'] + '.pyx'), 'w') as mod:
             for line in original:
                 if line.strip() == 'include "config.pxi"':
                     line = 'include "' + config_file_name + '"\n'
                 mod.write(line)
-    shutil.copystat(join(mod_dir, 'interface.pyx'), join(mod_dir, config['file_name'] + '.pyx'))
+    shutil.copystat(join(mod_dir, 'randomstate.pyx'), join(mod_dir, config['file_name'] + '.pyx'))
     # Write specific config file
     write_config(config_file_name, config)
-    shutil.copystat(join(mod_dir, 'interface.pyx'), config_file_name)
+    shutil.copystat(join(mod_dir, 'randomstate.pyx'), config_file_name)
 
     ext = Extension('randomstate.prng.' + config['file_name'] + '.' + config['file_name'],
                     sources=config['sources'],
