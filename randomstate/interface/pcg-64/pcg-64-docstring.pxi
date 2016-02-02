@@ -66,7 +66,7 @@ produce non-overlapping sequences.
 
 The ``pcg64.RandomState`` state vector consists of 2 unsigned 128 bit values,
 which are represented externally as python longs (2.x) or ints (Python 3+).
-``pcg64.RandomState` is seeded using a single 128-bit unsigned integer
+``pcg64.RandomState`` is seeded using a single 128-bit unsigned integer
 (Python long/int). In addition, a second 128-bit unsigned integer is used
 to set the stream.
 

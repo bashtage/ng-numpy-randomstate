@@ -105,7 +105,7 @@ in parallel applications is not recommended.
 **State and Seeding**
 
 The ``pcg32.RandomState`` state vector consists of 2 unsigned 64 bit values.
-``pcg32.RandomState`  is seeded using a single 64-bit unsigned integer.
+``pcg32.RandomState``  is seeded using a single 64-bit unsigned integer.
 In addition, a second 64-bit unsigned integer is used to set the stream.
 
 References
