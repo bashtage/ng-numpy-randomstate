@@ -120,12 +120,12 @@ class Base(object):
     def test_gauss_inv(self):
         n = 25
         rs = self.RandomState(*self.data1['seed'])
-        gauss = rs.standard_normal(n, method='inv')
+        gauss = rs.standard_normal(n, method='bm')
         assert_allclose(gauss,
                         gauss_from_uint(self.data1['data'], n, self.bits))
 
         rs = self.RandomState(*self.data2['seed'])
-        gauss = rs.standard_normal(25, method='inv')
+        gauss = rs.standard_normal(25, method='bm')
         assert_allclose(gauss,
                         gauss_from_uint(self.data2['data'], n, self.bits))
 
@@ -239,11 +239,11 @@ class TestDSFMT(Base, TestCase):
     def test_gauss_inv(self):
         n = 25
         rs = self.RandomState(*self.data1['seed'])
-        gauss = rs.standard_normal(n, method='inv')
+        gauss = rs.standard_normal(n, method='bm')
         assert_allclose(gauss,
                         gauss_from_uint(self.data1['data'], n, 'dsfmt'))
 
         rs = self.RandomState(*self.data2['seed'])
-        gauss = rs.standard_normal(25, method='inv')
+        gauss = rs.standard_normal(25, method='bm')
         assert_allclose(gauss,
                         gauss_from_uint(self.data2['data'], n, 'dsfmt'))

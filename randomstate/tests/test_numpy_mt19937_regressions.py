@@ -7,6 +7,7 @@ from numpy.compat import long
 import numpy as np
 from randomstate.prng.mt19937 import mt19937
 
+
 class TestRegression(TestCase):
 
     def test_VonMises_range(self):

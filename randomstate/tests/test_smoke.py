@@ -310,12 +310,12 @@ class RNG(object):
         assert_equal(vals.shape, (10, 10, 10))
 
         state = self.rs.get_state()
-        vals = self.rs.randn(10, 10, 10, method='inv')
+        vals = self.rs.randn(10, 10, 10, method='bm')
         self.rs.set_state(state)
-        assert_equal(vals, self.rs.standard_normal((10, 10, 10), method='inv'))
+        assert_equal(vals, self.rs.standard_normal((10, 10, 10), method='bm'))
 
         state = self.rs.get_state()
-        vals_inv = self.rs.randn(10, 10, 10, method='inv')
+        vals_inv = self.rs.randn(10, 10, 10, method='bm')
         self.rs.set_state(state)
         vals_zig = self.rs.randn(10, 10, 10, method='zig')
         assert_((vals_zig != vals_inv).any())
@@ -411,7 +411,7 @@ class RNG(object):
         assert_(x.shape == (5000, 2))
         x_zig = self.rs.multivariate_normal(mean, cov, 5000, method='zig')
         assert_(x.shape == (5000, 2))
-        x_inv = self.rs.multivariate_normal(mean, cov, 5000, method='inv')
+        x_inv = self.rs.multivariate_normal(mean, cov, 5000, method='bm')
         assert_(x.shape == (5000, 2))
         assert_((x_zig != x_inv).any())
 
