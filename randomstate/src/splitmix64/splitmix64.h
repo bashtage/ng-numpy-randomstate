@@ -1,6 +1,6 @@
 #ifdef _WIN32
 #include "../common/inttypes.h"
-#define inline __inline
+#define inline __forceinline
 #else
 #include <inttypes.h>
 #endif

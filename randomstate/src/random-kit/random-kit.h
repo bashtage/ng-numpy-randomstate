@@ -6,7 +6,7 @@
 #endif
 
 #ifdef _WIN32
-#define inline __inline
+#define inline __forceinline
 #endif
 
 

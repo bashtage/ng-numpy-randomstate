@@ -23,11 +23,11 @@ rngs = ['RNG_DSFMT', 'RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64', 'RNG_MT19937
 compile_rngs = rngs[:]
 
 extra_defs = [('_CRT_SECURE_NO_WARNINGS','1')] if os.name == 'nt' else []
-extra_link_args = ['Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []
+extra_link_args = ['/LTCG', 'Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []
 base_extra_compile_args = [] if os.name == 'nt' else ['-std=c99']
 if USE_SSE2:
     if os.name == 'nt':
-        base_extra_compile_args += ['/wd4146']
+        base_extra_compile_args += ['/wd4146','/GL']
         if struct.calcsize('P') < 8:
             base_extra_compile_args += ['/arch:SSE2']
     else:
