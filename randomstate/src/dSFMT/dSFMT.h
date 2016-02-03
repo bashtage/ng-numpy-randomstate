@@ -101,14 +101,14 @@ typedef unsigned __int64 uint64_t;
 #    endif
 #    define DSFMT_UINT32_DEFINED
 #    if !defined(inline) && !defined(__cplusplus)
-#      define inline __inline
+#      define inline __forceinline
 #    endif
 #  endif
 #else
 #  include <inttypes.h>
 #  if !defined(inline) && !defined(__cplusplus)
 #    if defined(__GNUC__)
-#      define inline __inline__
+#      define inline __forceinline__
 #    else
 #      define inline
 #    endif

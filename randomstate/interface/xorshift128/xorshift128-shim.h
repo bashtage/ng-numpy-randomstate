@@ -1,6 +1,6 @@
 #ifdef _WIN32
 #include "../../src/common/stdint.h"
-#define inline __inline
+#define inline __forceinline
 #else
 #include <stdint.h>
 #endif
