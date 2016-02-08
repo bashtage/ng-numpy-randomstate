@@ -85,7 +85,7 @@ def timer_64bit():
 
 
 def timer_normal():
-    command = 'rs.{dist}(1000000, method="inv")'
+    command = 'rs.{dist}(1000000, method="bm")'
     command_numpy = 'rs.{dist}(1000000)'
     dist = 'standard_normal'
     run_timer(dist, command, command_numpy, SETUP, 'Standard normals')
