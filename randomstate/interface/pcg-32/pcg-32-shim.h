@@ -1,5 +1,3 @@
-#define RNG_TYPE pcg32_random_t
-
 #include <stdint.h>
 #include "../../src/common/binomial.h"
 #include "../../src/common/entropy.h"

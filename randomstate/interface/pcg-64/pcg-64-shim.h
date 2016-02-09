@@ -1,5 +1,3 @@
-#define RNG_TYPE pcg64_random_t
-
 #ifdef _WIN32
 #include "../../src/common/inttypes.h"
 #define inline __forceinline

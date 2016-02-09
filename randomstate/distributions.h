@@ -108,7 +108,7 @@ extern double random_triangular(aug_state *state, double left, double mode, doub
 
 extern long random_poisson(aug_state *state, double lam);
 
-extern long rk_negative_binomial(aug_state *state, double n, double p);
+extern long random_negative_binomial(aug_state *state, double n, double p);
 
 extern long random_binomial(aug_state *state, double p, long n);
 

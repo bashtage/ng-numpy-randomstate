@@ -18,25 +18,25 @@
 #define UPPER_MASK 0x80000000UL
 #define LOWER_MASK 0x7fffffffUL
 
-typedef struct s_rk_state
+typedef struct s_randomkit_state
 {
     uint32_t key[RK_STATE_LEN];
     int pos;
 }
-rk_state;
+randomkit_state;
 
-extern void rk_seed(rk_state *state, uint32_t seed);
+extern void randomkit_seed(randomkit_state *state, uint32_t seed);
 
-extern void rk_gen(rk_state *state);
+extern void randomkit_gen(randomkit_state *state);
 
 /* Slightly optimized reference implementation of the Mersenne Twister */
-inline uint32_t rk_random(rk_state *state)
+inline uint32_t randomkit_random(randomkit_state *state)
 {
     uint32_t y;
 
     if (state->pos == RK_STATE_LEN) {
         // Move to function to help inlining
-        rk_gen(state);
+        randomkit_gen(state);
     }
     y = state->key[state->pos++];
 
@@ -49,4 +49,4 @@ inline uint32_t rk_random(rk_state *state)
     return y;
 }
 
-extern void init_by_array(rk_state *state, unsigned long init_key[], int key_length);
+extern void randomkit_init_by_array(randomkit_state *state, uint32_t *init_key, int key_length);

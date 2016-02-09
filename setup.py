@@ -190,7 +190,7 @@ for config in configs:
 
 # Do not run cythonize if clean
 if 'clean' in sys.argv:
-    def cythonize(e):
+    def cythonize(e, *args, **kwargs):
         return e
 
 ext_modules = cythonize(extensions)

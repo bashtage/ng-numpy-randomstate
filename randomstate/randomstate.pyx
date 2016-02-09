@@ -216,7 +216,7 @@ cdef class RandomState:
             RandomState
 
             """
-            # cdef ndarray obj "arrayObject_obj"
+            cdef np.ndarray obj
             try:
                 if seed is None:
                     self.__seed = seed = _generate_seed(1)
@@ -232,10 +232,10 @@ cdef class RandomState:
                 obj = np.asarray(seed).astype(np.int64, casting='safe')
                 if ((obj > int(2**32 - 1)) | (obj < 0)).any():
                     raise ValueError("Seed must be between 0 and 4294967295")
-                obj = obj.astype('L', casting='unsafe')
+                obj = obj.astype(np.uint32, casting='unsafe', order='C')
                 with self.lock:
                     set_seed_by_array(&self.rng_state,
-                                      <unsigned long *>np.PyArray_DATA(obj),
+                                      <uint32_t*> obj.data,
                                       np.PyArray_DIM(obj, 0))
             self._reset_state_variables()
 

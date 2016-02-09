@@ -1,8 +1,8 @@
 #include "random-kit.h"
 
-extern inline uint32_t rk_random(rk_state *state);
+extern inline uint32_t randomkit_random(randomkit_state *state);
 
-void rk_seed(rk_state *state, uint32_t seed)
+void randomkit_seed(randomkit_state *state, uint32_t seed)
 {
     int pos;
     seed &= 0xffffffffUL;
@@ -17,7 +17,7 @@ void rk_seed(rk_state *state, uint32_t seed)
 
 
 /* initializes mt[RK_STATE_LEN] with a seed */
-static void init_genrand(rk_state *state, unsigned long s)
+static void init_genrand(randomkit_state *state, uint32_t s)
 {
     int mti;
     uint32_t *mt = state->key;
@@ -44,7 +44,7 @@ static void init_genrand(rk_state *state, unsigned long s)
  * init_key is the array for initializing keys
  * key_length is its length
  */
-extern void init_by_array(rk_state *state, unsigned long init_key[], int key_length)
+void randomkit_init_by_array(randomkit_state *state, uint32_t *init_key, int key_length)
 {
     /* was signed in the original code. RDH 12/16/2002 */
     int i = 1;
@@ -84,7 +84,7 @@ extern void init_by_array(rk_state *state, unsigned long init_key[], int key_len
     mt[0] = 0x80000000UL; /* MSB is 1; assuring non-zero initial array */
 }
 
-void rk_gen(rk_state *state)
+void randomkit_gen(randomkit_state *state)
 {
     uint32_t y;
     int i;
