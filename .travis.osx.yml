@@ -6,8 +6,11 @@ sudo: false
 
 language: objective-c
 
-env:
-  - PYTHON=2.7
+matrix:
+  fast_finish: true
+  include:
+  - env: PYTHON=2.7
+  - env: PYTHON=3.5
 
 before_install:
   - which python
