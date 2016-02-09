@@ -8,7 +8,7 @@ generators in Python and Numpy.
 
 Features
 
--  Immediate drop in replacement for Numy's RandomState
+-  Immediate drop in replacement for NumPy's RandomState
 
 .. code:: python
 
@@ -22,7 +22,7 @@ Features
    same seed, same random numbers).
 -  Support for random number generators that support independent streams
    and jumping ahead so that substreams can be generated
--  Faster ranomd number generations, especially for Normals using the
+-  Faster random number generations, especially for Normals using the
    Ziggurat method
 
 .. code:: python
@@ -46,7 +46,7 @@ in addition to the MT19937 that is included in NumPy. The RNGs include:
 -  `PCG32 <http://www.pcg-random.org/>`__ and
    `PCG64 <http:w//www.pcg-random.org/>`__
 -  `MRG32K3A <http://simul.iro.umontreal.ca/rng>`__
--  A multiplicative lagged fibonacci generator (LFG(31, 1279, 861, \*))
+-  A multiplicative lagged fibonacci generator (LFG(63, 1279, 861, \*))
 
 Differences from ``numpy.random.RandomState``
 ---------------------------------------------
@@ -54,10 +54,11 @@ Differences from ``numpy.random.RandomState``
 New Features
 ~~~~~~~~~~~~
 
--  ``stanard_normal``, ``normal``, ``randn`` and ``multivariate_normal``
-   all support an additional ``method`` keyword argument which can be
-   ``inv`` or ``zig`` where ``inv`` corresponds to the current method
-   and ``zig`` uses tha much faster (100%+) ziggurat method.
+-  ``standard_normal``, ``normal``, ``randn`` and
+   ``multivariate_normal`` all support an additional ``method`` keyword
+   argument which can be ``bm`` or ``zig`` where ``bm`` corresponds to
+   the current method and ``zig`` uses the much faster (100%+) ziggurat
+   method.
 
 New Functions
 ~~~~~~~~~~~~~
@@ -88,13 +89,13 @@ Status
 Version
 -------
 
-The version matched the latest verion of NumPy where
+The version matched the latest version of NumPy where
 ``randomstate.prng.mt19937`` passes all NumPy test.
 
 Documentation
 -------------
 
-A occasionally updated build of the documentation is available on `my
+An occasionally updated build of the documentation is available on `my
 github pages <http://bashtage.github.io/ng-numpy-randomstate/>`__.
 
 Plans
@@ -103,7 +104,7 @@ Plans
 This module is essentially complete. There are a few rough edges that
 need to be smoothed.
 
--  Stream support for MLFG and MRG32K3A
+-  Stream support for MLFG
 -  Creation of additional streams from a RandomState where supported
    (i.e. a ``next_stream()`` method)
 
@@ -151,7 +152,7 @@ Windows
 Either use a binary installer or if building from scratch using Python
 3.5 and the free Visual Studio 2015 Community Edition. It can also be
 build using Microsoft Visual C++ Compiler for Python 2.7 and Python 2.7,
-although some modifications are needed to distutils to find the
+although some modifications are needed to ``distutils`` to find the
 compiler.
 
 Using
@@ -196,27 +197,27 @@ NumPy's mt19937.
 
 ::
 
-    Speed-up relative to NumPy (Slow Normals)
+    Speed-up relative to NumPy (Box-Muller)
     ************************************************************
-    randomstate.prng-dsfmt-standard_normal            107.2%
-    randomstate.prng-mlfg_1279_861-standard_normal     51.2%
-    randomstate.prng-mrg32k3a-standard_normal         -11.8%
-    randomstate.prng-mt19937-standard_normal           44.0%
-    randomstate.prng-pcg32-standard_normal             51.2%
-    randomstate.prng-pcg64-standard_normal             51.1%
-    randomstate.prng-xorshift1024-standard_normal      50.5%
-    randomstate.prng-xorshift128-standard_normal       52.1%
+    randomstate.prng-dsfmt-standard_normal             70.5%
+    randomstate.prng-mlfg_1279_861-standard_normal     26.9%
+    randomstate.prng-mrg32k3a-standard_normal         -18.7%
+    randomstate.prng-mt19937-standard_normal           13.5%
+    randomstate.prng-pcg32-standard_normal             26.1%
+    randomstate.prng-pcg64-standard_normal             26.2%
+    randomstate.prng-xorshift1024-standard_normal      27.2%
+    randomstate.prng-xorshift128-standard_normal       30.0%
 
-    Speed-up relative to NumPy (Ziggural Normals)
+    Speed-up relative to NumPy (Ziggurat)
     ************************************************************
-    randomstate.prng-dsfmt-standard_normal            283.7%
-    randomstate.prng-mlfg_1279_861-standard_normal    217.4%
-    randomstate.prng-mrg32k3a-standard_normal          16.6%
-    randomstate.prng-mt19937-standard_normal          201.3%
-    randomstate.prng-pcg32-standard_normal            274.9%
-    randomstate.prng-pcg64-standard_normal            310.8%
-    randomstate.prng-xorshift1024-standard_normal     336.3%
-    randomstate.prng-xorshift128-standard_normal      425.1%
+    randomstate.prng-dsfmt-standard_normal            316.1%
+    randomstate.prng-mlfg_1279_861-standard_normal    247.0%
+    randomstate.prng-mrg32k3a-standard_normal          51.2%
+    randomstate.prng-mt19937-standard_normal          175.9%
+    randomstate.prng-pcg32-standard_normal            255.9%
+    randomstate.prng-pcg64-standard_normal            329.1%
+    randomstate.prng-xorshift1024-standard_normal     362.0%
+    randomstate.prng-xorshift128-standard_normal      513.7%
 
 .. |Travis Build Status| image:: https://travis-ci.org/bashtage/ng-numpy-randomstate.svg?branch=master
    :target: https://travis-ci.org/bashtage/ng-numpy-randomstate
