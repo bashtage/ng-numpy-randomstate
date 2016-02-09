@@ -7,14 +7,14 @@ ctypedef uint32_t rng_state_t
 
 cdef extern from "distributions.h":
 
-    cdef struct s_rk_state:
+    cdef struct s_randomkit_state:
       uint32_t key[RK_STATE_LEN]
       int pos
 
-    ctypedef s_rk_state rk_state
+    ctypedef s_randomkit_state randomkit_state
 
     cdef struct s_aug_state:
-        rk_state *rng
+        randomkit_state *rng
         binomial_t *binomial
 
         int has_gauss, shift_zig_random_int, has_uint32
@@ -26,11 +26,9 @@ cdef extern from "distributions.h":
 
     cdef void set_seed(aug_state* state, uint32_t seed)
 
-    cdef void set_seed_by_array(aug_state* state, unsigned long init_key[], int key_length)
+    cdef void set_seed_by_array(aug_state* state, uint32_t *init_key, int key_length)
 
-
-
-ctypedef rk_state rng_t
+ctypedef randomkit_state rng_t
 
 cdef object _get_state(aug_state state):
     cdef uint32_t [:] key = np.zeros(RK_STATE_LEN, dtype=np.uint32)
