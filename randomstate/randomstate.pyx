@@ -381,27 +381,8 @@ cdef class RandomState:
 
     IF RS_RNG_JUMPABLE:
         def jump(self, uint32_t iter = 1):
-            """
-            jump(iter = 1)
+            JUMP_DOCSTRING
 
-            Jumps the random number generator by a pre-specified skip.  The size of the jump is
-            rng-specific.
-
-            Parameters
-            ----------
-            iter : integer, positive
-                Number of times to jump the state of the rng.
-
-            Returns
-            -------
-            out : None
-                Returns 'None' on success.
-
-            Notes
-            -----
-            Jumping the rng state resets any pre-computed random numbers. This is required to ensure
-            exact reproducibility.
-            """
             cdef Py_ssize_t i;
             for i in range(iter):
                 jump_state(&self.rng_state)

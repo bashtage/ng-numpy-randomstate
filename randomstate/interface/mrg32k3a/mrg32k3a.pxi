@@ -191,3 +191,25 @@ References
        "An object-oriented random-number package with many long streams
        and substreams." Operations research 50, no. 6, pp. 1073-1075, 2002.
 """
+
+DEF JUMP_DOCSTRING = """
+jump(iter = 1)
+
+Jumps the state of the random number generator as-if 2**127 random numbers
+have been generated.
+
+Parameters
+----------
+iter : integer, positive
+    Number of times to jump the state of the rng.
+
+Returns
+-------
+out : None
+    Returns 'None' on success.
+
+Notes
+-----
+Jumping the rng state resets any pre-computed random numbers. This is required
+to ensure exact reproducibility.
+"""

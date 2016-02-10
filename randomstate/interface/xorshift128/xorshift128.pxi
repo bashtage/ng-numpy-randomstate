@@ -125,3 +125,25 @@ References
 .. [4] Sebastiano Vigna. "Further scramblings of Marsaglia's xorshift
        generators." CoRR, abs/1403.0930, 2014.
 """
+
+DEF JUMP_DOCSTRING = """
+jump(iter = 1)
+
+Jumps the state of the random number generator as-if 2**64 random numbers
+have been generated.
+
+Parameters
+----------
+iter : integer, positive
+    Number of times to jump the state of the rng.
+
+Returns
+-------
+out : None
+    Returns 'None' on success.
+
+Notes
+-----
+Jumping the rng state resets any pre-computed random numbers. This is required
+to ensure exact reproducibility.
+"""

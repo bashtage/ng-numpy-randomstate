@@ -161,3 +161,25 @@ state values.
        Jump Ahead Algorithm for Linear Recurrences in a Polynomial Space",
        Sequences and Their Applications - SETA, 290--298, 2008.
 """
+
+DEF JUMP_DOCSTRING = """
+jump(iter = 1)
+
+Jumps the state of the random number generator as-if 2**128 random numbers
+have been generated.
+
+Parameters
+----------
+iter : integer, positive
+    Number of times to jump the state of the rng.
+
+Returns
+-------
+out : None
+    Returns 'None' on success.
+
+Notes
+-----
+Jumping the rng state resets any pre-computed random numbers. This is required
+to ensure exact reproducibility.
+"""
