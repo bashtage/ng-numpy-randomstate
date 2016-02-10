@@ -1,10 +1,10 @@
 randomstate's documentation
 ===========================
-This package contains a drop-in replacements for the NumPy RandomState object
+This package contains drop-in replacements for the NumPy RandomState object
 that change the core random number generator.
 
 What's New or Different
-=======================
+-----------------------
 * ``random_uintegers`` produces either 32-bit or 64-bit unsigned integers.
   These are at the core of most PRNGs and so they are directly exposed.
 * ``randomstate.entropy.random_entropy`` provides access to the system
@@ -18,16 +18,24 @@ What's New or Different
   from randomstate import standard_normal
   standard_normal(100000, method='zig')
 
+Parallel Generation
+-------------------
+
+The included generators can be used in parallel, distributed applications in
+one of two ways:
+
+* :ref:`independent-streams`
+* :ref:`jump-and-advance`
 
 Supported Generators
-====================
-The main innovation is the inclusion of a number of alternative pseudo random number
+--------------------
+The main innovation is the inclusion of a number of alternative pseudo-random number
 generators, 'in addition' to the standard PRNG in NumPy.  The included PRNGs are:
 
 * MT19937 - The standard NumPy generator.  Produces identical results to NumPy
   using the same seed/state. See `NumPy's documentation`_.
 * dSFMT - A SSE2 enables version of the MT19937 generator.  Theoretically the
-  same, but with a different state and so it is not possible to produce an
+  same, but with a different state and so it is not possible to produce a
   sequence identical to MT19937. See the `dSFMT authors' page`_.
 * XorShit128+ and XorShift1024* - Vast fast generators based on the XSadd
   generator. These generators can be rapidly 'jumped' and so can be used in
@@ -55,7 +63,8 @@ generators, 'in addition' to the standard PRNG in NumPy.  The included PRNGs are
 .. _`MRG32K3A author's page`: http://simul.iro.umontreal.ca/
 
 
-RandomState Pseudo Random Number Generator Documentation:
+Individual Pseudo Random Number Generators
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 2
@@ -72,7 +81,7 @@ RandomState Pseudo Random Number Generator Documentation:
 
 
 Indices and tables
-==================
+~~~~~~~~~~~~~~~~~~
 
 * :ref:`genindex`
 * :ref:`modindex`
