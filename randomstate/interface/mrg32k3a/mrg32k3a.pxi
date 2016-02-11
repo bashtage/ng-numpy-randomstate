@@ -1,4 +1,4 @@
-DEF RS_RNG_NAME = 'mrg32k3a'
+DEF RS_RNG_NAME = u'mrg32k3a'
 DEF RS_RNG_JUMPABLE = 1
 
 cdef extern from "distributions.h":
@@ -103,7 +103,7 @@ cdef void jump_state(aug_state* state):
 
     state.rng.loc = 2
 
-DEF CLASS_DOCSTRING = """
+DEF CLASS_DOCSTRING = u"""
 RandomState(seed=None)
 
 Container for L'Ecuyer MRG32K3A pseudo random number generator.
@@ -192,7 +192,7 @@ References
        and substreams." Operations research 50, no. 6, pp. 1073-1075, 2002.
 """
 
-DEF JUMP_DOCSTRING = """
+DEF JUMP_DOCSTRING = u"""
 jump(iter = 1)
 
 Jumps the state of the random number generator as-if 2**127 random numbers

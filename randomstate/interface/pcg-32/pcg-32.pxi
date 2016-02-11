@@ -1,4 +1,4 @@
-DEF RS_RNG_NAME = 'pcg32'
+DEF RS_RNG_NAME = u'pcg32'
 DEF RS_RNG_ADVANCEABLE = 1
 DEF RS_RNG_SEED = 2
 
@@ -35,7 +35,7 @@ cdef object _set_state(aug_state *state, object state_info):
     state.rng.state = state_info[0]
     state.rng.inc = state_info[1]
 
-DEF CLASS_DOCSTRING = """
+DEF CLASS_DOCSTRING = u"""
 RandomState(seed=None)
 
 Container for the PCG-32 pseudo random number generator.

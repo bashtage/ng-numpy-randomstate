@@ -7,7 +7,6 @@ from numpy.testing import (
 from numpy.compat import asbytes
 import sys
 import warnings
-
 import randomstate as random
 from randomstate.prng.mt19937 import mt19937
 
@@ -89,9 +88,8 @@ class TestSetState(TestCase):
     def setUp(self):
         self.seed = 1234567890
         self.prng = random.RandomState(self.seed)
-        # Use legacy to get old NumPy state
         self.state = self.prng.get_state()
-        self.legacy_state = self.prng.get_state(legacy=True)
+        self.legacy_state = self.prng.get_state(legacy=True)         # Use legacy to get old NumPy state
 
     def test_basic(self):
         old = self.prng.tomaxint(16)
@@ -133,7 +131,6 @@ class TestSetState(TestCase):
         # Ensure that the negative binomial results take floating point
         # arguments without truncation.
         self.prng.negative_binomial(0.5, 0.5)
-
 
 class TestRandint(TestCase):
 

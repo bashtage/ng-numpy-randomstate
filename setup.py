@@ -220,7 +220,7 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Topic :: Security :: Cryptography']
 
 setup(name='randomstate',
-      version='1.10.1',
+      version='1.11.0',
       classifiers=classifiers,
       packages=find_packages(),
       package_dir={'randomstate': './randomstate'},
