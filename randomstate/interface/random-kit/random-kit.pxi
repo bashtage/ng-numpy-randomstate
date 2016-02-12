@@ -1,5 +1,5 @@
-DEF RS_RNG_NAME = 'mt19937'
-DEF RS_NORMAL_METHOD = 'bm'
+DEF RS_RNG_NAME = u'mt19937'
+DEF RS_NORMAL_METHOD = u'bm'
 DEF RK_STATE_LEN = 624
 DEF RS_SEED_NBYTES = 1
 
@@ -44,7 +44,7 @@ cdef object _set_state(aug_state *state, object state_info):
         state.rng.key[i] = key[i]
     state.rng.pos = state_info[1]
 
-DEF CLASS_DOCSTRING = """
+DEF CLASS_DOCSTRING = u"""
 RandomState(seed=None)
 
 Container for the Mersenne Twister pseudo-random number generator.

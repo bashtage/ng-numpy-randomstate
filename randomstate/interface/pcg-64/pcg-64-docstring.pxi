@@ -1,4 +1,4 @@
-DEF CLASS_DOCSTRING = """
+DEF CLASS_DOCSTRING = u"""
 RandomState(seed=None)
 
 Container for the PCG-64 pseudo random number generator.

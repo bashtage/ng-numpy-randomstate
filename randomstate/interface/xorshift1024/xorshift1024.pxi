@@ -1,4 +1,4 @@
-DEF RS_RNG_NAME = "xorshift-1024*"
+DEF RS_RNG_NAME = u"xorshift-1024*"
 DEF RS_RNG_JUMPABLE = 1
 
 cdef extern from "distributions.h":
@@ -46,7 +46,7 @@ cdef object _set_state(aug_state *state, object state_info):
     state.rng.p = state_info[1]
 
 
-DEF CLASS_DOCSTRING = """
+DEF CLASS_DOCSTRING = u"""
 RandomState(seed=None)
 
 Container for the xorshift1024* pseudo random number generator.
@@ -130,7 +130,7 @@ References
        generators." CoRR, abs/1403.0930, 2014.
 """
 
-DEF JUMP_DOCSTRING = """
+DEF JUMP_DOCSTRING = u"""
 jump(iter = 1)
 
 Jumps the state of the random number generator as-if 2**512 random numbers

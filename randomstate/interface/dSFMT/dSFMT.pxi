@@ -1,4 +1,4 @@
-DEF RS_RNG_NAME = 'dSFMT'
+DEF RS_RNG_NAME = u'dSFMT'
 DEF RS_RNG_JUMPABLE = 1
 DEF DSFMT_MEXP = 19937
 DEF DSFMT_N = 191 # ((DSFMT_MEXP - 128) / 104 + 1)
@@ -81,7 +81,7 @@ cdef object _set_state(aug_state *state, object state_info):
 
 
 
-DEF CLASS_DOCSTRING = """
+DEF CLASS_DOCSTRING = u"""
 RandomState(seed=None)
 
 Container for the SIMD-based Mersenne Twister pseudo-random number generator.
@@ -162,7 +162,7 @@ state values.
        Sequences and Their Applications - SETA, 290--298, 2008.
 """
 
-DEF JUMP_DOCSTRING = """
+DEF JUMP_DOCSTRING = u"""
 jump(iter = 1)
 
 Jumps the state of the random number generator as-if 2**128 random numbers
