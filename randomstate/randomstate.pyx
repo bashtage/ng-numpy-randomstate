@@ -48,10 +48,10 @@ IF RS_RNG_MOD_NAME == 'mlfg_1279_861':
 IF RS_RNG_MOD_NAME == 'dsfmt':
     include "interface/dSFMT/dSFMT.pxi"
 
-IF RS_NORMAL_METHOD == 'bm':
-    __normal_method = 'bm'
+IF RS_NORMAL_METHOD == u'bm':
+    __normal_method = u'bm'
 ELSE:
-    __normal_method = 'zig'
+    __normal_method = u'zig'
 
 
 cdef extern from "distributions.h":
@@ -150,7 +150,7 @@ cdef object _ensure_string(object s):
     try:
         return ''.join(map(chr, s))
     except:
-        return s
+        return str(s)
 
 
 cdef class RandomState:
@@ -1359,7 +1359,7 @@ cdef class RandomState:
         (3, 4, 2)
 
         """
-        if method == 'bm':
+        if method == u'bm':
             return double_fill(&self.rng_state, &random_gauss_fill,
                                size, self.lock)
         else:

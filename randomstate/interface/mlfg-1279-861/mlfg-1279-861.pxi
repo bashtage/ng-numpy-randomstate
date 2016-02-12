@@ -1,4 +1,4 @@
-DEF RS_RNG_NAME = 'mlfg-1279-861'
+DEF RS_RNG_NAME = u'mlfg-1279-861'
 DEF MLFG_STATE_LEN = 1279
 
 cdef extern from "distributions.h":
@@ -43,7 +43,7 @@ cdef object _set_state(aug_state *state, object state_info):
     state.rng.pos = state_info[1]
     state.rng.lag_pos = state_info[2]
 
-DEF CLASS_DOCSTRING = """
+DEF CLASS_DOCSTRING = u"""
 RandomState(seed=None)
 
 Container for a Multiplicative Lagged Fibonacci Generator (MLFG).
