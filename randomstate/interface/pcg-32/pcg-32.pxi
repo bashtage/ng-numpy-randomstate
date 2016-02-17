@@ -38,7 +38,7 @@ cdef object _set_state(aug_state *state, object state_info):
 DEF CLASS_DOCSTRING = u"""
 RandomState(seed=None)
 
-Container for the PCG-32 pseudo random number generator.
+Container for the PCG-32 pseudo-random number generator.
 
 PCG-32 is a 64-bit implementation of O'Neill's permutation congruential 
 generator ([1]_, [2]_). PCG-32 has a period of :math:`2^{64}` and supports advancing
@@ -67,7 +67,7 @@ seed : {None, long}, optional
     Random seed initializing the pseudo-random number generator.
     Can be an integer in [0, 2**64] or ``None`` (the default).
     If `seed` is ``None``, then ``pcg32.RandomState`` will try to read data
-    from ``/dev/urandom`` (or the Windows analogue) if available. If
+    from ``/dev/urandom`` (or the Windows analog) if available. If
     unavailable, a 64-bit hash of the time and process ID is used.
 inc : {None, int}, optional
     Stream to return.  
@@ -104,7 +104,7 @@ in parallel applications is not recommended.
 
 **State and Seeding**
 
-The ``pcg32.RandomState`` state vector consists of 2 unsigned 64 bit values.
+The ``pcg32.RandomState`` state vector consists of 2 unsigned 64-bit values.
 ``pcg32.RandomState``  is seeded using a single 64-bit unsigned integer.
 In addition, a second 64-bit unsigned integer is used to set the stream.
 

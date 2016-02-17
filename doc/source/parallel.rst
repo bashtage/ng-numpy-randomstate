@@ -33,7 +33,7 @@ Jump/Advance the PRNG state
 ---------------------------
 
 ``jump`` advances the state of the PRNG *as-if* a large number of random
-number have been drawn.  The specific number of draws varies by PRNG, and
+numbers have been drawn.  The specific number of draws varies by PRNG, and
 ranges from :math:`2^{64}` to :math:`2^{512}`.  Additionally, the *as-if*
 draws also depend on the size of the default random number produced by the
 specific PRNG.  The PRNGs that support ``jump``, along with the period of

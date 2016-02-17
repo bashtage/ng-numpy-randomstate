@@ -110,7 +110,7 @@ seed : {None, int, array_like}, optional
     Can be an integer in [0, 2**32-1], array of integers in
     [0, 2**32-1] or ``None`` (the default). If `seed` is ``None``,
     then ``dSFMT.RandomState`` will try to read entropy from
-    ``/dev/urandom`` (or the Windows analogue) if available to
+    ``/dev/urandom`` (or the Windows analog) if available to
     produce a 64-bit seed. If unavailable, the a 64-bit hash of the time
     and process ID is used.
 
@@ -125,9 +125,9 @@ number of probability distributions to choose from.
 **Parallel Features**
 
 ``dsfmt.RandomState`` can be used in parallel applications by
-calling the method ``jump`` which advances the the state as-if :math:`2^{128}`
-random numbers have been generated [2]_. This allow the original sequence to
-be split so that distinct segments can be used on each worker process.  All
+calling the method ``jump`` which advances the state as-if :math:`2^{128}`
+random numbers have been generated [2]_. This allows the original sequence to
+be split so that distinct segments can be used in each worker process.  All
 generators should be initialized with the same seed to ensure that the
 segments come from the same sequence.
 
@@ -148,7 +148,7 @@ used here augments this with a 384 element array of doubles which are used
 to efficiently access the random numbers produced by the dSFMT generator.
 
 ``dsfmt.RandomState`` is seeded using either a single 32-bit unsigned integer
-or a vector of 32-bit unsigned integers.  In either case the input seed is
+or a vector of 32-bit unsigned integers.  In either case, the input seed is
 used as an input (or inputs) for a hashing function, and the output of the
 hashing function is used as the initial state. Using a single 32-bit value
 for the seed can only initialize a small range of the possible initial
@@ -171,7 +171,7 @@ have been generated.
 Parameters
 ----------
 iter : integer, positive
-    Number of times to jump the state of the rng.
+    Number of times to jump the state of the prng.
 
 Returns
 -------

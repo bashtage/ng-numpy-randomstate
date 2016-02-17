@@ -2,21 +2,18 @@
 # versions.  Allows substantial flexability for choosing versions of
 # required packages and is simpler to use to test up-to-date scientific Python
 # stack
-sudo: false
-
-language: python
+sudo: required
+dist: trusty
+language: generic
 
 matrix:
   fast_finish: true
   include:
-  - python: 2.7
-    env:
+  - env:
     - PYTHON=2.7
-  - python: 2.7
-    env:
+  - env:
     - PYTHON=3.4
-  - python: 2.7
-    env:
+  - env:
     - PYTHON=3.5
 
 before_install:
@@ -35,13 +32,13 @@ before_install:
 
 # Install packages
 install:
-  - conda create -n rng-test ${PKGS} nose pip setuptools --quiet
-  - source activate rng-test
-  - export BUILD_DIR=$PWD
+  - conda create -n randomstate-test ${PKGS} nose pip setuptools --quiet
+  - source activate randomstate-test
   - python setup.py install
+  - export BUILD_DIR=$PWD
+  - cd $HOME
 
 script:
-  - cd $HOME
-  - nosetests -vv randomstate
+  - nosetests randomstate
   - cd $BUILD_DIR/randomstate
   - if [ ${PYTHON} = "2.7" ]; then python performance.py; fi

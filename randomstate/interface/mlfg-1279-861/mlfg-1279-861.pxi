@@ -48,8 +48,8 @@ RandomState(seed=None)
 
 Container for a Multiplicative Lagged Fibonacci Generator (MLFG).
 
-LFG(1279, 861, \*) is a 64-bit implementation of a MLFG that uses lags 1279 and
-861 where random numbers are determined by
+LFG(1279, 861, \*) is a 64-bit implementation of an MLFG that uses lags 1279
+and 861 where random numbers are determined by
 
 .. math::
 
@@ -83,7 +83,7 @@ seed : {None, int, array_like}, optional
     Can be an integer in [0, 2**64-1], array of integers in
     [0, 2**64-1] or ``None`` (the default). If `seed` is ``None``,
     then ``mlfg_1279_861.RandomState`` will try to read entropy from
-    ``/dev/urandom`` (or the Windows analogue) if available to
+    ``/dev/urandom`` (or the Windows analog) if available to
     produce a 64-bit seed. If unavailable, a 64-bit hash of the time
     and process ID is used.
 
@@ -98,11 +98,11 @@ state array of the current and lagged values.
 The ``mlfg_1279_861.RandomState`` state vector consists of a 1279 element array
 of 64-bit unsigned integers plus a two integers value between 0 and 1278
 indicating  the current position and the position of the lagged value within
-the main array required to produce the next random. All elements of the 1279
-element state array must be odd.
+the main array required to produce the next random. All 1279 elements of the
+state array must be odd.
 
 ``mlfg_1279_861.RandomState`` is seeded using either a single 64-bit unsigned integer
-or a vector of 64-bit unsigned integers.  In either case the input seed is
+or a vector of 64-bit unsigned integers.  In either case, the input seed is
 used as an input (or inputs) for another simple random number generator,
 Splitmix64, and the output of this PRNG function is used as the initial state.
 Using a single 64-bit value for the seed can only initialize a small range of

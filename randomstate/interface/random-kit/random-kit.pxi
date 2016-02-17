@@ -75,7 +75,7 @@ seed : {None, int, array_like}, optional
     Can be an integer, an array (or other sequence) of integers of
     any length, or ``None`` (the default).
     If `seed` is ``None``, then ``RandomState`` will try to read data from
-    ``/dev/urandom`` (or the Windows analogue) if available or seed from
+    ``/dev/urandom`` (or the Windows analog) if available or seed from
     the clock otherwise.
 
 Notes
