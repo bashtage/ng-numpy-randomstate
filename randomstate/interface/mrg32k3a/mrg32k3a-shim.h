@@ -31,6 +31,11 @@ inline uint64_t random_uint64(aug_state* state)
     return (((uint64_t) mrg32k3a_random(state->rng) << 32) | mrg32k3a_random(state->rng));
 }
 
+inline uint64_t random_raw(aug_state* state)
+{
+    return (uint64_t)random_uint32(state);
+}
+
 inline double random_double(aug_state* state)
 {
     int32_t a = random_uint32(state) >> 5, b = random_uint32(state) >> 6;

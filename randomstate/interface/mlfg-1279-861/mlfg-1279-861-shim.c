@@ -6,6 +6,8 @@ extern inline uint64_t random_uint64(aug_state* state);
 
 extern inline double random_double(aug_state* state);
 
+extern inline uint64_t random_raw(aug_state* state);
+
 void set_seed(aug_state* state, uint64_t val)
 {
     mlfg_seed(state->rng, val);

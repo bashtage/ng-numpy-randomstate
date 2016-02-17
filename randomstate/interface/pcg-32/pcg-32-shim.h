@@ -35,6 +35,11 @@ inline void advance_state(aug_state* state, uint64_t delta)
     pcg32_advance_r(state->rng, delta);
 }
 
+inline uint64_t random_raw(aug_state* state)
+{
+    return (uint64_t)random_uint32(state);
+}
+
 inline void entropy_init(aug_state* state)
 {
     uint64_t seeds[2];

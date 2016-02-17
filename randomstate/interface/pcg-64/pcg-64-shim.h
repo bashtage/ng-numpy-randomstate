@@ -38,6 +38,11 @@ inline uint64_t random_uint64(aug_state* state)
     return pcg64_random_r(state->rng);
 }
 
+inline uint64_t random_raw(aug_state* state)
+{
+    return random_uint64(state);
+}
+
 inline void set_seed(aug_state* state, pcg128_t seed, pcg128_t inc)
 {
     pcg64_srandom_r(state->rng, seed, inc);
