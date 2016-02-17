@@ -63,6 +63,14 @@ static inline double random_double(aug_state* state)
     // return dsfmt_genrand_close1_open2(state->rng) - 1.0;
 }
 
+
+static inline uint64_t random_raw(aug_state* state)
+{
+    double d = random_double_from_buffer(state);
+    return (uint64_t *)&d;
+}
+
+
 extern void entropy_init(aug_state* state);
 
 extern void set_seed_by_array(aug_state* state, uint32_t init_key[], int key_length);

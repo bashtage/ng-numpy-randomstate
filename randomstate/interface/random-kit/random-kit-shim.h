@@ -35,6 +35,11 @@ inline double random_double(aug_state* state)
     return (a * 67108864.0 + b) / 9007199254740992.0;
 }
 
+inline uint64_t random_raw(aug_state* state)
+{
+    return (uint64_t)random_uint32(state);
+}
+
 extern void entropy_init(aug_state* state);
 
 extern void set_seed_by_array(aug_state* state, uint32_t *init_key, int key_length);

@@ -58,7 +58,10 @@ an additional `method` keyword argument which can be `bm` or `zig` where
 
 * `random_entropy` - Read from the system entropy provider, which is commonly 
 used in cryptographic applications
-* `random_uintegers` - unsigned integers `[0, 2**64-1]` 
+* `random_uintegers` - unsigned integers `[0, 2**64-1]`
+* `random_raw` - Direct access to the values produced by the underlying PRNG.  
+The range of the values returned depends on the specifics of the PRNG 
+implementation.
 * `jump` - Jumps RNGs that support it.  `jump` moves the state a great 
 distance. _Only available if supported by the RNG._
 * `advance` - Advanced the core RNG 'as-if' a number of draws were made, 

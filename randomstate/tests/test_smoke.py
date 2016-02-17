@@ -120,6 +120,10 @@ class RNG(object):
     def test_random_uintegers(self):
         assert_(len(self.rs.random_uintegers(10)) == 10)
 
+    def test_random_uintegers(self):
+        assert_(len(self.rs.random_raw(10)) == 10)
+        assert_(self.rs.random_raw((10,10)).shape == (10,10))
+
     def test_uniform(self):
         r = self.rs.uniform(-1.0, 0.0, size=10)
         assert_(len(r) == 10)

@@ -32,6 +32,10 @@ inline uint64_t random_uint64(aug_state* state)
     return out;
 }
 
+inline uint64_t random_raw(aug_state* state)
+{
+    return  mlfg_next(state->rng) >> 1;
+}
 
 inline double random_double(aug_state* state)
 {
