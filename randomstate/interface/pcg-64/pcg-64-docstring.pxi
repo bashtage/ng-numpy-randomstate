@@ -1,7 +1,7 @@
 DEF CLASS_DOCSTRING = u"""
 RandomState(seed=None)
 
-Container for the PCG-64 pseudo random number generator.
+Container for the PCG-64 pseudo-random number generator.
 
 PCG-64 is a 128-bit implementation of O'Neill's permutation congruential
 generator ([1]_, [2]_). PCG-64 has a period of :math:`2^{128}` and supports advancing
@@ -30,7 +30,7 @@ seed : {None, long}, optional
     Random seed initializing the pseudo-random number generator.
     Can be an integer in [0, 2**128] or ``None`` (the default).
     If `seed` is ``None``, then ``pcg64.RandomState`` will try to read data
-    from ``/dev/urandom`` (or the Windows analogue) if available. If
+    from ``/dev/urandom`` (or the Windows analog) if available. If
     unavailable, a 64-bit hash of the time and process ID is used.
 inc : {None, int}, optional
     Stream to return.
@@ -64,7 +64,7 @@ produce non-overlapping sequences.
 
 **State and Seeding**
 
-The ``pcg64.RandomState`` state vector consists of 2 unsigned 128 bit values,
+The ``pcg64.RandomState`` state vector consists of 2 unsigned 128-bit values,
 which are represented externally as python longs (2.x) or ints (Python 3+).
 ``pcg64.RandomState`` is seeded using a single 128-bit unsigned integer
 (Python long/int). In addition, a second 128-bit unsigned integer is used

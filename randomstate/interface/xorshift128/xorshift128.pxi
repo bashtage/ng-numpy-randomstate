@@ -44,12 +44,12 @@ cdef inline object _set_state(aug_state *state, object state_info):
 DEF CLASS_DOCSTRING = u"""
 RandomState(seed=None)
 
-Container for the xorshift128+ pseudo random number generator.
+Container for the xorshift128+ pseudo-random number generator.
 
 xorshift128+ is a 64-bit implementation of Saito and Matsumoto's XSadd
 generator [1]_. xorshift128+ has a period of :math:`2^{128} - 1` and
-supports jumping the sequence in increments of :math:`2^{64}`, which allow multiple
-non-overlapping sequences to be generated.
+supports jumping the sequence in increments of :math:`2^{64}`, which allows
+multiple non-overlapping sequences to be generated.
 
 ``xorshift128.RandomState`` exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the
@@ -75,7 +75,7 @@ seed : {None, int, array_like}, optional
     Can be an integer in [0, 2**64-1], array of integers in
     [0, 2**64-1] or ``None`` (the default). If `seed` is ``None``,
     then ``xorshift128.RandomState`` will try to read data from
-    ``/dev/urandom`` (or the Windows analogue) if available.  If
+    ``/dev/urandom`` (or the Windows analog) if available.  If
     unavailable, a 64-bit hash of the time and process ID is used.
 
 Notes
@@ -86,10 +86,10 @@ See xorshift1024 for an implementation with a larger period
 **Parallel Features**
 
 ``xorshift128.RandomState`` can be used in parallel applications by
-calling the method ``jump`` which advances the
-the state as-if :math:`2^{64}` random numbers have been generated. This
+calling the method ``jump`` which advances the state as-if
+:math:`2^{64}` random numbers have been generated. This
 allow the original sequence to be split so that distinct segments can be used
-on each worker process. All generators should be initialized with the same
+in each worker process. All generators should be initialized with the same
 seed to ensure that the segments come from the same sequence.
 
 >>> import randomstate.prng.xorshift128 as rnd
@@ -104,7 +104,7 @@ The ``xorshift128.RandomState`` state vector consists of a 2 element array
 of 64-bit unsigned integers.
 
 ``xorshift128.RandomState`` is seeded using either a single 64-bit unsigned integer
-or a vector of 64-bit unsigned integers.  In either case the input seed is
+or a vector of 64-bit unsigned integers.  In either case, the input seed is
 used as an input (or inputs) for another simple random number generator,
 Splitmix64, and the output of this PRNG function is used as the initial state.
 Using a single 64-bit value for the seed can only initialize a small range of
