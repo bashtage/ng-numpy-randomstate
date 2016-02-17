@@ -58,7 +58,7 @@ cdef extern from "distributions.h":
 
     cdef uint64_t random_uint64(aug_state* state) nogil
     cdef uint32_t random_uint32(aug_state* state) nogil
-    cdef uint64_t random_raw(aug_state* state) nogil
+    cdef uint64_t random_raw_values(aug_state* state) nogil
 
     cdef long random_positive_int(aug_state* state) nogil
     cdef unsigned long random_uint(aug_state* state) nogil
@@ -633,7 +633,7 @@ cdef class RandomState:
         cdef Py_ssize_t i, n
 
         if size is None:
-            return random_raw(&self.rng_state)
+            return random_raw_values(&self.rng_state)
 
         randoms = <np.ndarray>np.empty(size, np.uint64)
         randoms_data = <uint64_t*>np.PyArray_DATA(randoms)
@@ -641,7 +641,7 @@ cdef class RandomState:
 
         with self.lock, nogil:
             for i in range(n):
-                randoms_data[i] = random_raw(&self.rng_state)
+                randoms_data[i] = random_raw_values(&self.rng_state)
         return randoms
 
     # Pickling support:
@@ -4402,6 +4402,9 @@ shuffle = _rand.shuffle
 permutation = _rand.permutation
 
 sample = ranf = random = random_sample
+
+random_raw = _rand.random_raw
+random_uintegers = _rand.random_uintegers
 
 IF RS_RNG_JUMPABLE:
     jump = _rand.jump

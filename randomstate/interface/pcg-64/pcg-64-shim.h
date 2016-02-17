@@ -38,7 +38,7 @@ inline uint64_t random_uint64(aug_state* state)
     return pcg64_random_r(state->rng);
 }
 
-inline uint64_t random_raw(aug_state* state)
+inline uint64_t random_raw_values(aug_state* state)
 {
     return random_uint64(state);
 }

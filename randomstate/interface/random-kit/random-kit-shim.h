@@ -35,7 +35,7 @@ inline double random_double(aug_state* state)
     return (a * 67108864.0 + b) / 9007199254740992.0;
 }
 
-inline uint64_t random_raw(aug_state* state)
+inline uint64_t random_raw_values(aug_state* state)
 {
     return (uint64_t)random_uint32(state);
 }

@@ -64,7 +64,7 @@ static inline double random_double(aug_state* state)
 }
 
 
-static inline uint64_t random_raw(aug_state* state)
+static inline uint64_t random_raw_values(aug_state* state)
 {
     double d = random_double_from_buffer(state);
     return (uint64_t *)&d;
