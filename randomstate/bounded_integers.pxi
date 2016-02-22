@@ -20,7 +20,7 @@ cdef object _rand_int64(low, high, size, aug_state *state, lock):
     if size is None:
         with lock:
             random_bounded_uint64_fill(state, off, rng, 1, &buf)
-        return <int64_t>buf
+        return np.int64(<int64_t>buf)
     else:
         array = <np.ndarray>np.empty(size, np.int64)
         cnt = np.PyArray_SIZE(array)
@@ -75,7 +75,7 @@ cdef object _rand_int32(low, high, size, aug_state *state, lock):
     if size is None:
         with lock:
             random_bounded_uint32_fill(state, off, rng, 1, &buf)
-        return <int32_t>buf
+        return np.int32(<int32_t>buf)
     else:
         array = <np.ndarray>np.empty(size, np.int32)
         cnt = np.PyArray_SIZE(array)
@@ -95,7 +95,7 @@ cdef object _rand_int16(low, high, size, aug_state *state, lock):
     if size is None:
         with lock:
             random_bounded_uint16_fill(state, off, rng, 1, &buf)
-        return <int16_t>buf
+        return np.int16(<int16_t>buf)
     else:
         array = <np.ndarray>np.empty(size, np.int16)
         cnt = np.PyArray_SIZE(array)
@@ -115,7 +115,7 @@ cdef object _rand_int8(low, high, size, aug_state *state, lock):
     if size is None:
         with lock:
             random_bounded_uint8_fill(state, off, rng, 1, &buf)
-        return <int8_t>buf
+        return np.int8(<int8_t>buf)
     else:
         array = <np.ndarray>np.empty(size, np.int8)
         cnt = np.PyArray_SIZE(array)
@@ -138,7 +138,7 @@ cdef object _rand_uint64(low, high, size, aug_state *state, lock):
     if size is None:
         with lock:
             random_bounded_uint64_fill(state, off, rng, 1, &buf)
-        return <uint64_t>buf
+        return np.uint64(<uint64_t>buf)
     else:
         array = <np.ndarray>np.empty(size, np.uint64)
         cnt = np.PyArray_SIZE(array)
@@ -158,7 +158,7 @@ cdef object _rand_uint32(low, high, size, aug_state *state, lock):
     if size is None:
         with lock:
             random_bounded_uint32_fill(state, off, rng, 1, &buf)
-        return <uint32_t>buf
+        return np.uint32(<uint32_t>buf)
     else:
         array = <np.ndarray>np.empty(size, np.uint32)
         cnt = np.PyArray_SIZE(array)
@@ -178,7 +178,7 @@ cdef object _rand_uint16(low, high, size, aug_state *state, lock):
     if size is None:
         with lock:
             random_bounded_uint16_fill(state, off, rng, 1, &buf)
-        return <uint16_t>buf
+        return np.uint16(<uint16_t>buf)
     else:
         array = <np.ndarray>np.empty(size, np.uint16)
         cnt = np.PyArray_SIZE(array)
@@ -198,7 +198,7 @@ cdef object _rand_uint8(low, high, size, aug_state *state, lock):
     if size is None:
         with lock:
             random_bounded_uint8_fill(state, off, rng, 1, &buf)
-        return <uint8_t>buf
+        return np.uint8(<uint8_t>buf)
     else:
         array = <np.ndarray>np.empty(size, np.uint8)
         cnt = np.PyArray_SIZE(array)
@@ -219,7 +219,7 @@ cdef object _rand_bool(low, high, size, aug_state *state, lock):
     if size is None:
         with lock:
             random_bool_fill(state, off, rng, 1, &buf)
-        return <np.npy_bool>buf
+        return np.bool_(<np.npy_bool>buf)
     else:
         array = <np.ndarray>np.empty(size, np.bool)
         cnt = np.PyArray_SIZE(array)

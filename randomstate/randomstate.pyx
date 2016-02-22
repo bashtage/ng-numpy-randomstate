@@ -761,7 +761,7 @@ cdef class RandomState:
             randoms_data[i] = random_positive_int(&self.rng_state)
         return randoms
 
-    def randint(self, low, high=None, size=None, dtype='l'):
+    def randint(self, low, high=None, size=None, dtype=int):
         """
         randint(low, high=None, size=None, dtype='l')
 
@@ -788,7 +788,7 @@ cdef class RandomState:
             Desired dtype of the result. All dtypes are determined by their
             name, i.e., 'int64', 'int', etc, so byteorder is not available
             and a specific precision may have different C types depending
-            on the platform. The default value is 'l' (C long).
+            on the platform. The default value is 'np.int'.
 
             .. versionadded:: 1.11.0
 
@@ -836,23 +836,28 @@ cdef class RandomState:
             raise ValueError("low >= high")
 
         if key == 'int32':
-            return _rand_int32(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int32(low, high - 1, size, &self.rng_state, self.lock)
         elif key == 'int64':
-            return _rand_int64(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int64(low, high - 1, size, &self.rng_state, self.lock)
         elif key == 'int16':
-            return _rand_int16(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int16(low, high - 1, size, &self.rng_state, self.lock)
         elif key == 'int8':
-            return _rand_int8(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int8(low, high - 1, size, &self.rng_state, self.lock)
         elif key == 'uint64':
-            return _rand_uint64(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint64(low, high - 1, size, &self.rng_state, self.lock)
         elif key == 'uint32':
-            return _rand_uint32(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint32(low, high - 1, size, &self.rng_state, self.lock)
         elif key == 'uint16':
-            return _rand_uint16(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint16(low, high - 1, size, &self.rng_state, self.lock)
         elif key == 'uint8':
-            return _rand_uint8(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint8(low, high - 1, size, &self.rng_state, self.lock)
         elif key == 'bool':
-            return _rand_bool(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_bool(low, high - 1, size, &self.rng_state, self.lock)
+
+        if size is None:
+            if dtype in (np.bool, np.int, np.long):
+                return dtype(ret)
+        return ret
 
     def bytes(self, np.npy_intp length):
         """
@@ -3567,11 +3572,13 @@ cdef class RandomState:
         the probability density function:
 
         >>> import matplotlib.pyplot as plt
-        >>> import scipy.special as sps
-        Truncate s values at 50 so plot is interesting
+        >>> from scipy import special
+
+        Truncate s values at 50 so plot is interesting:
+
         >>> count, bins, ignored = plt.hist(s[s<50], 50, normed=True)
         >>> x = np.arange(1., 50.)
-        >>> y = x**(-a)/sps.zetac(a)
+        >>> y = x**(-a) / special.zetac(a)
         >>> plt.plot(x, y/max(y), linewidth=2, color='r')
         >>> plt.show()
 
