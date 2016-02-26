@@ -254,14 +254,15 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
             check_constraint(_c, c_name, c_constraint)
 
     if size is None:
-        if narg == 0:
-            return (<random_double_0>func)(state)
-        elif narg == 1:
-            return (<random_double_1>func)(state, _a)
-        elif narg == 2:
-            return (<random_double_2>func)(state, _a, _b)
-        elif narg == 3:
-            return (<random_double_3>func)(state, _a, _b, _c)
+        with lock:
+            if narg == 0:
+                return (<random_double_0>func)(state)
+            elif narg == 1:
+                return (<random_double_1>func)(state, _a)
+            elif narg == 2:
+                return (<random_double_2>func)(state, _a, _b)
+            elif narg == 3:
+                return (<random_double_3>func)(state, _a, _b, _c)
 
     cdef np.npy_intp i, n = compute_numel(size)
     cdef np.ndarray randoms = np.empty(n, np.double)
@@ -541,20 +542,21 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
                 check_constraint(<double>_ic, c_name, c_constraint)
 
     if size is None:
-        if narg_long == 0:
-            if narg_double == 0:
-                return (<random_uint_0>func)(state)
-            elif narg_double == 1:
-                return (<random_uint_d>func)(state, _da)
-            elif narg_double == 2:
-                return (<random_uint_dd>func)(state, _da, _db)
-        elif narg_long == 1:
-            if narg_double == 0:
-                return (<random_uint_i>func)(state, _ia)
-            if narg_double == 1:
-                return (<random_uint_di>func)(state, _da, _ib)
-        else:
-            return (<random_uint_iii>func)(state, _ia, _ib, _ic)
+        with lock:
+            if narg_long == 0:
+                if narg_double == 0:
+                    return (<random_uint_0>func)(state)
+                elif narg_double == 1:
+                    return (<random_uint_d>func)(state, _da)
+                elif narg_double == 2:
+                    return (<random_uint_dd>func)(state, _da, _db)
+            elif narg_long == 1:
+                if narg_double == 0:
+                    return (<random_uint_i>func)(state, _ia)
+                if narg_double == 1:
+                    return (<random_uint_di>func)(state, _da, _ib)
+            else:
+                return (<random_uint_iii>func)(state, _ia, _ib, _ic)
 
     cdef np.npy_intp i, n = compute_numel(size)
     cdef np.int_t [::1] randoms = np.empty(n, np.int)

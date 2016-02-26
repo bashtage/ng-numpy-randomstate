@@ -111,7 +111,7 @@ cdef extern from "distributions.h":
     cdef void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, intptr_t cnt,uint32_t *out) nogil
     cdef void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, intptr_t cnt, uint16_t *out) nogil
     cdef void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, intptr_t cnt, uint8_t *out) nogil
-    cdef void random_bool_fill(aug_state *state, int8_t off, int8_t rng, intptr_t cnt, int8_t *out) nogil
+    cdef void random_bool_fill(aug_state *state, np.npy_bool off, np.npy_bool rng, intptr_t cnt, np.npy_bool *out) nogil
     cdef void random_uniform_fill(aug_state *state, intptr_t cnt, double *out) nogil
     cdef void random_standard_exponential_fill(aug_state* state, intptr_t count, double *out) nogil
     cdef void random_gauss_fill(aug_state* state, intptr_t count, double *out) nogil
@@ -580,24 +580,28 @@ cdef class RandomState:
         """
         cdef uint32_t [:] randoms32
         cdef uint64_t [:] randoms64
+        cdef aug_state* rng_state
         cdef Py_ssize_t i, n
+        rng_state = &self.rng_state
         if bits == 64:
             if size is None:
-                return random_uint64(&self.rng_state)
+                with self.lock:
+                    return random_uint64(rng_state)
             n = compute_numel(size)
             randoms64 = np.empty(n, np.uint64)
             with self.lock, nogil:
                 for i in range(n):
-                    randoms64[i] = random_uint64(&self.rng_state)
+                    randoms64[i] = random_uint64(rng_state)
             return np.asarray(randoms64).reshape(size)
         elif bits == 32:
             if size is None:
-                return random_uint32(&self.rng_state)
+                with self.lock:
+                    return random_uint32(rng_state)
             n = compute_numel(size)
             randoms32 = np.empty(n, np.uint32)
             with self.lock, nogil:
                 for i in range(n):
-                    randoms32[i] = random_uint32(&self.rng_state)
+                    randoms32[i] = random_uint32(rng_state)
             return np.asarray(randoms32).reshape(size)
         else:
             raise ValueError('Unknown value of bits.  Must be either 32 or 64.')
@@ -631,9 +635,12 @@ cdef class RandomState:
         cdef np.ndarray randoms
         cdef uint64_t *randoms_data
         cdef Py_ssize_t i, n
+        cdef aug_state* rng_state
+        rng_state = &self.rng_state
 
         if size is None:
-            return random_raw_values(&self.rng_state)
+            with self.lock:
+                return random_raw_values(rng_state)
 
         randoms = <np.ndarray>np.empty(size, np.uint64)
         randoms_data = <uint64_t*>np.PyArray_DATA(randoms)
@@ -641,7 +648,7 @@ cdef class RandomState:
 
         with self.lock, nogil:
             for i in range(n):
-                randoms_data[i] = random_raw_values(&self.rng_state)
+                randoms_data[i] = random_raw_values(rng_state)
         return randoms
 
     # Pickling support:
@@ -749,16 +756,20 @@ cdef class RandomState:
         cdef np.npy_intp n
         cdef np.ndarray randoms
         cdef long *randoms_data
+        cdef aug_state* rng_state
+        rng_state = &self.rng_state
 
         if size is None:
-            return random_positive_int(&self.rng_state)
+            with self.lock:
+                return random_positive_int(rng_state)
 
         randoms = <np.ndarray>np.empty(size, dtype=np.int)
         randoms_data = <long*>np.PyArray_DATA(randoms)
         n = np.PyArray_SIZE(randoms)
 
         for i in range(n):
-            randoms_data[i] = random_positive_int(&self.rng_state)
+            with self.lock, nogil:
+                randoms_data[i] = random_positive_int(rng_state)
         return randoms
 
     def randint(self, low, high=None, size=None, dtype=int):
@@ -4239,6 +4250,10 @@ cdef class RandomState:
 
         Modify a sequence in-place by shuffling its contents.
 
+        This function only shuffles the array along the first axis of a
+        multi-dimensional array. The order of sub-arrays is changed but
+        their contents remains the same.
+
         Parameters
         ----------
         x : array_like
@@ -4255,8 +4270,7 @@ cdef class RandomState:
         >>> arr
         [1 7 5 2 9 4 3 6 0 8]
 
-        This function only shuffles the array along the first index of a
-        multi-dimensional array:
+        Multi-dimensional arrays are only shuffled along the first axis:
 
         >>> arr = np.arange(9).reshape((3, 3))
         >>> np.random.shuffle(arr)
