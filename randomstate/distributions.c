@@ -1579,8 +1579,7 @@ void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, npy_i
  * Fills an array with cnt random npy_bool between off and off + rng
  * inclusive.
  */
-/* TODO: This needs to use bools. See original */
-void random_bool_fill(aug_state *state, int8_t off, int8_t rng, npy_intp cnt, int8_t *out)
+void random_bool_fill(aug_state *state, npy_bool off, npy_bool rng, npy_intp cnt, npy_bool *out)
 {
     int i;
     uint32_t buf = 0;

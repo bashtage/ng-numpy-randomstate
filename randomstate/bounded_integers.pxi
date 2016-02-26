@@ -207,15 +207,14 @@ cdef object _rand_uint8(low, high, size, aug_state *state, lock):
             random_bounded_uint8_fill(state, off, rng, cnt, out)
         return array
     
-# TODO: Needs to change types
 cdef object _rand_bool(low, high, size, aug_state *state, lock):
-    cdef int8_t off, rng, buf
-    cdef int8_t *out
+    cdef np.npy_bool off, rng, buf
+    cdef np.npy_bool *out
     cdef np.ndarray array
     cdef np.npy_intp cnt
 
-    rng = <uint8_t>(high - low)
-    off = <uint8_t>low
+    rng = <np.npy_bool>(high - low)
+    off = <np.npy_bool>low
     if size is None:
         with lock:
             random_bool_fill(state, off, rng, 1, &buf)
@@ -223,7 +222,7 @@ cdef object _rand_bool(low, high, size, aug_state *state, lock):
     else:
         array = <np.ndarray>np.empty(size, np.bool)
         cnt = np.PyArray_SIZE(array)
-        out = <int8_t *>np.PyArray_DATA(array)
+        out = <np.npy_bool *>np.PyArray_DATA(array)
         with lock, nogil:
             random_bool_fill(state, off, rng, cnt, out)
         return array
