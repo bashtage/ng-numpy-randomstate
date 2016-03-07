@@ -71,10 +71,10 @@ previous behavior remains unchanged.
 Parameters
 ----------
 seed : {None, int, array_like}, optional
-    Random seed initializing the pseudo-random number generator.
-    Can be an integer, an array (or other sequence) of integers of
-    any length, or ``None`` (the default).
-    If `seed` is ``None``, then ``RandomState`` will try to read data from
+    Random seed used to initialize the pseudo-random number generator.  Can
+    be any integer between 0 and 2**32 - 1 inclusive, an array (or other
+    sequence) of such integers, or ``None`` (the default).  If `seed` is
+    ``None``, then `RandomState` will try to read data from
     ``/dev/urandom`` (or the Windows analog) if available or seed from
     the clock otherwise.
 
