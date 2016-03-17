@@ -226,13 +226,13 @@ cdef class RandomState:
                 else:
                     idx = operator.index(seed)
                     if idx > int(2**32 - 1) or idx < 0:
-                        raise ValueError("Seed must be between 0 and 4294967295")
+                        raise ValueError("Seed must be between 0 and 2**32 - 1")
                     with self.lock:
                         set_seed(&self.rng_state, seed)
             except TypeError:
                 obj = np.asarray(seed).astype(np.int64, casting='safe')
                 if ((obj > int(2**32 - 1)) | (obj < 0)).any():
-                    raise ValueError("Seed must be between 0 and 4294967295")
+                    raise ValueError("Seed must be between 0 and 2**32 - 1")
                 obj = obj.astype(np.uint32, casting='unsafe', order='C')
                 with self.lock:
                     set_seed_by_array(&self.rng_state,
