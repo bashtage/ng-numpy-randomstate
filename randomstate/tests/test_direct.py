@@ -11,6 +11,7 @@ from randomstate.prng.pcg32 import pcg32
 from randomstate.prng.pcg64 import pcg64
 from randomstate.prng.xorshift1024 import xorshift1024
 from randomstate.prng.xorshift128 import xorshift128
+from randomstate.prng.xoroshiro128plus import xoroshiro128plus
 from randomstate.prng.dsfmt import dsfmt
 from numpy.testing import assert_equal, assert_allclose
 
@@ -139,6 +140,15 @@ class TestXorshift128(Base, TestCase):
         cls.data1 = cls._read_csv(join(pwd, './data/xorshift128-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/xorshift128-testset-2.csv'))
 
+
+class TestXoroshiro128plus(Base, TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.RandomState = xoroshiro128plus.RandomState
+        cls.bits = 64
+        cls.dtype = np.uint64
+        cls.data1 = cls._read_csv(join(pwd, './data/xoroshiro128plus-testset-1.csv'))
+        cls.data2 = cls._read_csv(join(pwd, './data/xoroshiro128plus-testset-2.csv'))
 
 class TestXorshift1024(Base, TestCase):
     @classmethod

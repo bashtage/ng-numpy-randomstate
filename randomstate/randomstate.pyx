@@ -39,6 +39,8 @@ IF RS_RNG_MOD_NAME == 'mt19937':
     include "interface/random-kit/random-kit.pxi"
 IF RS_RNG_MOD_NAME == 'xorshift128':
     include "interface/xorshift128/xorshift128.pxi"
+IF RS_RNG_MOD_NAME == 'xoroshiro128plus':
+    include "interface/xoroshiro128plus/xoroshiro128plus.pxi"
 IF RS_RNG_MOD_NAME == 'xorshift1024':
     include "interface/xorshift1024/xorshift1024.pxi"
 IF RS_RNG_MOD_NAME == 'mrg32k3a':
@@ -224,6 +226,8 @@ cdef class RandomState:
                     with self.lock:
                         set_seed(&self.rng_state, seed)
                 else:
+                    if hasattr(seed, 'squeeze'):
+                        seed = seed.squeeze()
                     idx = operator.index(seed)
                     if idx > int(2**32 - 1) or idx < 0:
                         raise ValueError("Seed must be between 0 and 2**32 - 1")
@@ -268,6 +272,8 @@ cdef class RandomState:
             """
             try:
                 if seed is not None:
+                    if hasattr(seed, 'squeeze'):
+                        seed = seed.squeeze()
                     idx = operator.index(seed)
                     if idx < 0:
                         raise ValueError('seed < 0')

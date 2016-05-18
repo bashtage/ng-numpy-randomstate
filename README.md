@@ -40,7 +40,7 @@ The RNGs include:
  the NumPy rng
 * [dSFMT](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/) a SSE2-aware 
 version of the MT19937 generator that is especially fast at generating doubles
-* [xorshift128+](http://xorshift.di.unimi.it/) and 
+* [xorshift128+](http://xorshift.di.unimi.it/), [xoroshiro128+](http://xoroshiro.di.unimi.it/)
 [xorshift1024*](http://xorshift.di.unimi.it/)
 * [PCG32](http://www.pcg-random.org/) and [PCG64](http:w//www.pcg-random.org/)
 * [MRG32K3A](http://simul.iro.umontreal.ca/rng)
@@ -97,8 +97,8 @@ This module is essentially complete.  There are a few rough edges that need to b
 ## Requirements
 Building requires:
 
-  * Numpy (1.9, 1.10)
-  * Cython (0.22, 0.23)
+  * Numpy (1.9, 1.10, 1.11)
+  * Cython (0.22, 0.23, 0.24)
   * Python (2.6, 2.7, 3.3, 3.4, 3.5)
 
 **Note:** it might work with other versions but only tested with these 
@@ -169,23 +169,25 @@ Performance is promising, and even the mt19937 seems to be faster than NumPy's m
 ```
 Speed-up relative to NumPy (Box-Muller)
 ************************************************************
-randomstate.prng-dsfmt-standard_normal             70.5%
-randomstate.prng-mlfg_1279_861-standard_normal     26.9%
-randomstate.prng-mrg32k3a-standard_normal         -18.7%
-randomstate.prng-mt19937-standard_normal           13.5%
-randomstate.prng-pcg32-standard_normal             26.1%
-randomstate.prng-pcg64-standard_normal             26.2%
-randomstate.prng-xorshift1024-standard_normal      27.2%
-randomstate.prng-xorshift128-standard_normal       30.0%
+randomstate.prng-dsfmt-standard_normal                30.2%
+randomstate.prng-mlfg_1279_861-standard_normal        24.7%
+randomstate.prng-mrg32k3a-standard_normal            -17.8%
+randomstate.prng-mt19937-standard_normal              11.2%
+randomstate.prng-pcg32-standard_normal                22.0%
+randomstate.prng-pcg64-standard_normal                21.8%
+randomstate.prng-xoroshiro128plus-standard_normal     26.5%
+randomstate.prng-xorshift1024-standard_normal         20.2%
+randomstate.prng-xorshift128-standard_normal          23.5%
 
 Speed-up relative to NumPy (Ziggurat)
 ************************************************************
-randomstate.prng-dsfmt-standard_normal            316.1%
-randomstate.prng-mlfg_1279_861-standard_normal    247.0%
-randomstate.prng-mrg32k3a-standard_normal          51.2%
-randomstate.prng-mt19937-standard_normal          175.9%
-randomstate.prng-pcg32-standard_normal            255.9%
-randomstate.prng-pcg64-standard_normal            329.1%
-randomstate.prng-xorshift1024-standard_normal     362.0%
-randomstate.prng-xorshift128-standard_normal      513.7%
+randomstate.prng-dsfmt-standard_normal               494.2%
+randomstate.prng-mlfg_1279_861-standard_normal       464.2%
+randomstate.prng-mrg32k3a-standard_normal            103.8%
+randomstate.prng-mt19937-standard_normal             362.6%
+randomstate.prng-pcg32-standard_normal               539.6%
+randomstate.prng-pcg64-standard_normal               407.7%
+randomstate.prng-xoroshiro128plus-standard_normal    722.8%
+randomstate.prng-xorshift1024-standard_normal        506.1%
+randomstate.prng-xorshift128-standard_normal         686.3%
 ```

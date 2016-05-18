@@ -516,8 +516,9 @@ class TestAgainstNumpy(unittest.TestCase):
         mod = dir(randomstate)
         known_exlcuded = ['__all__', 'Tester', 'info', 'bench',
                           '__RandomState_ctor', 'mtrand', 'test',
-                          '__warningregistry__']
+                          '__warningregistry__','_numpy_tester']
         mod += known_exlcuded
-        assert(len(set(npmod).difference(mod)) == 0)
+        diff = set(npmod).difference(mod)
+        assert_equal(len(diff), 0)
 
 

@@ -17,6 +17,7 @@ from randomstate.prng.pcg32 import pcg32
 from randomstate.prng.pcg64 import pcg64
 from randomstate.prng.xorshift1024 import xorshift1024
 from randomstate.prng.xorshift128 import xorshift128
+from randomstate.prng.xoroshiro128plus import xoroshiro128plus
 from randomstate.prng.dsfmt import dsfmt
 from numpy.testing import assert_almost_equal, assert_equal, assert_raises, assert_
 
@@ -553,6 +554,18 @@ class TestXorShift128(RNG, unittest.TestCase):
     @classmethod
     def setup_class(cls):
         cls.mod = xorshift128
+        cls.advance = None
+        cls.seed = [12345]
+        cls.rs = cls.mod.RandomState(*cls.seed)
+        cls.initial_state = cls.rs.get_state()
+        cls.seed_vector_bits = 64
+        cls._extra_setup()
+
+
+class TestXoroShiro128Plus(RNG, unittest.TestCase):
+    @classmethod
+    def setup_class(cls):
+        cls.mod = xoroshiro128plus
         cls.advance = None
         cls.seed = [12345]
         cls.rs = cls.mod.RandomState(*cls.seed)

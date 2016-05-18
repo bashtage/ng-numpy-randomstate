@@ -17,8 +17,9 @@ USE_SSE2 = True if not '--no-sse2' in sys.argv else False
 mod_dir = './randomstate'
 configs = []
 
-rngs = ['RNG_DSFMT', 'RNG_MLFG_1279_861', 'RNG_PCG32', 'RNG_PCG64', 'RNG_MT19937',
-        'RNG_XORSHIFT128', 'RNG_XORSHIFT1024', 'RNG_MRG32K3A']
+rngs = ['RNG_DSFMT', 'RNG_MLFG_1279_861', 'RNG_MRG32K3A', 'RNG_MT19937',
+        'RNG_PCG32', 'RNG_PCG64', 'RNG_XORSHIFT128', 'RNG_XOROSHIRO128PLUS',
+        'RNG_XORSHIFT1024']
 
 compile_rngs = rngs[:]
 
@@ -109,6 +110,13 @@ for rng in rngs:
         defs = [('RS_XORSHIFT1024', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'xorshift1024')]
+    elif rng == 'RNG_XOROSHIRO128PLUS':
+        sources += [join(mod_dir, 'src', 'xoroshiro128plus', 'xoroshiro128plus.c')]
+        sources += [join(mod_dir, 'interface', 'xoroshiro128plus', 'xoroshiro128plus-shim.c')]
+
+        defs = [('RS_XOROSHIRO128PLUS', '1')]
+
+        include_dirs += [join(mod_dir, 'src', 'xoroshiro128plus')]
     elif rng == 'RNG_MRG32K3A':
         sources += [join(mod_dir, 'src', 'mrg32k3a', 'mrg32k3a.c')]
         sources += [join(mod_dir, 'interface', 'mrg32k3a', 'mrg32k3a-shim.c')]
@@ -220,7 +228,7 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Topic :: Security :: Cryptography']
 
 setup(name='randomstate',
-      version='1.11.0',
+      version='1.11.1',
       classifiers=classifiers,
       packages=find_packages(),
       package_dir={'randomstate': './randomstate'},
