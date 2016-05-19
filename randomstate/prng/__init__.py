@@ -1,4 +1,5 @@
 from .xorshift128 import xorshift128
+from .xoroshiro128plus import xoroshiro128plus
 from .xorshift1024 import xorshift1024
 from .mlfg_1279_861 import mlfg_1279_861
 from .mt19937 import mt19937
@@ -39,6 +40,8 @@ def __generic_ctor(mod_name='mt19937'):
         mod = pcg32
     elif mod_name == 'xorshift128':
         mod = xorshift128
+    elif mod_name == 'xoroshiro128plus':
+        mod = xoroshiro128plus
     elif mod_name == 'xorshift1024':
         mod = xorshift1024
     elif mod_name == 'dsfmt':

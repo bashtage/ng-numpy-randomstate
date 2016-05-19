@@ -21,7 +21,7 @@ else:
     scale_64 = 2
 
 RNGS = ['mlfg_1279_861', 'mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024',
-        'dsfmt', 'random']
+        'xoroshiro128plus', 'dsfmt', 'random']
 
 
 def timer(code, setup):

@@ -32,6 +32,8 @@ typedef int bool;
 #include "interface/xorshift128/xorshift128-shim.h"
 #elif defined(RS_XORSHIFT1024)
 #include "interface/xorshift1024/xorshift1024-shim.h"
+#elif defined(RS_XOROSHIRO128PLUS)
+#include "interface/xoroshiro128plus/xoroshiro128plus-shim.h"
 #elif defined(RS_MRG32K3A)
 #include "interface/mrg32k3a/mrg32k3a-shim.h"
 #elif defined(RS_MLFG_1279_861)
