@@ -1,5 +1,5 @@
-XorShift128+ Randomstate
-************************
+XoroShiro128+ Randomstate
+*************************
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

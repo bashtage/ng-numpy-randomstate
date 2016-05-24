@@ -445,6 +445,11 @@ class RNG(object):
         print(unpick.get_state())
         assert_(comp_state(self.rs.get_state(), unpick.get_state()))
 
+    def test_version(self):
+        state = self.rs.get_state()
+        assert_('version' in state)
+        assert_(state['version'] == 0)
+
     def test_seed_array(self):
         if self.seed_vector_bits is None:
             raise SkipTest
