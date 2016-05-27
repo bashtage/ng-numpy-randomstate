@@ -26,15 +26,9 @@ def uniform_from_uint(x, bits):
         return uniform_from_uint64(x)
     elif bits == 32:
         return uniform_from_uint32(x)
-    elif bits == 63:
-        return uniform_from_uint64(x)
-
 
 def uniform_from_uint64(x):
-    a = x >> 37
-    b = (x & 0xFFFFFFFF) >> 6
-    return (a * 67108864.0 + b) / 9007199254740992.0
-
+    return (x >> np.uint64(11)) * (1.0 / 9007199254740992.0)
 
 def uniform_from_uint32(x):
     out = np.empty(len(x) // 2)
@@ -43,7 +37,6 @@ def uniform_from_uint32(x):
         b = x[i + 1] >> 6
         out[i // 2] = (a * 67108864.0 + b) / 9007199254740992.0
     return out
-
 
 def uint64_from_uint63(x):
     out = np.empty(len(x) // 2, dtype=np.uint64)
