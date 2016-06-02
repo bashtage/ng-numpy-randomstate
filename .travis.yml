@@ -11,8 +11,12 @@ matrix:
   include:
   - env:
     - PYTHON=2.7
+    - NUMPY=1.9
+    - CYTHON=0.22
   - env:
     - PYTHON=3.4
+    - NUMPY=1.10
+    - CYTHON=0.23
   - env:
     - PYTHON=3.5
 

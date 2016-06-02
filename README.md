@@ -18,12 +18,12 @@ y = rnd.random_sample(100)
 z = rnd.randn(10,10)
 ```
 
-* Default random generator is identical to NumPy's RandomState (i.e., same 
-seed, same random numbers).
-* Support for random number generators that support independent streams and 
-jumping ahead so that substreams can be generated
-* Faster random number generations, especially for Normals using the Ziggurat 
-method 
+* Default random generator is identical to NumPy's RandomState (i.e., 
+same seed, same random numbers).
+* Support for random number generators that support independent streams 
+and jumping ahead so that substreams can be generated
+* Faster random number generation, especially for Normals using the 
+Ziggurat method 
 
 ```python
 import randomstate as rnd
@@ -49,23 +49,24 @@ version of the MT19937 generator that is especially fast at generating doubles
 ## Differences from `numpy.random.RandomState`
 
 ### New Features
-* `standard_normal`, `normal`, `randn` and `multivariate_normal` all support 
-an additional `method` keyword argument which can be `bm` or `zig` where 
-`bm` corresponds to the current method and `zig` uses the much faster 
-(100%+) ziggurat method.
+* `standard_normal`, `normal`, `randn` and `multivariate_normal` all 
+support an additional `method` keyword argument which can be `bm` or 
+`zig` where `bm` corresponds to the current method using the Box-Muller 
+transformation and `zig` uses the much faster (100%+) ziggurat method.
 
 ### New Functions
 
-* `random_entropy` - Read from the system entropy provider, which is commonly 
-used in cryptographic applications
+* `random_entropy` - Read from the system entropy provider, which is 
+commonly used in cryptographic applications
 * `random_uintegers` - unsigned integers `[0, 2**64-1]`
-* `random_raw` - Direct access to the values produced by the underlying PRNG.  
-The range of the values returned depends on the specifics of the PRNG 
-implementation.
+* `random_raw` - Direct access to the values produced by the underlying 
+PRNG. The range of the values returned depends on the specifics of the 
+PRNG implementation.
 * `jump` - Jumps RNGs that support it.  `jump` moves the state a great 
 distance. _Only available if supported by the RNG._
 * `advance` - Advanced the core RNG 'as-if' a number of draws were made, 
-without actually drawing the numbers. _Only available if supported by the RNG._
+without actually drawing the numbers. _Only available if supported by 
+the RNG._
 
 ## Status
 
@@ -73,10 +74,11 @@ without actually drawing the numbers. _Only available if supported by the RNG._
 generator is identical to `numpy.random.RandomState`, and will produce an 
 identical sequence of random numbers for a given seed.   
 * Builds and passes all tests on:
-  * Linux 32/64 bit, Python 2.6, 2.7, 3.3, 3.4, 3.5
+  * Linux 32/64 bit, Python 2.7, 3.4, 3.5 (should work on 2.6 and 3.3)
   * PC-BSD (FreeBSD) 64-bit, Python 2.7
   * OSX  64-bit, Python 2.7
-  * Windows 32/64 bit (only tested on Python 2.7 and 3.5, but should work on 3.3/3.4)
+  * Windows 32/64 bit (only tested on Python 2.7 and 3.5, but should 
+    work on 3.3/3.4)
 
 ## Version
 The version matched the latest version of NumPy where 
@@ -88,18 +90,19 @@ An occasionally updated build of the documentation is available on
 [my github pages](http://bashtage.github.io/ng-numpy-randomstate/).
 
 ## Plans
-This module is essentially complete.  There are a few rough edges that need to be smoothed.
+This module is essentially complete.  There are a few rough edges that 
+need to be smoothed.
   
   * Stream support for MLFG
-  * Creation of additional streams from a RandomState where supported (i.e. 
-  a `next_stream()` method)
+  * Creation of additional streams from a RandomState where supported 
+  (i.e. a `next_stream()` method)
   
 ## Requirements
 Building requires:
 
   * Numpy (1.9, 1.10, 1.11)
   * Cython (0.22, 0.23, 0.24)
-  * Python (2.6, 2.7, 3.3, 3.4, 3.5)
+  * Python (2.7, 3.4, 3.5)
 
 **Note:** it might work with other versions but only tested with these 
 versions. 
@@ -119,18 +122,19 @@ python setup.py install
 ```
 
 ### SSE2
-`dSFTM` makes use of SSE2 by default.  If you have a very old computer or are 
-building on non-x86, you can install using:
+`dSFTM` makes use of SSE2 by default.  If you have a very old computer 
+or are building on non-x86, you can install using:
 
 ```bash
 python setup.py install --no-sse2
 ```
 
 ### Windows
-Either use a binary installer or if building from scratch using Python 3.5 and 
-the free Visual Studio 2015 Community Edition. It can also be build using 
-Microsoft Visual C++ Compiler for Python 2.7 and Python 2.7, although some
-modifications are needed to `distutils` to find the compiler.
+Either use a binary installer, or if building from scratch, use 
+Python 3.5 with Visual Studio 2015 Community Edition. It can also be 
+build using Microsoft Visual C++ Compiler for Python 2.7 and Python 2.7, 
+although some modifications may be needed to `distutils` to find the 
+compiler.
 
 ## Using
 
@@ -167,27 +171,39 @@ Standard NCSA, plus sub licenses for components.
 Performance is promising, and even the mt19937 seems to be faster than NumPy's mt19937. 
 
 ```
-Speed-up relative to NumPy (Box-Muller)
+Speed-up relative to NumPy (Uniform Doubles)
 ************************************************************
-randomstate.prng-dsfmt-standard_normal                30.2%
-randomstate.prng-mlfg_1279_861-standard_normal        24.7%
-randomstate.prng-mrg32k3a-standard_normal            -17.8%
-randomstate.prng-mt19937-standard_normal              11.2%
-randomstate.prng-pcg32-standard_normal                22.0%
-randomstate.prng-pcg64-standard_normal                21.8%
-randomstate.prng-xoroshiro128plus-standard_normal     26.5%
-randomstate.prng-xorshift1024-standard_normal         20.2%
-randomstate.prng-xorshift128-standard_normal          23.5%
+randomstate.prng-dsfmt-random_sample               313.5%
+randomstate.prng-mlfg_1279_861-random_sample       459.4%
+randomstate.prng-mrg32k3a-random_sample            -57.6%
+randomstate.prng-mt19937-random_sample              72.5%
+randomstate.prng-pcg32-random_sample               232.8%
+randomstate.prng-pcg64-random_sample               330.6%
+randomstate.prng-xoroshiro128plus-random_sample    609.9%
+randomstate.prng-xorshift1024-random_sample        348.8%
+randomstate.prng-xorshift128-random_sample         489.7%
 
-Speed-up relative to NumPy (Ziggurat)
+Speed-up relative to NumPy (Normals using Box-Muller)
 ************************************************************
-randomstate.prng-dsfmt-standard_normal               494.2%
-randomstate.prng-mlfg_1279_861-standard_normal       464.2%
-randomstate.prng-mrg32k3a-standard_normal            103.8%
-randomstate.prng-mt19937-standard_normal             362.6%
-randomstate.prng-pcg32-standard_normal               539.6%
-randomstate.prng-pcg64-standard_normal               407.7%
-randomstate.prng-xoroshiro128plus-standard_normal    722.8%
-randomstate.prng-xorshift1024-standard_normal        506.1%
-randomstate.prng-xorshift128-standard_normal         686.3%
+randomstate.prng-dsfmt-standard_normal                26.8%
+randomstate.prng-mlfg_1279_861-standard_normal        30.9%
+randomstate.prng-mrg32k3a-standard_normal            -14.8%
+randomstate.prng-mt19937-standard_normal              17.7%
+randomstate.prng-pcg32-standard_normal                24.5%
+randomstate.prng-pcg64-standard_normal                26.2%
+randomstate.prng-xoroshiro128plus-standard_normal     31.4%
+randomstate.prng-xorshift1024-standard_normal         27.4%
+randomstate.prng-xorshift128-standard_normal          30.3%
+
+Speed-up relative to NumPy (Normals using Ziggurat)
+************************************************************
+randomstate.prng-dsfmt-standard_normal               491.7%
+randomstate.prng-mlfg_1279_861-standard_normal       439.6%
+randomstate.prng-mrg32k3a-standard_normal            101.2%
+randomstate.prng-mt19937-standard_normal             354.4%
+randomstate.prng-pcg32-standard_normal               531.0%
+randomstate.prng-pcg64-standard_normal               517.9%
+randomstate.prng-xoroshiro128plus-standard_normal    674.0%
+randomstate.prng-xorshift1024-standard_normal        486.7%
+randomstate.prng-xorshift128-standard_normal         617.0%
 ```
