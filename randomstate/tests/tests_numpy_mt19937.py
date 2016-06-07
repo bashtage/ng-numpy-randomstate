@@ -157,6 +157,7 @@ class TestRandint(TestCase):
             lbnd = 0 if dt is np.bool_ else np.iinfo(dt).min
             ubnd = 2 if dt is np.bool_ else np.iinfo(dt).max + 1
             tgt = ubnd - 1
+
             assert_equal(self.rfunc(tgt, tgt + 1, size=1000, dtype=dt), tgt)
             tgt = lbnd
             assert_equal(self.rfunc(tgt, tgt + 1, size=1000, dtype=dt), tgt)

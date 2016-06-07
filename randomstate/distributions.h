@@ -136,7 +136,7 @@ extern void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t 
 
 extern void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, npy_intp cnt, uint8_t *out);
 
-extern void random_bool_fill(aug_state *state, npy_bool off, npy_bool rng, npy_intp cnt, npy_bool *out);
+extern void random_bounded_bool_fill(aug_state *state, npy_bool off, npy_bool rng, npy_intp cnt, npy_bool *out);
 
 extern void random_uniform_fill(aug_state* state, npy_intp count, double *out);
 

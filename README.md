@@ -100,9 +100,12 @@ need to be smoothed.
 ## Requirements
 Building requires:
 
+  * Python (2.7, 3.4, 3.5)
   * Numpy (1.9, 1.10, 1.11)
   * Cython (0.22, 0.23, 0.24)
-  * Python (2.7, 3.4, 3.5)
+  * tempita (0.5+), if not provided by Cython
+ 
+Testing requires nose (1.3+).
 
 **Note:** it might work with other versions but only tested with these 
 versions. 
