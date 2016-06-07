@@ -113,7 +113,7 @@ cdef extern from "distributions.h":
     cdef void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, intptr_t cnt,uint32_t *out) nogil
     cdef void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, intptr_t cnt, uint16_t *out) nogil
     cdef void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, intptr_t cnt, uint8_t *out) nogil
-    cdef void random_bool_fill(aug_state *state, np.npy_bool off, np.npy_bool rng, intptr_t cnt, np.npy_bool *out) nogil
+    cdef void random_bounded_bool_fill(aug_state *state, np.npy_bool off, np.npy_bool rng, intptr_t cnt, np.npy_bool *out) nogil
     cdef void random_uniform_fill(aug_state *state, intptr_t cnt, double *out) nogil
     cdef void random_standard_exponential_fill(aug_state* state, intptr_t count, double *out) nogil
     cdef void random_gauss_fill(aug_state* state, intptr_t count, double *out) nogil

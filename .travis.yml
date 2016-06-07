@@ -2,9 +2,16 @@
 # versions.  Allows substantial flexability for choosing versions of
 # required packages and is simpler to use to test up-to-date scientific Python
 # stack
-sudo: required
+group: edge
 dist: trusty
-language: generic
+sudo: required
+language: python
+
+services:
+    - docker
+
+before_install:
+    - docker pull ubuntu:16.04
 
 matrix:
   fast_finish: true
@@ -38,6 +45,7 @@ before_install:
 install:
   - conda create -n randomstate-test ${PKGS} nose pip setuptools --quiet
   - source activate randomstate-test
+  - pip install tempita
   - python setup.py install
   - export BUILD_DIR=$PWD
   - cd $HOME

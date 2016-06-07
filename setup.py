@@ -11,6 +11,15 @@ from setuptools import setup, find_packages
 from setuptools.extension import Extension
 from setuptools.dist import Distribution
 
+try:
+    import Cython.Tempita as tempita
+except ImportError:
+    try:
+        import tempita
+    except ImportError:
+        raise ImportError('tempita required to install, '
+                          'use pip install tempita')
+
 FORCE_EMULATION = False
 USE_SSE2 = True if not '--no-sse2' in sys.argv else False
 
@@ -200,6 +209,11 @@ for config in configs:
 if 'clean' in sys.argv:
     def cythonize(e, *args, **kwargs):
         return e
+else:
+    with open('./randomstate/bounded_integers.pxi.in', 'r') as source_file:
+        template = tempita.Template(source_file.read())
+    with open('./randomstate/bounded_integers.pxi', 'w') as output_file:
+        output_file.write(template.substitute())
 
 ext_modules = cythonize(extensions)
 
