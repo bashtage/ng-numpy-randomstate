@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.set_state
+===========================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: set_state

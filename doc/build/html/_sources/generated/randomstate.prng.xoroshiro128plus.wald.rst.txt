@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.wald
+======================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: wald

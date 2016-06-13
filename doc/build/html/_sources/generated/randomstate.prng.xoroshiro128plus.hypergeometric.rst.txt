@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.hypergeometric
+================================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: hypergeometric

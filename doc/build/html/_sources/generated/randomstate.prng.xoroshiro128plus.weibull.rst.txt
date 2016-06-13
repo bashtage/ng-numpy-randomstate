@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.weibull
+=========================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: weibull
