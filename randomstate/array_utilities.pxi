@@ -16,7 +16,9 @@ ctypedef uint32_t (* random_uint_1_i_32)(aug_state* state, uint32_t a) nogil
 ctypedef int32_t (* random_int_2_i_32)(aug_state* state, int32_t a, int32_t b) nogil
 ctypedef int64_t (* random_int_2_i)(aug_state* state, int64_t a, int64_t b) nogil
 
+ctypedef void (* random_float_fill)(aug_state* state, np.npy_intp count, float *out) nogil
 ctypedef void (* random_double_fill)(aug_state* state, np.npy_intp count, double *out) nogil
+
 
 cdef np.npy_intp compute_numel(size):
     cdef np.npy_intp i, n = 1
@@ -613,6 +615,25 @@ cdef object double_fill(aug_state* state, void *func, object size, object lock):
         out_array = <np.ndarray>np.empty(size, np.float64)
         n = np.PyArray_SIZE(out_array)
         out_array_data = <double *>np.PyArray_DATA(out_array)
+        with lock, nogil:
+            f(state, n, out_array_data)
+        return out_array
+
+cdef object float_fill(aug_state* state, void *func, object size, object lock):
+    cdef random_float_fill f = <random_float_fill>func
+    cdef float out
+    cdef float *out_array_data
+    cdef np.ndarray out_array
+    cdef np.npy_intp n
+
+    if size is None:
+        with lock:
+            f(state, 1, &out)
+        return out
+    else:
+        out_array = <np.ndarray>np.empty(size, np.float32)
+        n = np.PyArray_SIZE(out_array)
+        out_array_data = <float *>np.PyArray_DATA(out_array)
         with lock, nogil:
             f(state, n, out_array_data)
         return out_array

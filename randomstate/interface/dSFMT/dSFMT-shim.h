@@ -39,6 +39,7 @@ static inline double random_double_from_buffer(aug_state *state)
 
 static inline uint32_t random_uint32(aug_state* state)
 {
+    /* TODO: This can be improved to use upper bits */
     double d = random_double_from_buffer(state);//dsfmt_genrand_close1_open2(state->rng);
     uint64_t *out = (uint64_t *)&d;
     return (uint32_t)(*out & 0xffffffff);
@@ -46,7 +47,8 @@ static inline uint32_t random_uint32(aug_state* state)
 
 static inline uint64_t random_uint64(aug_state* state)
 {
-    double d = random_double_from_buffer(state);//dsfmt_genrand_close1_open2(state->rng);
+    /* TODO: This can be improved to use upper bits */
+    double d = random_double_from_buffer(state); //dsfmt_genrand_close1_open2(state->rng);
     uint64_t out;
     uint64_t *tmp;
     tmp = (uint64_t *)&d;
