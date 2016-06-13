@@ -10,8 +10,12 @@ What's New or Different
 * ``randomstate.entropy.random_entropy`` provides access to the system
   source of randomness that is used in cryptographic applications (e.g.,
   ``/dev/urandom`` on Unix).
-* The normal generator supports a 256-step ziggurat method which is 2-6 times
-  faster than NumPy's ``standard_normal``.  This generator can be accessed using
+* The normal generator supports a 256-step Ziggurat method which is 2-6 times
+  faster than NumPy's ``standard_normal``.  This generator can be accessed
+  by passing the keyword argument ``method='zig'``.
+* ``random_sample`` accepts the optional keyword argument ``dtype`` which
+  accepts ``np.float32`` or ``np.float64`` to produce either single or
+  double prevision uniform random variables
 * For changes since the previous release, see the :ref:`change-log`
 
 .. code-block:: python
@@ -69,6 +73,14 @@ generators, 'in addition' to the standard PRNG in NumPy.  The included PRNGs are
 .. _`wiki page on Fibonacci generators`: https://en.wikipedia.org/wiki/Lagged_Fibonacci_generator
 .. _`MRG32K3A author's page`: http://simul.iro.umontreal.ca/
 
+New Features
+~~~~~~~~~~~~
+.. toctree::
+   :maxdepth: 2
+
+   Using in Parallel Applications <parallel>
+   Reading System Entropy <entropy>
+
 
 Individual Pseudo Random Number Generators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -85,8 +97,13 @@ Individual Pseudo Random Number Generators
    PCG-64 <pcg64>
    MLFG <mlfg>
    MRG32K3A <mrg32k3a>
-   Reading System Entropy <entropy>
 
+Changes
+~~~~~~~
+.. toctree::
+   :maxdepth: 2
+
+   Change Log <change-log>
 
 Indices and tables
 ~~~~~~~~~~~~~~~~~~
