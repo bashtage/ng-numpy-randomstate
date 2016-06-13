@@ -7,6 +7,7 @@ This is a library and generic interface for alternative random
 generators in Python and Numpy.
 
 Features
+--------
 
 -  Immediate drop in replacement for NumPy's RandomState
 

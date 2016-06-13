@@ -68,7 +68,9 @@ cdef extern from "distributions.h":
 
     cdef void entropy_init(aug_state* state) nogil
 
-    cdef double random_standard_uniform(aug_state* state) nogil
+    cdef float random_standard_uniform32(aug_state* state) nogil
+
+    cdef double random_standard_uniform64(aug_state* state) nogil
     cdef double random_gauss(aug_state* state) nogil
     cdef double random_gauss_zig(aug_state* state) nogil
     cdef double random_gauss_zig_julia(aug_state* state) nogil
@@ -114,7 +116,8 @@ cdef extern from "distributions.h":
     cdef void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, intptr_t cnt, uint16_t *out) nogil
     cdef void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, intptr_t cnt, uint8_t *out) nogil
     cdef void random_bounded_bool_fill(aug_state *state, np.npy_bool off, np.npy_bool rng, intptr_t cnt, np.npy_bool *out) nogil
-    cdef void random_uniform_fill(aug_state *state, intptr_t cnt, double *out) nogil
+    cdef void random_uniform_fill32(aug_state *state, intptr_t cnt, double *out) nogil
+    cdef void random_uniform_fill64(aug_state *state, intptr_t cnt, double *out) nogil
     cdef void random_standard_exponential_fill(aug_state* state, intptr_t count, double *out) nogil
     cdef void random_gauss_fill(aug_state* state, intptr_t count, double *out) nogil
     cdef void random_gauss_zig_julia_fill(aug_state* state, intptr_t count, double *out) nogil
@@ -680,9 +683,9 @@ cdef class RandomState:
                 self.get_state())
 
     # Basic distributions:
-    def random_sample(self, size=None):
+    def random_sample(self, size=None, dtype=np.float64):
         """
-        random_sample(size=None)
+        random_sample(size=None, dtype=np.float64)
 
         Return random floats in the half-open interval [0.0, 1.0).
 
@@ -698,6 +701,9 @@ cdef class RandomState:
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
+        dtype : dtype, optional
+            Desired dtype of the result, either ``np.float64`` (default)
+            or ``np.float32``.
 
         Returns
         -------
@@ -722,7 +728,12 @@ cdef class RandomState:
                [-1.23204345, -1.75224494]])
 
         """
-        return double_fill(&self.rng_state, &random_uniform_fill, size, self.lock)
+        if dtype is np.float64:
+            return double_fill(&self.rng_state, &random_uniform_fill64, size, self.lock)
+        elif dtype is np.float32:
+            return float_fill(&self.rng_state, &random_uniform_fill32, size, self.lock)
+        else:
+            raise ValueError('Unknown dtype')
 
     def tomaxint(self, size=None):
         """

@@ -2,6 +2,21 @@
 
 Change Log
 ==========
+Version 1.11.2
+--------------
+* Added keyword argument `dtype` to `random_sample` which allows for single
+  precision as well as double precision uniforms to be generated.
+
+.. ipython:: python
+
+   import numpy as np
+   import randomstate as rs
+   rs.seed(23456)
+   rs.random_sample(3, dtype=np.float64)
+
+   rs.seed(23456)
+   rs.random_sample(3, dtype=np.float32)
+
 
 Version 1.11.1
 --------------

@@ -30,13 +30,25 @@ unsigned long random_uint(aug_state* state)
 }
 
 
-double random_standard_uniform(aug_state* state)
+float random_standard_uniform32(aug_state* state)
+{
+    return (random_uint32(state) >> 9) * (1.0 / 8388608.0);
+}
+
+double random_standard_uniform64(aug_state* state)
 {
     return random_double(state);
 }
 
+void random_uniform_fill32(aug_state* state, npy_intp count, float *out)
+{
+    int i;
+    for (i=0; i < count; i++) {
+        out[i] = (random_uint32(state) >> 9) * (float)(1.0 / 8388608.0);
+    }
+}
 
-void random_uniform_fill(aug_state* state, npy_intp count, double *out)
+void random_uniform_fill64(aug_state* state, npy_intp count, double *out)
 {
     int i;
     for (i=0; i < count; i++) {

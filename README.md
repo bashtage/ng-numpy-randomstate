@@ -53,6 +53,9 @@ version of the MT19937 generator that is especially fast at generating doubles
 support an additional `method` keyword argument which can be `bm` or 
 `zig` where `bm` corresponds to the current method using the Box-Muller 
 transformation and `zig` uses the much faster (100%+) ziggurat method.
+* `random_sample` can produce either single precision (`np.float32`) or
+double precision (`np.float64`, the default) using an the optional keyword
+argument `dtype`.
 
 ### New Functions
 

@@ -2,6 +2,7 @@ import os
 import sys
 from os.path import join
 from unittest import TestCase
+from nose import SkipTest
 
 import numpy as np
 from randomstate.prng.mlfg_1279_861 import mlfg_1279_861
@@ -21,14 +22,57 @@ if (sys.version_info > (3, 0)):
 pwd = os.path.dirname(os.path.abspath(__file__))
 
 
-def uniform_from_uint(x, bits):
+def uniform32_from_uint64(x):
+    x = np.uint64(x)
+    upper = np.array(x >> np.uint64(32), dtype=np.uint32)
+    lower = np.uint64(0xffffffff)
+    lower = np.array(x & lower, dtype=np.uint32)
+    joined = np.column_stack([lower, upper]).ravel()
+    out = (joined >> np.uint32(9)) * (1.0 / 2 ** 23)
+    return out.astype(np.float32)
+
+
+def uniform32_from_uint63(x):
+    x = np.uint64(x)
+    x = np.uint32(x >> np.uint64(32))
+    out = (x >> np.uint32(9)) * (1.0 / 2 ** 23)
+    return out.astype(np.float32)
+
+
+def uniform32_from_uint53(x):
+    x = np.uint64(x)
+    x = np.uint32(x & np.uint64(0xffffffff))
+    out = (x >> np.uint32(9)) * (1.0 / 2 ** 23)
+    return out.astype(np.float32)
+
+
+def uniform32_from_uint32(x):
+    return (x >> np.uint32(9)) * (1.0 / 2 ** 23)
+
+
+def uniform32_from_uint(x, bits):
     if bits == 64:
+        return uniform32_from_uint64(x)
+    elif bits == 63:
+        return uniform32_from_uint63(x)
+    elif bits == 53:
+        return uniform32_from_uint53(x)
+    elif bits == 32:
+        return uniform32_from_uint32(x)
+    else:
+        raise NotImplementedError
+
+
+def uniform_from_uint(x, bits):
+    if bits in (64, 63, 53):
         return uniform_from_uint64(x)
     elif bits == 32:
         return uniform_from_uint32(x)
 
+
 def uniform_from_uint64(x):
     return (x >> np.uint64(11)) * (1.0 / 9007199254740992.0)
+
 
 def uniform_from_uint32(x):
     out = np.empty(len(x) // 2)
@@ -38,6 +82,7 @@ def uniform_from_uint32(x):
         out[i // 2] = (a * 67108864.0 + b) / 9007199254740992.0
     return out
 
+
 def uint64_from_uint63(x):
     out = np.empty(len(x) // 2, dtype=np.uint64)
     for i in range(0, len(x), 2):
@@ -46,11 +91,13 @@ def uint64_from_uint63(x):
         out[i // 2] = a | b
     return out
 
+
 def uniform_from_dsfmt(x):
     return x.view(np.double) - 1.0
 
+
 def gauss_from_uint(x, n, bits):
-    if bits == 64:
+    if bits in (64, 63):
         doubles = uniform_from_uint64(x)
     elif bits == 32:
         doubles = uniform_from_uint32(x)
@@ -58,15 +105,16 @@ def gauss_from_uint(x, n, bits):
         doubles = uniform_from_dsfmt(x)
     gauss = []
     loc = 0
+    x1 = x2 = 0.0
     while len(gauss) < n:
         r2 = 2
         while r2 >= 1.0 or r2 == 0.0:
-            x1 = 2.0 * doubles[loc] - 1.0;
-            x2 = 2.0 * doubles[loc + 1] - 1.0;
-            r2 = x1 * x1 + x2 * x2;
+            x1 = 2.0 * doubles[loc] - 1.0
+            x2 = 2.0 * doubles[loc + 1] - 1.0
+            r2 = x1 * x1 + x2 * x2
             loc += 2
 
-        f = np.sqrt(-2.0 * np.log(r2) / r2);
+        f = np.sqrt(-2.0 * np.log(r2) / r2)
         gauss.append(f * x2)
         gauss.append(f * x1)
 
@@ -74,6 +122,9 @@ def gauss_from_uint(x, n, bits):
 
 
 class Base(object):
+    dtype = np.uint64
+    data2 = data1 = {}
+
     @classmethod
     def setUpClass(cls):
         cls.RandomState = xorshift128.RandomState
@@ -93,11 +144,12 @@ class Base(object):
 
     def test_raw(self):
         rs = self.RandomState(*self.data1['seed'])
-        uints = rs.random_uintegers(1000, bits=self.bits)
+        bitsize = 64 if self.bits > 32 else self.bits
+        uints = rs.random_uintegers(1000, bits=bitsize)
         assert_equal(uints, self.data1['data'])
 
         rs = self.RandomState(*self.data2['seed'])
-        uints = rs.random_uintegers(1000, bits=self.bits)
+        uints = rs.random_uintegers(1000, bits=bitsize)
         assert_equal(uints, self.data2['data'])
 
     def test_double(self):
@@ -105,11 +157,13 @@ class Base(object):
         vals = uniform_from_uint(self.data1['data'], self.bits)
         uniforms = rs.random_sample(len(vals))
         assert_allclose(uniforms, vals)
+        assert_equal(uniforms.dtype, np.float64)
 
         rs = self.RandomState(*self.data2['seed'])
         vals = uniform_from_uint(self.data2['data'], self.bits)
         uniforms = rs.random_sample(len(vals))
         assert_allclose(uniforms, vals)
+        assert_equal(uniforms.dtype, np.float64)
 
     def test_gauss_inv(self):
         n = 25
@@ -123,6 +177,19 @@ class Base(object):
         assert_allclose(gauss,
                         gauss_from_uint(self.data2['data'], n, self.bits))
 
+    def test_32bit_uniform(self):
+        rs = self.RandomState(*self.data1['seed'])
+        vals = uniform32_from_uint(self.data1['data'], self.bits)
+        uniforms = rs.random_sample(len(vals), dtype=np.float32)
+        assert_allclose(uniforms, vals)
+        assert_equal(uniforms.dtype, np.float32)
+
+        rs = self.RandomState(*self.data2['seed'])
+        vals = uniform32_from_uint(self.data2['data'], self.bits)
+        uniforms = rs.random_sample(len(vals), dtype=np.float32)
+        assert_allclose(uniforms, vals)
+        assert_equal(uniforms.dtype, np.float32)
+
 
 class TestXorshift128(Base, TestCase):
     @classmethod
@@ -132,6 +199,7 @@ class TestXorshift128(Base, TestCase):
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/xorshift128-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/xorshift128-testset-2.csv'))
+        cls.uniform32_func = uniform32_from_uint64
 
 
 class TestXoroshiro128plus(Base, TestCase):
@@ -142,6 +210,7 @@ class TestXoroshiro128plus(Base, TestCase):
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/xoroshiro128plus-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/xoroshiro128plus-testset-2.csv'))
+
 
 class TestXorshift1024(Base, TestCase):
     @classmethod
@@ -162,6 +231,7 @@ class TestMT19937(Base, TestCase):
         cls.data1 = cls._read_csv(join(pwd, './data/randomkit-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/randomkit-testset-2.csv'))
 
+
 class TestPCG32(Base, TestCase):
     @classmethod
     def setUpClass(cls):
@@ -171,6 +241,7 @@ class TestPCG32(Base, TestCase):
         cls.data1 = cls._read_csv(join(pwd, './data/pcg32-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/pcg32-testset-2.csv'))
 
+
 class TestPCG64(Base, TestCase):
     @classmethod
     def setUpClass(cls):
@@ -179,7 +250,6 @@ class TestPCG64(Base, TestCase):
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/pcg64-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/pcg64-testset-2.csv'))
-
 
 
 class TestMRG32K3A(Base, TestCase):
@@ -196,7 +266,7 @@ class TestMLFG(Base, TestCase):
     @classmethod
     def setUpClass(cls):
         cls.RandomState = mlfg_1279_861.RandomState
-        cls.bits = 64
+        cls.bits = 63
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/mlfg-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/mlfg-testset-2.csv'))
@@ -204,19 +274,21 @@ class TestMLFG(Base, TestCase):
     def test_raw(self):
         rs = self.RandomState(*self.data1['seed'])
         vals = uint64_from_uint63(self.data1['data'])
-        uints = rs.random_uintegers(len(vals), bits=self.bits)
+        bitsize = 64 if self.bits > 32 else self.bits
+        uints = rs.random_uintegers(len(vals), bits=bitsize)
         assert_equal(uints, vals)
 
         rs = self.RandomState(*self.data2['seed'])
         vals = uint64_from_uint63(self.data2['data'])
-        uints = rs.random_uintegers(len(vals), bits=self.bits)
+        uints = rs.random_uintegers(len(vals), bits=bitsize)
         assert_equal(uints, vals)
+
 
 class TestDSFMT(Base, TestCase):
     @classmethod
     def setUpClass(cls):
         cls.RandomState = dsfmt.RandomState
-        cls.bits = 64
+        cls.bits = 53
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/dSFMT-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/dSFMT-testset-2.csv'))

@@ -48,7 +48,9 @@ extern int64_t random_positive_int64(aug_state* state);
 
 extern int32_t random_positive_int32(aug_state* state);
 
-extern double random_standard_uniform(aug_state* state);
+extern float random_standard_uniform32(aug_state* state);
+
+extern double random_standard_uniform64(aug_state* state);
 
 extern double random_standard_exponential(aug_state* state);
 
@@ -138,7 +140,9 @@ extern void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng
 
 extern void random_bounded_bool_fill(aug_state *state, npy_bool off, npy_bool rng, npy_intp cnt, npy_bool *out);
 
-extern void random_uniform_fill(aug_state* state, npy_intp count, double *out);
+extern void random_uniform_fill32(aug_state* state, npy_intp count, float *out);
+
+extern void random_uniform_fill64(aug_state* state, npy_intp count, double *out);
 
 extern void random_standard_exponential_fill(aug_state* state, npy_intp count, double *out);
 
