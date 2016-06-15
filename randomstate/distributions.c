@@ -53,6 +53,36 @@ static inline double gauss(aug_state* state)
     }
 }
 
+static inline float gauss_float(aug_state* state)
+{
+    if (state->has_gauss_float)
+    {
+        const float temp = state->gauss_float;
+        state->has_gauss_float = false;
+        state->gauss_float = 0.0f;
+        return temp;
+    }
+    else
+    {
+        float f, x1, x2, r2;
+
+        do {
+            x1 = 2.0f * random_float(state) - 1.0f;
+            x2 = 2.0f * random_float(state) - 1.0f;
+            r2 = x1*x1 + x2*x2;
+        }
+        while (r2 >= 1.0 || r2 == 0.0);
+
+        /* Box-Muller transform */
+        f = sqrtf(-2.0f * logf(r2)/r2);
+        /* Keep for next call */
+        state->gauss_float = f*x1;
+        state->has_gauss_float = true;
+        return f*x2;
+    }
+}
+
+
 /*
 *  Julia implementation of Ziggurat algo
 *  MIT license
@@ -91,6 +121,116 @@ static inline double gauss_zig_julia(aug_state* state)
         }
     }
 }
+
+
+static inline double standard_gamma(aug_state* state, double shape)
+{
+    double b, c;
+    double U, V, X, Y;
+
+    if (shape == 1.0)
+    {
+        return standard_exponential(state);
+    }
+    else if (shape < 1.0)
+    {
+        for (;;)
+        {
+            U = random_double(state);
+            V = standard_exponential(state);
+            if (U <= 1.0 - shape)
+            {
+                X = pow(U, 1./shape);
+                if (X <= V)
+                {
+                    return X;
+                }
+            }
+            else
+            {
+                Y = -log((1-U)/shape);
+                X = pow(1.0 - shape + shape*Y, 1./shape);
+                if (X <= (V + Y))
+                {
+                    return X;
+                }
+            }
+        }
+    }
+    else
+    {
+        b = shape - 1./3.;
+        c = 1./sqrt(9*b);
+        for (;;)
+        {
+            do
+            {
+                X = gauss(state);
+                V = 1.0 + c*X;
+            } while (V <= 0.0);
+
+            V = V*V*V;
+            U = random_double(state);
+            if (U < 1.0 - 0.0331*(X*X)*(X*X)) return (b*V);
+            if (log(U) < 0.5*X*X + b*(1. - V + log(V))) return (b*V);
+        }
+    }
+}
+
+static inline float standard_gamma_float(aug_state* state, float shape)
+{
+    float b, c;
+    float U, V, X, Y;
+
+    if (shape == 1.0f)
+    {
+        return standard_exponential_float(state);
+    }
+    else if (shape < 1.0f)
+    {
+        for (;;)
+        {
+            U = random_float(state);
+            V = standard_exponential_float(state);
+            if (U <= 1.0f - shape)
+            {
+                X = powf(U, 1.0f/shape);
+                if (X <= V)
+                {
+                    return X;
+                }
+            }
+            else
+            {
+                Y = -logf((1.0f-U)/shape);
+                X = powf(1.0f - shape + shape*Y, 1.0f/shape);
+                if (X <= (V + Y))
+                {
+                    return X;
+                }
+            }
+        }
+    }
+    else
+    {
+        b = shape - 1.0f/3.0f;
+        c = 1.0f / sqrtf(9.0f*b);
+        for (;;)
+        {
+            do
+            {
+                X = gauss_float(state);
+                V = 1.0f + c*X;
+            } while (V <= 0.0f);
+
+            V = V*V*V;
+            U = random_float(state);
+            if (U < 1.0f - 0.0331f * (X*X)*(X*X)) return (b*V);
+            if (logf(U) < 0.5f * X*X + b*(1.0f - V + logf(V))) return (b*V);
+        }
+    }
+}
+
 
 /*
  *
@@ -186,59 +326,17 @@ void random_gauss_fill(aug_state* state, npy_intp count, double *out) {
     }
 }
 
+void random_gauss_fill_float(aug_state* state, npy_intp count, float *out) {
+
+    npy_intp i;
+    for (i = 0; i < count; i++) {
+        out[i] = gauss_float(state);
+    }
+}
 
 double random_standard_gamma(aug_state* state, double shape)
 {
-    double b, c;
-    double U, V, X, Y;
-
-    if (shape == 1.0)
-    {
-        return random_standard_exponential(state);
-    }
-    else if (shape < 1.0)
-    {
-        for (;;)
-        {
-            U = random_double(state);
-            V = random_standard_exponential(state);
-            if (U <= 1.0 - shape)
-            {
-                X = pow(U, 1./shape);
-                if (X <= V)
-                {
-                    return X;
-                }
-            }
-            else
-            {
-                Y = -log((1-U)/shape);
-                X = pow(1.0 - shape + shape*Y, 1./shape);
-                if (X <= (V + Y))
-                {
-                    return X;
-                }
-            }
-        }
-    }
-    else
-    {
-        b = shape - 1./3.;
-        c = 1./sqrt(9*b);
-        for (;;)
-        {
-            do
-            {
-                X = random_gauss(state);
-                V = 1.0 + c*X;
-            } while (V <= 0.0);
-
-            V = V*V*V;
-            U = random_double(state);
-            if (U < 1.0 - 0.0331*(X*X)*(X*X)) return (b*V);
-            if (log(U) < 0.5*X*X + b*(1. - V + log(V))) return (b*V);
-        }
-    }
+    return standard_gamma(state, shape);
 }
 
 
@@ -311,7 +409,12 @@ double random_uniform(aug_state *state, double lower, double range)
 
 double random_gamma(aug_state *state, double shape, double scale)
 {
-    return scale * random_standard_gamma(state, shape);
+    return scale * standard_gamma(state, shape);
+}
+
+float random_gamma_float(aug_state *state, float shape, float scale)
+{
+    return scale * standard_gamma_float(state, shape);
 }
 
 double random_beta(aug_state *state, double a, double b)

@@ -13,7 +13,8 @@ typedef struct s_aug_state {
     xorshift1024_state *rng;
     binomial_t *binomial;
 
-    int has_gauss, shift_zig_random_int, has_uint32;
+    int has_gauss, has_gauss_float, shift_zig_random_int, has_uint32;
+    float gauss_float;
     double gauss;
     uint32_t uinteger;
     uint64_t zig_random_int;
