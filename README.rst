@@ -32,14 +32,16 @@ Features
     w = rnd.standard_normal(10000, method='zig')
 
 -  Preliminary support for 32-bit floating randoms for core generators.
-   Currently only uniforms (``random_sample``) and exponentials
-   (``standard_exponential``) have been implemented. Ultimately support
-   should be avialable for:
+   Currently only uniforms (``random_sample``), exponentials
+   (``standard_exponential``) and normals (``standard_normal`` but only
+   using Box-Muller, so ``method='bm'`` is required) have been
+   implemented. Ultimately support should be avialable for:
 
    -  Uniforms
    -  Exponentials
    -  Standard Gammas (via ``standard_gamma``)
-   -  Normals (via ``standard_normal``)
+   -  Normals (currently only implemented using Box-Muller
+      transformation)
 
 **WARNING**: The 32-bit generators are **experimental** and subjust to
 change.

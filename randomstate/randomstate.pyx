@@ -70,6 +70,7 @@ cdef extern from "distributions.h":
     cdef void entropy_init(aug_state* state) nogil
 
     cdef float random_standard_uniform_float(aug_state* state) nogil
+    cdef float random_gamma_float(aug_state *state, double shape, float scale) nogil
 
     cdef double random_standard_uniform_double(aug_state* state) nogil
     cdef double random_gauss(aug_state* state) nogil
@@ -120,6 +121,7 @@ cdef extern from "distributions.h":
 
     cdef void random_uniform_fill_float(aug_state *state, intptr_t cnt, double *out) nogil
     cdef void random_standard_exponential_fill_float(aug_state* state, intptr_t count, float *out) nogil
+    cdef void random_gauss_fill_float(aug_state* state, intptr_t count, float *out) nogil
 
     cdef void random_uniform_fill_double(aug_state *state, intptr_t cnt, double *out) nogil
     cdef void random_standard_exponential_fill_double(aug_state* state, intptr_t count, double *out) nogil
@@ -360,7 +362,9 @@ cdef class RandomState:
 
     def _reset_state_variables(self):
         self.rng_state.gauss = 0.0
+        self.rng_state.gauss_float = 0.0
         self.rng_state.has_gauss = 0
+        self.rng_state.has_gauss_float = 0
         self.rng_state.has_uint32= 0
         self.rng_state.uinteger = 0
         self.rng_state.binomial.has_binomial = 0
@@ -397,6 +401,8 @@ cdef class RandomState:
 
             self.rng_state.has_gauss = 0
             self.rng_state.gauss = 0.0
+            self.rng_state.has_gauss_float = 0
+            self.rng_state.gauss_float = 0.0
             return None
 
     IF RS_RNG_JUMPABLE:
@@ -408,6 +414,8 @@ cdef class RandomState:
                 jump_state(&self.rng_state)
             self.rng_state.has_gauss = 0
             self.rng_state.gauss = 0.0
+            self.rng_state.has_gauss_float = 0
+            self.rng_state.gauss_float = 0.0
             return None
 
     IF RS_RNG_MOD_NAME == 'mt19937':
@@ -415,7 +423,7 @@ cdef class RandomState:
             """
             get_state()
 
-            Return a tuple representing the internal state of the generator.
+            Return a tuple or dict representing the internal state of the generator.
 
             For more details, see ``set_state``.
 
@@ -426,13 +434,16 @@ cdef class RandomState:
 
             Returns
             -------
-            out : tuple(str, tuple, tuple, tuple)
-                The returned tuple has the following items:
+            out : dict
+                The returned dictionary has the following items:
 
-                1. the string containing the PRNG type.
-                2. a tuple containing the PRNG-specific state
-                3. a tuple containing two values :``has_gauss`` and ``cached_gaussian``
-                4. a tuple containing two values :``has_uint32`` and ``cached_uint32``
+                * `name`: the string containing the PRNG type.
+                * `state` tuple containing the PRNG-specific state
+                * `gauss`: a dict with two items :``has_gauss`` and ``cached_gaussian``
+                * `gauss_float`: a dict with two items :``has_gauss`` and ``cached_gaussian``
+                * `uint32`: a dict with two items :``has_uint32`` and ``uint32``
+                * `seed`: the seed used to initialize the RandomState object
+                * `version`: The version of the RandomState object (not currently used)
 
             See Also
             --------
@@ -455,8 +466,12 @@ cdef class RandomState:
 
             state = {'name': rng_name,
                      'state': _get_state(self.rng_state),
-                     'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
-                     'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger},
+                     'gauss': {'has_gauss': self.rng_state.has_gauss,
+                               'gauss': self.rng_state.gauss},
+                     'gauss_float': {'has_gauss': self.rng_state.has_gauss_float,
+                                     'gauss': self.rng_state.gauss_float},
+                     'uint32': {'has_uint32': self.rng_state.has_uint32,
+                                'uint32': self.rng_state.uinteger},
                      'seed': self.__seed,
                      'version': self.__version}
             if self.__stream is not None:
@@ -467,19 +482,22 @@ cdef class RandomState:
             """
             get_state()
 
-            Return a tuple representing the internal state of the generator.
+            Return a dict containing the internal state of the generator.
 
             For more details, see ``set_state``.
 
             Returns
             -------
-            out : tuple(str, tuple, tuple, tuple)
-                The returned tuple has the following items:
+            out : dict
+                The returned dictionary has the following items:
 
-                1. the string containing the PRNG type.
-                2. a tuple containing the PRNG-specific state
-                3. a tuple containing two values :``has_gauss`` and ``cached_gaussian``
-                4. a tuple containing two values :``has_uint32`` and ``cached_uint32``
+                * `name`: the string containing the PRNG type.
+                * `state` tuple containing the PRNG-specific state
+                * `gauss`: a dict with two items :``has_gauss`` and ``cached_gaussian``
+                * `gauss_float`: a dict with two items :``has_gauss`` and ``cached_gaussian``
+                * `uint32`: a dict with two items :``has_uint32`` and ``uint32``
+                * `seed`: the seed used to initialize the RandomState object
+                * `version`: The version of the RandomState object (not currently used)
 
             See Also
             --------
@@ -497,8 +515,12 @@ cdef class RandomState:
             rng_name = _ensure_string(RS_RNG_NAME)
             state = {'name': rng_name,
                      'state': _get_state(self.rng_state),
-                     'gauss': {'has_gauss': self.rng_state.has_gauss, 'gauss': self.rng_state.gauss},
-                     'uint32': {'has_uint32': self.rng_state.has_uint32, 'uint32': self.rng_state.uinteger},
+                     'gauss': {'has_gauss': self.rng_state.has_gauss,
+                               'gauss': self.rng_state.gauss},
+                     'gauss_float': {'has_gauss': self.rng_state.has_gauss_float,
+                                     'gauss': self.rng_state.gauss_float},
+                     'uint32': {'has_uint32': self.rng_state.has_uint32,
+                                'uint32': self.rng_state.uinteger},
                      'seed': self.__seed,
                      'version': self.__version}
             if self.__stream is not None:
@@ -516,13 +538,16 @@ cdef class RandomState:
 
         Parameters
         ----------
-        state : tuple(str, tuple, tuple, tuple)
-            The returned tuple has the following items:
+        state : dict or tuple
+            The state dictionary should have the following keys
 
-            1. the string containing the PRNG type.
-            2. a tuple containing the PRNG-specific state
-            3. a tuple containing two values :``has_gauss`` and ``cached_gaussian``
-            4. a tuple containing two values :``has_uint32`` and ``cached_uint32``
+            * `name`: the string containing the PRNG type.
+            * `state` tuple containing the PRNG-specific state
+            * `gauss`: a dict with two items :``has_gauss`` and ``cached_gaussian``
+            * `gauss_float`: a dict with two items :``has_gauss`` and ``cached_gaussian``
+            * `uint32`: a dict with two items :``has_uint32`` and ``uint32``
+            * `seed`: the seed used to initialize the RandomState object
+            * `version`: The version of the RandomState object (not currently used)
 
         Returns
         -------
@@ -554,6 +579,8 @@ cdef class RandomState:
                 else:
                     self.rng_state.has_gauss = 0
                     self.rng_state.gauss = 0.0
+                self.rng_state.has_gauss_float = 0
+                self.rng_state.gauss_float = 0.0
                 self.rng_state.has_uint32 = 0
                 self.rng_state.uinteger = 0
                 return None
@@ -567,6 +594,8 @@ cdef class RandomState:
         _set_state(&self.rng_state, state['state'])
         self.rng_state.has_gauss = state['gauss']['has_gauss']
         self.rng_state.gauss = state['gauss']['gauss']
+        self.rng_state.has_gauss_float = state['gauss_float']['has_gauss']
+        self.rng_state.gauss_float = state['gauss_float']['gauss']
         self.rng_state.has_uint32 = state['uint32']['has_uint32']
         self.rng_state.uinteger = state['uint32']['uint32']
         self.__seed = state['seed']
@@ -1418,9 +1447,9 @@ cdef class RandomState:
 
 
     # Complicated, continuous distributions:
-    def standard_normal(self, size=None, method=__normal_method):
+    def standard_normal(self, size=None, dtype=np.float64, method=__normal_method):
         """
-        standard_normal(size=None, method='bm')
+        standard_normal(size=None, dtype=np.float64, method='bm')
 
         Draw samples from a standard Normal distribution (mean=0, stdev=1).
 
@@ -1430,6 +1459,9 @@ cdef class RandomState:
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
+        dtype : dtype, optional
+            Desired dtype of the result, either ``np.float64`` (default)
+            or ``np.float32``.
         method : str, optional
             Either 'bm' or 'zig'. 'bm' uses the default Box-Muller transformations
             method.  'zig' uses the much faster Ziggurat method of Marsaglia and Tsang.
@@ -1451,13 +1483,24 @@ cdef class RandomState:
         >>> s.shape
         (3, 4, 2)
 
+        Notes
+        -----
+        float32 normals are only available using the Box-Muller transformation
+
         """
-        if method == u'bm':
-            return double_fill(&self.rng_state, &random_gauss_fill,
-                               size, self.lock)
+        if dtype == np.float64:
+            if method == u'bm':
+                return double_fill(&self.rng_state, &random_gauss_fill,
+                                   size, self.lock)
+            else:
+                return double_fill(&self.rng_state, &random_gauss_zig_julia_fill,
+                                   size, self.lock)
+        elif dtype == np.float32 and method == u'bm':
+                return float_fill(&self.rng_state, &random_gauss_fill_float,
+                                   size, self.lock)
         else:
-            return double_fill(&self.rng_state, &random_gauss_zig_julia_fill,
-                               size, self.lock)
+            raise ValueError('Unknown dtype or invalid dtype/method combination')
+
 
     def normal(self, loc=0.0, scale=1.0, size=None, method=__normal_method):
         """

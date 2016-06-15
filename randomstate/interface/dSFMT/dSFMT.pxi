@@ -28,7 +28,8 @@ cdef extern from "distributions.h":
         dsfmt_t *rng
         binomial_t *binomial
 
-        int has_gauss, shift_zig_random_int, has_uint32
+        int has_gauss, shift_zig_random_int, has_uint32, has_gauss_float
+        float gauss_float
         double gauss
         uint64_t zig_random_int
         uint32_t uinteger
