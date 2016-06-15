@@ -19,7 +19,7 @@ from randomstate.prng.xorshift1024 import xorshift1024
 from randomstate.prng.xorshift128 import xorshift128
 from randomstate.prng.xoroshiro128plus import xoroshiro128plus
 from randomstate.prng.dsfmt import dsfmt
-from numpy.testing import assert_almost_equal, assert_equal, assert_raises, assert_
+from numpy.testing import assert_almost_equal, assert_equal, assert_raises, assert_, assert_array_equal
 
 from nose import SkipTest
 
@@ -84,6 +84,19 @@ def comp_state(state1, state2):
     return identical
 
 
+def warmup(rs, n=None):
+    if n is None:
+        n = 11 + np.random.randint(0, 20)
+    rs.standard_normal(n, method='bm')
+    rs.standard_normal(n, method='zig')
+    rs.standard_normal(n, method='bm', dtype=np.float32)
+    rs.randint(0, 2 ** 24, n, dtype=np.uint64)
+    rs.randint(0, 2 ** 48, n, dtype=np.uint64)
+    rs.standard_gamma(11, n)
+    rs.random_sample(n, dtype=np.float64)
+    rs.random_sample(n, dtype=np.float32)
+
+
 class RNG(object):
     @classmethod
     def _extra_setup(cls):
@@ -121,7 +134,7 @@ class RNG(object):
 
     def test_random_raw(self):
         assert_(len(self.rs.random_raw(10)) == 10)
-        assert_(self.rs.random_raw((10,10)).shape == (10,10))
+        assert_(self.rs.random_raw((10, 10)).shape == (10, 10))
 
     def test_uniform(self):
         r = self.rs.uniform(-1.0, 0.0, size=10)
@@ -202,17 +215,17 @@ class RNG(object):
         rs2 = self.mod.RandomState()
         rs2.set_state(state)
         n2 = rs2.standard_normal(size=10)
-        assert_((n1 == n2).all())
+        assert_array_equal(n1, n2)
 
     def test_reset_state_uint32(self):
         rs = self.mod.RandomState(*self.seed)
-        rs.randint(0, 2 ** 24, dtype=np.uint32)
+        rs.randint(0, 2 ** 24, 120, dtype=np.uint32)
         state = rs.get_state()
-        n1 = rs.randint(0, 2**24, 10, dtype=np.uint32)
+        n1 = rs.randint(0, 2 ** 24, 10, dtype=np.uint32)
         rs2 = self.mod.RandomState()
         rs2.set_state(state)
-        n2 = rs.randint(0, 2**24, 10, dtype=np.uint32)
-        assert_((n1 == n2).all())
+        n2 = rs2.randint(0, 2 ** 24, 10, dtype=np.uint32)
+        assert_array_equal(n1, n2)
 
     def test_shuffle(self):
         original = np.arange(200, 0, -1)
@@ -487,10 +500,10 @@ class RNG(object):
     def test_seed_array_error(self):
         if self.seed_vector_bits == 32:
             dtype = np.uint32
-            out_of_bounds = 2**32
+            out_of_bounds = 2 ** 32
         else:
             dtype = np.uint64
-            out_of_bounds = 2**64
+            out_of_bounds = 2 ** 64
 
         seed = -1
         assert_raises(ValueError, self.rs.seed, seed)
@@ -503,6 +516,32 @@ class RNG(object):
 
         seed = np.array([1, 2, 3, out_of_bounds])
         assert_raises(ValueError, self.rs.seed, seed)
+
+    def test_uniform_float(self):
+        rs = self.mod.RandomState(12345)
+        warmup(rs)
+        state = rs.get_state()
+        r1 = rs.random_sample(11, dtype=np.float32)
+        rs2 = self.mod.RandomState()
+        warmup(rs2)
+        rs2.set_state(state)
+        r2 = rs2.random_sample(11, dtype=np.float32)
+        assert_array_equal(r1, r2)
+        assert_equal(r1.dtype, np.float32)
+        assert_(comp_state(rs.get_state(), rs2.get_state()))
+
+    def test_normal_floats(self):
+        rs = self.mod.RandomState()
+        warmup(rs)
+        state = rs.get_state()
+        r1 = rs.standard_normal(11, method='bm', dtype=np.float32)
+        rs2 = self.mod.RandomState()
+        warmup(rs2)
+        rs2.set_state(state)
+        r2 = rs2.standard_normal(11, method='bm', dtype=np.float32)
+        assert_array_equal(r1, r2)
+        assert_equal(r1.dtype, np.float32)
+        assert_(comp_state(rs.get_state(), rs2.get_state()))
 
 
 class TestMT19937(RNG):
@@ -642,9 +681,3 @@ class TestEntropy(unittest.TestCase):
         time.sleep(0.1)
         e2 = entropy.random_entropy(source='fallback')
         assert_((e1 != e2))
-
-
-if __name__ == '__main__':
-    import nose
-
-    nose.run(argv=[__file__, '-vv'])
