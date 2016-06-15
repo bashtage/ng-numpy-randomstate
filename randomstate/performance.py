@@ -3,11 +3,13 @@ import struct
 import timeit
 
 import pandas as pd
+import numpy as np
 from numpy.random import RandomState
 
 rs = RandomState()
 
 SETUP = '''
+import numpy as np
 import {mod}.{rng}
 rs = {mod}.{rng}.RandomState()
 rs.random_sample()
@@ -71,17 +73,23 @@ def timer_uniform():
 
 
 def timer_32bit():
-    command = 'rs.{dist}(1000000, bits=32)'
-    command_numpy = 'rs.tomaxint({scale} * 1000000)'.format(scale=scale_32)
-    dist = 'random_uintegers'
-    run_timer(dist, command, command_numpy, SETUP, '32-bit unsigned integers')
+    info = np.iinfo(np.uint32)
+    min, max = info.min, info.max
+    dist = 'randint'
+    command = 'rs.{dist}({min}, {max}+1, 1000000, dtype=np.uint64)'
+    command = command.format(dist='{dist}', min=min, max=max)
+    command_numpy = command
+    run_timer(dist, command, None, SETUP, '32-bit unsigned integers')
 
 
 def timer_64bit():
-    dist = 'random_uintegers'
-    command = 'rs.{dist}(1000000, bits=64)'
-    command_numpy = 'rs.tomaxint({scale} * 1000000)'.format(scale=scale_64)
-    run_timer(dist, command, command_numpy, SETUP, '64-bit unsigned integers')
+    info = np.iinfo(np.uint64)
+    min, max = info.min, info.max
+    dist = 'randint'
+    command = 'rs.{dist}({min}, {max}+1, 1000000, dtype=np.uint64)'
+    command = command.format(dist='{dist}', min=min, max=max)
+    command_numpy = command
+    run_timer(dist, command, None, SETUP, '64-bit unsigned integers')
 
 
 def timer_normal():

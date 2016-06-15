@@ -31,7 +31,6 @@ Simple random data
    sample
    choice
    bytes
-   random_uintegers
    random_raw
 
 Permutations

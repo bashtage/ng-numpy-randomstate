@@ -14,7 +14,7 @@ from randomstate.prng.xorshift1024 import xorshift1024
 from randomstate.prng.xorshift128 import xorshift128
 from randomstate.prng.xoroshiro128plus import xoroshiro128plus
 from randomstate.prng.dsfmt import dsfmt
-from numpy.testing import assert_equal, assert_allclose
+from numpy.testing import assert_equal, assert_allclose, assert_array_equal
 
 if (sys.version_info > (3, 0)):
     long = int
@@ -144,26 +144,12 @@ class Base(object):
 
     def test_raw(self):
         rs = self.RandomState(*self.data1['seed'])
-        bitsize = 64 if self.bits > 32 else self.bits
-        uints = rs.random_uintegers(1000, bits=bitsize)
+        uints = rs.random_raw(1000)
         assert_equal(uints, self.data1['data'])
 
         rs = self.RandomState(*self.data2['seed'])
-        uints = rs.random_uintegers(1000, bits=bitsize)
+        uints = rs.random_raw(1000)
         assert_equal(uints, self.data2['data'])
-
-    def test_double(self):
-        rs = self.RandomState(*self.data1['seed'])
-        vals = uniform_from_uint(self.data1['data'], self.bits)
-        uniforms = rs.random_sample(len(vals))
-        assert_allclose(uniforms, vals)
-        assert_equal(uniforms.dtype, np.float64)
-
-        rs = self.RandomState(*self.data2['seed'])
-        vals = uniform_from_uint(self.data2['data'], self.bits)
-        uniforms = rs.random_sample(len(vals))
-        assert_allclose(uniforms, vals)
-        assert_equal(uniforms.dtype, np.float64)
 
     def test_gauss_inv(self):
         n = 25
@@ -177,7 +163,20 @@ class Base(object):
         assert_allclose(gauss,
                         gauss_from_uint(self.data2['data'], n, self.bits))
 
-    def test_32bit_uniform(self):
+    def test_uniform_double(self):
+        rs = self.RandomState(*self.data1['seed'])
+        vals = uniform_from_uint(self.data1['data'], self.bits)
+        uniforms = rs.random_sample(len(vals))
+        assert_allclose(uniforms, vals)
+        assert_equal(uniforms.dtype, np.float64)
+
+        rs = self.RandomState(*self.data2['seed'])
+        vals = uniform_from_uint(self.data2['data'], self.bits)
+        uniforms = rs.random_sample(len(vals))
+        assert_allclose(uniforms, vals)
+        assert_equal(uniforms.dtype, np.float64)
+
+    def test_uniform_float(self):
         rs = self.RandomState(*self.data1['seed'])
         vals = uniform32_from_uint(self.data1['data'], self.bits)
         uniforms = rs.random_sample(len(vals), dtype=np.float32)
@@ -273,15 +272,14 @@ class TestMLFG(Base, TestCase):
 
     def test_raw(self):
         rs = self.RandomState(*self.data1['seed'])
-        vals = uint64_from_uint63(self.data1['data'])
-        bitsize = 64 if self.bits > 32 else self.bits
-        uints = rs.random_uintegers(len(vals), bits=bitsize)
-        assert_equal(uints, vals)
+        mod_data = self.data1['data'] >> np.uint64(1)
+        uints = rs.random_raw(1000)
+        assert_equal(uints, mod_data)
 
         rs = self.RandomState(*self.data2['seed'])
-        vals = uint64_from_uint63(self.data2['data'])
-        uints = rs.random_uintegers(len(vals), bits=bitsize)
-        assert_equal(uints, vals)
+        mod_data = self.data2['data'] >> np.uint64(1)
+        uints = rs.random_raw(1000)
+        assert_equal(uints, mod_data)
 
 
 class TestDSFMT(Base, TestCase):
@@ -293,19 +291,11 @@ class TestDSFMT(Base, TestCase):
         cls.data1 = cls._read_csv(join(pwd, './data/dSFMT-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/dSFMT-testset-2.csv'))
 
-    def test_raw(self):
+    def test_uniform_double(self):
         rs = self.RandomState(*self.data1['seed'])
-        expected = np.array(self.data1['data'] & 0xffffffff, np.uint32)
-        assert_equal(expected, rs.random_uintegers(1000, bits=32))
-
-        rs = self.RandomState(*self.data2['seed'])
-        expected = np.array(self.data2['data'] & 0xffffffff, np.uint32)
-        assert_equal(expected, rs.random_uintegers(1000, bits=32))
-
-    def test_double(self):
-        rs = self.RandomState(*self.data1['seed'])
-        assert_equal(uniform_from_dsfmt(self.data1['data']),
-                     rs.random_sample(1000))
+        aa = uniform_from_dsfmt(self.data1['data'])
+        assert_array_equal(uniform_from_dsfmt(self.data1['data']),
+                           rs.random_sample(1000))
 
         rs = self.RandomState(*self.data2['seed'])
         assert_equal(uniform_from_dsfmt(self.data2['data']),

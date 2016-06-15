@@ -88,7 +88,6 @@ New Functions
 
 -  ``random_entropy`` - Read from the system entropy provider, which is
    commonly used in cryptographic applications
--  ``random_uintegers`` - unsigned integers ``[0, 2**64-1]``
 -  ``random_raw`` - Direct access to the values produced by the
    underlying PRNG. The range of the values returned depends on the
    specifics of the PRNG implementation.

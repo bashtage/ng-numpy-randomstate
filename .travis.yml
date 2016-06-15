@@ -53,4 +53,4 @@ install:
 script:
   - nosetests randomstate
   - cd $BUILD_DIR/randomstate
-  - if [ ${PYTHON} = "2.7" ]; then python performance.py; fi
+  - if [ ${PYTHON} = "3.5" ]; then python performance.py; fi
