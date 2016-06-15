@@ -15,6 +15,7 @@ cimport cython
 from libc cimport string
 from libc.stdint cimport (uint8_t, uint16_t, uint32_t, uint64_t,
                           int8_t, int16_t, int32_t, int64_t, intptr_t)
+from libc.stdlib cimport malloc, free
 
 from cpython cimport Py_INCREF
 
@@ -68,9 +69,9 @@ cdef extern from "distributions.h":
 
     cdef void entropy_init(aug_state* state) nogil
 
-    cdef float random_standard_uniform32(aug_state* state) nogil
+    cdef float random_standard_uniform_float(aug_state* state) nogil
 
-    cdef double random_standard_uniform64(aug_state* state) nogil
+    cdef double random_standard_uniform_double(aug_state* state) nogil
     cdef double random_gauss(aug_state* state) nogil
     cdef double random_gauss_zig(aug_state* state) nogil
     cdef double random_gauss_zig_julia(aug_state* state) nogil
@@ -116,13 +117,17 @@ cdef extern from "distributions.h":
     cdef void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, intptr_t cnt, uint16_t *out) nogil
     cdef void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, intptr_t cnt, uint8_t *out) nogil
     cdef void random_bounded_bool_fill(aug_state *state, np.npy_bool off, np.npy_bool rng, intptr_t cnt, np.npy_bool *out) nogil
-    cdef void random_uniform_fill32(aug_state *state, intptr_t cnt, double *out) nogil
-    cdef void random_uniform_fill64(aug_state *state, intptr_t cnt, double *out) nogil
-    cdef void random_standard_exponential_fill(aug_state* state, intptr_t count, double *out) nogil
+
+    cdef void random_uniform_fill_float(aug_state *state, intptr_t cnt, double *out) nogil
+    cdef void random_standard_exponential_fill_float(aug_state* state, intptr_t count, float *out) nogil
+
+    cdef void random_uniform_fill_double(aug_state *state, intptr_t cnt, double *out) nogil
+    cdef void random_standard_exponential_fill_double(aug_state* state, intptr_t count, double *out) nogil
     cdef void random_gauss_fill(aug_state* state, intptr_t count, double *out) nogil
     cdef void random_gauss_zig_julia_fill(aug_state* state, intptr_t count, double *out) nogil
 
 include "array_utilities.pxi"
+include "array_fillers.pxi"
 include "bounded_integers.pxi"
 include "aligned_malloc.pxi"
 
@@ -729,9 +734,9 @@ cdef class RandomState:
 
         """
         if dtype is np.float64:
-            return double_fill(&self.rng_state, &random_uniform_fill64, size, self.lock)
+            return double_fill(&self.rng_state, &random_uniform_fill_double, size, self.lock)
         elif dtype is np.float32:
-            return float_fill(&self.rng_state, &random_uniform_fill32, size, self.lock)
+            return float_fill(&self.rng_state, &random_uniform_fill_float, size, self.lock)
         else:
             raise ValueError('Unknown dtype')
 
@@ -1652,9 +1657,9 @@ cdef class RandomState:
                     0.0, '', CONS_NONE,
                     0.0, '', CONS_NONE)
 
-    def standard_exponential(self, size=None):
+    def standard_exponential(self, size=None, dtype=np.float64):
         """
-        standard_exponential(size=None)
+        standard_exponential(size=None, dtype=np.float64)
 
         Draw samples from the standard exponential distribution.
 
@@ -1667,6 +1672,9 @@ cdef class RandomState:
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
+        dtype : dtype, optional
+            Desired dtype of the result, either ``np.float64`` (default)
+            or ``np.float32``.
 
         Returns
         -------
@@ -1680,9 +1688,16 @@ cdef class RandomState:
         >>> n = np.random.standard_exponential((3, 8000))
 
         """
-        return double_fill(&self.rng_state,
-                           &random_standard_exponential_fill,
-                           size, self.lock)
+        if dtype == np.float64:
+            return double_fill(&self.rng_state,
+                               &random_standard_exponential_fill_double,
+                               size, self.lock)
+        elif dtype == np.float32:
+            return float_fill(&self.rng_state,
+                              &random_standard_exponential_fill_float,
+                              size, self.lock)
+        else:
+            raise ValueError()
 
     def standard_gamma(self, shape, size=None):
         """

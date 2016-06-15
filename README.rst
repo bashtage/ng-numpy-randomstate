@@ -31,6 +31,22 @@ Features
     import randomstate as rnd
     w = rnd.standard_normal(10000, method='zig')
 
+-  Preliminary support for 32-bit floating randoms for core generators.
+   Currently only uniforms (``random_sample``) and exponentials
+   (``standard_exponential``) have been implemented. Ultimately support
+   should be avialable for:
+
+   -  Uniforms
+   -  Exponentials
+   -  Standard Gammas (via ``standard_gamma``)
+   -  Normals (via ``standard_normal``)
+
+**WARNING**: The 32-bit generators are **experimental** and subjust to
+change.
+
+**Note**: There are no plans to extend the alternative precision
+generation to all random number types.
+
 Included Pseudo Random Number Generators
 ----------------------------------------
 
@@ -61,6 +77,9 @@ New Features
    argument which can be ``bm`` or ``zig`` where ``bm`` corresponds to
    the current method using the Box-Muller transformation and ``zig``
    uses the much faster (100%+) ziggurat method.
+-  ``random_sample`` can produce either single precision
+   (``np.float32``) or double precision (``np.float64``, the default)
+   using an the optional keyword argument ``dtype``.
 
 New Functions
 ~~~~~~~~~~~~~

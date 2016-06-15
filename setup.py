@@ -1,3 +1,4 @@
+import glob
 import os
 import shutil
 import sys
@@ -210,10 +211,13 @@ if 'clean' in sys.argv:
     def cythonize(e, *args, **kwargs):
         return e
 else:
-    with open('./randomstate/bounded_integers.pxi.in', 'r') as source_file:
-        template = tempita.Template(source_file.read())
-    with open('./randomstate/bounded_integers.pxi', 'w') as output_file:
-        output_file.write(template.substitute())
+    files = glob.glob('./randomstate/*.in')
+    for templated_file in files:
+        output_file_name = os.path.splitext(templated_file)[0]
+        with open(templated_file, 'r') as source_file:
+            template = tempita.Template(source_file.read())
+        with open(output_file_name, 'w') as output_file:
+            output_file.write(template.substitute())
 
 ext_modules = cythonize(extensions)
 
