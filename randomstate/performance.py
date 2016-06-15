@@ -70,20 +70,6 @@ def timer_uniform():
     run_timer(dist, command, None, SETUP, 'Uniforms')
 
 
-def timer_32bit():
-    command = 'rs.{dist}(1000000, bits=32)'
-    command_numpy = 'rs.tomaxint({scale} * 1000000)'.format(scale=scale_32)
-    dist = 'random_uintegers'
-    run_timer(dist, command, command_numpy, SETUP, '32-bit unsigned integers')
-
-
-def timer_64bit():
-    dist = 'random_uintegers'
-    command = 'rs.{dist}(1000000, bits=64)'
-    command_numpy = 'rs.tomaxint({scale} * 1000000)'.format(scale=scale_64)
-    run_timer(dist, command, command_numpy, SETUP, '64-bit unsigned integers')
-
-
 def timer_normal():
     command = 'rs.{dist}(1000000, method="bm")'
     command_numpy = 'rs.{dist}(1000000)'

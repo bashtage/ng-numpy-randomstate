@@ -97,7 +97,8 @@ class RNG(object):
     def test_init(self):
         rs = self.mod.RandomState()
         state = rs.get_state()
-        rs.random_uintegers(1)
+        rs.standard_normal(1, method='bm')
+        rs.standard_normal(1, method='zig')
         rs.set_state(state)
         new_state = rs.get_state()
         assert_(comp_state(state, new_state))
@@ -118,10 +119,7 @@ class RNG(object):
         else:
             raise SkipTest
 
-    def test_random_uintegers(self):
-        assert_(len(self.rs.random_uintegers(10)) == 10)
-
-    def test_random_uintegers(self):
+    def test_random_raw(self):
         assert_(len(self.rs.random_raw(10)) == 10)
         assert_(self.rs.random_raw((10,10)).shape == (10,10))
 
@@ -179,9 +177,9 @@ class RNG(object):
 
     def test_reset_state(self):
         state = self.rs.get_state()
-        int_1 = self.rs.random_uintegers(1)
+        int_1 = self.rs.random_raw(1)
         self.rs.set_state(state)
-        int_2 = self.rs.random_uintegers(1)
+        int_2 = self.rs.random_raw(1)
         assert_(int_1 == int_2)
 
     def test_entropy_init(self):
@@ -208,12 +206,12 @@ class RNG(object):
 
     def test_reset_state_uint32(self):
         rs = self.mod.RandomState(*self.seed)
-        rs.random_uintegers(bits=32)
+        rs.randint(0, 2 ** 24, dtype=np.uint32)
         state = rs.get_state()
-        n1 = rs.random_uintegers(bits=32, size=10)
+        n1 = rs.randint(0, 2**24, 10, dtype=np.uint32)
         rs2 = self.mod.RandomState()
         rs2.set_state(state)
-        n2 = rs2.random_uintegers(bits=32, size=10)
+        n2 = rs.randint(0, 2**24, 10, dtype=np.uint32)
         assert_((n1 == n2).all())
 
     def test_shuffle(self):

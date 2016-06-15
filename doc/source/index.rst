@@ -5,8 +5,6 @@ that change the core random number generator.
 
 What's New or Different
 -----------------------
-* ``random_uintegers`` produces either 32-bit or 64-bit unsigned integers.
-  These are at the core of most PRNGs and so they are directly exposed.
 * ``randomstate.entropy.random_entropy`` provides access to the system
   source of randomness that is used in cryptographic applications (e.g.,
   ``/dev/urandom`` on Unix).

@@ -142,16 +142,6 @@ class Base(object):
                 data.append(long(line.split(',')[-1]))
             return {'seed': seed, 'data': np.array(data, dtype=cls.dtype)}
 
-    def test_raw(self):
-        rs = self.RandomState(*self.data1['seed'])
-        bitsize = 64 if self.bits > 32 else self.bits
-        uints = rs.random_uintegers(1000, bits=bitsize)
-        assert_equal(uints, self.data1['data'])
-
-        rs = self.RandomState(*self.data2['seed'])
-        uints = rs.random_uintegers(1000, bits=bitsize)
-        assert_equal(uints, self.data2['data'])
-
     def test_double(self):
         rs = self.RandomState(*self.data1['seed'])
         vals = uniform_from_uint(self.data1['data'], self.bits)
@@ -271,18 +261,6 @@ class TestMLFG(Base, TestCase):
         cls.data1 = cls._read_csv(join(pwd, './data/mlfg-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/mlfg-testset-2.csv'))
 
-    def test_raw(self):
-        rs = self.RandomState(*self.data1['seed'])
-        vals = uint64_from_uint63(self.data1['data'])
-        bitsize = 64 if self.bits > 32 else self.bits
-        uints = rs.random_uintegers(len(vals), bits=bitsize)
-        assert_equal(uints, vals)
-
-        rs = self.RandomState(*self.data2['seed'])
-        vals = uint64_from_uint63(self.data2['data'])
-        uints = rs.random_uintegers(len(vals), bits=bitsize)
-        assert_equal(uints, vals)
-
 
 class TestDSFMT(Base, TestCase):
     @classmethod
@@ -292,15 +270,6 @@ class TestDSFMT(Base, TestCase):
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/dSFMT-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/dSFMT-testset-2.csv'))
-
-    def test_raw(self):
-        rs = self.RandomState(*self.data1['seed'])
-        expected = np.array(self.data1['data'] & 0xffffffff, np.uint32)
-        assert_equal(expected, rs.random_uintegers(1000, bits=32))
-
-        rs = self.RandomState(*self.data2['seed'])
-        expected = np.array(self.data2['data'] & 0xffffffff, np.uint32)
-        assert_equal(expected, rs.random_uintegers(1000, bits=32))
 
     def test_double(self):
         rs = self.RandomState(*self.data1['seed'])
