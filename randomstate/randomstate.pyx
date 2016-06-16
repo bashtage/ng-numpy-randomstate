@@ -71,6 +71,7 @@ cdef extern from "distributions.h":
 
     cdef float random_standard_uniform_float(aug_state* state) nogil
     cdef float random_gamma_float(aug_state *state, double shape, float scale) nogil
+    cdef float random_standard_gamma_float(aug_state* state, float shape) nogil
 
     cdef double random_standard_uniform_double(aug_state* state) nogil
     cdef double random_gauss(aug_state* state) nogil
@@ -119,10 +120,12 @@ cdef extern from "distributions.h":
     cdef void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, intptr_t cnt, uint8_t *out) nogil
     cdef void random_bounded_bool_fill(aug_state *state, np.npy_bool off, np.npy_bool rng, intptr_t cnt, np.npy_bool *out) nogil
 
+    cdef void random_gauss_zig_float_fill(aug_state *state, intptr_t count, float *out) nogil
     cdef void random_uniform_fill_float(aug_state *state, intptr_t cnt, double *out) nogil
     cdef void random_standard_exponential_fill_float(aug_state* state, intptr_t count, float *out) nogil
     cdef void random_gauss_fill_float(aug_state* state, intptr_t count, float *out) nogil
 
+    cdef void random_gauss_zig_double_fill(aug_state* state, intptr_t count, double *out) nogil
     cdef void random_uniform_fill_double(aug_state *state, intptr_t cnt, double *out) nogil
     cdef void random_standard_exponential_fill_double(aug_state* state, intptr_t count, double *out) nogil
     cdef void random_gauss_fill(aug_state* state, intptr_t count, double *out) nogil
@@ -661,7 +664,7 @@ cdef class RandomState:
     # Basic distributions:
     def random_sample(self, size=None, dtype=np.float64):
         """
-        random_sample(size=None, dtype=np.float64)
+        random_sample(size=None, dtype='d')
 
         Return random floats in the half-open interval [0.0, 1.0).
 
@@ -678,8 +681,9 @@ cdef class RandomState:
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
         dtype : dtype, optional
-            Desired dtype of the result, either ``np.float64`` (default)
-            or ``np.float32``.
+            Desired dtype of the result. All dtypes are determined by their
+            name, either 'float64' or 'float32'. The default value is
+            'float64'.
 
         Returns
         -------
@@ -704,12 +708,13 @@ cdef class RandomState:
                [-1.23204345, -1.75224494]])
 
         """
-        if dtype is np.float64:
+        key = np.dtype(dtype).name
+        if key == 'float64':
             return double_fill(&self.rng_state, &random_uniform_fill_double, size, self.lock)
-        elif dtype is np.float32:
+        elif key == 'float32':
             return float_fill(&self.rng_state, &random_uniform_fill_float, size, self.lock)
         else:
-            raise ValueError('Unknown dtype')
+            raise TypeError('Unsupported dtype "%s" for random_sample' % key)
 
     def tomaxint(self, size=None):
         """
@@ -1189,9 +1194,9 @@ cdef class RandomState:
                     arange, '', CONS_NONE,
                     0.0, '', CONS_NONE)
 
-    def rand(self, *args):
+    def rand(self, *args, dtype=np.float64):
         """
-        rand(d0, d1, ..., dn)
+        rand(d0, d1, ..., dn, dtype='float64')
 
         Random values in a given shape.
 
@@ -1204,6 +1209,10 @@ cdef class RandomState:
         d0, d1, ..., dn : int, optional
             The dimensions of the returned array, should all be positive.
             If no argument is given a single Python float is returned.
+        dtype : dtype, optional
+            Desired dtype of the result. All dtypes are determined by their
+            name, either 'float64' or 'float32'. The default value is
+            'float64'.
 
         Returns
         -------
@@ -1216,9 +1225,10 @@ cdef class RandomState:
 
         Notes
         -----
-        This is a convenience function. If you want an interface that
-        takes a shape-tuple as the first argument, refer to
-        np.random.random_sample .
+        This is a convenience function. If you want an interface that takes
+        a shape-tuple as the first argument, refer to np.random.random_sample.
+
+        ``dtype`` can only be changed using a keyword argument.
 
         Examples
         --------
@@ -1226,16 +1236,15 @@ cdef class RandomState:
         array([[ 0.14022471,  0.96360618],  #random
                [ 0.37601032,  0.25528411],  #random
                [ 0.49313049,  0.94909878]]) #random
-
         """
         if len(args) == 0:
-            return self.random_sample()
+            return self.random_sample(dtype=dtype)
         else:
-            return self.random_sample(size=args)
+            return self.random_sample(size=args, dtype=dtype)
 
-    def randn(self, *args, method=__normal_method):
+    def randn(self, *args, method=__normal_method, dtype=np.float64):
         """
-        randn(d0, d1, ..., dn, method='bm')
+        randn(d0, d1, ..., dn, method='bm', dtype='float64')
 
         Return a sample (or samples) from the "standard normal" distribution.
 
@@ -1258,6 +1267,10 @@ cdef class RandomState:
         method : str, optional
             Either 'bm' or 'zig'. 'bm' uses the default Box-Muller transformations
             method.  'zig' uses the much faster Ziggurat method of Marsaglia and Tsang.
+        dtype : dtype, optional
+            Desired dtype of the result. All dtypes are determined by their
+            name, either 'float64' or 'float32'. The default value is
+            'float64'.
 
         Returns
         -------
@@ -1289,9 +1302,9 @@ cdef class RandomState:
 
         """
         if len(args) == 0:
-            return self.standard_normal(method=method)
+            return self.standard_normal(method=method, dtype=dtype)
         else:
-            return self.standard_normal(size=args, method=method)
+            return self.standard_normal(size=args, method=method, dtype=dtype)
 
     def random_integers(self, low, high=None, size=None):
         """
@@ -1392,7 +1405,7 @@ cdef class RandomState:
     # Complicated, continuous distributions:
     def standard_normal(self, size=None, dtype=np.float64, method=__normal_method):
         """
-        standard_normal(size=None, dtype=np.float64, method='bm')
+        standard_normal(size=None, dtype='d', method='bm')
 
         Draw samples from a standard Normal distribution (mean=0, stdev=1).
 
@@ -1403,8 +1416,9 @@ cdef class RandomState:
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
         dtype : dtype, optional
-            Desired dtype of the result, either ``np.float64`` (default)
-            or ``np.float32``.
+            Desired dtype of the result. All dtypes are determined by their
+            name, either 'float64' or 'float32'. The default value is
+            'float64'.
         method : str, optional
             Either 'bm' or 'zig'. 'bm' uses the default Box-Muller transformations
             method.  'zig' uses the much faster Ziggurat method of Marsaglia and Tsang.
@@ -1431,18 +1445,24 @@ cdef class RandomState:
         float32 normals are only available using the Box-Muller transformation
 
         """
-        if dtype == np.float64:
-            if method == u'bm':
-                return double_fill(&self.rng_state, &random_gauss_fill,
+        key = np.dtype(dtype).name
+        if key == 'float64':
+            if method == u'zig':
+                return double_fill(&self.rng_state, &random_gauss_zig_double_fill,
                                    size, self.lock)
             else:
-                return double_fill(&self.rng_state, &random_gauss_zig_julia_fill,
+                return double_fill(&self.rng_state, &random_gauss_fill,
                                    size, self.lock)
-        elif dtype == np.float32 and method == u'bm':
+        elif key == 'float32':
+            if method == u'zig':
+                return float_fill(&self.rng_state, &random_gauss_zig_float_fill,
+                                   size, self.lock)
+            else:
                 return float_fill(&self.rng_state, &random_gauss_fill_float,
                                    size, self.lock)
         else:
-            raise ValueError('Unknown dtype or invalid dtype/method combination')
+            raise TypeError('Unsupported dtype "%s" for standard_normal' % key)
+
 
 
     def normal(self, loc=0.0, scale=1.0, size=None, method=__normal_method):
@@ -1659,8 +1679,9 @@ cdef class RandomState:
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
         dtype : dtype, optional
-            Desired dtype of the result, either ``np.float64`` (default)
-            or ``np.float32``.
+            Desired dtype of the result. All dtypes are determined by their
+            name, either 'float64' or 'float32'. The default value is
+            'float64'.
 
         Returns
         -------
@@ -1674,20 +1695,22 @@ cdef class RandomState:
         >>> n = np.random.standard_exponential((3, 8000))
 
         """
-        if dtype == np.float64:
+        key = np.dtype(dtype).name
+        if key == 'float64':
             return double_fill(&self.rng_state,
                                &random_standard_exponential_fill_double,
                                size, self.lock)
-        elif dtype == np.float32:
+        elif key == 'float32':
             return float_fill(&self.rng_state,
                               &random_standard_exponential_fill_float,
                               size, self.lock)
         else:
-            raise ValueError()
+            raise TypeError('Unsupported dtype "%s" for standard_exponential'
+                            % key)
 
-    def standard_gamma(self, shape, size=None):
+    def standard_gamma(self, shape, size=None, dtype=np.float64):
         """
-        standard_gamma(shape, size=None)
+        standard_gamma(shape, size=None, dtype=np.float64)
 
         Draw samples from a standard Gamma distribution.
 
@@ -1703,6 +1726,9 @@ cdef class RandomState:
             ``m * n * k`` samples are drawn.  If size is ``None`` (default),
             a single value is returned if ``shape`` is a scalar.  Otherwise,
             ``np.array(shape).size`` samples are drawn.
+        dtype : dtype, optional
+            Desired dtype of the result, either ``np.float64`` (default)
+            or ``np.float32``.
 
         Returns
         -------
@@ -1754,10 +1780,18 @@ cdef class RandomState:
         >>> plt.show()
 
         """
-        return cont(&self.rng_state, &random_standard_gamma, size, self.lock, 1,
-                    shape, 'shape', CONS_POSITIVE,
-                    0.0, '', CONS_NONE,
-                    0.0, '', CONS_NONE)
+        key = np.dtype(dtype).name
+        if key == 'float64':
+            return cont(&self.rng_state, &random_standard_gamma,
+                        size, self.lock, 1,
+                        shape, 'shape', CONS_POSITIVE,
+                        0.0, '', CONS_NONE,
+                        0.0, '', CONS_NONE)
+        if key == 'float32':
+            return cont_float(&self.rng_state, &random_standard_gamma_float,
+                              size, self.lock, shape, 'shape', CONS_POSITIVE)
+        else:
+            raise TypeError('Unsupported dtype "%s" for standard_gamma' % key)
 
     def gamma(self, shape, scale=1.0, size=None):
         """

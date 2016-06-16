@@ -3,6 +3,8 @@ ctypedef double (* random_double_1)(aug_state* state, double a) nogil
 ctypedef double (* random_double_2)(aug_state* state, double a, double b) nogil
 ctypedef double (* random_double_3)(aug_state* state, double a, double b, double c) nogil
 
+ctypedef float (* random_float_1)(aug_state* state, float a) nogil
+
 ctypedef long (* random_uint_0)(aug_state* state) nogil
 ctypedef long (* random_uint_d)(aug_state* state, double a) nogil
 ctypedef long (* random_uint_dd)(aug_state* state, double a, double b) nogil
@@ -102,6 +104,7 @@ cdef object cont_broadcast_1(aug_state* state, void* func, object size, object l
                              np.ndarray a_arr, object a_name, constraint_type a_constraint):
 
     cdef np.ndarray randoms
+    cdef double a_val
     cdef double *randoms_data
     cdef np.broadcast it
     cdef random_double_1 f = (<random_double_1>func)
@@ -132,6 +135,7 @@ cdef object cont_broadcast_2(aug_state* state, void* func, object size, object l
                  np.ndarray a_arr, object a_name, constraint_type a_constraint,
                  np.ndarray b_arr, object b_name, constraint_type b_constraint):
     cdef np.ndarray randoms
+    cdef double a_val, b_val
     cdef double *randoms_data
     cdef np.broadcast it
     cdef random_double_2 f = (<random_double_2>func)
@@ -170,6 +174,7 @@ cdef object cont_broadcast_3(aug_state* state, void* func, object size, object l
                              np.ndarray b_arr, object b_name, constraint_type b_constraint,
                              np.ndarray c_arr, object c_name, constraint_type c_constraint):
     cdef np.ndarray randoms
+    cdef double a_val, b_val, c_val
     cdef double *randoms_data
     cdef np.broadcast it
     cdef random_double_3 f = (<random_double_3>func)
@@ -595,4 +600,71 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
 
     return np.asarray(randoms).reshape(size)
 
+
+cdef object cont_broadcast_float_1(aug_state* state, void* func, object size, object lock,
+                                   np.ndarray a_arr, object a_name, constraint_type a_constraint):
+
+    cdef np.ndarray randoms
+    cdef float a_val
+    cdef float *randoms_data
+    cdef np.broadcast it
+    cdef random_float_1 f = (<random_float_1>func)
+    cdef np.npy_intp i, n
+
+    if a_constraint != CONS_NONE:
+        check_array_constraint(a_arr, a_name, a_constraint)
+
+    if size is not None:
+        randoms = <np.ndarray>np.empty(size, np.float32)
+    else:
+        randoms = np.PyArray_SimpleNew(np.PyArray_NDIM(a_arr),
+                                       np.PyArray_DIMS(a_arr),
+                                       np.NPY_FLOAT32)
+
+    randoms_data = <float *>np.PyArray_DATA(randoms)
+    n = np.PyArray_SIZE(randoms)
+    it = np.broadcast(randoms, a_arr)
+
+    with lock, nogil:
+        for i in range(n):
+            a_val = (<float*>np.PyArray_MultiIter_DATA(it, 1))[0]
+            randoms_data[i] = f(state, a_val)
+
+            np.PyArray_MultiIter_NEXT(it)
+
+    return randoms
+
+cdef object cont_float(aug_state* state, void* func, object size, object lock,
+                       object a, object a_name, constraint_type a_constraint):
+
+    cdef np.ndarray a_arr, b_arr, c_arr
+    cdef float _a
+    cdef bint is_scalar = True
+    cdef int requirements = np.NPY_ALIGNED | np.NPY_FORCECAST
+
+    a_arr = <np.ndarray>np.PyArray_FROMANY(a, np.NPY_FLOAT32, 0, 0, requirements)
+    # a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_FLOAT32, np.NPY_ALIGNED)
+    is_scalar = np.PyArray_NDIM(a_arr) == 0
+
+    if not is_scalar:
+        return cont_broadcast_float_1(state, func, size, lock, a_arr, a_name, a_constraint)
+
+    _a = <float>PyFloat_AsDouble(a)
+    if a_constraint != CONS_NONE:
+        check_constraint(_a, a_name, a_constraint)
+
+    if size is None:
+        with lock:
+            return (<random_float_1>func)(state, _a)
+
+    cdef np.npy_intp i, n = compute_numel(size)
+    cdef np.ndarray randoms = np.empty(n, np.float32)
+    cdef float *randoms_data =  <float *>np.PyArray_DATA(randoms)
+    cdef random_float_1 f1 = <random_float_1>func;
+
+    with lock, nogil:
+        for i in range(n):
+            randoms_data[i] = f1(state, _a)
+
+    return np.asarray(randoms).reshape(size)
 

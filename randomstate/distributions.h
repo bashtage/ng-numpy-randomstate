@@ -58,6 +58,8 @@ extern double random_gauss(aug_state* state);
 
 extern double random_standard_gamma(aug_state* state, double shape);
 
+extern float random_standard_gamma_float(aug_state* state, float shape);
+
 extern double random_normal(aug_state *state, double loc, double scale);
 
 extern double random_normal_zig(aug_state *state, double loc, double scale);
@@ -155,3 +157,7 @@ extern void random_gauss_fill(aug_state* state, npy_intp count, double *out);
 extern void random_gauss_fill_float(aug_state* state, npy_intp count, float *out);
 
 extern void random_gauss_zig_julia_fill(aug_state *state, npy_intp count, double *out);
+
+extern void random_gauss_zig_float_fill(aug_state *state, npy_intp count, float *out);
+
+extern void random_gauss_zig_double_fill(aug_state *state, npy_intp count, double *out);

@@ -250,3 +250,7 @@ static const double fi[] =
 static const double ziggurat_nor_r      = 3.6541528853610087963519472518;
 static const double ziggurat_nor_inv_r  = 0.27366123732975827203338247596; // 1.0 / ziggurat_nor_r;
 static const double ziggurat_exp_r      = 7.6971174701310497140446280481;
+
+static const float ziggurat_nor_r_f = 3.6541528853610087963519472518f;
+static const float ziggurat_nor_inv_r_f  = 0.27366123732975827203338247596f;
+static const float ziggurat_exp_r_f      = 7.6971174701310497140446280481f;
