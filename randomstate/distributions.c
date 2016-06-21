@@ -1,4 +1,5 @@
 #include "distributions.h"
+#include "ziggurat_constants.h"
 #include "ziggurat.h"
 #include <limits.h>
 
@@ -82,7 +83,6 @@ static inline float gauss_float(aug_state* state)
     }
 }
 
-
 /*
 *  Julia implementation of Ziggurat algo
 *  MIT license
@@ -122,6 +122,83 @@ static inline double gauss_zig_julia(aug_state* state)
     }
 }
 
+static inline double gauss_zig_double(aug_state* state)
+{
+
+    uint64_t r;
+    int sign;
+    int64_t rabs;
+    int idx;
+    double x, xx, yy;
+    for (;;)
+    {
+        /* r = e3n52sb8 */
+        r = random_uint64(state);
+        idx = r & 0xff;
+        r >>= 8;
+        sign = r & 0x1;
+        rabs = (int64_t)((r >> 1) & 0x000fffffffffffff);
+        x = rabs * wi_double[idx];
+        if (sign & 0x1)
+            x = -x;
+        if (r & 0x1)
+            x = -x;
+        if (rabs < ki_double[idx])
+            return x;  // # 99.3% of the time return here
+        if (idx == 0)
+        {
+            for (;;)
+            {
+                xx = -ziggurat_nor_inv_r*log(random_double(state));
+                yy = -log(random_double(state));
+                if (yy+yy > xx*xx)
+                    return ((rabs >> 8) & 0x1) ? -(ziggurat_nor_r+xx) : ziggurat_nor_r+xx;
+            }
+        }
+        else
+        {
+            if (((fi_double[idx-1] - fi_double[idx])*random_double(state) + fi_double[idx]) < exp(-0.5*x*x))
+                return x;
+        }
+    }
+}
+
+static inline float gauss_zig_float(aug_state* state)
+{
+    uint32_t r;
+    int sign;
+    int32_t rabs;
+    int idx;
+    float x, xx, yy;
+    for (;;)
+    {
+        /* r = n23sb8 */
+        r = random_uint32(state);
+        idx = r & 0xff;
+        sign = (r >> 8) & 0x1;
+        rabs = (int32_t)((r >> 9) & 0x0007fffff);
+        x = rabs * wi_float[idx];
+        if (sign & 0x1)
+            x = -x;
+        if (rabs < ki_float[idx])
+            return x;  // # 99.3% of the time return here
+        if (idx == 0)
+        {
+            for (;;)
+            {
+                xx = -ziggurat_nor_inv_r_f*logf(random_float(state));
+                yy = -logf(random_float(state));
+                if (yy+yy > xx*xx)
+                    return ((rabs >> 8) & 0x1) ? -(ziggurat_nor_r_f+xx) : ziggurat_nor_r_f+xx;
+            }
+        }
+        else
+        {
+            if (((fi_float[idx-1] - fi_float[idx])*random_float(state) + fi_float[idx]) < exp(-0.5*x*x))
+                return x;
+        }
+    }
+}
 
 static inline double standard_gamma(aug_state* state, double shape)
 {
@@ -231,7 +308,6 @@ static inline float standard_gamma_float(aug_state* state, float shape)
     }
 }
 
-
 /*
  *
  * RNGs for use in other code
@@ -292,7 +368,6 @@ void random_uniform_fill_double(aug_state* state, npy_intp count, double *out)
     }
 }
 
-
 double random_standard_exponential(aug_state* state)
 {
     return standard_exponential(state);
@@ -339,6 +414,10 @@ double random_standard_gamma(aug_state* state, double shape)
     return standard_gamma(state, shape);
 }
 
+float random_standard_gamma_float(aug_state* state, float shape)
+{
+    return standard_gamma_float(state, shape);
+}
 
 /*
  * log-gamma function to support some of these distributions. The
@@ -465,7 +544,6 @@ double random_chisquare(aug_state *state, double df)
     return 2.0*random_standard_gamma(state, df/2.0);
 }
 
-
 double random_f(aug_state *state, double dfnum, double dfden)
 {
     return ((random_chisquare(state, dfnum) * dfden) /
@@ -564,7 +642,6 @@ static long random_poisson_mult(aug_state *state, double lam)
         }
     }
 }
-
 
 #define LS2PI 0.91893853320467267
 #define TWELFTH 0.083333333333333333333333
@@ -1252,6 +1329,21 @@ void random_gauss_zig_julia_fill(aug_state *state, npy_intp count, double *out) 
     }
 }
 
+void random_gauss_zig_double_fill(aug_state *state, npy_intp count, double *out) {
+
+    npy_intp i;
+    for (i = 0; i < count; i++) {
+        out[i] = gauss_zig_double(state);
+    }
+}
+
+void random_gauss_zig_float_fill(aug_state *state, npy_intp count, float *out) {
+
+    npy_intp i;
+    for (i = 0; i < count; i++) {
+        out[i] = gauss_zig_float(state);
+    }
+}
 
 unsigned long random_interval(aug_state *state, unsigned long max)
 {
@@ -1285,8 +1377,6 @@ unsigned long random_interval(aug_state *state, unsigned long max)
 #endif
     return value;
 }
-
-
 
 static inline uint64_t gen_mask(uint64_t max)
 {

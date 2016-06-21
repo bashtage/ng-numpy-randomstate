@@ -11,15 +11,33 @@ What's New or Different
 * The normal generator supports a 256-step Ziggurat method which is 2-6 times
   faster than NumPy's ``standard_normal``.  This generator can be accessed
   by passing the keyword argument ``method='zig'``.
-* ``random_sample`` accepts the optional keyword argument ``dtype`` which
-  accepts ``np.float32`` or ``np.float64`` to produce either single or
-  double prevision uniform random variables
-* For changes since the previous release, see the :ref:`change-log`
 
-.. code-block:: python
+.. ipython:: python
 
   from randomstate import standard_normal
   standard_normal(100000, method='zig')
+
+* Optional ``dtype`` argument that accepts ``np.float32`` or ``np.float64``
+  to produce either single or double prevision uniform random variables for
+  select distributions
+
+    * Uniforms (:meth:`~randomstate.entropy.random_sample` and :meth:`~randomstate.entropy.rand`)
+    * Normals (:meth:`~randomstate.entropy.standard_normal` and :meth:`~randomstate.entropy.randn`)
+    * Standard Gammas (:meth:`~randomstate.entropy.standard_gamma`)
+    * Standard Exponentials (:meth:`~randomstate.entropy.standard_exponential`)
+
+.. ipython:: python
+
+  import numpy as np
+  import randomstate as rs
+  rs.seed(0)
+  rs.random_sample(3, dtype=np.float64)
+  rs.seed(0)
+  rs.random_sample(3, dtype=np.float32)
+
+
+
+* For changes since the previous release, see the :ref:`change-log`
 
 Parallel Generation
 -------------------

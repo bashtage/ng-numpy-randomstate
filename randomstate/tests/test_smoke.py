@@ -90,9 +90,11 @@ def warmup(rs, n=None):
     rs.standard_normal(n, method='bm')
     rs.standard_normal(n, method='zig')
     rs.standard_normal(n, method='bm', dtype=np.float32)
+    rs.standard_normal(n, method='zig', dtype=np.float32)
     rs.randint(0, 2 ** 24, n, dtype=np.uint64)
     rs.randint(0, 2 ** 48, n, dtype=np.uint64)
-    rs.standard_gamma(11, n)
+    rs.standard_gamma(11.0, n)
+    rs.standard_gamma(11.0, n, dtype=np.float32)
     rs.random_sample(n, dtype=np.float64)
     rs.random_sample(n, dtype=np.float32)
 
@@ -317,6 +319,8 @@ class RNG(object):
         self.rs.set_state(state)
         assert_((vals == self.rs.random_sample((10, 10, 10))).all())
         assert_(vals.shape == (10, 10, 10))
+        vals = self.rs.rand(10, 10, 10, dtype=np.float32)
+        assert_(vals.shape == (10, 10, 10))
 
     def test_randn(self):
         state = self.rs.get_state()
@@ -335,6 +339,9 @@ class RNG(object):
         self.rs.set_state(state)
         vals_zig = self.rs.randn(10, 10, 10, method='zig')
         assert_((vals_zig != vals_inv).any())
+
+        vals = self.rs.randn(10, 10, 10, dtype=np.float32)
+        assert_(vals.shape == (10, 10, 10))
 
     def test_noncentral_chisquare(self):
         vals = self.rs.noncentral_chisquare(10, 2, 10)
@@ -530,6 +537,19 @@ class RNG(object):
         assert_equal(r1.dtype, np.float32)
         assert_(comp_state(rs.get_state(), rs2.get_state()))
 
+    def test_gamma_floats(self):
+        rs = self.mod.RandomState()
+        warmup(rs)
+        state = rs.get_state()
+        r1 = rs.standard_gamma(4.0, 11, dtype=np.float32)
+        rs2 = self.mod.RandomState()
+        warmup(rs2)
+        rs2.set_state(state)
+        r2 = rs2.standard_gamma(4.0, 11, dtype=np.float32)
+        assert_array_equal(r1, r2)
+        assert_equal(r1.dtype, np.float32)
+        assert_(comp_state(rs.get_state(), rs2.get_state()))
+
     def test_normal_floats(self):
         rs = self.mod.RandomState()
         warmup(rs)
@@ -539,6 +559,20 @@ class RNG(object):
         warmup(rs2)
         rs2.set_state(state)
         r2 = rs2.standard_normal(11, method='bm', dtype=np.float32)
+        assert_array_equal(r1, r2)
+        assert_equal(r1.dtype, np.float32)
+        assert_(comp_state(rs.get_state(), rs2.get_state()))
+
+
+    def test_normal_zig_floats(self):
+        rs = self.mod.RandomState()
+        warmup(rs)
+        state = rs.get_state()
+        r1 = rs.standard_normal(11, method='zig', dtype=np.float32)
+        rs2 = self.mod.RandomState()
+        warmup(rs2)
+        rs2.set_state(state)
+        r2 = rs2.standard_normal(11, method='zig', dtype=np.float32)
         assert_array_equal(r1, r2)
         assert_equal(r1.dtype, np.float32)
         assert_(comp_state(rs.get_state(), rs2.get_state()))

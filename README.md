@@ -3,8 +3,8 @@
 [![Travis Build Status](https://travis-ci.org/bashtage/ng-numpy-randomstate.svg?branch=master)](https://travis-ci.org/bashtage/ng-numpy-randomstate) 
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/odc5c4ukhru5xicl/branch/master?svg=true)](https://ci.appveyor.com/project/bashtage/ng-numpy-randomstate/branch/master)
 
-This is a library and generic interface for alternative random generators 
-in Python and Numpy. 
+This is a library and generic interface for alternative random 
+generators in Python and Numpy. 
 
 ## Features
 
@@ -30,22 +30,19 @@ import randomstate as rnd
 w = rnd.standard_normal(10000, method='zig')
 ```
 
-* Preliminary support for 32-bit floating randoms for core generators. 
-  Currently only uniforms (`random_sample`), exponentials 
-  (`standard_exponential`) and normals (`standard_normal` but only 
-  using Box-Muller, so `method='bm'` is required) have been implemented. 
-  Ultimately support should be avialable for:
-  
-    * Uniforms
-    * Exponentials
-    * Standard Gammas (via `standard_gamma`)
-    * Normals (currently only implemented using Box-Muller transformation)
+* Support for 32-bit floating randoms for core generators. 
+  Currently supported:
+
+    * Uniforms (`random_sample`)
+    * Exponentials (`standard_exponential`) 
+    * Normals (`standard_normal`, both Box-Muller and Ziggurat)
+    * Standard Gammas (via `standard_gamma`) 
   
   **WARNING**: The 32-bit generators are **experimental** and subjust 
   to change.
   
-  **Note**: There are no plans to extend the alternative precision generation to 
-  all random number types.
+  **Note**: There are _no_ plans to extend the alternative precision 
+  generation to all random number types.
   
   
   
@@ -59,11 +56,14 @@ The RNGs include:
 
 * [MT19937](https://github.com/numpy/numpy/blob/master/numpy/random/mtrand/),
  the NumPy rng
-* [dSFMT](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/) a SSE2-aware 
-version of the MT19937 generator that is especially fast at generating doubles
-* [xorshift128+](http://xorshift.di.unimi.it/), [xoroshiro128+](http://xoroshiro.di.unimi.it/)
-[xorshift1024*](http://xorshift.di.unimi.it/)
-* [PCG32](http://www.pcg-random.org/) and [PCG64](http:w//www.pcg-random.org/)
+* [dSFMT](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/) a 
+  SSE2-aware version of the MT19937 generator that is especially fast at 
+  generating doubles
+* [xorshift128+](http://xorshift.di.unimi.it/), 
+  [xoroshiro128+](http://xoroshiro.di.unimi.it/) and
+  [xorshift1024*](http://xorshift.di.unimi.it/)
+* [PCG32](http://www.pcg-random.org/) and 
+  [PCG64](http:w//www.pcg-random.org/)
 * [MRG32K3A](http://simul.iro.umontreal.ca/rng)
 * A multiplicative lagged fibonacci generator (LFG(63, 1279, 861, *))
 
@@ -75,8 +75,8 @@ support an additional `method` keyword argument which can be `bm` or
 `zig` where `bm` corresponds to the current method using the Box-Muller 
 transformation and `zig` uses the much faster (100%+) ziggurat method.
 * `random_sample` can produce either single precision (`np.float32`) or
-double precision (`np.float64`, the default) using an the optional keyword
-argument `dtype`.
+double precision (`np.float64`, the default) using an the optional 
+keyword argument `dtype`.
 
 ### New Functions
 
@@ -93,9 +93,9 @@ the RNG._
 
 ## Status
 
-* Complete drop-in replacement for `numpy.random.RandomState`. The `mt19937` 
-generator is identical to `numpy.random.RandomState`, and will produce an 
-identical sequence of random numbers for a given seed.   
+* Complete drop-in replacement for `numpy.random.RandomState`. The 
+`mt19937` generator is identical to `numpy.random.RandomState`, and 
+will produce an identical sequence of random numbers for a given seed.   
 * Builds and passes all tests on:
   * Linux 32/64 bit, Python 2.7, 3.4, 3.5 (should work on 2.6 and 3.3)
   * PC-BSD (FreeBSD) 64-bit, Python 2.7
@@ -133,13 +133,16 @@ Testing requires nose (1.3+).
 **Note:** it might work with other versions but only tested with these 
 versions. 
 
-All development has been on 64-bit Linux, and it is regularly tested on 
-Travis-CI. The library is occasionally tested on Linux 32-bit,  OSX 10.10, 
-PC-BSD 10.2 (should also work on Free BSD) and Windows (Python 2.7/3.5, 
-both 32 and 64-bit).
+## Development and Testing
 
-Basic tests are in place for all RNGs. The MT19937 is tested against NumPy's 
-implementation for identical results. It also passes NumPy's test suite.
+All development has been on 64-bit Linux, and it is regularly tested on 
+Travis-CI. The library is occasionally tested on Linux 32-bit,  
+OSX 10.10, PC-BSD 10.2 (should also work on Free BSD) and Windows 
+(Python 2.7/3.5, both 32 and 64-bit).
+
+Basic tests are in place for all RNGs. The MT19937 is tested against 
+NumPy's implementation for identical results. It also passes NumPy's 
+test suite.
 
 ## Installing
 
@@ -179,8 +182,8 @@ rs = randomstate.prng.mt19937.RandomState()
 rs.random_sample(100)
 ```
 
-Like NumPy, `randomstate` also exposes a single instance of the `mt19937` 
-generator directly at the module level so that commands like
+Like NumPy, `randomstate` also exposes a single instance of the 
+`mt19937` generator directly at the module level so that commands like
 
 ```python
 import randomstate
@@ -194,7 +197,8 @@ will work.
 Standard NCSA, plus sub licenses for components.
 
 ## Performance
-Performance is promising, and even the mt19937 seems to be faster than NumPy's mt19937. 
+Performance is promising, and even the mt19937 seems to be faster than 
+NumPy's mt19937. 
 
 ```
 Speed-up relative to NumPy (Uniform Doubles)
