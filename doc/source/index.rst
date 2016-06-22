@@ -21,10 +21,10 @@ What's New or Different
   to produce either single or double prevision uniform random variables for
   select distributions
 
-    * Uniforms (:meth:`~randomstate.entropy.random_sample` and :meth:`~randomstate.entropy.rand`)
-    * Normals (:meth:`~randomstate.entropy.standard_normal` and :meth:`~randomstate.entropy.randn`)
-    * Standard Gammas (:meth:`~randomstate.entropy.standard_gamma`)
-    * Standard Exponentials (:meth:`~randomstate.entropy.standard_exponential`)
+  * Uniforms (:meth:`~randomstate.prng.mt19937.random_sample` and :meth:`~randomstate.prng.mt19937.rand`)
+  * Normals (:meth:`~randomstate.prng.mt19937.standard_normal` and :meth:`~randomstate.prng.mt19937.randn`)
+  * Standard Gammas (:meth:`~randomstate.prng.mt19937.standard_gamma`)
+  * Standard Exponentials (:meth:`~randomstate.prng.mt19937.standard_exponential`)
 
 .. ipython:: python
 

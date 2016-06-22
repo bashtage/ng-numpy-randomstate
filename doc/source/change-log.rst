@@ -7,10 +7,10 @@ Head (not released)
 -------------------
 * Extended 32-bit generation to
 
-  * Uniforms (:meth:`~randomstate.entropy.random_sample` and :meth:`~randomstate.entropy.rand`)
-  * Normals (:meth:`~randomstate.entropy.standard_normal` and :meth:`~randomstate.entropy.randn`)
-  * Standard Gammas (:meth:`~randomstate.entropy.standard_gamma`)
-  * Standard Exponentials (:meth:`~randomstate.entropy.standard_exponential`)
+  * Uniforms (:meth:`~randomstate.prng.mt19937.random_sample` and :meth:`~randomstate.prng.mt19937.rand`)
+  * Normals (:meth:`~randomstate.prng.mt19937.standard_normal` and :meth:`~randomstate.prng.mt19937.randn`)
+  * Standard Gammas (:meth:`~randomstate.prng.mt19937.standard_gamma`)
+  * Standard Exponentials (:meth:`~randomstate.prng.mt19937.standard_exponential`)
 
   using the ``dtype`` keyword.
 * Removed ``random_uintegers`` since these are special cases of
