@@ -1561,12 +1561,12 @@ cdef class RandomState:
         if method == 'bm':
             return cont(&self.rng_state, &random_normal, size, self.lock, 2,
                         loc, '', CONS_NONE,
-                        scale, 'scale', CONS_POSITIVE,
+                        scale, 'scale', CONS_NON_NEGATIVE,
                         0.0, '', CONS_NONE)
         else:
             return cont(&self.rng_state, &random_normal_zig, size, self.lock, 2,
                         loc, '', CONS_NONE,
-                        scale, 'scale', CONS_POSITIVE,
+                        scale, 'scale', CONS_NON_NEGATIVE,
                         0.0, '', CONS_NONE)
 
     def beta(self, a, b, size=None):
@@ -1659,7 +1659,7 @@ cdef class RandomState:
 
         """
         return cont(&self.rng_state, &random_exponential, size, self.lock, 1,
-                    scale, 'scale', CONS_POSITIVE,
+                    scale, 'scale', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE,
                     0.0, '', CONS_NONE)
 
@@ -1784,12 +1784,12 @@ cdef class RandomState:
         if key == 'float64':
             return cont(&self.rng_state, &random_standard_gamma,
                         size, self.lock, 1,
-                        shape, 'shape', CONS_POSITIVE,
+                        shape, 'shape', CONS_NON_NEGATIVE,
                         0.0, '', CONS_NONE,
                         0.0, '', CONS_NONE)
         if key == 'float32':
             return cont_float(&self.rng_state, &random_standard_gamma_float,
-                              size, self.lock, shape, 'shape', CONS_POSITIVE)
+                              size, self.lock, shape, 'shape', CONS_NON_NEGATIVE)
         else:
             raise TypeError('Unsupported dtype "%s" for standard_gamma' % key)
 
@@ -1867,8 +1867,8 @@ cdef class RandomState:
 
         """
         return cont(&self.rng_state, &random_gamma, size, self.lock, 2,
-                    shape, 'shape', CONS_POSITIVE,
-                    scale, 'scale', CONS_POSITIVE,
+                    shape, 'shape', CONS_NON_NEGATIVE,
+                    scale, 'scale', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE)
 
     def f(self, dfnum, dfden, size=None):
@@ -2616,7 +2616,7 @@ cdef class RandomState:
 
         """
         return cont(&self.rng_state, &random_weibull, size, self.lock, 1,
-                    a, 'a', CONS_POSITIVE,
+                    a, 'a', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE,
                     0.0, '', CONS_NONE)
 
@@ -2801,7 +2801,7 @@ cdef class RandomState:
         """
         return cont(&self.rng_state, &random_laplace, size, self.lock, 2,
                     loc, 'loc', CONS_NONE,
-                    scale, 'scale', CONS_POSITIVE,
+                    scale, 'scale', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE)
 
     def gumbel(self, loc=0.0, scale=1.0, size=None):
@@ -2918,7 +2918,7 @@ cdef class RandomState:
         """
         return cont(&self.rng_state, &random_gumbel, size, self.lock, 2,
                     loc, 'loc', CONS_NONE,
-                    scale, 'scale', CONS_POSITIVE,
+                    scale, 'scale', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE)
 
     def logistic(self, loc=0.0, scale=1.0, size=None):
@@ -3107,7 +3107,7 @@ cdef class RandomState:
         """
         return cont(&self.rng_state, &random_lognormal, size, self.lock, 2,
                     mean, 'mean', CONS_NONE,
-                    sigma, 'sigma', CONS_POSITIVE,
+                    sigma, 'sigma', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE)
 
     def rayleigh(self, scale=1.0, size=None):
@@ -3173,7 +3173,7 @@ cdef class RandomState:
 
         """
         return cont(&self.rng_state, &random_rayleigh, size, self.lock, 1,
-                    scale, 'scale', CONS_POSITIVE,
+                    scale, 'scale', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE,
                     0.0, '', CONS_NONE)
 
@@ -4354,7 +4354,11 @@ cdef class RandomState:
             x_ptr = <char*><size_t>x.ctypes.data
             stride = x.strides[0]
             itemsize = x.dtype.itemsize
-            buf = np.empty_like(x[0])  # GC'd at function exit
+            # As the array x could contain python objects we use a buffer
+            # of bytes for the swaps to avoid leaving one of the objects
+            # within the buffer and erroneously decrementing it's refcount
+            # when the function exits.
+            buf = np.empty(itemsize, dtype=np.int8) # GC'd at function exit
             buf_ptr = <char*><size_t>buf.ctypes.data
             with self.lock:
                 # We trick gcc into providing a specialized implementation for

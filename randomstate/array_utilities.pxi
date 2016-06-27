@@ -46,7 +46,7 @@ cdef uint64_t MAXSIZE = <uint64_t>sys.maxsize
 
 cdef int check_array_constraint(np.ndarray val, object name, constraint_type cons) except -1:
     if cons == CONS_NON_NEGATIVE:
-        if np.any(np.less(val, 0)):
+        if np.any(np.signbit(val)):
             raise ValueError(name + " < 0")
     elif cons == CONS_POSITIVE:
         if np.any(np.less_equal(val, 0)):
@@ -75,7 +75,7 @@ cdef int check_array_constraint(np.ndarray val, object name, constraint_type con
 
 cdef int check_constraint(double val, object name, constraint_type cons) except -1:
     if cons == CONS_NON_NEGATIVE:
-        if val < 0:
+        if np.signbit(val):
             raise ValueError(name + " < 0")
     elif cons == CONS_POSITIVE:
         if val <= 0:
