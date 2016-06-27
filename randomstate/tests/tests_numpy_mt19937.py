@@ -132,6 +132,7 @@ class TestSetState(TestCase):
         # arguments without truncation.
         self.prng.negative_binomial(0.5, 0.5)
 
+
 class TestRandint(TestCase):
 
     rfunc = random.randint
@@ -157,7 +158,6 @@ class TestRandint(TestCase):
             lbnd = 0 if dt is np.bool_ else np.iinfo(dt).min
             ubnd = 2 if dt is np.bool_ else np.iinfo(dt).max + 1
             tgt = ubnd - 1
-
             assert_equal(self.rfunc(tgt, tgt + 1, size=1000, dtype=dt), tgt)
             tgt = lbnd
             assert_equal(self.rfunc(tgt, tgt + 1, size=1000, dtype=dt), tgt)
@@ -261,22 +261,26 @@ class TestRandomDist(TestCase):
 
     def test_random_integers(self):
         mt19937.seed(self.seed)
-        actual = mt19937.random_integers(-99, 99, size=(3, 2))
-        desired = np.array([[31, 3],
-                            [-52, 41],
-                            [-48, -66]])
-        assert_array_equal(actual, desired)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            actual = mt19937.random_integers(-99, 99, size=(3, 2))
+            desired = np.array([[31, 3],
+                                [-52, 41],
+                                [-48, -66]])
+            assert_array_equal(actual, desired)
 
     def test_random_integers_max_int(self):
         # Tests whether random_integers can generate the
         # maximum allowed Python int that can be converted
         # into a C long. Previous implementations of this
-        # method have thrown an OverflowError when attemping
+        # method have thrown an OverflowError when attempting
         # to generate this integer.
-        actual = mt19937.random_integers(np.iinfo('l').max,
-                                         np.iinfo('l').max)
-        desired = np.iinfo('l').max
-        assert_equal(actual, desired)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            actual = mt19937.random_integers(np.iinfo('l').max,
+                                             np.iinfo('l').max)
+            desired = np.iinfo('l').max
+            assert_equal(actual, desired)
 
     def test_random_integers_deprecated(self):
         with warnings.catch_warnings():
@@ -482,6 +486,10 @@ class TestRandomDist(TestCase):
                             [0.68717433461363442, 1.69175666993575979]])
         assert_array_almost_equal(actual, desired, decimal=15)
 
+    def test_exponential_0(self):
+        assert_equal(mt19937.exponential(scale=0), 0)
+        assert_raises(ValueError, mt19937.exponential, scale=-0.)
+
     def test_f(self):
         mt19937.seed(self.seed)
         actual = mt19937.f(12, 77, size=(3, 2))
@@ -498,6 +506,10 @@ class TestRandomDist(TestCase):
                             [31.71863275789960568, 33.30143302795922011]])
         assert_array_almost_equal(actual, desired, decimal=14)
 
+    def test_gamma_0(self):
+        assert_equal(mt19937.gamma(shape=0, scale=0), 0)
+        assert_raises(ValueError, mt19937.gamma, shape=-0., scale=-0.)
+
     def test_geometric(self):
         mt19937.seed(self.seed)
         actual = mt19937.geometric(.123456789, size=(3, 2))
@@ -513,6 +525,10 @@ class TestRandomDist(TestCase):
                             [-1.4492522252274278, -1.47374816298446865],
                             [1.10651090478803416, -0.69535848626236174]])
         assert_array_almost_equal(actual, desired, decimal=15)
+
+    def test_gumbel_0(self):
+        assert_equal(mt19937.gumbel(scale=0), 0)
+        assert_raises(ValueError, mt19937.gumbel, scale=-0.)
 
     def test_hypergeometric(self):
         mt19937.seed(self.seed)
@@ -548,6 +564,10 @@ class TestRandomDist(TestCase):
                             [-0.05391065675859356, 1.74901336242837324]])
         assert_array_almost_equal(actual, desired, decimal=15)
 
+    def test_laplace_0(self):
+        assert_equal(mt19937.laplace(scale=0), 0)
+        assert_raises(ValueError, mt19937.laplace, scale=-0.)
+
     def test_logistic(self):
         mt19937.seed(self.seed)
         actual = mt19937.logistic(loc=.123456789, scale=2.0, size=(3, 2))
@@ -556,6 +576,10 @@ class TestRandomDist(TestCase):
                             [-0.21682183359214885, 2.63373365386060332]])
         assert_array_almost_equal(actual, desired, decimal=15)
 
+    def test_laplace_0(self):
+        assert_(mt19937.laplace(scale=0) in [0, 1])
+        assert_raises(ValueError, mt19937.laplace, scale=-0.)
+
     def test_lognormal(self):
         mt19937.seed(self.seed)
         actual = mt19937.lognormal(mean=.123456789, sigma=2.0, size=(3, 2))
@@ -563,6 +587,10 @@ class TestRandomDist(TestCase):
                             [22.67886599981281748, 0.71617561058995771],
                             [65.72798501792723869, 86.84341601437161273]])
         assert_array_almost_equal(actual, desired, decimal=13)
+
+    def test_lognormal_0(self):
+        assert_equal(mt19937.lognormal(sigma=0), 1)
+        assert_raises(ValueError, mt19937.lognormal, sigma=-0.)
 
     def test_logseries(self):
         mt19937.seed(self.seed)
@@ -654,6 +682,10 @@ class TestRandomDist(TestCase):
                             [4.18552478636557357, 4.46410668111310471]])
         assert_array_almost_equal(actual, desired, decimal=15)
 
+    def test_normal_0(self):
+        assert_equal(mt19937.normal(scale=0), 0)
+        assert_raises(ValueError, mt19937.normal, scale=-0.)
+
     def test_pareto(self):
         mt19937.seed(self.seed)
         actual = mt19937.pareto(a=.123456789, size=(3, 2))
@@ -701,6 +733,10 @@ class TestRandomDist(TestCase):
                             [11.06066537006854311, 17.35468505778271009]])
         assert_array_almost_equal(actual, desired, decimal=14)
 
+    def test_rayleigh_0(self):
+        assert_equal(mt19937.rayleigh(scale=0), 0)
+        assert_raises(ValueError, mt19937.rayleigh, scale=-0.)
+
     def test_standard_cauchy(self):
         mt19937.seed(self.seed)
         actual = mt19937.standard_cauchy(size=(3, 2))
@@ -724,6 +760,10 @@ class TestRandomDist(TestCase):
                             [5.93988484943779227, 2.31044849402133989],
                             [7.54838614231317084, 8.012756093271868]])
         assert_array_almost_equal(actual, desired, decimal=14)
+
+    def test_standard_gamma_0(self):
+        assert_equal(mt19937.standard_gamma(shape=0), 0)
+        assert_raises(ValueError, mt19937.standard_gamma, shape=-0.)
 
     def test_standard_normal(self):
         mt19937.seed(self.seed)
@@ -799,6 +839,10 @@ class TestRandomDist(TestCase):
                             [1.89517770034962929, 1.91414357960479564],
                             [0.67057783752390987, 1.39494046635066793]])
         assert_array_almost_equal(actual, desired, decimal=15)
+
+    def test_weibull_0(self):
+        assert_equal(mt19937.weibull(a=0), 0)
+        assert_raises(ValueError, mt19937.weibull, a=-0.)
 
     def test_zipf(self):
         mt19937.seed(self.seed)
@@ -1404,7 +1448,7 @@ class TestThread(TestCase):
     def test_multinomial(self):
         def gen_random(state, out):
             out[...] = state.multinomial(10, [1/6.]*6, size=10000)
-        self.check_function(gen_random, sz=(10000,6))
+        self.check_function(gen_random, sz=(10000, 6))
 
 # See Issue #4263
 class TestSingleEltArrayInput(TestCase):
