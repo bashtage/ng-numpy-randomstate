@@ -12,8 +12,7 @@ Version 1.11.3
   * Standard Exponentials (:meth:`~randomstate.prng.mt19937.standard_exponential`)
 
   using the ``dtype`` keyword.
-* Removed ``random_uintegers`` since these are special cases of
-  :meth:`~randomstate.entropy.randint`
+* Removed ``random_uintegers`` since these are special cases of ``randint``
 * Release to include files required for install from PyPi
 
 Version 1.11.2
