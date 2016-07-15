@@ -246,11 +246,11 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Topic :: Security :: Cryptography']
 
 setup(name='randomstate',
-      version='1.11.2',
+      version='1.11.3',
       classifiers=classifiers,
       packages=find_packages(),
       package_dir={'randomstate': './randomstate'},
-      package_data={'': ['*.c', '*.h', '*.pxi', '*.pyx', '*.pxd'],
+      package_data={'': ['*.c', '*.h', '*.pxi', '*.pyx', '*.pxd', '*.pxi.in'],
                     'randomstate.tests.data': ['*.csv']},
       include_package_data=True,
       license='NSCA',
@@ -266,9 +266,9 @@ setup(name='randomstate',
       zip_safe=False)
 
 # Clean up generated files
-exts = ('.pyx', '-config.pxi', '.c')
-for config in configs:
-    for ext in exts:
-        file_path = join(mod_dir, config['file_name'] + ext)
-        if os.path.exists(file_path):
-            os.unlink(file_path)
+# exts = ('.pyx', '-config.pxi', '.c'),
+# for config in configs:
+#    for ext in exts:
+#        file_path = join(mod_dir, config['file_name'] + ext)
+#        if os.path.exists(file_path):
+#            os.unlink(file_path)
