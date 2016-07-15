@@ -2,9 +2,8 @@
 
 Change Log
 ==========
-
-Head (not released)
--------------------
+Version 1.11.3
+--------------
 * Extended 32-bit generation to
 
   * Uniforms (:meth:`~randomstate.prng.mt19937.random_sample` and :meth:`~randomstate.prng.mt19937.rand`)
@@ -15,6 +14,7 @@ Head (not released)
   using the ``dtype`` keyword.
 * Removed ``random_uintegers`` since these are special cases of
   :meth:`~randomstate.entropy.randint`
+* Release to include files required for install from PyPi
 
 Version 1.11.2
 --------------
