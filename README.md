@@ -2,6 +2,7 @@
 
 [![Travis Build Status](https://travis-ci.org/bashtage/ng-numpy-randomstate.svg?branch=master)](https://travis-ci.org/bashtage/ng-numpy-randomstate) 
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/odc5c4ukhru5xicl/branch/master?svg=true)](https://ci.appveyor.com/project/bashtage/ng-numpy-randomstate/branch/master)
+[![PyPI version](https://badge.fury.io/py/randomstate.svg)](https://badge.fury.io/py/randomstate)
 
 This is a library and generic interface for alternative random 
 generators in Python and Numpy. 
