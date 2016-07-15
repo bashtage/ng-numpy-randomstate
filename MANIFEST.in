@@ -1,4 +1,4 @@
-recursive-include randomstate *.c *.h *.pxi *.pxd *.pyx
+recursive-include randomstate *.c *.h *.pxi *.pxd *.pyx *.in
 recursive-include randomstate/tests *.csv
 include *.md
 exclude randomstate/entropy.c

@@ -31,22 +31,18 @@ Features
     import randomstate as rnd
     w = rnd.standard_normal(10000, method='zig')
 
--  Preliminary support for 32-bit floating randoms for core generators.
-   Currently only uniforms (``random_sample``), exponentials
-   (``standard_exponential``) and normals (``standard_normal`` but only
-   using Box-Muller, so ``method='bm'`` is required) have been
-   implemented. Ultimately support should be avialable for:
+-  Support for 32-bit floating randoms for core generators. Currently
+   supported:
 
-   -  Uniforms
-   -  Exponentials
+   -  Uniforms (``random_sample``)
+   -  Exponentials (``standard_exponential``)
+   -  Normals (``standard_normal``, both Box-Muller and Ziggurat)
    -  Standard Gammas (via ``standard_gamma``)
-   -  Normals (currently only implemented using Box-Muller
-      transformation)
 
 **WARNING**: The 32-bit generators are **experimental** and subjust to
 change.
 
-**Note**: There are no plans to extend the alternative precision
+**Note**: There are *no* plans to extend the alternative precision
 generation to all random number types.
 
 Included Pseudo Random Number Generators
@@ -61,7 +57,7 @@ in addition to the MT19937 that is included in NumPy. The RNGs include:
    SSE2-aware version of the MT19937 generator that is especially fast
    at generating doubles
 -  `xorshift128+ <http://xorshift.di.unimi.it/>`__,
-   `xoroshiro128+ <http://xoroshiro.di.unimi.it/>`__
+   `xoroshiro128+ <http://xoroshiro.di.unimi.it/>`__ and
    `xorshift1024\* <http://xorshift.di.unimi.it/>`__
 -  `PCG32 <http://www.pcg-random.org/>`__ and
    `PCG64 <http:w//www.pcg-random.org/>`__
@@ -148,10 +144,13 @@ Testing requires nose (1.3+).
 **Note:** it might work with other versions but only tested with these
 versions.
 
-All development has been on 64-bit Linux, and it is regularly tested on
-Travis-CI. The library is occasionally tested on Linux 32-bit, OSX
-10.10, PC-BSD 10.2 (should also work on Free BSD) and Windows (Python
-2.7/3.5, both 32 and 64-bit).
+Development and Testing
+-----------------------
+
+| All development has been on 64-bit Linux, and it is regularly tested
+  on Travis-CI. The library is occasionally tested on Linux 32-bit,
+| OSX 10.10, PC-BSD 10.2 (should also work on Free BSD) and Windows
+  (Python 2.7/3.5, both 32 and 64-bit).
 
 Basic tests are in place for all RNGs. The MT19937 is tested against
 NumPy's implementation for identical results. It also passes NumPy's
