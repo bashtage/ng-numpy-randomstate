@@ -141,8 +141,6 @@ static inline double gauss_zig_double(aug_state* state)
         x = rabs * wi_double[idx];
         if (sign & 0x1)
             x = -x;
-        if (r & 0x1)
-            x = -x;
         if (rabs < ki_double[idx])
             return x;  // # 99.3% of the time return here
         if (idx == 0)
