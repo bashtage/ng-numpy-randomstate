@@ -2,6 +2,10 @@
 
 Change Log
 ==========
+Version 1.11.4
+--------------
+* Fix for error in Ziggurat implementation of Normal
+
 Version 1.11.3
 --------------
 * Extended 32-bit generation to
