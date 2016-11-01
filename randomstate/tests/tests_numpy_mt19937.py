@@ -8,6 +8,7 @@ from numpy.compat import asbytes
 import sys
 import warnings
 import randomstate as random
+from randomstate.compat import suppress_warnings
 from randomstate.prng.mt19937 import mt19937
 
 class TestSeed(TestCase):
@@ -261,13 +262,14 @@ class TestRandomDist(TestCase):
 
     def test_random_integers(self):
         mt19937.seed(self.seed)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+        with suppress_warnings() as sup:
+            w = sup.record(DeprecationWarning)
             actual = mt19937.random_integers(-99, 99, size=(3, 2))
-            desired = np.array([[31, 3],
-                                [-52, 41],
-                                [-48, -66]])
-            assert_array_equal(actual, desired)
+            assert_(len(w) == 1)
+        desired = np.array([[31, 3],
+                            [-52, 41],
+                            [-48, -66]])
+        assert_array_equal(actual, desired)
 
     def test_random_integers_max_int(self):
         # Tests whether random_integers can generate the
@@ -275,12 +277,14 @@ class TestRandomDist(TestCase):
         # into a C long. Previous implementations of this
         # method have thrown an OverflowError when attempting
         # to generate this integer.
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+        with suppress_warnings() as sup:
+            w = sup.record(DeprecationWarning)
             actual = mt19937.random_integers(np.iinfo('l').max,
                                              np.iinfo('l').max)
-            desired = np.iinfo('l').max
-            assert_equal(actual, desired)
+            assert_(len(w) == 1)
+
+        desired = np.iinfo('l').max
+        assert_equal(actual, desired)
 
     def test_random_integers_deprecated(self):
         with warnings.catch_warnings():
@@ -347,8 +351,8 @@ class TestRandomDist(TestCase):
         assert_raises(ValueError, sample, [1, 2], 3, p=[1.1, -0.1])
         assert_raises(ValueError, sample, [1, 2], 3, p=[0.4, 0.4])
         assert_raises(ValueError, sample, [1, 2, 3], 4, replace=False)
-        assert_raises(ValueError, sample, [1, 2, 3], 2, replace=False,
-                      p=[1, 0, 0])
+        assert_raises(ValueError, sample, [1, 2, 3], 2,
+                      replace=False, p=[1, 0, 0])
 
     def test_choice_return_shape(self):
         p = [0.1, 0.9]
@@ -417,7 +421,7 @@ class TestRandomDist(TestCase):
 
     def test_shuffle_masked(self):
         # gh-3263
-        a = np.ma.masked_values(np.reshape(range(20), (5,4)) % 3 - 1, -1)
+        a = np.ma.masked_values(np.reshape(range(20), (5, 4)) % 3 - 1, -1)
         b = np.ma.masked_values(np.arange(20) % 3 - 1, -1)
         a_orig = a.copy()
         b_orig = b.copy()
@@ -668,7 +672,7 @@ class TestRandomDist(TestCase):
     def test_noncentral_f(self):
         mt19937.seed(self.seed)
         actual = mt19937.noncentral_f(dfnum=5, dfden=2, nonc=1,
-                                      size=(3, 2))
+                                        size=(3, 2))
         desired = np.array([[1.40598099674926669, 0.34207973179285761],
                             [3.57715069265772545, 7.92632662577829805],
                             [0.43741599463544162, 1.1774208752428319]])
@@ -713,9 +717,9 @@ class TestRandomDist(TestCase):
         lambig = np.iinfo('l').max
         lamneg = -1
         assert_raises(ValueError, mt19937.poisson, lamneg)
-        assert_raises(ValueError, mt19937.poisson, [lamneg] * 10)
+        assert_raises(ValueError, mt19937.poisson, [lamneg]*10)
         assert_raises(ValueError, mt19937.poisson, lambig)
-        assert_raises(ValueError, mt19937.poisson, [lambig] * 10)
+        assert_raises(ValueError, mt19937.poisson, [lambig]*10)
 
     def test_power(self):
         mt19937.seed(self.seed)
@@ -804,8 +808,8 @@ class TestRandomDist(TestCase):
 
         func = mt19937.uniform
         assert_raises(OverflowError, func, -np.inf, 0)
-        assert_raises(OverflowError, func, 0, np.inf)
-        assert_raises(OverflowError, func, fmin, fmax)
+        assert_raises(OverflowError, func,  0,      np.inf)
+        assert_raises(OverflowError, func,  fmin,   fmax)
 
         # (fmax / 1e17) - fmin is within range, so this should not throw
         mt19937.uniform(low=fmin, high=fmax / 1e17)

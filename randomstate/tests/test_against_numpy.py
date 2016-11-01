@@ -77,7 +77,7 @@ def compare_3_input(f1, f2, is_np=False):
         assert_allclose(v1, v2)
 
 
-class TestAgainstNumpy(unittest.TestCase):
+class TestAgainstNumPy(unittest.TestCase):
     @classmethod
     def setup_class(cls):
         cls.np = numpy.random

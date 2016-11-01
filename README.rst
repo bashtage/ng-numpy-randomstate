@@ -4,7 +4,7 @@ randomstate
 |Travis Build Status| |Appveyor Build Status|
 
 This is a library and generic interface for alternative random
-generators in Python and Numpy.
+generators in Python and NumPy.
 
 Features
 --------
@@ -135,7 +135,7 @@ Requirements
 Building requires:
 
 -  Python (2.7, 3.4, 3.5)
--  Numpy (1.9, 1.10, 1.11)
+-  NumPy (1.9, 1.10, 1.11)
 -  Cython (0.22, 0.23, 0.24)
 -  tempita (0.5+), if not provided by Cython
 
