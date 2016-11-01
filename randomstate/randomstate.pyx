@@ -794,8 +794,8 @@ cdef class RandomState:
         ----------
         low : int
             Lowest (signed) integer to be drawn from the distribution (unless
-            ``high=None``, in which case this parameter is the *highest* such
-            integer).
+            ``high=None``, in which case this parameter is one above the
+            *highest* such integer).
         high : int, optional
             If provided, one above the largest (signed) integer to be drawn
             from the distribution (see above for behavior if ``high=None``).
@@ -1504,8 +1504,8 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.norm : probability density function,
-            distribution or cumulative density function, etc.
+        scipy.stats.norm : probability density function, distribution or
+            cumulative density function, etc.
 
         Notes
         -----
@@ -1737,8 +1737,8 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.gamma : probability density function,
-            distribution or cumulative density function, etc.
+        scipy.stats.gamma : probability density function, distribution or
+            cumulative density function, etc.
 
         Notes
         -----
@@ -1823,8 +1823,8 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.gamma : probability density function,
-            distribution or cumulative density function, etc.
+        scipy.stats.gamma : probability density function, distribution or
+            cumulative density function, etc.
 
         Notes
         -----
@@ -1906,8 +1906,8 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.f : probability density function,
-            distribution or cumulative density function, etc.
+        scipy.stats.f : probability density function, distribution or
+            cumulative density function, etc.
 
         Notes
         -----
@@ -2111,7 +2111,7 @@ cdef class RandomState:
         Parameters
         ----------
         df : int or array_like of ints
-            Degrees of freedom, should be > 0 as of Numpy 1.10,
+            Degrees of freedom, should be > 0 as of NumPy 1.10.0,
             should be > 1 for earlier versions.
         nonc : float or array_like of floats
             Non-centrality, should be non-negative.
@@ -2374,8 +2374,8 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.vonmises : probability density function,
-            distribution, or cumulative density function, etc.
+        scipy.stats.vonmises : probability density function, distribution, or
+            cumulative density function, etc.
 
         Notes
         -----
@@ -2465,10 +2465,10 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.lomax.pdf : probability density function,
-            distribution or cumulative density function, etc.
-        scipy.stats.distributions.genpareto.pdf : probability density function,
-            distribution or cumulative density function, etc.
+        scipy.stats.lomax : probability density function, distribution or
+            cumulative density function, etc.
+        scipy.stats.genpareto : probability density function, distribution or
+            cumulative density function, etc.
 
         Notes
         -----
@@ -2555,9 +2555,9 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.weibull_max
-        scipy.stats.distributions.weibull_min
-        scipy.stats.distributions.genextreme
+        scipy.stats.weibull_max
+        scipy.stats.weibull_min
+        scipy.stats.genextreme
         gumbel
 
         Notes
@@ -2950,8 +2950,8 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.logistic : probability density function,
-            distribution or cumulative density function, etc.
+        scipy.stats.logistic : probability density function, distribution or
+            cumulative density function, etc.
 
         Notes
         -----
@@ -3377,8 +3377,8 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.binom : probability density function,
-            distribution or cumulative density function, etc.
+        scipy.stats.binom : probability density function, distribution or
+            cumulative density function, etc.
 
         Notes
         -----
@@ -3613,8 +3613,8 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.zipf : probability density function,
-            distribution, or cumulative density function, etc.
+        scipy.stats.zipf : probability density function, distribution, or
+            cumulative density function, etc.
 
         Notes
         -----
@@ -3746,8 +3746,8 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.hypergeom : probability density function,
-            distribution or cumulative density function, etc.
+        scipy.stats.hypergeom : probability density function, distribution or
+            cumulative density function, etc.
 
         Notes
         -----
@@ -3860,8 +3860,8 @@ cdef class RandomState:
 
         See Also
         --------
-        scipy.stats.distributions.logser : probability density function,
-            distribution or cumulative density function, etc.
+        scipy.stats.logser : probability density function, distribution or
+            cumulative density function, etc.
 
         Notes
         -----
