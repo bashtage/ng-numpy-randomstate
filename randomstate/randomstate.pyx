@@ -1187,7 +1187,7 @@ cdef class RandomState:
         Py_INCREF(temp)  # needed to get around Pyrex's automatic reference-counting
                          # rules because EnsureArray steals a reference
         arange = <np.ndarray>np.PyArray_EnsureArray(temp)
-        if not np.isfinite(arange).all():
+        if not np.all(np.isfinite(arange)):
             raise OverflowError('Range exceeds valid bounds')
         return cont(&self.rng_state, &random_uniform, size, self.lock, 2,
                     alow, '', CONS_NONE,
@@ -2287,7 +2287,7 @@ cdef class RandomState:
         a good estimate of the true mean.
 
         The derivation of the t-distribution was first published in
-        1908 by William Gisset while working for the Guinness Brewery
+        1908 by William Gosset while working for the Guinness Brewery
         in Dublin. Due to proprietary issues, he had to publish under
         a pseudonym, and so he used the name Student.
 
