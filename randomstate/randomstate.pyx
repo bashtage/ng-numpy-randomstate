@@ -662,9 +662,9 @@ cdef class RandomState:
                 self.get_state())
 
     # Basic distributions:
-    def random_sample(self, size=None, dtype=np.float64):
+    def random_sample(self, size=None, dtype=np.float64, out=None):
         """
-        random_sample(size=None, dtype='d')
+        random_sample(size=None, dtype='d', out=None)
 
         Return random floats in the half-open interval [0.0, 1.0).
 
@@ -684,6 +684,10 @@ cdef class RandomState:
             Desired dtype of the result. All dtypes are determined by their
             name, either 'float64' or 'float32'. The default value is
             'float64'.
+        out : ndarray, optional
+            Alternative output array in which to place the result. If size is not None,
+            it must have the same shape as the provided size and must match the type of
+            the output values.
 
         Returns
         -------
@@ -710,9 +714,9 @@ cdef class RandomState:
         """
         key = np.dtype(dtype).name
         if key == 'float64':
-            return double_fill(&self.rng_state, &random_uniform_fill_double, size, self.lock)
+            return double_fill(&self.rng_state, &random_uniform_fill_double, size, self.lock, out)
         elif key == 'float32':
-            return float_fill(&self.rng_state, &random_uniform_fill_float, size, self.lock)
+            return float_fill(&self.rng_state, &random_uniform_fill_float, size, self.lock, out)
         else:
             raise TypeError('Unsupported dtype "%s" for random_sample' % key)
 
@@ -1403,9 +1407,10 @@ cdef class RandomState:
 
 
     # Complicated, continuous distributions:
-    def standard_normal(self, size=None, dtype=np.float64, method=__normal_method):
+    def standard_normal(self, size=None, dtype=np.float64, method=__normal_method,
+                        out=None):
         """
-        standard_normal(size=None, dtype='d', method='bm')
+        standard_normal(size=None, dtype='d', method='bm', out=None)
 
         Draw samples from a standard Normal distribution (mean=0, stdev=1).
 
@@ -1422,6 +1427,10 @@ cdef class RandomState:
         method : str, optional
             Either 'bm' or 'zig'. 'bm' uses the default Box-Muller transformations
             method.  'zig' uses the much faster Ziggurat method of Marsaglia and Tsang.
+        out : ndarray, optional
+            Alternative output array in which to place the result. If size is not None,
+            it must have the same shape as the provided size and must match the type of
+            the output values.
 
         Returns
         -------
@@ -1440,26 +1449,22 @@ cdef class RandomState:
         >>> s.shape
         (3, 4, 2)
 
-        Notes
-        -----
-        float32 normals are only available using the Box-Muller transformation
-
         """
         key = np.dtype(dtype).name
         if key == 'float64':
             if method == u'zig':
                 return double_fill(&self.rng_state, &random_gauss_zig_double_fill,
-                                   size, self.lock)
+                                   size, self.lock, out)
             else:
                 return double_fill(&self.rng_state, &random_gauss_fill,
-                                   size, self.lock)
+                                   size, self.lock, out)
         elif key == 'float32':
             if method == u'zig':
                 return float_fill(&self.rng_state, &random_gauss_zig_float_fill,
-                                   size, self.lock)
+                                   size, self.lock, out)
             else:
                 return float_fill(&self.rng_state, &random_gauss_fill_float,
-                                   size, self.lock)
+                                   size, self.lock, out)
         else:
             raise TypeError('Unsupported dtype "%s" for standard_normal' % key)
 
@@ -1663,9 +1668,9 @@ cdef class RandomState:
                     0.0, '', CONS_NONE,
                     0.0, '', CONS_NONE)
 
-    def standard_exponential(self, size=None, dtype=np.float64):
+    def standard_exponential(self, size=None, dtype=np.float64, out=None):
         """
-        standard_exponential(size=None, dtype=np.float64)
+        standard_exponential(size=None, dtype=np.float64, out=None)
 
         Draw samples from the standard exponential distribution.
 
@@ -1682,6 +1687,10 @@ cdef class RandomState:
             Desired dtype of the result. All dtypes are determined by their
             name, either 'float64' or 'float32'. The default value is
             'float64'.
+        out : ndarray, optional
+            Alternative output array in which to place the result. If size is not None,
+            it must have the same shape as the provided size and must match the type of
+            the output values.
 
         Returns
         -------
@@ -1699,11 +1708,11 @@ cdef class RandomState:
         if key == 'float64':
             return double_fill(&self.rng_state,
                                &random_standard_exponential_fill_double,
-                               size, self.lock)
+                               size, self.lock, out)
         elif key == 'float32':
             return float_fill(&self.rng_state,
                               &random_standard_exponential_fill_float,
-                              size, self.lock)
+                              size, self.lock, out)
         else:
             raise TypeError('Unsupported dtype "%s" for standard_exponential'
                             % key)

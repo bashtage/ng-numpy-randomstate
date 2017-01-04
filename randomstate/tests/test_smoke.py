@@ -577,6 +577,61 @@ class RNG(object):
         assert_equal(r1.dtype, np.float32)
         assert_(comp_state(rs.get_state(), rs2.get_state()))
 
+    def test_output_fill(self):
+        rs = self.rs
+        state = rs.get_state()
+        size = (31,7,97)
+        existing = np.empty(size)
+        rs.set_state(state)
+        rs.standard_normal(out=existing)
+        rs.set_state(state)
+        direct = rs.standard_normal(size=size)
+        assert_equal(direct, existing)
+
+        existing = np.empty(size, dtype=np.float32)
+        rs.set_state(state)
+        rs.standard_normal(out=existing, dtype=np.float32)
+        rs.set_state(state)
+        direct = rs.standard_normal(size=size, dtype=np.float32)
+        assert_equal(direct, existing)
+
+    def test_output_filling_uniform(self):
+        rs = self.rs
+        state = rs.get_state()
+        size = (31,7,97)
+        existing = np.empty(size)
+        rs.set_state(state)
+        rs.random_sample(out=existing)
+        rs.set_state(state)
+        direct = rs.random_sample(size=size)
+        assert_equal(direct, existing)
+
+        existing = np.empty(size, dtype=np.float32)
+        rs.set_state(state)
+        rs.random_sample(out=existing, dtype=np.float32)
+        rs.set_state(state)
+        direct = rs.random_sample(size=size, dtype=np.float32)
+        assert_equal(direct, existing)
+
+
+    def test_output_filling_exponential(self):
+        rs = self.rs
+        state = rs.get_state()
+        size = (31,7,97)
+        existing = np.empty(size)
+        rs.set_state(state)
+        rs.standard_exponential(out=existing)
+        rs.set_state(state)
+        direct = rs.standard_exponential(size=size)
+        assert_equal(direct, existing)
+
+        existing = np.empty(size, dtype=np.float32)
+        rs.set_state(state)
+        rs.standard_exponential(out=existing, dtype=np.float32)
+        rs.set_state(state)
+        direct = rs.standard_exponential(size=size, dtype=np.float32)
+        assert_equal(direct, existing)
+
 
 class TestMT19937(RNG):
     @classmethod

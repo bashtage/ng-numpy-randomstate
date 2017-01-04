@@ -35,7 +35,24 @@ What's New or Different
   rs.seed(0)
   rs.random_sample(3, dtype=np.float32)
 
+* Optional ``out`` argument that allows existing arrays to be filled for
+  select distributions
 
+  * Uniforms (:meth:`~randomstate.prng.mt19937.random_sample`)
+  * Normals (:meth:`~randomstate.prng.mt19937.standard_normal`)
+  * Standard Exponentials (:meth:`~randomstate.prng.mt19937.standard_exponential`)
+
+  This allows mulththreading to fill large arrays in chunks using suitable
+  PRNGs in parallel.
+
+.. ipython:: python
+
+  import numpy as np
+  import randomstate as rs
+  existing = np.zeros(4)
+  rs.seed(0)
+  rs.random_sample(out=existing[:2])
+  print(existing)
 
 * For changes since the previous release, see the :ref:`change-log`
 

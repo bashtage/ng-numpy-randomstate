@@ -2,6 +2,17 @@
 
 Change Log
 ==========
+
+Changes since 1.11.4
+--------------------
+* Add ``out`` argument which allows filling existing arrays. This feature was
+  added to facilitate multithreaded filling of arrays using parallel random
+  number generators.
+
+  * Uniforms (:meth:`~randomstate.prng.mt19937.random_sample`)
+  * Normals (:meth:`~randomstate.prng.mt19937.standard_normal`)
+  * Standard Exponentials (:meth:`~randomstate.prng.mt19937.standard_exponential`)
+
 Version 1.11.4
 --------------
 * Fix for error in Ziggurat implementation of Normal

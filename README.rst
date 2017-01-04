@@ -1,7 +1,7 @@
 randomstate
 ===========
 
-|Travis Build Status| |Appveyor Build Status|
+|Travis Build Status| |Appveyor Build Status| |PyPI version|
 
 This is a library and generic interface for alternative random
 generators in Python and NumPy.
@@ -44,6 +44,13 @@ change.
 
 **Note**: There are *no* plans to extend the alternative precision
 generation to all random number types.
+
+-  Support for filling existing arrays using ``out`` keyword argument.
+   Currently supported in (both 32- and 64-bit outputs)
+
+   -  Uniforms (``random_sample``)
+   -  Exponentials (``standard_exponential``)
+   -  Normals (``standard_normal``)
 
 Included Pseudo Random Number Generators
 ----------------------------------------
@@ -101,7 +108,8 @@ Status
    and will produce an identical sequence of random numbers for a given
    seed.
 -  Builds and passes all tests on:
--  Linux 32/64 bit, Python 2.7, 3.4, 3.5 (should work on 2.6 and 3.3)
+-  Linux 32/64 bit, Python 2.7, 3.4, 3.5, 3.6 (probably works on 2.6 and
+   3.3)
 -  PC-BSD (FreeBSD) 64-bit, Python 2.7
 -  OSX 64-bit, Python 2.7
 -  Windows 32/64 bit (only tested on Python 2.7 and 3.5, but should work
@@ -134,9 +142,9 @@ Requirements
 
 Building requires:
 
--  Python (2.7, 3.4, 3.5)
--  NumPy (1.9, 1.10, 1.11)
--  Cython (0.22, 0.23, 0.24)
+-  Python (2.7, 3.4, 3.5, 3.6)
+-  NumPy (1.9, 1.10, 1.11, 1.12)
+-  Cython (0.22, 0.23, 0.24, 0.25)
 -  tempita (0.5+), if not provided by Cython
 
 Testing requires nose (1.3+).
@@ -264,3 +272,5 @@ NumPy's mt19937.
    :target: https://travis-ci.org/bashtage/ng-numpy-randomstate
 .. |Appveyor Build Status| image:: https://ci.appveyor.com/api/projects/status/odc5c4ukhru5xicl/branch/master?svg=true
    :target: https://ci.appveyor.com/project/bashtage/ng-numpy-randomstate/branch/master
+.. |PyPI version| image:: https://badge.fury.io/py/randomstate.svg
+   :target: https://badge.fury.io/py/randomstate

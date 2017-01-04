@@ -9,24 +9,37 @@ ctypes = (('float64', 'double'),
 {{for  nptype, ctype in ctypes}}
 
 
-cdef object {{ctype}}_fill(aug_state* state, void *func, object size, object lock):
+cdef object {{ctype}}_fill(aug_state* state, void *func, object size, object lock, object out):
     cdef random_{{ctype}}_fill f = <random_{{ctype}}_fill>func
-    cdef {{ctype}} out
+    cdef {{ctype}} fout
     cdef {{ctype}} *out_array_data
     cdef np.ndarray out_array
     cdef np.npy_intp n
 
-    if size is None:
+    if size is None and out is None:
         with lock:
-            f(state, 1, &out)
-        return out
+            f(state, 1, &fout)
+        return fout
+
+    if out is not None:
+        out_array = <np.ndarray>out
+        if out_array.dtype != np.{{nptype}}:
+            raise TypeError('Supplied output array has the wrong type.'
+                             'Expected {{nptype}}, got {0}'.format(out_array.dtype))
+        if not (np.PyArray_CHKFLAGS(out_array, np.NPY_C_CONTIGUOUS) or
+                np.PyArray_CHKFLAGS(out_array, np.NPY_F_CONTIGUOUS)):
+            raise ValueError('Supplied output array is not C contiguous')
+        if size is not None:
+            # TODO: enable this !!! if tuple(size) != out_array.shape:
+            raise ValueError('size and shape of the supplied output are different')
     else:
         out_array = <np.ndarray>np.empty(size, np.{{nptype}})
-        n = np.PyArray_SIZE(out_array)
-        out_array_data = <{{ctype}} *>np.PyArray_DATA(out_array)
-        with lock, nogil:
-            f(state, n, out_array_data)
-        return out_array
+
+    n = np.PyArray_SIZE(out_array)
+    out_array_data = <{{ctype}} *>np.PyArray_DATA(out_array)
+    with lock, nogil:
+        f(state, n, out_array_data)
+    return out_array
 
 {{endfor}}
 
