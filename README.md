@@ -44,10 +44,13 @@ w = rnd.standard_normal(10000, method='zig')
   
   **Note**: There are _no_ plans to extend the alternative precision 
   generation to all random number types.
-  
-  
-  
 
+* Support for filling existing arrays using `out` keyword argument. Currently
+  supported in (both 32- and 64-bit outputs)
+
+    * Uniforms (`random_sample`)
+    * Exponentials (`standard_exponential`)
+    * Normals (`standard_normal`)
 
 ## Included Pseudo Random Number Generators
 
@@ -98,9 +101,9 @@ the RNG._
 `mt19937` generator is identical to `numpy.random.RandomState`, and 
 will produce an identical sequence of random numbers for a given seed.   
 * Builds and passes all tests on:
-  * Linux 32/64 bit, Python 2.7, 3.4, 3.5 (should work on 2.6 and 3.3)
+  * Linux 32/64 bit, Python 2.7, 3.4, 3.5, 3.6 (probably works on 2.6 and 3.3)
   * PC-BSD (FreeBSD) 64-bit, Python 2.7
-  * OSX  64-bit, Python 2.7
+  * OSX 64-bit, Python 2.7
   * Windows 32/64 bit (only tested on Python 2.7 and 3.5, but should 
     work on 3.3/3.4)
 
@@ -124,9 +127,9 @@ need to be smoothed.
 ## Requirements
 Building requires:
 
-  * Python (2.7, 3.4, 3.5)
-  * NumPy (1.9, 1.10, 1.11)
-  * Cython (0.22, 0.23, 0.24)
+  * Python (2.7, 3.4, 3.5, 3.6)
+  * NumPy (1.9, 1.10, 1.11, 1.12)
+  * Cython (0.22, 0.23, 0.24, 0.25)
   * tempita (0.5+), if not provided by Cython
  
 Testing requires nose (1.3+).
