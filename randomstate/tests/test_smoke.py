@@ -632,6 +632,13 @@ class RNG(object):
         direct = rs.standard_exponential(size=size, dtype=np.float32)
         assert_equal(direct, existing)
 
+    def test_output_fill_error(self):
+        rs = self.rs
+        size = (31, 7, 97)
+        existing = np.empty(size)
+        assert_raises(TypeError, rs.standard_normal, out=existing, dtype=np.float32)
+        assert_raises(ValueError, rs.standard_normal, out=existing[::3])
+
 
 class TestMT19937(RNG):
     @classmethod

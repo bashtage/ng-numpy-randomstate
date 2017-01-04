@@ -26,9 +26,9 @@ cdef object {{ctype}}_fill(aug_state* state, void *func, object size, object loc
         if out_array.dtype != np.{{nptype}}:
             raise TypeError('Supplied output array has the wrong type.'
                              'Expected {{nptype}}, got {0}'.format(out_array.dtype))
-        if not (np.PyArray_CHKFLAGS(out_array, np.NPY_C_CONTIGUOUS) or
-                np.PyArray_CHKFLAGS(out_array, np.NPY_F_CONTIGUOUS)):
-            raise ValueError('Supplied output array is not C contiguous')
+        if not (np.PyArray_CHKFLAGS(out_array, np.NPY_CARRAY) or
+                np.PyArray_CHKFLAGS(out_array, np.NPY_FARRAY)):
+            raise ValueError('Supplied output array is not contiguous, writable or aligned.')
         if size is not None:
             # TODO: enable this !!! if tuple(size) != out_array.shape:
             raise ValueError('size and shape of the supplied output are different')
