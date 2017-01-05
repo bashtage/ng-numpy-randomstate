@@ -27,6 +27,20 @@ cdef np.npy_intp compute_numel(size):
         n = size
     return n
 
+cdef check_output(object out, object dtype, object size):
+    if out is None:
+        return
+    cdef np.ndarray out_array = <np.ndarray>out
+    if not (np.PyArray_CHKFLAGS(out_array, np.NPY_CARRAY) or
+            np.PyArray_CHKFLAGS(out_array, np.NPY_FARRAY)):
+        raise ValueError('Supplied output array is not contiguous, writable or aligned.')
+    if out_array.dtype != dtype:
+        raise TypeError('Supplied output array has the wrong type. '
+                        'Expected {0}, got {0}'.format(dtype, out_array.dtype))
+    if size is not None:
+        # TODO: enable this !!! if tuple(size) != out_array.shape:
+        raise ValueError('size and out cannot be simultaneously used')
+
 cdef double POISSON_LAM_MAX = <double>np.iinfo('l').max - np.sqrt(np.iinfo('l').max)*10
 
 cdef enum ConstraintType:
@@ -101,7 +115,8 @@ cdef int check_constraint(double val, object name, constraint_type cons) except 
     return 0
 
 cdef object cont_broadcast_1(aug_state* state, void* func, object size, object lock,
-                             np.ndarray a_arr, object a_name, constraint_type a_constraint):
+                             np.ndarray a_arr, object a_name, constraint_type a_constraint,
+                             object out):
 
     cdef np.ndarray randoms
     cdef double a_val
@@ -113,10 +128,12 @@ cdef object cont_broadcast_1(aug_state* state, void* func, object size, object l
     if a_constraint != CONS_NONE:
         check_array_constraint(a_arr, a_name, a_constraint)
 
-    if size is not None:
+    if size is not None and out is None:
         randoms = <np.ndarray>np.empty(size, np.double)
-    else:
+    elif out is None:
         randoms = np.PyArray_SimpleNew(np.PyArray_NDIM(a_arr), np.PyArray_DIMS(a_arr), np.NPY_DOUBLE)
+    else:
+        randoms = <np.ndarray>out
 
     randoms_data = <double *>np.PyArray_DATA(randoms)
     n = np.PyArray_SIZE(randoms)
@@ -214,11 +231,13 @@ cdef object cont_broadcast_3(aug_state* state, void* func, object size, object l
 cdef object cont(aug_state* state, void* func, object size, object lock, int narg,
                  object a, object a_name, constraint_type a_constraint,
                  object b, object b_name, constraint_type b_constraint,
-                 object c, object c_name, constraint_type c_constraint):
+                 object c, object c_name, constraint_type c_constraint,
+                 object out):
 
     cdef np.ndarray a_arr, b_arr, c_arr
     cdef double _a = 0.0, _b = 0.0, _c = 0.0
     cdef bint is_scalar = True
+    check_output(out, np.float64, size)
     if narg > 0:
         a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_DOUBLE, np.NPY_ALIGNED)
         is_scalar = is_scalar and np.PyArray_NDIM(a_arr) == 0
@@ -232,7 +251,8 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
     if not is_scalar:
         if narg == 1:
             return cont_broadcast_1(state, func, size, lock,
-                                    a_arr, a_name, a_constraint)
+                                    a_arr, a_name, a_constraint,
+                                    out)
         elif narg == 2:
             return cont_broadcast_2(state, func, size, lock,
                                     a_arr, a_name, a_constraint,
@@ -256,7 +276,7 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
         if c_constraint != CONS_NONE and is_scalar:
             check_constraint(_c, c_name, c_constraint)
 
-    if size is None:
+    if size is None and out is None:
         with lock:
             if narg == 0:
                 return (<random_double_0>func)(state)
@@ -267,8 +287,15 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
             elif narg == 3:
                 return (<random_double_3>func)(state, _a, _b, _c)
 
-    cdef np.npy_intp i, n = compute_numel(size)
-    cdef np.ndarray randoms = np.empty(n, np.double)
+    cdef np.npy_intp i, n
+    cdef np.ndarray randoms
+    if out is None:
+        n = compute_numel(size)
+        randoms = np.empty(n, np.double)
+    else:
+        randoms = <np.ndarray>out
+        n = np.PyArray_SIZE(randoms)
+
     cdef double *randoms_data =  <double *>np.PyArray_DATA(randoms)
     cdef random_double_0 f0;
     cdef random_double_1 f1;
@@ -293,7 +320,10 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
             for i in range(n):
                 randoms_data[i] = f3(state, _a, _b, _c)
 
-    return np.asarray(randoms).reshape(size)
+    if out is None:
+        return np.asarray(randoms).reshape(size)
+    else:
+        return out
 
 cdef object discrete_broadcast_d(aug_state* state, void* func, object size, object lock,
                                  np.ndarray a_arr, object a_name, constraint_type a_constraint):
@@ -602,7 +632,8 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
 
 
 cdef object cont_broadcast_float_1(aug_state* state, void* func, object size, object lock,
-                                   np.ndarray a_arr, object a_name, constraint_type a_constraint):
+                                   np.ndarray a_arr, object a_name, constraint_type a_constraint,
+                                   object out):
 
     cdef np.ndarray randoms
     cdef float a_val
@@ -614,12 +645,14 @@ cdef object cont_broadcast_float_1(aug_state* state, void* func, object size, ob
     if a_constraint != CONS_NONE:
         check_array_constraint(a_arr, a_name, a_constraint)
 
-    if size is not None:
+    if size is not None and out is None:
         randoms = <np.ndarray>np.empty(size, np.float32)
-    else:
+    elif out is None:
         randoms = np.PyArray_SimpleNew(np.PyArray_NDIM(a_arr),
                                        np.PyArray_DIMS(a_arr),
                                        np.NPY_FLOAT32)
+    else:
+        randoms = <np.ndarray>out
 
     randoms_data = <float *>np.PyArray_DATA(randoms)
     n = np.PyArray_SIZE(randoms)
@@ -635,30 +668,38 @@ cdef object cont_broadcast_float_1(aug_state* state, void* func, object size, ob
     return randoms
 
 cdef object cont_float(aug_state* state, void* func, object size, object lock,
-                       object a, object a_name, constraint_type a_constraint):
+                       object a, object a_name, constraint_type a_constraint,
+                       object out):
 
     cdef np.ndarray a_arr, b_arr, c_arr
     cdef float _a
     cdef bint is_scalar = True
     cdef int requirements = np.NPY_ALIGNED | np.NPY_FORCECAST
-
+    check_output(out, np.float32, size)
     a_arr = <np.ndarray>np.PyArray_FROMANY(a, np.NPY_FLOAT32, 0, 0, requirements)
     # a_arr = <np.ndarray>np.PyArray_FROM_OTF(a, np.NPY_FLOAT32, np.NPY_ALIGNED)
     is_scalar = np.PyArray_NDIM(a_arr) == 0
 
     if not is_scalar:
-        return cont_broadcast_float_1(state, func, size, lock, a_arr, a_name, a_constraint)
+        return cont_broadcast_float_1(state, func, size, lock, a_arr, a_name, a_constraint, out)
 
     _a = <float>PyFloat_AsDouble(a)
     if a_constraint != CONS_NONE:
         check_constraint(_a, a_name, a_constraint)
 
-    if size is None:
+    if size is None and out is None:
         with lock:
             return (<random_float_1>func)(state, _a)
 
-    cdef np.npy_intp i, n = compute_numel(size)
-    cdef np.ndarray randoms = np.empty(n, np.float32)
+    cdef np.npy_intp i, n
+    cdef np.ndarray randoms
+    if out is None:
+        n = compute_numel(size)
+        randoms = np.empty(n, np.float32)
+    else:
+        randoms = <np.ndarray>out
+        n = np.PyArray_SIZE(randoms)
+
     cdef float *randoms_data =  <float *>np.PyArray_DATA(randoms)
     cdef random_float_1 f1 = <random_float_1>func;
 
@@ -666,5 +707,7 @@ cdef object cont_float(aug_state* state, void* func, object size, object lock,
         for i in range(n):
             randoms_data[i] = f1(state, _a)
 
-    return np.asarray(randoms).reshape(size)
-
+    if out is None:
+        return np.asarray(randoms).reshape(size)
+    else:
+        return out

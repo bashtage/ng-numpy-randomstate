@@ -40,6 +40,7 @@ What's New or Different
 
   * Uniforms (:meth:`~randomstate.prng.mt19937.random_sample`)
   * Normals (:meth:`~randomstate.prng.mt19937.standard_normal`)
+  * Standard Gammas (:meth:`~randomstate.prng.mt19937.standard_gamma`)
   * Standard Exponentials (:meth:`~randomstate.prng.mt19937.standard_exponential`)
 
   This allows mulththreading to fill large arrays in chunks using suitable
