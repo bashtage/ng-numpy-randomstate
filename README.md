@@ -51,6 +51,7 @@ w = rnd.standard_normal(10000, method='zig')
     * Uniforms (`random_sample`)
     * Exponentials (`standard_exponential`)
     * Normals (`standard_normal`)
+    * Standard Gammas (via `standard_gamma`)
 
 ## Included Pseudo Random Number Generators
 
@@ -78,9 +79,12 @@ The RNGs include:
 support an additional `method` keyword argument which can be `bm` or 
 `zig` where `bm` corresponds to the current method using the Box-Muller 
 transformation and `zig` uses the much faster (100%+) ziggurat method.
-* `random_sample` can produce either single precision (`np.float32`) or
-double precision (`np.float64`, the default) using an the optional 
-keyword argument `dtype`.
+* Core random number generators can produce either single precision
+(`np.float32`) or double precision (`np.float64`, the default) using
+an the optional keyword argument `dtype`
+* Core random number generators can fill existin arrays using the
+`out` keyword argument
+
 
 ### New Functions
 

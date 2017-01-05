@@ -12,6 +12,7 @@ Changes since 1.11.4
   * Uniforms (:meth:`~randomstate.prng.mt19937.random_sample`)
   * Normals (:meth:`~randomstate.prng.mt19937.standard_normal`)
   * Standard Exponentials (:meth:`~randomstate.prng.mt19937.standard_exponential`)
+  * Standard Gammas (:meth:`~randomstate.prng.mt19937.standard_gamma`)
 
 Version 1.11.4
 --------------

@@ -452,15 +452,11 @@ class RNG(object):
         pick = pickle.dumps(self.rs)
         unpick = pickle.loads(pick)
         assert_((type(self.rs) == type(unpick)))
-        print(self.rs.get_state())
-        print(unpick.get_state())
         assert_(comp_state(self.rs.get_state(), unpick.get_state()))
 
         pick = cPickle.dumps(self.rs)
         unpick = cPickle.loads(pick)
         assert_((type(self.rs) == type(unpick)))
-        print(self.rs.get_state())
-        print(unpick.get_state())
         assert_(comp_state(self.rs.get_state(), unpick.get_state()))
 
     def test_version(self):
@@ -506,10 +502,8 @@ class RNG(object):
 
     def test_seed_array_error(self):
         if self.seed_vector_bits == 32:
-            dtype = np.uint32
             out_of_bounds = 2 ** 32
         else:
-            dtype = np.uint64
             out_of_bounds = 2 ** 64
 
         seed = -1
@@ -563,7 +557,6 @@ class RNG(object):
         assert_equal(r1.dtype, np.float32)
         assert_(comp_state(rs.get_state(), rs2.get_state()))
 
-
     def test_normal_zig_floats(self):
         rs = self.mod.RandomState()
         warmup(rs)
@@ -580,7 +573,7 @@ class RNG(object):
     def test_output_fill(self):
         rs = self.rs
         state = rs.get_state()
-        size = (31,7,97)
+        size = (31, 7, 97)
         existing = np.empty(size)
         rs.set_state(state)
         rs.standard_normal(out=existing)
@@ -598,7 +591,7 @@ class RNG(object):
     def test_output_filling_uniform(self):
         rs = self.rs
         state = rs.get_state()
-        size = (31,7,97)
+        size = (31, 7, 97)
         existing = np.empty(size)
         rs.set_state(state)
         rs.random_sample(out=existing)
@@ -613,11 +606,10 @@ class RNG(object):
         direct = rs.random_sample(size=size, dtype=np.float32)
         assert_equal(direct, existing)
 
-
     def test_output_filling_exponential(self):
         rs = self.rs
         state = rs.get_state()
-        size = (31,7,97)
+        size = (31, 7, 97)
         existing = np.empty(size)
         rs.set_state(state)
         rs.standard_exponential(out=existing)
@@ -632,12 +624,58 @@ class RNG(object):
         direct = rs.standard_exponential(size=size, dtype=np.float32)
         assert_equal(direct, existing)
 
+    def test_output_filling_gamma(self):
+        rs = self.rs
+        state = rs.get_state()
+        size = (31, 7, 97)
+        existing = np.zeros(size)
+        rs.set_state(state)
+        rs.standard_gamma(1.0, out=existing)
+        rs.set_state(state)
+        direct = rs.standard_gamma(1.0, size=size)
+        assert_equal(direct, existing)
+
+        existing = np.zeros(size, dtype=np.float32)
+        rs.set_state(state)
+        rs.standard_gamma(1.0, out=existing, dtype=np.float32)
+        rs.set_state(state)
+        direct = rs.standard_gamma(1.0, size=size, dtype=np.float32)
+        assert_equal(direct, existing)
+
+    def test_output_filling_gamma_broadcast(self):
+        rs = self.rs
+        state = rs.get_state()
+        size = (31, 7, 97)
+        mu = np.arange(97.0) + 1.0
+        existing = np.zeros(size)
+        rs.set_state(state)
+        rs.standard_gamma(mu, out=existing)
+        rs.set_state(state)
+        direct = rs.standard_gamma(mu, size=size)
+        assert_equal(direct, existing)
+
+        existing = np.zeros(size, dtype=np.float32)
+        rs.set_state(state)
+        rs.standard_gamma(mu, out=existing, dtype=np.float32)
+        rs.set_state(state)
+        direct = rs.standard_gamma(mu, size=size, dtype=np.float32)
+        assert_equal(direct, existing)
+
     def test_output_fill_error(self):
         rs = self.rs
         size = (31, 7, 97)
         existing = np.empty(size)
         assert_raises(TypeError, rs.standard_normal, out=existing, dtype=np.float32)
         assert_raises(ValueError, rs.standard_normal, out=existing[::3])
+        existing = np.empty(size, dtype=np.float32)
+        assert_raises(TypeError, rs.standard_normal, out=existing, dtype=np.float64)
+
+        existing = np.zeros(size, dtype=np.float32)
+        assert_raises(TypeError, rs.standard_gamma, 1.0, out=existing, dtype=np.float64)
+        assert_raises(ValueError, rs.standard_gamma, 1.0, out=existing[::3], dtype=np.float32)
+        existing = np.zeros(size, dtype=np.float64)
+        assert_raises(TypeError, rs.standard_gamma, 1.0, out=existing, dtype=np.float32)
+        assert_raises(ValueError, rs.standard_gamma, 1.0, out=existing[::3])
 
 
 class TestMT19937(RNG):

@@ -1185,7 +1185,8 @@ cdef class RandomState:
             return cont(&self.rng_state, &random_uniform, size, self.lock, 2,
                         _low, '', CONS_NONE,
                         range, '', CONS_NONE,
-                        0.0, '', CONS_NONE)
+                        0.0, '', CONS_NONE,
+                        None)
 
         temp = np.subtract(ahigh, alow)
         Py_INCREF(temp)  # needed to get around Pyrex's automatic reference-counting
@@ -1196,7 +1197,8 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_uniform, size, self.lock, 2,
                     alow, '', CONS_NONE,
                     arange, '', CONS_NONE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE,
+                    None)
 
     def rand(self, *args, dtype=np.float64):
         """
@@ -1567,12 +1569,14 @@ cdef class RandomState:
             return cont(&self.rng_state, &random_normal, size, self.lock, 2,
                         loc, '', CONS_NONE,
                         scale, 'scale', CONS_NON_NEGATIVE,
-                        0.0, '', CONS_NONE)
+                        0.0, '', CONS_NONE,
+                        None)
         else:
             return cont(&self.rng_state, &random_normal_zig, size, self.lock, 2,
                         loc, '', CONS_NONE,
                         scale, 'scale', CONS_NON_NEGATIVE,
-                        0.0, '', CONS_NONE)
+                        0.0, '', CONS_NONE,
+                        None)
 
     def beta(self, a, b, size=None):
         """
@@ -1615,7 +1619,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_beta, size, self.lock, 2,
                     a, 'a', CONS_POSITIVE,
                     b, 'b', CONS_POSITIVE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
 
     def exponential(self, scale=1.0, size=None):
@@ -1666,7 +1670,8 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_exponential, size, self.lock, 1,
                     scale, 'scale', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE,
+                    None)
 
     def standard_exponential(self, size=None, dtype=np.float64, out=None):
         """
@@ -1717,7 +1722,7 @@ cdef class RandomState:
             raise TypeError('Unsupported dtype "%s" for standard_exponential'
                             % key)
 
-    def standard_gamma(self, shape, size=None, dtype=np.float64):
+    def standard_gamma(self, shape, size=None, dtype=np.float64, out=None):
         """
         standard_gamma(shape, size=None, dtype=np.float64)
 
@@ -1738,6 +1743,10 @@ cdef class RandomState:
         dtype : dtype, optional
             Desired dtype of the result, either ``np.float64`` (default)
             or ``np.float32``.
+        out : ndarray, optional
+            Alternative output array in which to place the result. If size is
+            not None, it must have the same shape as the provided size and
+            must match the type of the output values.
 
         Returns
         -------
@@ -1795,10 +1804,11 @@ cdef class RandomState:
                         size, self.lock, 1,
                         shape, 'shape', CONS_NON_NEGATIVE,
                         0.0, '', CONS_NONE,
-                        0.0, '', CONS_NONE)
+                        0.0, '', CONS_NONE, out)
         if key == 'float32':
             return cont_float(&self.rng_state, &random_standard_gamma_float,
-                              size, self.lock, shape, 'shape', CONS_NON_NEGATIVE)
+                              size, self.lock, shape, 'shape', CONS_NON_NEGATIVE,
+                              out)
         else:
             raise TypeError('Unsupported dtype "%s" for standard_gamma' % key)
 
@@ -1878,7 +1888,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_gamma, size, self.lock, 2,
                     shape, 'shape', CONS_NON_NEGATIVE,
                     scale, 'scale', CONS_NON_NEGATIVE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def f(self, dfnum, dfden, size=None):
         """
@@ -1966,7 +1976,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_f, size, self.lock, 2,
                     dfnum, 'dfnum', CONS_POSITIVE,
                     dfden, 'dfden', CONS_POSITIVE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def noncentral_f(self, dfnum, dfden, nonc, size=None):
         """
@@ -2038,7 +2048,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_noncentral_f, size, self.lock, 3,
                     dfnum, 'dfnum', CONS_POSITIVE,
                     dfden, 'dfden', CONS_POSITIVE,
-                    nonc, 'nonc', CONS_NON_NEGATIVE)
+                    nonc, 'nonc', CONS_NON_NEGATIVE, None)
 
     def chisquare(self, df, size=None):
         """
@@ -2106,7 +2116,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_chisquare, size, self.lock, 1,
                     df, 'df', CONS_POSITIVE,
                     0.0, '', CONS_NONE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def noncentral_chisquare(self, df, nonc, size=None):
         """
@@ -2191,7 +2201,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_noncentral_chisquare, size, self.lock, 2,
                     df, 'df', CONS_POSITIVE,
                     nonc, 'nonc', CONS_NON_NEGATIVE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def standard_cauchy(self, size=None):
         """
@@ -2255,7 +2265,7 @@ cdef class RandomState:
 
         """
         return cont(&self.rng_state, &random_standard_cauchy, size, self.lock, 0,
-                    0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, 0.0, '', CONS_NONE, 0.0, '', CONS_NONE, None)
 
     def standard_t(self, df, size=None):
         """
@@ -2348,7 +2358,8 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_standard_t, size, self.lock, 1,
                     df, 'df', CONS_POSITIVE,
                     0, '', CONS_NONE,
-                    0, '', CONS_NONE)
+                    0, '', CONS_NONE,
+                    None)
 
     def vonmises(self, mu, kappa, size=None):
         """
@@ -2431,7 +2442,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_vonmises, size, self.lock, 2,
                     mu, 'mu', CONS_NONE,
                     kappa, 'kappa', CONS_NON_NEGATIVE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def pareto(self, a, size=None):
         """
@@ -2529,7 +2540,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_pareto, size, self.lock, 1,
                     a, 'a', CONS_POSITIVE,
                     0.0, '', CONS_NONE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def weibull(self, a, size=None):
         """
@@ -2627,7 +2638,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_weibull, size, self.lock, 1,
                     a, 'a', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def power(self, a, size=None):
         """
@@ -2727,7 +2738,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_power, size, self.lock, 1,
                     a, 'a', CONS_POSITIVE,
                     0.0, '', CONS_NONE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def laplace(self, loc=0.0, scale=1.0, size=None):
         """
@@ -2811,7 +2822,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_laplace, size, self.lock, 2,
                     loc, 'loc', CONS_NONE,
                     scale, 'scale', CONS_NON_NEGATIVE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def gumbel(self, loc=0.0, scale=1.0, size=None):
         """
@@ -2928,7 +2939,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_gumbel, size, self.lock, 2,
                     loc, 'loc', CONS_NONE,
                     scale, 'scale', CONS_NON_NEGATIVE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def logistic(self, loc=0.0, scale=1.0, size=None):
         """
@@ -3007,7 +3018,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_logistic, size, self.lock, 2,
                     loc, 'loc', CONS_NONE,
                     scale, 'scale', CONS_POSITIVE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def lognormal(self, mean=0.0, sigma=1.0, size=None):
         """
@@ -3117,7 +3128,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_lognormal, size, self.lock, 2,
                     mean, 'mean', CONS_NONE,
                     sigma, 'sigma', CONS_NON_NEGATIVE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def rayleigh(self, scale=1.0, size=None):
         """
@@ -3184,7 +3195,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_rayleigh, size, self.lock, 1,
                     scale, 'scale', CONS_NON_NEGATIVE,
                     0.0, '', CONS_NONE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def wald(self, mean, scale, size=None):
         """
@@ -3252,7 +3263,7 @@ cdef class RandomState:
         return cont(&self.rng_state, &random_wald, size, self.lock, 2,
                     mean, 'mean', CONS_POSITIVE,
                     scale, 'scale', CONS_POSITIVE,
-                    0.0, '', CONS_NONE)
+                    0.0, '', CONS_NONE, None)
 
     def triangular(self, left, mode, right, size=None):
         """
@@ -3339,7 +3350,7 @@ cdef class RandomState:
             return cont(&self.rng_state, &random_triangular, size, self.lock, 3,
                         fleft, '', CONS_NONE,
                         fmode, '', CONS_NONE,
-                        fright, '', CONS_NONE)
+                        fright, '', CONS_NONE, None)
 
         if np.any(np.greater(oleft, omode)):
             raise ValueError("left > mode")
