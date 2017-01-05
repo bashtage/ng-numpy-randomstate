@@ -113,6 +113,7 @@ New Features
    :maxdepth: 2
 
    Using in Parallel Applications <parallel>
+   Multithreaded Generation <multithreading>
    Reading System Entropy <entropy>
 
 
