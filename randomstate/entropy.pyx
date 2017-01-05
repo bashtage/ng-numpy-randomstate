@@ -30,7 +30,7 @@ def random_entropy(size=None, source='system'):
         single value is returned.
     source : str {'system', 'fallback'}
         Source of entropy.  'system' uses system cryptographic pool.
-        'fallback' uses a has to the time and process id.
+        'fallback' uses a hash of the time and process id.
 
     Returns
     -------
@@ -40,7 +40,8 @@ def random_entropy(size=None, source='system'):
     Notes
     -----
     On Unix-like machines, reads from ``/dev/urandom``. On Windows machines
-    reads from the RSA Full cryptographic service provider.
+    reads from the RSA algorithm provided by the cryptographic service
+    provider.
 
     This function reads from the system entropy pool and so samples are
     not reproducible.  In particular, it does *NOT* make use of a
