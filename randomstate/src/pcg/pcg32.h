@@ -1,5 +1,7 @@
 #ifdef _WIN32
+#ifndef _INTTYPES
 #include "../common/inttypes.h"
+#endif
 #define inline __forceinline
 #else
 #include <inttypes.h>

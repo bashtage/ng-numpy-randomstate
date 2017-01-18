@@ -26,7 +26,9 @@
 #define PCG64_H_INCLUDED 1
 
 #ifdef _WIN32
+#ifndef _INTTYPES
 #include "../common/inttypes.h"
+#endif
 #define inline __forceinline
 #else
 #include <inttypes.h>
