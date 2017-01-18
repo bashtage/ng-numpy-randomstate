@@ -11,6 +11,7 @@ from Cython.Build import cythonize
 from setuptools import setup, find_packages
 from setuptools.extension import Extension
 from setuptools.dist import Distribution
+import versioneer
 
 try:
     import Cython.Tempita as tempita
@@ -246,7 +247,8 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Topic :: Security :: Cryptography']
 
 setup(name='randomstate',
-      version='1.11.4',
+      version=versioneer.get_version(),
+      cmdclass=versioneer.get_cmdclass(),
       classifiers=classifiers,
       packages=find_packages(),
       package_dir={'randomstate': './randomstate'},
