@@ -3,7 +3,8 @@ from __future__ import division, absolute_import, print_function
 import numpy as np
 from numpy.testing import (
         TestCase, run_module_suite, assert_, assert_raises, assert_equal,
-        assert_warns, assert_array_equal, assert_array_almost_equal)
+        assert_warns, assert_no_warnings, assert_array_equal,
+        assert_array_almost_equal)
 from numpy.compat import asbytes
 import sys
 import warnings
@@ -614,27 +615,36 @@ class TestRandomDist(TestCase):
     def test_multivariate_normal(self):
         mt19937.seed(self.seed)
         mean = (.123456789, 10)
-        # Hmm... not even symmetric.
-        cov = [[1, 0], [1, 0]]
+        cov = [[1, 0], [0, 1]]
         size = (3, 2)
         actual = mt19937.multivariate_normal(mean, cov, size)
-        desired = np.array([[[-1.47027513018564449, 10.],
-                             [-1.65915081534845532, 10.]],
-                            [[-2.29186329304599745, 10.],
-                             [-1.77505606019580053, 10.]],
-                            [[-0.54970369430044119, 10.],
-                             [0.29768848031692957, 10.]]])
+        desired = np.array([[[1.463620246718631, 11.73759122771936 ],
+                             [1.622445133300628, 9.771356667546383]],
+                            [[2.154490787682787, 12.170324946056553],
+                             [1.719909438201865, 9.230548443648306]],
+                            [[0.689515026297799, 9.880729819607714],
+                             [-0.023054015651998, 9.201096623542879]]])
+
         assert_array_almost_equal(actual, desired, decimal=15)
 
         # Check for default size, was raising deprecation warning
         actual = mt19937.multivariate_normal(mean, cov)
-        desired = np.array([-0.79441224511977482, 10.])
+        desired = np.array([0.895289569463708, 9.17180864067987])
         assert_array_almost_equal(actual, desired, decimal=15)
 
-        # Check that non positive-semidefinite covariance raises warning
+        # Check that non positive-semidefinite covariance warns with
+        # RuntimeWarning
         mean = [0, 0]
-        cov = [[1, 1 + 1e-10], [1 + 1e-10, 1]]
+        cov = [[1, 2], [2, 1]]
         assert_warns(RuntimeWarning, mt19937.multivariate_normal, mean, cov)
+
+        # and that it doesn't warn with RuntimeWarning check_valid='ignore'
+        assert_no_warnings(mt19937.multivariate_normal, mean, cov,
+                           check_valid='ignore')
+
+        # and that it raises with RuntimeWarning check_valid='raises'
+        assert_raises(ValueError, mt19937.multivariate_normal, mean, cov,
+                      check_valid='raise')
 
     def test_negative_binomial(self):
         mt19937.seed(self.seed)
@@ -810,7 +820,9 @@ class TestRandomDist(TestCase):
         assert_raises(OverflowError, func, [0], [np.inf])
 
         # (fmax / 1e17) - fmin is within range, so this should not throw
-        mt19937.uniform(low=fmin, high=fmax / 1e17)
+        # account for i386 extended precision DBL_MAX / 1e17 + DBL_MAX >
+        # DBL_MAX by increasing fmin a bit
+        mt19937.uniform(low=np.nextafter(fmin, 1), high=fmax / 1e17)
 
     def test_vonmises(self):
         mt19937.seed(self.seed)
