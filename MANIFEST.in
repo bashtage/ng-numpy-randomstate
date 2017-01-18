@@ -10,3 +10,5 @@ exclude randomstate/pcg64*
 exclude randomstate/xorshift128*
 exclude randomstate/xorshift1024*
 
+include versioneer.py
+include randomstate/_version.py
