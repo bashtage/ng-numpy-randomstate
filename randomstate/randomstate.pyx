@@ -3934,9 +3934,10 @@ cdef class RandomState:
                  0.0, '', CONS_NONE)
 
     # Multivariate distributions:
-    def multivariate_normal(self, mean, cov, size=None, method=__normal_method):
+    def multivariate_normal(self, mean, cov, size=None, check_valid='warn',
+                            tol=1e-8, method=__normal_method):
         """
-        multivariate_normal(mean, cov, size=None, method='bm')
+        multivariate_normal(mean, cov[, size, check_valid, tol])
 
         Draw random samples from a multivariate normal distribution.
 
@@ -3959,6 +3960,10 @@ cdef class RandomState:
             generated, and packed in an `m`-by-`n`-by-`k` arrangement.  Because
             each sample is `N`-dimensional, the output shape is ``(m,n,k,N)``.
             If no shape is specified, a single (`N`-D) sample is returned.
+        check_valid : { 'warn', 'raise', 'ignore' }, optional
+            Behavior when the covariance matrix is not positive semidefinite.
+        tol : float, optional
+            Tolerance when checking the singular values in covariance matrix.
         method : str, optional
             Either 'bm' or 'zig'. 'bm' uses the default Box-Muller transformations
             method.  'zig' uses the much faster Ziggurat method of Marsaglia and Tsang.
@@ -4073,12 +4078,20 @@ cdef class RandomState:
         # not zero. We continue to use the SVD rather than Cholesky in
         # order to preserve current outputs. Note that symmetry has not
         # been checked.
+
         (u, s, v) = svd(cov)
-        neg = (np.sum(u.T * v, axis=1) < 0) & (s > 0)
-        if np.any(neg):
-            s[neg] = 0.
-            warnings.warn("covariance is not positive-semidefinite.",
-                          RuntimeWarning)
+
+        if check_valid != 'ignore':
+            if check_valid != 'warn' and check_valid != 'raise':
+                raise ValueError("check_valid must equal 'warn', 'raise', or 'ignore'")
+
+            psd = np.allclose(np.dot(v.T * s, v), cov, rtol=tol, atol=tol)
+            if not psd:
+                if check_valid == 'warn':
+                    warnings.warn("covariance is not positive-semidefinite.",
+                                  RuntimeWarning)
+                else:
+                    raise ValueError("covariance is not positive-semidefinite.")
 
         x = np.dot(x, np.sqrt(s)[:, None] * v)
         x += mean
