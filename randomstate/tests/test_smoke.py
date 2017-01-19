@@ -134,6 +134,9 @@ class RNG(object):
         else:
             raise SkipTest
 
+    def test_random_uintegers(self):
+        assert_(len(self.rs.random_uintegers(10)) == 10)
+
     def test_random_raw(self):
         assert_(len(self.rs.random_raw(10)) == 10)
         assert_(self.rs.random_raw((10, 10)).shape == (10, 10))
@@ -228,6 +231,16 @@ class RNG(object):
         rs2.set_state(state)
         n2 = rs2.randint(0, 2 ** 24, 10, dtype=np.uint32)
         assert_array_equal(n1, n2)
+
+    def test_reset_state_uintegers(self):
+        rs = self.mod.RandomState(*self.seed)
+        rs.random_uintegers(bits=32)
+        state = rs.get_state()
+        n1 = rs.random_uintegers(bits=32, size=10)
+        rs2 = self.mod.RandomState()
+        rs2.set_state(state)
+        n2 = rs2.random_uintegers(bits=32, size=10)
+        assert_((n1 == n2).all())
 
     def test_shuffle(self):
         original = np.arange(200, 0, -1)

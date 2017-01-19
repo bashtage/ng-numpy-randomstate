@@ -97,6 +97,8 @@ New Functions
 -  ``random_raw`` - Direct access to the values produced by the
    underlying PRNG. The range of the values returned depends on the
    specifics of the PRNG implementation.
+-  ``random_uintegers`` - unsigned integers, either 32-
+   (``[0, 2**32-1]``) or 64-bit (``[0, 2**64-1]``)
 -  ``jump`` - Jumps RNGs that support it. ``jump`` moves the state a
    great distance. *Only available if supported by the RNG.*
 -  ``advance`` - Advanced the core RNG 'as-if' a number of draws were
