@@ -2,8 +2,8 @@ import os
 import struct
 import timeit
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from numpy.random import RandomState
 
 rs = RandomState()
@@ -44,7 +44,7 @@ def run_timer(dist, command, numpy_command=None, setup='', random_type=''):
         mod = 'randomstate.prng' if rng != 'random' else 'numpy'
         key = '-'.join((mod, rng, dist)).replace('"', '')
         command = numpy_command if 'numpy' in mod else command
-        res[key] = timer(command.format(dist=dist), setup=setup.format(mod=mod, rng=rng))
+        res[key] = timer(command, setup=setup.format(mod=mod, rng=rng))
 
     s = pd.Series(res)
     t = s.apply(lambda x: '{0:0.2f} ms'.format(x))
@@ -68,41 +68,41 @@ def run_timer(dist, command, numpy_command=None, setup='', random_type=''):
 
 def timer_uniform():
     dist = 'random_sample'
-    command = 'rs.{dist}(1000000)'
+    command = 'rs.random_sample(1000000)'
     run_timer(dist, command, None, SETUP, 'Uniforms')
 
 
 def timer_32bit():
     info = np.iinfo(np.uint32)
     min, max = info.min, info.max
-    dist = 'randint'
-    command = 'rs.{dist}({min}, {max}+1, 1000000, dtype=np.uint64)'
-    command = command.format(dist='{dist}', min=min, max=max)
-    command_numpy = command
-    run_timer(dist, command, None, SETUP, '32-bit unsigned integers')
+    dist = 'random_uintegers'
+    command = 'rs.random_uintegers(1000000, 32)'
+    command_numpy = 'rs.randint({min}, {max}+1, 1000000, dtype=np.uint32)'
+    command_numpy = command_numpy.format(min=min, max=max)
+    run_timer(dist, command, command_numpy, SETUP, '32-bit unsigned integers')
 
 
 def timer_64bit():
     info = np.iinfo(np.uint64)
     min, max = info.min, info.max
-    dist = 'randint'
-    command = 'rs.{dist}({min}, {max}+1, 1000000, dtype=np.uint64)'
-    command = command.format(dist='{dist}', min=min, max=max)
-    command_numpy = command
-    run_timer(dist, command, None, SETUP, '64-bit unsigned integers')
+    dist = 'random_uintegers'
+    command = 'rs.random_uintegers(1000000)'
+    command_numpy = 'rs.randint({min}, {max}+1, 1000000, dtype=np.uint64)'
+    command_numpy = command_numpy.format(min=min, max=max)
+    run_timer(dist, command, command_numpy, SETUP, '64-bit unsigned integers')
 
 
 def timer_normal():
-    command = 'rs.{dist}(1000000, method="bm")'
-    command_numpy = 'rs.{dist}(1000000)'
     dist = 'standard_normal'
+    command = 'rs.standard_normal(1000000, method="bm")'
+    command_numpy = 'rs.standard_normal(1000000)'
     run_timer(dist, command, command_numpy, SETUP, 'Box-Muller normals')
 
 
 def timer_normal_zig():
-    command = 'rs.{dist}(1000000, method="zig")'
-    command_numpy = 'rs.{dist}(1000000)'
     dist = 'standard_normal'
+    command = 'rs.standard_normal(1000000, method="zig")'
+    command_numpy = 'rs.standard_normal(1000000)'
     run_timer(dist, command, command_numpy, SETUP, 'Standard normals (Ziggurat)')
 
 

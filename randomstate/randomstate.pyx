@@ -633,33 +633,35 @@ cdef class RandomState:
         These should not be used to produce bounded random numbers by
         simple truncation.
         """
-        cdef uint32_t [:] randoms32
-        cdef uint64_t [:] randoms64
-        cdef aug_state* rng_state
-        cdef Py_ssize_t i, n
-        rng_state = &self.rng_state
+        cdef np.npy_intp i, n
+        cdef np.ndarray array
+        cdef uint32_t* data32
+        cdef uint64_t* data64
+        cdef aug_state* rng_state = &self.rng_state
         if bits == 64:
             if size is None:
                 with self.lock:
                     return random_uint64(rng_state)
-            n = compute_numel(size)
-            randoms64 = np.empty(n, np.uint64)
+            array = <np.ndarray>np.empty(size, np.uint64)
+            n = np.PyArray_SIZE(array)
+            data64 = <uint64_t *>np.PyArray_DATA(array)
             with self.lock, nogil:
                 for i in range(n):
-                    randoms64[i] = random_uint64(rng_state)
-            return np.asarray(randoms64).reshape(size)
+                    data64[i] = random_uint64(rng_state)
         elif bits == 32:
             if size is None:
                 with self.lock:
                     return random_uint32(rng_state)
-            n = compute_numel(size)
-            randoms32 = np.empty(n, np.uint32)
+            array = <np.ndarray>np.empty(size, np.uint32)
+            n = np.PyArray_SIZE(array)
+            data32 = <uint32_t *>np.PyArray_DATA(array)
             with self.lock, nogil:
                 for i in range(n):
-                    randoms32[i] = random_uint32(rng_state)
-            return np.asarray(randoms32).reshape(size)
+                    data32[i] = random_uint32(rng_state)
         else:
             raise ValueError('Unknown value of bits.  Must be either 32 or 64.')
+
+        return array
 
     def random_raw(self, size=None):
         """
