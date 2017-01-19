@@ -172,7 +172,6 @@ cdef object _ensure_string(object s):
 cdef class RandomState:
     CLASS_DOCSTRING
 
-    # cdef rng_t rng
     cdef void *rng_loc
     cdef binomial_t binomial_info
     cdef aug_state rng_state
