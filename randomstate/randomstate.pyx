@@ -603,6 +603,64 @@ cdef class RandomState:
         self.__seed = state['seed']
         self.__stream = state['stream'] if 'stream' in state else None
 
+    def random_uintegers(self, size=None, int bits=64):
+        """
+        random_uintegers(size=None, bits=64)
+
+        Return random unsigned integers
+
+        Parameters
+        ----------
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  Default is None, in which case a
+            single value is returned.
+        bits : int {32, 64}
+            Size of the unsigned integer to return, either 32 bit or 64 bit.
+
+        Returns
+        -------
+        out : uint or ndarray
+            Drawn samples.
+
+        Notes
+        -----
+        This method effectively exposes access to the raw underlying
+        pseudo-random number generator since these all produce unsigned
+        integers. In practice these are most useful for generating other
+        random numbers.
+
+        These should not be used to produce bounded random numbers by
+        simple truncation.
+        """
+        cdef uint32_t [:] randoms32
+        cdef uint64_t [:] randoms64
+        cdef aug_state* rng_state
+        cdef Py_ssize_t i, n
+        rng_state = &self.rng_state
+        if bits == 64:
+            if size is None:
+                with self.lock:
+                    return random_uint64(rng_state)
+            n = compute_numel(size)
+            randoms64 = np.empty(n, np.uint64)
+            with self.lock, nogil:
+                for i in range(n):
+                    randoms64[i] = random_uint64(rng_state)
+            return np.asarray(randoms64).reshape(size)
+        elif bits == 32:
+            if size is None:
+                with self.lock:
+                    return random_uint32(rng_state)
+            n = compute_numel(size)
+            randoms32 = np.empty(n, np.uint32)
+            with self.lock, nogil:
+                for i in range(n):
+                    randoms32[i] = random_uint32(rng_state)
+            return np.asarray(randoms32).reshape(size)
+        else:
+            raise ValueError('Unknown value of bits.  Must be either 32 or 64.')
+
     def random_raw(self, size=None):
         """
         random_raw(self, size=None)
@@ -4523,6 +4581,7 @@ permutation = _rand.permutation
 sample = ranf = random = random_sample
 
 random_raw = _rand.random_raw
+random_uintegers = _rand.random_uintegers
 
 
 IF RS_RNG_JUMPABLE:
