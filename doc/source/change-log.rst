@@ -3,8 +3,9 @@
 Change Log
 ==========
 
-Changes since 1.11.4
---------------------
+Version 1.12
+------------
+* Synchronize with NumPy 1.12 release
 * Add ``out`` argument which allows filling existing arrays. This feature was
   added to facilitate multithreaded filling of arrays using parallel random
   number generators.

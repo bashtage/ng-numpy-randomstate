@@ -39,7 +39,7 @@ Features
    -  Normals (``standard_normal``, both Box-Muller and Ziggurat)
    -  Standard Gammas (via ``standard_gamma``)
 
-**WARNING**: The 32-bit generators are **experimental** and subjust to
+**WARNING**: The 32-bit generators are **experimental** and subject to
 change.
 
 **Note**: There are *no* plans to extend the alternative precision
@@ -82,11 +82,11 @@ New Features
    ``multivariate_normal`` all support an additional ``method`` keyword
    argument which can be ``bm`` or ``zig`` where ``bm`` corresponds to
    the current method using the Box-Muller transformation and ``zig``
-   uses the much faster (100%+) ziggurat method.
+   uses the much faster (100%+) Ziggurat method.
 -  Core random number generators can produce either single precision
    (``np.float32``) or double precision (``np.float64``, the default)
    using an the optional keyword argument ``dtype``
--  Core random number generators can fill existin arrays using the
+-  Core random number generators can fill existing arrays using the
    ``out`` keyword argument
 
 New Functions

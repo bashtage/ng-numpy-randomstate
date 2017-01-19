@@ -58,7 +58,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'randomstate'
-copyright = '2016, Kevin Sheppard'
+copyright = '2017, Kevin Sheppard'
 author = 'Kevin Sheppard'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -131,7 +131,7 @@ extensions.append("guzzle_sphinx_theme")
 # Guzzle theme options (see theme.conf for more information)
 html_theme_options = {
     # Set the name of the project to appear in the sidebar
-    "project_nav_name": "randomstate",
+    "project_nav_name": "randomstate " + version,
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -286,8 +286,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   (master_doc, 'randomstate', 'randomstate Documentation',
-   author, 'randomstate', 'One line description of project.',
-   'Miscellaneous'),
+   author, 'randomstate', 'NumPy-like random number generation supporting multiple core PRNG.',
+   'Random Numbers'),
 ]
 
 # Documents to append as an appendix to all manuals.

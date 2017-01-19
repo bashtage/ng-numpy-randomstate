@@ -3,14 +3,14 @@ Multithreaded Generation
 
 The four core distributions all allow existing arrays to be filled using the
 ``out`` keyword argument.  Existing arrays need to be contiguous and
-well-behaved (writable and algined).  Under normal circumstances, arrays
+well-behaved (writable and aligned).  Under normal circumstances, arrays
 created using the common constructors such as ``numpy.empty`` will satisfy
 these requirements.
 
 This example makes use of Python 3 ``futures`` to fill an array using multiple
 threads.  Threads are long-lived so that repeated calls do not require any
-additional overheads from thread creation. The undelying PRNG is xorshift2014
-which is fast, has a long period and supports using ``jump`` to advange the
+additional overheads from thread creation. The underlying PRNG is xorshift2014
+which is fast, has a long period and supports using ``jump`` to advance the
 state. The random numbers generated are reproducible in the sense that the
 same seed will produce the same outputs.
 
