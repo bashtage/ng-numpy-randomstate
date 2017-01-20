@@ -18,15 +18,6 @@ ctypedef uint32_t (* random_uint_1_i_32)(aug_state* state, uint32_t a) nogil
 ctypedef int32_t (* random_int_2_i_32)(aug_state* state, int32_t a, int32_t b) nogil
 ctypedef int64_t (* random_int_2_i)(aug_state* state, int64_t a, int64_t b) nogil
 
-cdef np.npy_intp compute_numel(size):
-    cdef np.npy_intp i, n = 1
-    if isinstance(size, tuple):
-        for i in range(len(size)):
-            n *= size[i]
-    else:
-        n = size
-    return n
-
 cdef check_output(object out, object dtype, object size):
     if out is None:
         return
@@ -137,7 +128,7 @@ cdef object cont_broadcast_1(aug_state* state, void* func, object size, object l
 
     randoms_data = <double *>np.PyArray_DATA(randoms)
     n = np.PyArray_SIZE(randoms)
-    it = np.broadcast(randoms, a_arr)
+    it = np.PyArray_MultiIterNew2(randoms, a_arr)
 
     with lock, nogil:
         for i in range(n):
@@ -290,11 +281,10 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
     cdef np.npy_intp i, n
     cdef np.ndarray randoms
     if out is None:
-        n = compute_numel(size)
-        randoms = np.empty(n, np.double)
+        randoms = <np.ndarray>np.empty(size)
     else:
         randoms = <np.ndarray>out
-        n = np.PyArray_SIZE(randoms)
+    n = np.PyArray_SIZE(randoms)
 
     cdef double *randoms_data =  <double *>np.PyArray_DATA(randoms)
     cdef random_double_0 f0;
@@ -321,7 +311,7 @@ cdef object cont(aug_state* state, void* func, object size, object lock, int nar
                 randoms_data[i] = f3(state, _a, _b, _c)
 
     if out is None:
-        return np.asarray(randoms).reshape(size)
+        return randoms
     else:
         return out
 
@@ -346,7 +336,7 @@ cdef object discrete_broadcast_d(aug_state* state, void* func, object size, obje
     randoms_data = <long *>np.PyArray_DATA(randoms)
     n = np.PyArray_SIZE(randoms)
 
-    it = np.broadcast(randoms, a_arr)
+    it = np.PyArray_MultiIterNew2(randoms, a_arr)
     with lock, nogil:
         for i in range(n):
             a_val = (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
@@ -486,7 +476,7 @@ cdef object discrete_broadcast_i(aug_state* state, void* func, object size, obje
     randoms_data = <long *>np.PyArray_DATA(randoms)
     n = np.PyArray_SIZE(randoms)
 
-    it = np.broadcast(randoms, a_arr)
+    it = np.PyArray_MultiIterNew2(randoms, a_arr)
     with lock, nogil:
         for i in range(n):
             a_val = (<long*>np.PyArray_MultiIter_DATA(it, 1))[0]
@@ -591,8 +581,9 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
             else:
                 return (<random_uint_iii>func)(state, _ia, _ib, _ic)
 
-    cdef np.npy_intp i, n = compute_numel(size)
-    cdef np.int_t [::1] randoms = np.empty(n, np.int)
+    cdef np.npy_intp i, n
+    cdef np.ndarray randoms = <np.ndarray>np.empty(size, np.int)
+    cdef np.int_t *randoms_data
     cdef random_uint_0 f0;
     cdef random_uint_d fd;
     cdef random_uint_dd fdd;
@@ -600,35 +591,38 @@ cdef object disc(aug_state* state, void* func, object size, object lock,
     cdef random_uint_i fi;
     cdef random_uint_iii fiii;
 
+    n = np.PyArray_SIZE(randoms)
+    randoms_data =  <np.int_t *>np.PyArray_DATA(randoms)
+
     with lock, nogil:
         if narg_long == 0:
             if narg_double == 0:
                 f0 = (<random_uint_0>func)
                 for i in range(n):
-                    randoms[i] = f0(state)
+                    randoms_data[i] = f0(state)
             elif narg_double == 1:
                 fd = (<random_uint_d>func)
                 for i in range(n):
-                    randoms[i] = fd(state, _da)
+                    randoms_data[i] = fd(state, _da)
             elif narg_double == 2:
                 fdd = (<random_uint_dd>func)
                 for i in range(n):
-                    randoms[i] = fdd(state, _da, _db)
+                    randoms_data[i] = fdd(state, _da, _db)
         elif narg_long == 1:
             if narg_double == 0:
                 fi = (<random_uint_i>func)
                 for i in range(n):
-                    randoms[i] = fi(state, _ia)
+                    randoms_data[i] = fi(state, _ia)
             if narg_double == 1:
                 fdi = (<random_uint_di>func)
                 for i in range(n):
-                    randoms[i] = fdi(state, _da, _ib)
+                    randoms_data[i] = fdi(state, _da, _ib)
         else:
             fiii = (<random_uint_iii>func)
             for i in range(n):
-                randoms[i] = fiii(state, _ia, _ib, _ic)
+                randoms_data[i] = fiii(state, _ia, _ib, _ic)
 
-    return np.asarray(randoms).reshape(size)
+    return randoms
 
 
 cdef object cont_broadcast_float_1(aug_state* state, void* func, object size, object lock,
@@ -656,7 +650,7 @@ cdef object cont_broadcast_float_1(aug_state* state, void* func, object size, ob
 
     randoms_data = <float *>np.PyArray_DATA(randoms)
     n = np.PyArray_SIZE(randoms)
-    it = np.broadcast(randoms, a_arr)
+    it = np.PyArray_MultiIterNew2(randoms, a_arr)
 
     with lock, nogil:
         for i in range(n):
@@ -694,11 +688,10 @@ cdef object cont_float(aug_state* state, void* func, object size, object lock,
     cdef np.npy_intp i, n
     cdef np.ndarray randoms
     if out is None:
-        n = compute_numel(size)
-        randoms = np.empty(n, np.float32)
+        randoms = <np.ndarray>np.empty(size, np.float32)
     else:
         randoms = <np.ndarray>out
-        n = np.PyArray_SIZE(randoms)
+    n = np.PyArray_SIZE(randoms)
 
     cdef float *randoms_data =  <float *>np.PyArray_DATA(randoms)
     cdef random_float_1 f1 = <random_float_1>func;
@@ -708,6 +701,6 @@ cdef object cont_float(aug_state* state, void* func, object size, object lock,
             randoms_data[i] = f1(state, _a)
 
     if out is None:
-        return np.asarray(randoms).reshape(size)
+        return randoms
     else:
         return out
