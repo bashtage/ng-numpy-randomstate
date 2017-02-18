@@ -41,7 +41,7 @@ ctypedef pcg64_random_t rng_t
 cdef object pcg128_to_pylong(pcg128_t x):
     return PyLong_FromUnsignedLongLong(x.high) * 2**64 + PyLong_FromUnsignedLongLong(x.low)
 
-cdef pcg128_t pcg128_from_pylong(object x):
+cdef pcg128_t pcg128_from_pylong(object x) except *:
     cdef pcg128_t out
     out.high = PyLong_AsUnsignedLongLong(x // (2 ** 64))
     out.low = PyLong_AsUnsignedLongLong(x % (2 ** 64))
