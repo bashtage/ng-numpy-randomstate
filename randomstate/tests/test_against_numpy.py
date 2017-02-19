@@ -38,7 +38,7 @@ def compare_2_input(f1, f2, is_np=False, is_scalar=False):
               ((np.array([a] * 10), b), {}),
               ((a, np.array([b] * 10)), {}),
               ((a, np.array([b] * 10)), {'size': 10}),
-              ((np.array([[[a]] * 100]), np.array([b] * 10)), {'size': (100, 10)}),
+              ((np.reshape(np.array([[a] * 100]), (100,1)), np.array([b] * 10)), {'size': (100, 10)}),
               ((np.ones((7, 31), dtype=dtype) * a, np.array([b] * 31)), {'size': (7, 31)}),
               ((np.ones((7, 31), dtype=dtype) * a, np.array([b] * 31)), {'size': (10, 7, 31)})]
 
@@ -46,9 +46,11 @@ def compare_2_input(f1, f2, is_np=False, is_scalar=False):
         inputs = inputs[:3]
 
     for i in inputs:
+        print(i[0], i[1])
         v1 = f1(*i[0], **i[1])
         v2 = f2(*i[0], **i[1])
         assert_allclose(v1, v2)
+        print('OK!'*20)
 
 
 def compare_3_input(f1, f2, is_np=False):

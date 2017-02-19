@@ -75,8 +75,10 @@ def comp_state(state1, state2):
     if isinstance(state1, dict):
         for key in state1:
             identical &= comp_state(state1[key], state2[key])
+    elif type(state1) != type(state2):
+        identical &= type(state1) == type(state2)
     else:
-        if isinstance(state1, (list, tuple, np.ndarray)):
+        if (isinstance(state1, (list, tuple, np.ndarray)) and isinstance(state2, (list, tuple, np.ndarray))):
             for s1, s2 in zip(state1, state2):
                 identical &= comp_state(s1, s2)
         else:
@@ -105,6 +107,7 @@ class RNG(object):
         cls.vec_1d = np.arange(2.0, 102.0)
         cls.vec_2d = np.arange(2.0, 102.0)[None, :]
         cls.mat = np.arange(2.0, 102.0, 0.01).reshape((100, 100))
+        cls.seed_error = TypeError
 
     def _reset_state(self):
         self.rs.set_state(self.initial_state)
@@ -701,6 +704,7 @@ class TestMT19937(RNG):
         cls.initial_state = cls.rs.get_state()
         cls.seed_vector_bits = 32
         cls._extra_setup()
+        cls.seed_error = ValueError
 
     def test_numpy_state(self):
         nprs = np.random.RandomState()
@@ -725,6 +729,25 @@ class TestPCG32(RNG, unittest.TestCase):
         cls.seed_vector_bits = None
         cls._extra_setup()
 
+    def test_seed_array_error(self):
+        # GH #82 for eror type changes
+        if self.seed_vector_bits == 32:
+            out_of_bounds = 2 ** 32
+        else:
+            out_of_bounds = 2 ** 64
+
+        seed = -1
+        assert_raises(ValueError, self.rs.seed, seed)
+
+        seed = np.array([-1], dtype=np.int32)
+        assert_raises(TypeError, self.rs.seed, seed)
+
+        seed = np.array([1, 2, 3, -5], dtype=np.int32)
+        assert_raises(TypeError, self.rs.seed, seed)
+
+        seed = np.array([1, 2, 3, out_of_bounds])
+        assert_raises(TypeError, self.rs.seed, seed)
+
 
 class TestPCG64(RNG, unittest.TestCase):
     @classmethod
@@ -737,6 +760,25 @@ class TestPCG64(RNG, unittest.TestCase):
         cls.initial_state = cls.rs.get_state()
         cls.seed_vector_bits = None
         cls._extra_setup()
+
+    def test_seed_array_error(self):
+        # GH #82 for eror type changes
+        if self.seed_vector_bits == 32:
+            out_of_bounds = 2 ** 32
+        else:
+            out_of_bounds = 2 ** 64
+
+        seed = -1
+        assert_raises(ValueError, self.rs.seed, seed)
+
+        seed = np.array([-1], dtype=np.int32)
+        assert_raises(TypeError, self.rs.seed, seed)
+
+        seed = np.array([1, 2, 3, -5], dtype=np.int32)
+        assert_raises(TypeError, self.rs.seed, seed)
+
+        seed = np.array([1, 2, 3, out_of_bounds])
+        assert_raises(TypeError, self.rs.seed, seed)
 
 
 class TestXorShift128(RNG, unittest.TestCase):

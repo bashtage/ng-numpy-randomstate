@@ -14,7 +14,8 @@ from randomstate.prng.xorshift1024 import xorshift1024
 from randomstate.prng.xorshift128 import xorshift128
 from randomstate.prng.xoroshiro128plus import xoroshiro128plus
 from randomstate.prng.dsfmt import dsfmt
-from numpy.testing import assert_equal, assert_allclose, assert_array_equal
+from numpy.testing import assert_equal, assert_allclose, assert_array_equal, \
+    assert_raises
 
 if (sys.version_info > (3, 0)):
     long = int
@@ -126,10 +127,11 @@ class Base(object):
     data2 = data1 = {}
 
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         cls.RandomState = xorshift128.RandomState
         cls.bits = 64
         cls.dtype = np.uint64
+        cls.seed_error_type = TypeError
 
     @classmethod
     def _read_csv(cls, filename):
@@ -189,86 +191,163 @@ class Base(object):
         assert_allclose(uniforms, vals)
         assert_equal(uniforms.dtype, np.float32)
 
+    def test_seed_float(self):
+        # GH #82
+        rs = self.RandomState(*self.data1['seed'])
+        assert_raises(self.seed_error_type, rs.seed, np.pi)
+        assert_raises(self.seed_error_type, rs.seed, -np.pi)
+
+    def test_seed_float_array(self):
+        # GH #82
+        rs = self.RandomState(*self.data1['seed'])
+        assert_raises(self.seed_error_type, rs.seed, np.array([np.pi]))
+        assert_raises(self.seed_error_type, rs.seed, np.array([-np.pi]))
+        assert_raises(self.seed_error_type, rs.seed, np.array([np.pi, -np.pi]))
+        assert_raises(self.seed_error_type, rs.seed, np.array([0, np.pi]))
+        assert_raises(self.seed_error_type, rs.seed, [np.pi])
+        assert_raises(self.seed_error_type, rs.seed, [0, np.pi])
+
+    def test_seed_out_of_range(self):
+        # GH #82
+        rs = self.RandomState(*self.data1['seed'])
+        assert_raises(ValueError, rs.seed, 2 ** (2 * self.bits+1))
+        assert_raises(ValueError, rs.seed, -1)
+
+    def test_seed_out_of_range_array(self):
+        # GH #82
+        rs = self.RandomState(*self.data1['seed'])
+        assert_raises(ValueError, rs.seed, [2 ** (2 * self.bits+1)])
+        assert_raises(ValueError, rs.seed, [-1])
 
 class TestXorshift128(Base, TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         cls.RandomState = xorshift128.RandomState
         cls.bits = 64
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/xorshift128-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/xorshift128-testset-2.csv'))
         cls.uniform32_func = uniform32_from_uint64
+        cls.seed_error_type = TypeError
 
 
 class TestXoroshiro128plus(Base, TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         cls.RandomState = xoroshiro128plus.RandomState
         cls.bits = 64
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/xoroshiro128plus-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/xoroshiro128plus-testset-2.csv'))
-
+        cls.seed_error_type = TypeError
 
 class TestXorshift1024(Base, TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         cls.RandomState = xorshift1024.RandomState
         cls.bits = 64
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/xorshift1024-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/xorshift1024-testset-2.csv'))
-
+        cls.seed_error_type = TypeError
 
 class TestMT19937(Base, TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         cls.RandomState = mt19937.RandomState
         cls.bits = 32
         cls.dtype = np.uint32
         cls.data1 = cls._read_csv(join(pwd, './data/randomkit-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/randomkit-testset-2.csv'))
+        cls.seed_error_type = ValueError
+
+    def test_seed_out_of_range(self):
+        # GH #82
+        rs = self.RandomState(*self.data1['seed'])
+        assert_raises(ValueError, rs.seed, 2 ** (self.bits + 1))
+        assert_raises(ValueError, rs.seed, -1)
+        assert_raises(ValueError, rs.seed, 2 ** (2 * self.bits+1))
+
+    def test_seed_out_of_range_array(self):
+        # GH #82
+        rs = self.RandomState(*self.data1['seed'])
+        assert_raises(ValueError, rs.seed, [2 ** (self.bits + 1)])
+        assert_raises(ValueError, rs.seed, [-1])
+        assert_raises(TypeError, rs.seed, [2 ** (2 * self.bits+1)])
+
+    def test_seed_float(self):
+        # GH #82
+        rs = self.RandomState(*self.data1['seed'])
+        assert_raises(TypeError, rs.seed, np.pi)
+        assert_raises(TypeError, rs.seed, -np.pi)
+
+    def test_seed_float_array(self):
+        # GH #82
+        rs = self.RandomState(*self.data1['seed'])
+        assert_raises(TypeError, rs.seed, np.array([np.pi]))
+        assert_raises(TypeError, rs.seed, np.array([-np.pi]))
+        assert_raises(TypeError, rs.seed, np.array([np.pi, -np.pi]))
+        assert_raises(TypeError, rs.seed, np.array([0, np.pi]))
+        assert_raises(TypeError, rs.seed, [np.pi])
+        assert_raises(TypeError, rs.seed, [0, np.pi])
 
 
 class TestPCG32(Base, TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         cls.RandomState = pcg32.RandomState
         cls.bits = 32
         cls.dtype = np.uint32
         cls.data1 = cls._read_csv(join(pwd, './data/pcg32-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/pcg32-testset-2.csv'))
+        cls.seed_error_type = TypeError
+
+    def test_seed_out_of_range_array(self):
+        # GH #82
+        rs = self.RandomState(*self.data1['seed'])
+        assert_raises(TypeError, rs.seed, [2 ** (self.bits + 1)])
+        assert_raises(TypeError, rs.seed, [-1])
+        assert_raises(TypeError, rs.seed, [2 ** (2 * self.bits+1)])
 
 
 class TestPCG64(Base, TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         cls.RandomState = pcg64.RandomState
         cls.bits = 64
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/pcg64-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/pcg64-testset-2.csv'))
+        cls.seed_error_type = TypeError
+
+    def test_seed_out_of_range_array(self):
+        # GH #82
+        rs = self.RandomState(*self.data1['seed'])
+        assert_raises(TypeError, rs.seed, [2 ** (self.bits + 1)])
+        assert_raises(TypeError, rs.seed, [-1])
+        assert_raises(TypeError, rs.seed, [2 ** (2 * self.bits+1)])
 
 
 class TestMRG32K3A(Base, TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         cls.RandomState = mrg32k3a.RandomState
         cls.bits = 32
         cls.dtype = np.uint32
         cls.data1 = cls._read_csv(join(pwd, './data/mrg32k3a-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/mrg32k3a-testset-2.csv'))
+        cls.seed_error_type = TypeError
 
 
 class TestMLFG(Base, TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         cls.RandomState = mlfg_1279_861.RandomState
         cls.bits = 63
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/mlfg-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/mlfg-testset-2.csv'))
+        cls.seed_error_type = TypeError
 
     def test_raw(self):
         rs = self.RandomState(*self.data1['seed'])
@@ -284,12 +363,13 @@ class TestMLFG(Base, TestCase):
 
 class TestDSFMT(Base, TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         cls.RandomState = dsfmt.RandomState
         cls.bits = 53
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/dSFMT-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/dSFMT-testset-2.csv'))
+        cls.seed_error_type = TypeError
 
     def test_uniform_double(self):
         rs = self.RandomState(*self.data1['seed'])

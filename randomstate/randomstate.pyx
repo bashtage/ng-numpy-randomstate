@@ -275,6 +275,13 @@ cdef class RandomState:
             ----------
             seed : int, optional
                 Seed for ``RandomState``.
+            
+            Raises
+            ------
+            ValueError
+                If seed values are out of range for the PRNG.
+            TypeError
+                If seed values are not integers.
 
             Notes
             -----
@@ -287,38 +294,49 @@ cdef class RandomState:
             --------
             RandomState
             """
-            try:
-                if seed is not None:
-                    if hasattr(seed, 'squeeze'):
-                        seed = seed.squeeze()
-                    idx = operator.index(seed)
-                    if idx < 0:
-                        raise ValueError('seed < 0')
-                else:
-                    self.__seed = seed = _generate_seed(RS_SEED_NBYTES)
+            if seed is None:
+                self.__seed = seed = _generate_seed(RS_SEED_NBYTES)
                 set_seed(&self.rng_state, seed)
-            except TypeError:
+                self._reset_state_variables()
+                return
+
+            if hasattr(seed, 'squeeze'):
+                seed = seed.squeeze()
+            IF RS_SEED_ARRAY_BITS == 32:
+                seed = np.asarray(seed).astype(np.object, casting='safe')
+                if np.any((seed // 1) != seed):
+                    raise TypeError("Seed values must be integers between "
+                                    "0 and 4294967295 (2**32-1)")
+                if np.any((seed < int(0)) | (seed > int(2**32-1))):
+                    raise ValueError("Seed values must be integers between "
+                                    "0 and 4294967295 (2**32-1)")
+                seed = np.asarray(seed).astype(np.uint32, casting='unsafe')
+            ELSE:
+                seed = np.asarray(seed).astype(np.object, casting='safe')
+                if np.any((seed // 1) != seed):
+                    raise TypeError("Seed values must be integers between 0 and "
+                                    "18446744073709551616 (2**64-1)")
+                if np.any((seed < int(0)) | (seed > int(2**64-1))):
+                    raise ValueError("Seed values must be integers between 0 and "
+                                     "18446744073709551616 (2**64-1)")
+                seed = np.asarray(seed).astype(np.uint64, casting='unsafe')
+
+            if seed.ndim == 0:
                 IF RS_SEED_ARRAY_BITS == 32:
-                    seed = np.asarray(seed).astype(np.int64, casting='safe')
-                    if ((seed > int(2**32 - 1)) | (seed < 0)).any():
-                        raise ValueError("Seed values must be between 0 and "
-                                         "4294967295  (2**32-1)")
-                    seed = seed.astype(np.uint32, casting='unsafe')
-                    with self.lock:
-                        set_seed_by_array(&self.rng_state,
-                                          <uint32_t *>np.PyArray_DATA(seed),
-                                          np.PyArray_DIM(seed, 0))
+                    seed = <uint32_t> seed
                 ELSE:
-                    seed = np.asarray(seed).astype(np.object, casting='safe')
-                    if ((seed > int(2**64 - 1)) | (seed < 0)).any():
-                        raise ValueError("Seed values must be between 0 and "
-                                         "18446744073709551616 (2**64-1)")
-                    seed = seed.astype(np.uint64, casting='unsafe')
-                    with self.lock:
-                        set_seed_by_array(&self.rng_state,
-                                          <uint64_t *>np.PyArray_DATA(seed),
-                                          np.PyArray_DIM(seed, 0))
-                self.__seed = seed
+                    seed = <uint64_t> seed
+                set_seed(&self.rng_state, seed)
+            else:
+                IF RS_SEED_ARRAY_BITS == 32:
+                    set_seed_by_array(&self.rng_state,
+                                      <uint32_t *>np.PyArray_DATA(seed),
+                                      np.PyArray_DIM(seed, 0))
+                ELSE:
+                    set_seed_by_array(&self.rng_state,
+                                      <uint64_t *>np.PyArray_DATA(seed),
+                                      np.PyArray_DIM(seed, 0))
+            self.__seed = seed
             self._reset_state_variables()
 
     ELSE:
@@ -338,18 +356,41 @@ cdef class RandomState:
             stream : int, optional
                 Generator stream to use
 
+            Raises
+            ------
+            ValueError
+                If seed values are out of range for the PRNG.
+            TypeError
+                If seed values are not scalar integers.
+
             See Also
             --------
             RandomState
             """
-            if seed is None:
+            ub =  2 ** (32 * RS_SEED_NBYTES)
+            if seed is not None:
+                error_msg = 'seed must be a scalar integer 0<=seed<{0}'.format(ub)
+                _seed = np.asarray(seed, dtype=np.object)
+                if _seed.ndim > 0:
+                    raise TypeError(error_msg)
+                elif seed // 1 != seed:
+                    raise TypeError(error_msg)
+                elif seed < 0 or seed >= ub:
+                    raise ValueError(error_msg)
+            else:
                 self.__seed = seed = _generate_seed(RS_SEED_NBYTES)
-            elif seed < 0:
-                raise ValueError('seed < 0')
-            if stream is None:
+
+            if stream is not None:
+                error_msg = 'stream must be a scalar integer 0<=stream<{0}'.format(ub)
+                _stream= np.asarray(stream, dtype=np.object)
+                if _stream.ndim > 0:
+                    raise TypeError(error_msg)
+                elif stream // 1 != stream:
+                    raise TypeError(error_msg)
+                elif stream < 0 or stream >= ub:
+                    raise ValueError(error_msg)
+            else:
                 self.__stream = stream = 1
-            elif stream < 0:
-                raise ValueError('stream < 0')
 
             IF RS_RNG_MOD_NAME == 'pcg64':
                 IF RS_PCG128_EMULATED:
@@ -359,7 +400,7 @@ cdef class RandomState:
                 ELSE:
                     set_seed(&self.rng_state, seed, stream)
             ELSE:
-                set_seed(&self.rng_state, seed, stream)
+                set_seed(&self.rng_state, <uint64_t>seed, <uint64_t>stream)
             self._reset_state_variables()
 
     def _reset_state_variables(self):
