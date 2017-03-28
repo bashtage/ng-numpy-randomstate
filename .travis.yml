@@ -60,7 +60,7 @@ install:
       cd doc
       make html
       pip install doctr
-      doctr deploy doc/build
+      doctr deploy doc
     fi;
   - cd $HOME
 
