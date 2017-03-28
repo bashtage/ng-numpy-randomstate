@@ -28,12 +28,13 @@ same seed will produce the same outputs.
                 threads = multiprocessing.cpu_count()
             self.threads = threads
 
-            self._random_states = [rs]
-            for _ in range(1, threads):
+            self._random_states = []
+            for _ in range(0, threads-1):
                 _rs = randomstate.prng.xorshift1024.RandomState()
-                rs.jump()
                 _rs.set_state(rs.get_state())
                 self._random_states.append(_rs)
+                rs.jump()
+            self._random_states.append(rs)
 
             self.n = n
             self.executor = concurrent.futures.ThreadPoolExecutor(threads)
@@ -68,12 +69,13 @@ same seed will produce the same outputs.
      ....:         if threads is None:
      ....:             threads = multiprocessing.cpu_count()
      ....:         self.threads = threads
-     ....:         self._random_states = [rs]
-     ....:         for _ in range(1, threads):
+     ....:         self._random_states = []
+     ....:         for _ in range(0, threads-1):
      ....:             _rs = randomstate.prng.xorshift1024.RandomState()
-     ....:             rs.jump()
      ....:             _rs.set_state(rs.get_state())
      ....:             self._random_states.append(_rs)
+     ....:             rs.jump()
+     ....:         self._random_states.append(rs)
      ....:         self.n = n
      ....:         self.executor = concurrent.futures.ThreadPoolExecutor(threads)
      ....:         self.values = np.empty(n)
