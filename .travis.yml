@@ -65,6 +65,7 @@ script:
       conda install -c conda-forge doctr
       cd ${BUILD_DIR}/doc
       make html
+      cd ${BUILD_DIR}
       doctr deploy doc
     fi;
   - |
