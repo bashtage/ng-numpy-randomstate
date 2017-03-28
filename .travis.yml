@@ -7,6 +7,10 @@ dist: trusty
 sudo: required
 language: python
 
+env:
+  global:
+    - secure: "aupv9PPJZh7WjV2fl8fnxvztT5HHPz0j3pPkaMrxWT5fhWhbL/RYSqkkCh+GZiYFnDToXEdiNLuj2UD3CsRNu1ry9RuI9f9KcBgL9udacu2XC00c8XMl1Puiy02RjHe17DAHmAyoTEcckDoHyoKHM6rfyYCjGEDoqJuW6VfJr0KdNUE9bZSdj+kDQgQT0cilaHywzLnHg0v7K83vp2MG0BELV4vcB/OU/BmFeekjqNWaYHDHP0Ur+WG7FoOpGyG3dqO+Hlutx8tXlwjVHgTjkd6vJOU/3AHjWFfrNd9Z6Pzi2afCBZjLXHOeHm8X4Be4Gd9EJnWpARRev+6bgXVCyVZsaRscXPsdl0ylmYFROiUqIlvnqjPRDTRhq4kA72Fvtsf6RzTHX0CdDyctVMw3RoasrA9yRRg7SQYuTn1yKCpEpSGeDWjHo1/PqyBTvGdAwTse9jitBxyw3lC3dXAQDpQo5Smk5ZFwBS+9T0tm8QR1P63Nv9TeK9yjsJe/cytb5ZP495FKBJ1iBntjhOfhoahKbcFcVZjyZZYQZ5f1pVcZoKI4iTuBZup060ZmDRXjwStR2N63za9DocY6oVIyHaLcrgiej8KqvBeqWCxNvMNdiw/4O47/4T6qsvsjdceSUBkR8yPyuL3NfkZXUzzxdWwkNKHynxYYLprKZqHqfUU="
+
 services:
     - docker
 
@@ -45,11 +49,19 @@ before_install:
 
 # Install packages
 install:
-  - conda create -n randomstate-test ${PKGS} nose pip setuptools --quiet
+  - conda create -n randomstate-test ${PKGS} nose pip setuptools matplotlib --quiet
   - source activate randomstate-test
-  - pip install tempita
+  - pip install tempita sphinx guzzle_sphinx_theme ipython -q
   - python setup.py install
   - export BUILD_DIR=$PWD
+  - set -e
+  - |
+    if [ ${PYTHON} = 3.5 ]; then
+      cd doc
+      make html
+      pip install doctr
+      doctr deploy doc/build
+    fi;
   - cd $HOME
 
 script:
