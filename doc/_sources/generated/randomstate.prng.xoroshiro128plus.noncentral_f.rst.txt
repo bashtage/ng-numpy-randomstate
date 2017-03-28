@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.noncentral_f
+==============================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: noncentral_f

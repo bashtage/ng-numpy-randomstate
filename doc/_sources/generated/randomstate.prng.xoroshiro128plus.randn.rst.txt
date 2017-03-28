@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.randn
+=======================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: randn

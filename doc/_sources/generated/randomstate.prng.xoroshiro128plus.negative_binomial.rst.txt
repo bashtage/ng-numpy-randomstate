@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.negative_binomial
+===================================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: negative_binomial

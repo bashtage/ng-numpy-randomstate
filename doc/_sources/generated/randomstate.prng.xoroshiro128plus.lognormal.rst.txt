@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.lognormal
+===========================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: lognormal

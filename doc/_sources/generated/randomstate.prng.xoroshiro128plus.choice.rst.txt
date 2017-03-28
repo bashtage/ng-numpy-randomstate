@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.choice
+========================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: choice

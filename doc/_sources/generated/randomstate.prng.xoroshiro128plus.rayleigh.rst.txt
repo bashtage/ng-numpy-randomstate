@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.rayleigh
+==========================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: rayleigh

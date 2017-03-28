@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.power
+=======================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: power

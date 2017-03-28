@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.beta
+======================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: beta

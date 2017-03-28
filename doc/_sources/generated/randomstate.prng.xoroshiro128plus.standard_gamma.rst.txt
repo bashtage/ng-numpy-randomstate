@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.standard_gamma
+================================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: standard_gamma

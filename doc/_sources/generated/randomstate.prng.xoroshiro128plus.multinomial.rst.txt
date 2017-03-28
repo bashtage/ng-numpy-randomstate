@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.multinomial
+=============================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: multinomial

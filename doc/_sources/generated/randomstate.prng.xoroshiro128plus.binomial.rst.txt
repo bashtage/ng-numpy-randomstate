@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.binomial
+==========================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: binomial

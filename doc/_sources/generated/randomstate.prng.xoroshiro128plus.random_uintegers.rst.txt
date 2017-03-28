@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.random_uintegers
+==================================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: random_uintegers

@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.poisson
+=========================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: poisson
