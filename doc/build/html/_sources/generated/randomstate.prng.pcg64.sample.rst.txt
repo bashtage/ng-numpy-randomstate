@@ -1,6 +1,0 @@
-randomstate.prng.pcg64.sample
-=============================
-
-.. currentmodule:: randomstate.prng.pcg64
-
-.. autofunction:: sample

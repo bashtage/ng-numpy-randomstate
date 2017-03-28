@@ -1,6 +1,0 @@
-randomstate.prng.xoroshiro128plus.seed
-======================================
-
-.. currentmodule:: randomstate.prng.xoroshiro128plus
-
-.. autofunction:: seed

@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.triangular
-=================================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: triangular

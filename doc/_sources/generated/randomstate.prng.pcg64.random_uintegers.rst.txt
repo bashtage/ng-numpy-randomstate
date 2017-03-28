@@ -1,6 +1,0 @@
-randomstate.prng.pcg64.random_uintegers
-=======================================
-
-.. currentmodule:: randomstate.prng.pcg64
-
-.. autofunction:: random_uintegers

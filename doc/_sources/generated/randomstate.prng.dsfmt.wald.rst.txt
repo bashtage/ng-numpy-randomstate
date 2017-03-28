@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.wald
-===========================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: wald

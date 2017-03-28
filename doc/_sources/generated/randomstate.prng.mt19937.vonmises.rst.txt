@@ -1,6 +1,0 @@
-randomstate.prng.mt19937.vonmises
-=================================
-
-.. currentmodule:: randomstate.prng.mt19937
-
-.. autofunction:: vonmises

@@ -1,6 +1,0 @@
-randomstate.prng.xorshift128.dirichlet
-======================================
-
-.. currentmodule:: randomstate.prng.xorshift128
-
-.. autofunction:: dirichlet

@@ -1,6 +1,0 @@
-randomstate.prng.mlfg_1279_861.weibull
-======================================
-
-.. currentmodule:: randomstate.prng.mlfg_1279_861
-
-.. autofunction:: weibull

@@ -1,6 +1,0 @@
-randomstate.prng.pcg32.gamma
-============================
-
-.. currentmodule:: randomstate.prng.pcg32
-
-.. autofunction:: gamma

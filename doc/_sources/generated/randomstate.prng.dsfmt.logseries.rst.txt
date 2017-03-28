@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.logseries
-================================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: logseries

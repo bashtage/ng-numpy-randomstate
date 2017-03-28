@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.weibull
-==============================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: weibull

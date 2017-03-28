@@ -1,6 +1,0 @@
-randomstate.prng.pcg32.multivariate_normal
-==========================================
-
-.. currentmodule:: randomstate.prng.pcg32
-
-.. autofunction:: multivariate_normal

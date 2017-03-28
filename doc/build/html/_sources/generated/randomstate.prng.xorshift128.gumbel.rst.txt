@@ -1,6 +1,0 @@
-randomstate.prng.xorshift128.gumbel
-===================================
-
-.. currentmodule:: randomstate.prng.xorshift128
-
-.. autofunction:: gumbel

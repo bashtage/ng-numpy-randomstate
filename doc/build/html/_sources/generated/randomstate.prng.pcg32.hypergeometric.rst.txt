@@ -1,6 +1,0 @@
-randomstate.prng.pcg32.hypergeometric
-=====================================
-
-.. currentmodule:: randomstate.prng.pcg32
-
-.. autofunction:: hypergeometric

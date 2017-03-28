@@ -1,6 +1,0 @@
-randomstate.prng.xorshift1024.geometric
-=======================================
-
-.. currentmodule:: randomstate.prng.xorshift1024
-
-.. autofunction:: geometric

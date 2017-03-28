@@ -1,6 +1,0 @@
-randomstate.prng.xoroshiro128plus.shuffle
-=========================================
-
-.. currentmodule:: randomstate.prng.xoroshiro128plus
-
-.. autofunction:: shuffle

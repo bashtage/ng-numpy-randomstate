@@ -1,6 +1,0 @@
-randomstate.prng.mt19937.sample
-===============================
-
-.. currentmodule:: randomstate.prng.mt19937
-
-.. autofunction:: sample

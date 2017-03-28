@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.standard_normal
-======================================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: standard_normal

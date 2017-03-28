@@ -1,6 +1,0 @@
-randomstate.prng.xorshift128.weibull
-====================================
-
-.. currentmodule:: randomstate.prng.xorshift128
-
-.. autofunction:: weibull

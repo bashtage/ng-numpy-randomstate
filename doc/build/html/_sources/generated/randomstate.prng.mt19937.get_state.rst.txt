@@ -1,6 +1,0 @@
-randomstate.prng.mt19937.get_state
-==================================
-
-.. currentmodule:: randomstate.prng.mt19937
-
-.. autofunction:: get_state

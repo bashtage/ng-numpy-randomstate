@@ -1,6 +1,0 @@
-randomstate.prng.pcg32.vonmises
-===============================
-
-.. currentmodule:: randomstate.prng.pcg32
-
-.. autofunction:: vonmises

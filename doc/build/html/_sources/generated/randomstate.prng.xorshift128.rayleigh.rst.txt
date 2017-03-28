@@ -1,6 +1,0 @@
-randomstate.prng.xorshift128.rayleigh
-=====================================
-
-.. currentmodule:: randomstate.prng.xorshift128
-
-.. autofunction:: rayleigh

@@ -1,6 +1,0 @@
-randomstate.prng.xorshift128.lognormal
-======================================
-
-.. currentmodule:: randomstate.prng.xorshift128
-
-.. autofunction:: lognormal

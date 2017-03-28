@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.laplace
-==============================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: laplace

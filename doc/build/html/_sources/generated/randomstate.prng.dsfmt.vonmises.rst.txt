@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.vonmises
-===============================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: vonmises

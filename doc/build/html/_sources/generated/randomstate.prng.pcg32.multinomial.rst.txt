@@ -1,6 +1,0 @@
-randomstate.prng.pcg32.multinomial
-==================================
-
-.. currentmodule:: randomstate.prng.pcg32
-
-.. autofunction:: multinomial

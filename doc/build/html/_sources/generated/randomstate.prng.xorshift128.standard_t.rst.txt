@@ -1,6 +1,0 @@
-randomstate.prng.xorshift128.standard_t
-=======================================
-
-.. currentmodule:: randomstate.prng.xorshift128
-
-.. autofunction:: standard_t

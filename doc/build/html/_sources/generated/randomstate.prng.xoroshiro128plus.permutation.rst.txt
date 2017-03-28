@@ -1,6 +1,0 @@
-randomstate.prng.xoroshiro128plus.permutation
-=============================================
-
-.. currentmodule:: randomstate.prng.xoroshiro128plus
-
-.. autofunction:: permutation

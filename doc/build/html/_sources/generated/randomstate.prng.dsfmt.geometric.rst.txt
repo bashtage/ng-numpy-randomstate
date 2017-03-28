@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.geometric
-================================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: geometric

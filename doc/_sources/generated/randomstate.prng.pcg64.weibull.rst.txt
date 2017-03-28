@@ -1,6 +1,0 @@
-randomstate.prng.pcg64.weibull
-==============================
-
-.. currentmodule:: randomstate.prng.pcg64
-
-.. autofunction:: weibull

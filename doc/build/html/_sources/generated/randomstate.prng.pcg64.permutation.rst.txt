@@ -1,6 +1,0 @@
-randomstate.prng.pcg64.permutation
-==================================
-
-.. currentmodule:: randomstate.prng.pcg64
-
-.. autofunction:: permutation

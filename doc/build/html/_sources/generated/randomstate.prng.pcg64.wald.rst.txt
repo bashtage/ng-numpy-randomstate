@@ -1,6 +1,0 @@
-randomstate.prng.pcg64.wald
-===========================
-
-.. currentmodule:: randomstate.prng.pcg64
-
-.. autofunction:: wald

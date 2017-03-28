@@ -1,6 +1,0 @@
-randomstate.prng.pcg64.zipf
-===========================
-
-.. currentmodule:: randomstate.prng.pcg64
-
-.. autofunction:: zipf

@@ -1,6 +1,0 @@
-randomstate.prng.pcg32.seed
-===========================
-
-.. currentmodule:: randomstate.prng.pcg32
-
-.. autofunction:: seed

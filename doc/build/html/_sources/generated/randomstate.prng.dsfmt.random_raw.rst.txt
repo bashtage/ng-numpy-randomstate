@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.random_raw
-=================================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: random_raw

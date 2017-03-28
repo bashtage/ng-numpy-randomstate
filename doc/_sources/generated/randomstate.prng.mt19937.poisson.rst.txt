@@ -1,6 +1,0 @@
-randomstate.prng.mt19937.poisson
-================================
-
-.. currentmodule:: randomstate.prng.mt19937
-
-.. autofunction:: poisson

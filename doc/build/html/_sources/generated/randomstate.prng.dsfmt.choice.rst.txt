@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.choice
-=============================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: choice

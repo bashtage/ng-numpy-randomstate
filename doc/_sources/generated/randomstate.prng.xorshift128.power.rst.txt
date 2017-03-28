@@ -1,6 +1,0 @@
-randomstate.prng.xorshift128.power
-==================================
-
-.. currentmodule:: randomstate.prng.xorshift128
-
-.. autofunction:: power

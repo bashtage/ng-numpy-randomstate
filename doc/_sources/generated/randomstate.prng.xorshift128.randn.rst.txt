@@ -1,6 +1,0 @@
-randomstate.prng.xorshift128.randn
-==================================
-
-.. currentmodule:: randomstate.prng.xorshift128
-
-.. autofunction:: randn

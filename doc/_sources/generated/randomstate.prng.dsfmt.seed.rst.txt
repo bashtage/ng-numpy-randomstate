@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.seed
-===========================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: seed

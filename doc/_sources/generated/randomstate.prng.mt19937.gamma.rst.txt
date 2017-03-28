@@ -1,6 +1,0 @@
-randomstate.prng.mt19937.gamma
-==============================
-
-.. currentmodule:: randomstate.prng.mt19937
-
-.. autofunction:: gamma

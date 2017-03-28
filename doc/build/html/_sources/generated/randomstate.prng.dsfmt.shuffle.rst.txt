@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.shuffle
-==============================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: shuffle

@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.standard_cauchy
-======================================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: standard_cauchy

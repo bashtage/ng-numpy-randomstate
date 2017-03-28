@@ -1,6 +1,0 @@
-randomstate.prng.mt19937.random_uintegers
-=========================================
-
-.. currentmodule:: randomstate.prng.mt19937
-
-.. autofunction:: random_uintegers

@@ -1,6 +1,0 @@
-randomstate.prng.dsfmt.randint
-==============================
-
-.. currentmodule:: randomstate.prng.dsfmt
-
-.. autofunction:: randint

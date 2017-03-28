@@ -1,6 +1,0 @@
-randomstate.prng.xoroshiro128plus.standard_t
-============================================
-
-.. currentmodule:: randomstate.prng.xoroshiro128plus
-
-.. autofunction:: standard_t
