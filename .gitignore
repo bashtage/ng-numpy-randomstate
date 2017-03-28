@@ -7,3 +7,5 @@ pcg/core-rng
 build
 dist
 *.egg-info
+.idea/
+
