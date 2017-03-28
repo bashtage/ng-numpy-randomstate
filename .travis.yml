@@ -65,7 +65,10 @@ script:
       conda install -c conda-forge doctr
       cd ${BUILD_DIR}/doc
       make html
-      cd ..
       doctr deploy doc
     fi;
-  - if [ ${PYTHON} = "3.5" ]; then python performance.py; fi
+  - |
+    if [ ${PYTHON} = "3.6" ]; then
+      cd ${BUILD_DIR}/randomstate
+      python performance.py;
+    fi
