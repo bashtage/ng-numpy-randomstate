@@ -1,0 +1,270 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>randomstate.prng.dsfmt.f &#8212; randomstate 1.12+23.g8708a2a documentation</title>
+    
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.12+23.g8708a2a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="randomstate.prng.dsfmt.gamma" href="randomstate.prng.dsfmt.gamma.html" />
+    <link rel="prev" title="randomstate.prng.dsfmt.exponential" href="randomstate.prng.dsfmt.exponential.html" />
+  
+   
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="randomstate.prng.dsfmt.gamma.html" title="randomstate.prng.dsfmt.gamma"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="randomstate.prng.dsfmt.exponential.html" title="randomstate.prng.dsfmt.exponential"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+23.g8708a2a documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../dsfmt.html" accesskey="U">dSFMT Randomstate</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">randomstate 1.12</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../parallel.html">Using in Parallel Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../multithreading.html">Multithreaded Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entropy.html">Reading System Entropy</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../mt19937.html">MT19937</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../dsfmt.html">dSFMT</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../dsfmt.html#random-generator">Random generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dsfmt.html#parallel-generation">Parallel generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dsfmt.html#simple-random-data">Simple random data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dsfmt.html#permutations">Permutations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../dsfmt.html#distributions">Distributions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../xorshift128.html">XorShift128+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../xoroshiro128plus.html">XoroShiro128+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../xorshift1024.html">XorShift1024*</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pcg32.html">PCG-32</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pcg64.html">PCG-64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mlfg.html">MLFG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mrg32k3a.html">MRG32K3A</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../change-log.html">Change Log</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="../dsfmt.html">dSFMT Randomstate</a></li>
+              
+              <li>randomstate.prng.dsfmt.f</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="randomstate-prng-dsfmt-f">
+<h1>randomstate.prng.dsfmt.f<a class="headerlink" href="#randomstate-prng-dsfmt-f" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="randomstate.prng.dsfmt.f">
+<code class="descclassname">randomstate.prng.dsfmt.</code><code class="descname">f</code><span class="sig-paren">(</span><em>dfnum</em>, <em>dfden</em>, <em>size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.dsfmt.f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw samples from an F distribution.</p>
+<p>Samples are drawn from an F distribution with specified parameters,
+<cite>dfnum</cite> (degrees of freedom in numerator) and <cite>dfden</cite> (degrees of
+freedom in denominator), where both parameters should be greater than
+zero.</p>
+<p>The random variate of the F distribution (also known as the
+Fisher distribution) is a continuous probability distribution
+that arises in ANOVA tests, and is the ratio of two chi-square
+variates.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>dfnum</strong> (<em>int</em><em> or </em><em>array_like of ints</em>) -- Degrees of freedom in numerator. Should be greater than zero.</li>
+<li><strong>dfden</strong> (<em>int</em><em> or </em><em>array_like of ints</em>) -- Degrees of freedom in denominator. Should be greater than zero.</li>
+<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) -- Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
+<code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  If size is <code class="docutils literal"><span class="pre">None</span></code> (default),
+a single value is returned if <code class="docutils literal"><span class="pre">dfnum</span></code> and <code class="docutils literal"><span class="pre">dfden</span></code> are both scalars.
+Otherwise, <code class="docutils literal"><span class="pre">np.broadcast(dfnum,</span> <span class="pre">dfden).size</span></code> samples are drawn.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first"><strong>out</strong> -- Drawn samples from the parameterized Fisher distribution.</p>
+</dd>
+<dt class="field-name">Return type</dt><dd class="field-body"><p class="first last">ndarray or scalar</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><code class="xref py py-func docutils literal"><span class="pre">scipy.stats.f()</span></code></dt>
+<dd>probability density function, distribution or cumulative density function, etc.</dd>
+</dl>
+</div>
+<p class="rubric">Notes</p>
+<p>The F statistic is used to compare in-group variances to between-group
+variances. Calculating the distribution depends on the sampling, and
+so it is a function of the respective degrees of freedom in the
+problem.  The variable <cite>dfnum</cite> is the number of samples minus one, the
+between-groups degrees of freedom, while <cite>dfden</cite> is the within-groups
+degrees of freedom, the sum of the number of samples in each group
+minus the number of groups.</p>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td>Glantz, Stanton A. &quot;Primer of Biostatistics.&quot;, McGraw-Hill,
+Fifth Edition, 2002.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[2]</td><td>Wikipedia, &quot;F-distribution&quot;,
+<a class="reference external" href="http://en.wikipedia.org/wiki/F-distribution">http://en.wikipedia.org/wiki/F-distribution</a></td></tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>An example from Glantz[1], pp 47-40:</p>
+<p>Two groups, children of diabetics (25 people) and children from people
+without diabetes (25 controls). Fasting blood glucose was measured,
+case group had a mean value of 86.1, controls had a mean value of
+82.2. Standard deviations were 2.09 and 2.49 respectively. Are these
+data consistent with the null hypothesis that the parents diabetic
+status does not affect their children's blood glucose levels?
+Calculating the F statistic from the data gives a value of 36.01.</p>
+<p>Draw samples from the distribution:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dfnum</span> <span class="o">=</span> <span class="mf">1.</span> <span class="c1"># between group degrees of freedom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dfden</span> <span class="o">=</span> <span class="mf">48.</span> <span class="c1"># within groups degrees of freedom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="n">dfnum</span><span class="p">,</span> <span class="n">dfden</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The lower bound for the top 1% of the samples is :</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sort</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="o">-</span><span class="mi">10</span><span class="p">]</span>
+<span class="go">7.61988120985</span>
+</pre></div>
+</div>
+<p>So there is about a 1% chance that the F statistic will exceed 7.62,
+the measured value is 36, so the null hypothesis is rejected at the 1%
+level.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="randomstate.prng.dsfmt.exponential.html" title="previous chapter (use the left arrow)">randomstate.prng.dsfmt.exponential</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="randomstate.prng.dsfmt.gamma.html" title="next chapter (use the right arrow)">randomstate.prng.dsfmt.gamma</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="randomstate.prng.dsfmt.gamma.html" title="randomstate.prng.dsfmt.gamma"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="randomstate.prng.dsfmt.exponential.html" title="randomstate.prng.dsfmt.exponential"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+23.g8708a2a documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../dsfmt.html" >dSFMT Randomstate</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

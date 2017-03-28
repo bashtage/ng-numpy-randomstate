@@ -1,0 +1,7 @@
+a{color: #180CD2;}
+table a:not(.btn), .table a:not(.btn) {text-decoration: none;}
+body {font-size: 16px;}
+code {font-size: 100%;}
+table {font-size: 16px;}
+.navbar {font-size: 16px;}
+.navbar .dropdown-menu > li > a, .navbar .dropdown-menu > li > a:focus {font-size: 15px;}

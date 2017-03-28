@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.bytes
+=======================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: bytes

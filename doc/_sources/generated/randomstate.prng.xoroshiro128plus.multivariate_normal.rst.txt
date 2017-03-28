@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.multivariate_normal
+=====================================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: multivariate_normal

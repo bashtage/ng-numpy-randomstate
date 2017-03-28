@@ -1,0 +1,270 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Change Log &#8212; randomstate 1.12+23.g8708a2a documentation</title>
+    
+    <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.12+23.g8708a2a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="randomstate.prng.mrg32k3a.zipf" href="generated/randomstate.prng.mrg32k3a.zipf.html" />
+  
+   
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="generated/randomstate.prng.mrg32k3a.zipf.html" title="randomstate.prng.mrg32k3a.zipf"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+23.g8708a2a documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    index.html" class="text-logo">randomstate 1.12</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="parallel.html">Using in Parallel Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multithreading.html">Multithreaded Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entropy.html">Reading System Entropy</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mt19937.html">MT19937</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dsfmt.html">dSFMT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xorshift128.html">XorShift128+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xoroshiro128plus.html">XoroShiro128+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xorshift1024.html">XorShift1024*</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcg32.html">PCG-32</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcg64.html">PCG-64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlfg.html">MLFG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mrg32k3a.html">MRG32K3A</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-12">Version 1.12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-11-4">Version 1.11.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-11-3">Version 1.11.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-11-2">Version 1.11.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-11-1">Version 1.11.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-11">Version 1.11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-10-1">Version 1.10.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-10">Version 1.10</a></li>
+</ul>
+</li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="index.html">Docs</a></li>
+              
+              <li>Change Log</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="change-log">
+<span id="id1"></span><h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="version-1-12">
+<h2>Version 1.12<a class="headerlink" href="#version-1-12" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Synchronize with NumPy 1.12 release</li>
+<li>Add <code class="docutils literal"><span class="pre">out</span></code> argument which allows filling existing arrays. This feature was
+added to facilitate multithreaded filling of arrays using parallel random
+number generators.<ul>
+<li>Uniforms (<a class="reference internal" href="generated/randomstate.prng.mt19937.random_sample.html#randomstate.prng.mt19937.random_sample" title="randomstate.prng.mt19937.random_sample"><code class="xref py py-meth docutils literal"><span class="pre">random_sample()</span></code></a>)</li>
+<li>Normals (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_normal.html#randomstate.prng.mt19937.standard_normal" title="randomstate.prng.mt19937.standard_normal"><code class="xref py py-meth docutils literal"><span class="pre">standard_normal()</span></code></a>)</li>
+<li>Standard Exponentials (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_exponential.html#randomstate.prng.mt19937.standard_exponential" title="randomstate.prng.mt19937.standard_exponential"><code class="xref py py-meth docutils literal"><span class="pre">standard_exponential()</span></code></a>)</li>
+<li>Standard Gammas (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_gamma.html#randomstate.prng.mt19937.standard_gamma" title="randomstate.prng.mt19937.standard_gamma"><code class="xref py py-meth docutils literal"><span class="pre">standard_gamma()</span></code></a>)</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="version-1-11-4">
+<h2>Version 1.11.4<a class="headerlink" href="#version-1-11-4" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Fix for error in Ziggurat implementation of Normal</li>
+</ul>
+</div>
+<div class="section" id="version-1-11-3">
+<h2>Version 1.11.3<a class="headerlink" href="#version-1-11-3" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Extended 32-bit generation to</p>
+<ul class="simple">
+<li>Uniforms (<a class="reference internal" href="generated/randomstate.prng.mt19937.random_sample.html#randomstate.prng.mt19937.random_sample" title="randomstate.prng.mt19937.random_sample"><code class="xref py py-meth docutils literal"><span class="pre">random_sample()</span></code></a> and <a class="reference internal" href="generated/randomstate.prng.mt19937.rand.html#randomstate.prng.mt19937.rand" title="randomstate.prng.mt19937.rand"><code class="xref py py-meth docutils literal"><span class="pre">rand()</span></code></a>)</li>
+<li>Normals (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_normal.html#randomstate.prng.mt19937.standard_normal" title="randomstate.prng.mt19937.standard_normal"><code class="xref py py-meth docutils literal"><span class="pre">standard_normal()</span></code></a> and <a class="reference internal" href="generated/randomstate.prng.mt19937.randn.html#randomstate.prng.mt19937.randn" title="randomstate.prng.mt19937.randn"><code class="xref py py-meth docutils literal"><span class="pre">randn()</span></code></a>)</li>
+<li>Standard Gammas (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_gamma.html#randomstate.prng.mt19937.standard_gamma" title="randomstate.prng.mt19937.standard_gamma"><code class="xref py py-meth docutils literal"><span class="pre">standard_gamma()</span></code></a>)</li>
+<li>Standard Exponentials (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_exponential.html#randomstate.prng.mt19937.standard_exponential" title="randomstate.prng.mt19937.standard_exponential"><code class="xref py py-meth docutils literal"><span class="pre">standard_exponential()</span></code></a>)</li>
+</ul>
+<p>using the <code class="docutils literal"><span class="pre">dtype</span></code> keyword.</p>
+</li>
+<li><p class="first">Removed <code class="docutils literal"><span class="pre">random_uintegers</span></code> since these are special cases of <code class="docutils literal"><span class="pre">randint</span></code></p>
+</li>
+<li><p class="first">Release to include files required for install from PyPi</p>
+</li>
+</ul>
+</div>
+<div class="section" id="version-1-11-2">
+<h2>Version 1.11.2<a class="headerlink" href="#version-1-11-2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added keyword argument <cite>dtype</cite> to <cite>random_sample</cite> which allows for single
+precision as well as double precision uniforms to be generated.</li>
+</ul>
+<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
+
+<span class="gp">In [3]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">23456</span><span class="p">)</span>
+
+<span class="gp">In [4]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gh">Out[4]: </span><span class="go">array([ 0.32180029,  0.32730047,  0.92742231])</span>
+
+<span class="gp">In [5]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">23456</span><span class="p">)</span>
+
+<span class="gp">In [6]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="gh">Out[6]: </span><span class="go">array([ 0.32180023,  0.12272525,  0.32730043], dtype=float32)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="version-1-11-1">
+<h2>Version 1.11.1<a class="headerlink" href="#version-1-11-1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added xoroshiro128+ PRNG.  This is an improved version of the xorshirt128+
+PRNG and should be used instead.  In the long run, xorshift128+ will likely
+be removed.</li>
+<li>Fixed DeprecationWarning when initializing a PRNG using a single element
+array.</li>
+</ul>
+</div>
+<div class="section" id="version-1-11">
+<h2>Version 1.11<a class="headerlink" href="#version-1-11" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Update to recent changes in NumPy's RandomState</li>
+<li>Expose system entropy through <a class="reference internal" href="entropy.html#randomstate.entropy.random_entropy" title="randomstate.entropy.random_entropy"><code class="xref py py-meth docutils literal"><span class="pre">randomstate.entropy.random_entropy()</span></code></a></li>
+<li>Add vector initialization for all PRNGs</li>
+</ul>
+</div>
+<div class="section" id="version-1-10-1">
+<h2>Version 1.10.1<a class="headerlink" href="#version-1-10-1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added support for jumping the MRG32K3A generator</li>
+<li>Added support for jumping the dSFMT generator</li>
+<li>Update to recent changes in NumPy's RandomState</li>
+</ul>
+</div>
+<div class="section" id="version-1-10">
+<h2>Version 1.10<a class="headerlink" href="#version-1-10" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>This is the initial release with compatibility with NumPy 1.10</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="generated/randomstate.prng.mrg32k3a.zipf.html" title="previous chapter (use the left arrow)">randomstate.prng.mrg32k3a.zipf</a>
+      </div>
+    
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="generated/randomstate.prng.mrg32k3a.zipf.html" title="randomstate.prng.mrg32k3a.zipf"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+23.g8708a2a documentation</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

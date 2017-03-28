@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.laplace
+=========================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: laplace

@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.standard_cauchy
+=================================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: standard_cauchy

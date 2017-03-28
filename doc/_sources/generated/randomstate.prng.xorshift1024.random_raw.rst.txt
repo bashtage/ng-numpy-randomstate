@@ -1,0 +1,6 @@
+randomstate.prng.xorshift1024.random_raw
+========================================
+
+.. currentmodule:: randomstate.prng.xorshift1024
+
+.. autofunction:: random_raw

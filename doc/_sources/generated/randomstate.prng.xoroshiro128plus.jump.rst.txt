@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.jump
+======================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: jump

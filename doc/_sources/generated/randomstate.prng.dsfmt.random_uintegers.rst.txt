@@ -1,0 +1,6 @@
+randomstate.prng.dsfmt.random_uintegers
+=======================================
+
+.. currentmodule:: randomstate.prng.dsfmt
+
+.. autofunction:: random_uintegers

@@ -1,0 +1,6 @@
+randomstate.prng.xoroshiro128plus.sample
+========================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: sample

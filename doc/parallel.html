@@ -1,0 +1,267 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Parallel Random Number Generation &#8212; randomstate 1.12+23.g8708a2a documentation</title>
+    
+    <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.12+23.g8708a2a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Multithreaded Generation" href="multithreading.html" />
+    <link rel="prev" title="randomstate&#39;s documentation" href="index.html" />
+  
+   
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="multithreading.html" title="Multithreaded Generation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="randomstate&#39;s documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+23.g8708a2a documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    index.html" class="text-logo">randomstate 1.12</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using in Parallel Applications</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#independent-streams">Independent Streams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jump-advance-the-prng-state">Jump/Advance the PRNG state</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="multithreading.html">Multithreaded Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entropy.html">Reading System Entropy</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mt19937.html">MT19937</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dsfmt.html">dSFMT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xorshift128.html">XorShift128+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xoroshiro128plus.html">XoroShiro128+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xorshift1024.html">XorShift1024*</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcg32.html">PCG-32</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcg64.html">PCG-64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlfg.html">MLFG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mrg32k3a.html">MRG32K3A</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="change-log.html">Change Log</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="index.html">Docs</a></li>
+              
+              <li>Parallel Random Number Generation</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="parallel-random-number-generation">
+<h1>Parallel Random Number Generation<a class="headerlink" href="#parallel-random-number-generation" title="Permalink to this headline">¶</a></h1>
+<p>There are three strategies implemented that can be used to produce
+repeatable pseudo-random numbers across multiple processes (local
+or distributed).</p>
+<div class="section" id="independent-streams">
+<span id="id1"></span><h2>Independent Streams<a class="headerlink" href="#independent-streams" title="Permalink to this headline">¶</a></h2>
+<p>Currently only <code class="docutils literal"><span class="pre">pcg32</span></code> and <code class="docutils literal"><span class="pre">pcg64</span></code> support independent streams, and,
+due to the limited period of <code class="docutils literal"><span class="pre">pcg32</span></code> (<span class="math">\(2^{64}\)</span>), only <code class="docutils literal"><span class="pre">pcg64</span></code>
+should be used.  This example shows how many streams can be created by
+passing in different index values in the second input while using the
+same seed in the first.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">randomstate.entropy</span> <span class="k">import</span> <span class="n">random_entropy</span>
+<span class="kn">import</span> <span class="nn">randomstate.prng.pcg64</span> <span class="k">as</span> <span class="nn">pcg64</span>
+
+<span class="n">entropy</span> <span class="o">=</span> <span class="n">random_entropy</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="c1"># 128-bit number as a seed</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="p">[</span><span class="n">long</span><span class="p">(</span><span class="n">entropy</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">32</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)])</span>
+<span class="n">streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">pcg64</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">stream</span><span class="p">)</span> <span class="k">for</span> <span class="n">stream</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="jump-advance-the-prng-state">
+<span id="jump-and-advance"></span><h2>Jump/Advance the PRNG state<a class="headerlink" href="#jump-advance-the-prng-state" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">jump</span></code> advances the state of the PRNG <em>as-if</em> a large number of random
+numbers have been drawn.  The specific number of draws varies by PRNG, and
+ranges from <span class="math">\(2^{64}\)</span> to <span class="math">\(2^{512}\)</span>.  Additionally, the <em>as-if</em>
+draws also depend on the size of the default random number produced by the
+specific PRNG.  The PRNGs that support <code class="docutils literal"><span class="pre">jump</span></code>, along with the period of
+the PRNG, the size of the jump and the bits in the default unsigned random
+are listed below.</p>
+<table class="table table-bordered">
+<colgroup>
+<col width="18%" />
+<col width="27%" />
+<col width="27%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">PRNG</th>
+<th class="head">Period</th>
+<th class="head">Jump Size</th>
+<th class="head">Bits</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>dsfmt</td>
+<td><span class="math">\(2^{19937}\)</span></td>
+<td><span class="math">\(2^{128}\)</span></td>
+<td>53</td>
+</tr>
+<tr class="row-odd"><td>mrg32k3a</td>
+<td><span class="math">\(\approx 2^{191}\)</span></td>
+<td><span class="math">\(2^{127}\)</span></td>
+<td>32</td>
+</tr>
+<tr class="row-even"><td>xorshift128</td>
+<td><span class="math">\(2^{128}\)</span></td>
+<td><span class="math">\(2^{64}\)</span></td>
+<td>64</td>
+</tr>
+<tr class="row-odd"><td>xorshift1024</td>
+<td><span class="math">\(2^{1024}\)</span></td>
+<td><span class="math">\(2^{512}\)</span></td>
+<td>64</td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal"><span class="pre">jump</span></code> can be used to produce long blocks which should be long enough to not
+overlap.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">randomstate.entropy</span> <span class="k">import</span> <span class="n">random_entropy</span>
+<span class="kn">import</span> <span class="nn">randomstate.prng.xorshift1024</span> <span class="k">as</span> <span class="nn">xorshift1024</span>
+
+<span class="n">entropy</span> <span class="o">=</span> <span class="n">random_entropy</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span>
+<span class="c1"># 64-bit number as a seed</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="n">entropy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span> <span class="o">+</span> <span class="n">entropy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">blocks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="n">xorshift1024</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">block</span><span class="o">.</span><span class="n">jump</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">advance</span></code> can be used to jump the state an arbitrary number of steps, and so
+is a more general approach than <code class="docutils literal"><span class="pre">jump</span></code>.  Only <code class="docutils literal"><span class="pre">pcg32</span></code> and <code class="docutils literal"><span class="pre">pcg64</span></code>
+support <code class="docutils literal"><span class="pre">advance</span></code>, and since these also support independent streams, it is
+not usually necessary to use <code class="docutils literal"><span class="pre">advance</span></code>.</p>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="index.html" title="previous chapter (use the left arrow)">randomstate's documentation</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="multithreading.html" title="next chapter (use the right arrow)">Multithreaded Generation</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="multithreading.html" title="Multithreaded Generation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="randomstate&#39;s documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+23.g8708a2a documentation</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>
