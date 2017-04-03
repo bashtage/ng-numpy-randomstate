@@ -1,5 +1,5 @@
-randomstate.prng.dsfmt.weibull
-==============================
+randomstate\.prng\.dsfmt\.weibull
+=================================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

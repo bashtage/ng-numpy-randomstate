@@ -1,5 +1,5 @@
-randomstate.prng.xorshift1024.standard_exponential
-==================================================
+randomstate\.prng\.xorshift1024\.standard\_exponential
+======================================================
 
 .. currentmodule:: randomstate.prng.xorshift1024
 

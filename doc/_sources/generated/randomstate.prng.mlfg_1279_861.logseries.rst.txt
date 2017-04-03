@@ -1,5 +1,5 @@
-randomstate.prng.mlfg_1279_861.logseries
-========================================
+randomstate\.prng\.mlfg\_1279\_861\.logseries
+=============================================
 
 .. currentmodule:: randomstate.prng.mlfg_1279_861
 

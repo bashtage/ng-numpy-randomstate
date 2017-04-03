@@ -1,5 +1,5 @@
-randomstate.prng.dsfmt.pareto
-=============================
+randomstate\.prng\.dsfmt\.pareto
+================================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

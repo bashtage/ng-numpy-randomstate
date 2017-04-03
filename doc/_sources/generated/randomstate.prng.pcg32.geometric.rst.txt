@@ -1,5 +1,5 @@
-randomstate.prng.pcg32.geometric
-================================
+randomstate\.prng\.pcg32\.geometric
+===================================
 
 .. currentmodule:: randomstate.prng.pcg32
 

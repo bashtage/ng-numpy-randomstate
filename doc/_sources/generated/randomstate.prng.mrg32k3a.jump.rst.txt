@@ -1,5 +1,5 @@
-randomstate.prng.mrg32k3a.jump
-==============================
+randomstate\.prng\.mrg32k3a\.jump
+=================================
 
 .. currentmodule:: randomstate.prng.mrg32k3a
 

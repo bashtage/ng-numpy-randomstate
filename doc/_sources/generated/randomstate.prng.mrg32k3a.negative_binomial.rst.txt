@@ -1,5 +1,5 @@
-randomstate.prng.mrg32k3a.negative_binomial
-===========================================
+randomstate\.prng\.mrg32k3a\.negative\_binomial
+===============================================
 
 .. currentmodule:: randomstate.prng.mrg32k3a
 

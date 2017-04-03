@@ -1,5 +1,5 @@
-randomstate.prng.xorshift1024.chisquare
-=======================================
+randomstate\.prng\.xorshift1024\.chisquare
+==========================================
 
 .. currentmodule:: randomstate.prng.xorshift1024
 

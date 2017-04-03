@@ -1,5 +1,5 @@
-randomstate.prng.xorshift1024.poisson
-=====================================
+randomstate\.prng\.xorshift1024\.poisson
+========================================
 
 .. currentmodule:: randomstate.prng.xorshift1024
 

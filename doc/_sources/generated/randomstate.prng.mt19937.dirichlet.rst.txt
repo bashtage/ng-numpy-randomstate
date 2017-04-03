@@ -1,5 +1,5 @@
-randomstate.prng.mt19937.dirichlet
-==================================
+randomstate\.prng\.mt19937\.dirichlet
+=====================================
 
 .. currentmodule:: randomstate.prng.mt19937
 

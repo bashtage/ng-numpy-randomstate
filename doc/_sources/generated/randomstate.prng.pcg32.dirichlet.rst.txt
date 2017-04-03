@@ -1,5 +1,5 @@
-randomstate.prng.pcg32.dirichlet
-================================
+randomstate\.prng\.pcg32\.dirichlet
+===================================
 
 .. currentmodule:: randomstate.prng.pcg32
 

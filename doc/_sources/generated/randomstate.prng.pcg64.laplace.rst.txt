@@ -1,5 +1,5 @@
-randomstate.prng.pcg64.laplace
-==============================
+randomstate\.prng\.pcg64\.laplace
+=================================
 
 .. currentmodule:: randomstate.prng.pcg64
 

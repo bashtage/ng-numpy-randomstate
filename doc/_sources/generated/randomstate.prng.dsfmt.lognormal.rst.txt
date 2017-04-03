@@ -1,5 +1,5 @@
-randomstate.prng.dsfmt.lognormal
-================================
+randomstate\.prng\.dsfmt\.lognormal
+===================================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

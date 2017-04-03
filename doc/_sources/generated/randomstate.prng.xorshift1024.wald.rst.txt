@@ -1,5 +1,5 @@
-randomstate.prng.xorshift1024.wald
-==================================
+randomstate\.prng\.xorshift1024\.wald
+=====================================
 
 .. currentmodule:: randomstate.prng.xorshift1024
 

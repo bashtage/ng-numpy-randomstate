@@ -1,5 +1,5 @@
-randomstate.prng.mlfg_1279_861.chisquare
-========================================
+randomstate\.prng\.mlfg\_1279\_861\.chisquare
+=============================================
 
 .. currentmodule:: randomstate.prng.mlfg_1279_861
 

@@ -1,5 +1,5 @@
-randomstate.prng.xorshift1024.noncentral_chisquare
-==================================================
+randomstate\.prng\.xorshift1024\.noncentral\_chisquare
+======================================================
 
 .. currentmodule:: randomstate.prng.xorshift1024
 

@@ -1,5 +1,5 @@
-randomstate.prng.pcg32.chisquare
-================================
+randomstate\.prng\.pcg32\.chisquare
+===================================
 
 .. currentmodule:: randomstate.prng.pcg32
 

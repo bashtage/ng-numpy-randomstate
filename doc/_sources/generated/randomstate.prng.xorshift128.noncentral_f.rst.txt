@@ -1,5 +1,5 @@
-randomstate.prng.xorshift128.noncentral_f
-=========================================
+randomstate\.prng\.xorshift128\.noncentral\_f
+=============================================
 
 .. currentmodule:: randomstate.prng.xorshift128
 

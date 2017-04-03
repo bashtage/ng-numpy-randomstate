@@ -1,5 +1,5 @@
-randomstate.prng.xoroshiro128plus.ranf
-======================================
+randomstate\.prng\.xoroshiro128plus\.ranf
+=========================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

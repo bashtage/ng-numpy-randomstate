@@ -1,5 +1,5 @@
-randomstate.prng.xoroshiro128plus.multivariate_normal
-=====================================================
+randomstate\.prng\.xoroshiro128plus\.multivariate\_normal
+=========================================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

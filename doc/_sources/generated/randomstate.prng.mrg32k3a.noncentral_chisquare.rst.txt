@@ -1,5 +1,5 @@
-randomstate.prng.mrg32k3a.noncentral_chisquare
-==============================================
+randomstate\.prng\.mrg32k3a\.noncentral\_chisquare
+==================================================
 
 .. currentmodule:: randomstate.prng.mrg32k3a
 

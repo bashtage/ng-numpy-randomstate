@@ -1,5 +1,5 @@
-randomstate.prng.pcg64.set_state
-================================
+randomstate\.prng\.pcg64\.set\_state
+====================================
 
 .. currentmodule:: randomstate.prng.pcg64
 

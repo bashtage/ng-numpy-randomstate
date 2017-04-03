@@ -1,5 +1,5 @@
-randomstate.prng.pcg64.zipf
-===========================
+randomstate\.prng\.pcg64\.zipf
+==============================
 
 .. currentmodule:: randomstate.prng.pcg64
 

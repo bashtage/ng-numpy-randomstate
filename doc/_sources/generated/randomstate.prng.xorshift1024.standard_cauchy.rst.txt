@@ -1,5 +1,5 @@
-randomstate.prng.xorshift1024.standard_cauchy
-=============================================
+randomstate\.prng\.xorshift1024\.standard\_cauchy
+=================================================
 
 .. currentmodule:: randomstate.prng.xorshift1024
 

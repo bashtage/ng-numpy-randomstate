@@ -1,5 +1,5 @@
-randomstate.prng.xorshift128.geometric
-======================================
+randomstate\.prng\.xorshift128\.geometric
+=========================================
 
 .. currentmodule:: randomstate.prng.xorshift128
 

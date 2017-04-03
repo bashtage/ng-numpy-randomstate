@@ -1,5 +1,5 @@
-randomstate.prng.xoroshiro128plus.standard_cauchy
-=================================================
+randomstate\.prng\.xoroshiro128plus\.standard\_cauchy
+=====================================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

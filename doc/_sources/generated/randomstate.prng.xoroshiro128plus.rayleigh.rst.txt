@@ -1,5 +1,5 @@
-randomstate.prng.xoroshiro128plus.rayleigh
-==========================================
+randomstate\.prng\.xoroshiro128plus\.rayleigh
+=============================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

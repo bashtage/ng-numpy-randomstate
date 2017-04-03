@@ -1,5 +1,5 @@
-randomstate.prng.xorshift1024.hypergeometric
-============================================
+randomstate\.prng\.xorshift1024\.hypergeometric
+===============================================
 
 .. currentmodule:: randomstate.prng.xorshift1024
 

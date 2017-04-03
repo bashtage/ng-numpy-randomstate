@@ -1,5 +1,5 @@
-randomstate.prng.mlfg_1279_861.random_uintegers
-===============================================
+randomstate\.prng\.mlfg\_1279\_861\.random\_uintegers
+=====================================================
 
 .. currentmodule:: randomstate.prng.mlfg_1279_861
 

@@ -1,5 +1,5 @@
-randomstate.prng.xorshift128.chisquare
-======================================
+randomstate\.prng\.xorshift128\.chisquare
+=========================================
 
 .. currentmodule:: randomstate.prng.xorshift128
 

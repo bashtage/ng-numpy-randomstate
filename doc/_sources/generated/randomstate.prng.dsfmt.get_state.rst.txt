@@ -1,5 +1,5 @@
-randomstate.prng.dsfmt.get_state
-================================
+randomstate\.prng\.dsfmt\.get\_state
+====================================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

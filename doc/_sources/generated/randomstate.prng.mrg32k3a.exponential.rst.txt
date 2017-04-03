@@ -1,5 +1,5 @@
-randomstate.prng.mrg32k3a.exponential
-=====================================
+randomstate\.prng\.mrg32k3a\.exponential
+========================================
 
 .. currentmodule:: randomstate.prng.mrg32k3a
 

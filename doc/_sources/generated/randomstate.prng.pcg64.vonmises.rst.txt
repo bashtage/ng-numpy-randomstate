@@ -1,5 +1,5 @@
-randomstate.prng.pcg64.vonmises
-===============================
+randomstate\.prng\.pcg64\.vonmises
+==================================
 
 .. currentmodule:: randomstate.prng.pcg64
 

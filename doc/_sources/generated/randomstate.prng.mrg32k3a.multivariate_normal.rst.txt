@@ -1,5 +1,5 @@
-randomstate.prng.mrg32k3a.multivariate_normal
-=============================================
+randomstate\.prng\.mrg32k3a\.multivariate\_normal
+=================================================
 
 .. currentmodule:: randomstate.prng.mrg32k3a
 

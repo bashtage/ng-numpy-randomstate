@@ -1,5 +1,5 @@
-randomstate.prng.mlfg_1279_861.standard_normal
-==============================================
+randomstate\.prng\.mlfg\_1279\_861\.standard\_normal
+====================================================
 
 .. currentmodule:: randomstate.prng.mlfg_1279_861
 

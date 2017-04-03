@@ -1,5 +1,5 @@
-randomstate.prng.pcg64.standard_exponential
-===========================================
+randomstate\.prng\.pcg64\.standard\_exponential
+===============================================
 
 .. currentmodule:: randomstate.prng.pcg64
 

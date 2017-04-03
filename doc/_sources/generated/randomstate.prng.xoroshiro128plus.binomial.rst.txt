@@ -1,5 +1,5 @@
-randomstate.prng.xoroshiro128plus.binomial
-==========================================
+randomstate\.prng\.xoroshiro128plus\.binomial
+=============================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

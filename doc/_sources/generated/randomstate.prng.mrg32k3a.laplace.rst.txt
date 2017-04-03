@@ -1,5 +1,5 @@
-randomstate.prng.mrg32k3a.laplace
-=================================
+randomstate\.prng\.mrg32k3a\.laplace
+====================================
 
 .. currentmodule:: randomstate.prng.mrg32k3a
 

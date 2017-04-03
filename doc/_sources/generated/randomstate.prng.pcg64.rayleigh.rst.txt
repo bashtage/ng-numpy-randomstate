@@ -1,5 +1,5 @@
-randomstate.prng.pcg64.rayleigh
-===============================
+randomstate\.prng\.pcg64\.rayleigh
+==================================
 
 .. currentmodule:: randomstate.prng.pcg64
 

@@ -1,5 +1,5 @@
-randomstate.prng.xorshift128.negative_binomial
-==============================================
+randomstate\.prng\.xorshift128\.negative\_binomial
+==================================================
 
 .. currentmodule:: randomstate.prng.xorshift128
 

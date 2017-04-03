@@ -1,5 +1,5 @@
-randomstate.prng.pcg64.standard_cauchy
-======================================
+randomstate\.prng\.pcg64\.standard\_cauchy
+==========================================
 
 .. currentmodule:: randomstate.prng.pcg64
 

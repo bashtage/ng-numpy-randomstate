@@ -1,5 +1,5 @@
-randomstate.prng.dsfmt.binomial
-===============================
+randomstate\.prng\.dsfmt\.binomial
+==================================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

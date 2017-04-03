@@ -1,5 +1,5 @@
-randomstate.prng.xoroshiro128plus.vonmises
-==========================================
+randomstate\.prng\.xoroshiro128plus\.vonmises
+=============================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

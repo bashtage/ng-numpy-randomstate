@@ -1,5 +1,5 @@
-randomstate.prng.xorshift1024.laplace
-=====================================
+randomstate\.prng\.xorshift1024\.laplace
+========================================
 
 .. currentmodule:: randomstate.prng.xorshift1024
 

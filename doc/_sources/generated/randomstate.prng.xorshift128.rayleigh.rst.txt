@@ -1,5 +1,5 @@
-randomstate.prng.xorshift128.rayleigh
-=====================================
+randomstate\.prng\.xorshift128\.rayleigh
+========================================
 
 .. currentmodule:: randomstate.prng.xorshift128
 

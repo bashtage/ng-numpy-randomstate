@@ -1,5 +1,5 @@
-randomstate.prng.pcg64.noncentral_f
-===================================
+randomstate\.prng\.pcg64\.noncentral\_f
+=======================================
 
 .. currentmodule:: randomstate.prng.pcg64
 

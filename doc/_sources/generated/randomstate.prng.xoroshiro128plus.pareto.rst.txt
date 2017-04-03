@@ -1,5 +1,5 @@
-randomstate.prng.xoroshiro128plus.pareto
-========================================
+randomstate\.prng\.xoroshiro128plus\.pareto
+===========================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 
