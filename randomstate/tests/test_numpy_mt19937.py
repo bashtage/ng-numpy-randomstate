@@ -5,7 +5,6 @@ from numpy.testing import (
         TestCase, run_module_suite, assert_, assert_raises, assert_equal,
         assert_warns, assert_no_warnings, assert_array_equal,
         assert_array_almost_equal)
-from numpy.compat import asbytes
 import sys
 import warnings
 import randomstate as random
@@ -394,7 +393,7 @@ class TestRandomDist(TestCase):
     def test_bytes(self):
         mt19937.seed(self.seed)
         actual = mt19937.bytes(10)
-        desired = asbytes('\x82Ui\x9e\xff\x97+Wf\xa5')
+        desired = b'\x82Ui\x9e\xff\x97+Wf\xa5'
         assert_equal(actual, desired)
 
     def test_shuffle(self):
@@ -824,6 +823,27 @@ class TestRandomDist(TestCase):
         # DBL_MAX by increasing fmin a bit
         mt19937.uniform(low=np.nextafter(fmin, 1), high=fmax / 1e17)
 
+    def test_scalar_exception_propagation(self):
+        # Tests that exceptions are correctly propagated in distributions
+        # when called with objects that throw exceptions when converted to
+        # scalars.
+        #
+        # Regression test for gh: 8865
+
+        class ThrowingFloat(np.ndarray):
+            def __float__(self):
+                raise TypeError
+
+        throwing_float = np.array(1.0).view(ThrowingFloat)
+        assert_raises(TypeError, mt19937.uniform, throwing_float, throwing_float)
+
+        class ThrowingInteger(np.ndarray):
+            def __int__(self):
+                raise TypeError
+
+        throwing_int = np.array(1).view(ThrowingInteger)
+        assert_raises(TypeError, mt19937.hypergeometric, throwing_int, 1, 1)
+        
     def test_vonmises(self):
         mt19937.seed(self.seed)
         actual = mt19937.vonmises(mu=1.23, kappa=1.54, size=(3, 2))
