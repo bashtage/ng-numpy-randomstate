@@ -949,33 +949,42 @@ cdef class RandomState:
         key = np.dtype(dtype).name
         if not key in _randint_type:
             raise TypeError('Unsupported dtype "%s" for randint' % key)
+
         lowbnd, highbnd = _randint_type[key]
 
-        if low < lowbnd:
+        # TODO: Do not cast these inputs to Python int
+        #
+        # This is a workaround until gh-8851 is resolved (bug in NumPy
+        # integer comparison and subtraction involving uint64 and non-
+        # uint64). Afterwards, remove these two lines.
+        ilow = int(low)
+        ihigh = int(high)
+        
+        if ilow < lowbnd:
             raise ValueError("low is out of bounds for %s" % (key,))
-        if high > highbnd:
+        if ihigh > highbnd:
             raise ValueError("high is out of bounds for %s" % (key,))
-        if low >= high:
+        if ilow >= ihigh:
             raise ValueError("low >= high")
 
         if key == 'int32':
-            ret = _rand_int32(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int32(ilow, ihigh - 1, size, &self.rng_state, self.lock)
         elif key == 'int64':
-            ret = _rand_int64(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int64(ilow, ihigh - 1, size, &self.rng_state, self.lock)
         elif key == 'int16':
-            ret = _rand_int16(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int16(ilow, ihigh - 1, size, &self.rng_state, self.lock)
         elif key == 'int8':
-            ret = _rand_int8(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int8(ilow, ihigh - 1, size, &self.rng_state, self.lock)
         elif key == 'uint64':
-            ret = _rand_uint64(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint64(ilow, ihigh - 1, size, &self.rng_state, self.lock)
         elif key == 'uint32':
-            ret = _rand_uint32(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint32(ilow, ihigh - 1, size, &self.rng_state, self.lock)
         elif key == 'uint16':
-            ret = _rand_uint16(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint16(ilow, ihigh - 1, size, &self.rng_state, self.lock)
         elif key == 'uint8':
-            ret = _rand_uint8(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint8(ilow, ihigh - 1, size, &self.rng_state, self.lock)
         elif key == 'bool':
-            ret = _rand_bool(low, high - 1, size, &self.rng_state, self.lock)
+            ret = _rand_bool(ilow, ihigh - 1, size, &self.rng_state, self.lock)
 
         if size is None:
             if dtype in (np.bool, np.int, np.long):
@@ -1021,7 +1030,7 @@ cdef class RandomState:
         ----------
         a : 1-D array-like or int
             If an ndarray, a random sample is generated from its elements.
-            If an int, the random sample is generated as if a was np.arange(n)
+            If an int, the random sample is generated as if a were np.arange(a)
         size : int or tuple of ints, optional
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
@@ -1035,7 +1044,7 @@ cdef class RandomState:
 
         Returns
         -------
-        samples : 1-D ndarray, shape (size,)
+        samples : single item or ndarray
             The generated random samples
 
         Raises
@@ -4094,8 +4103,8 @@ cdef class RandomState:
         Instead of specifying the full covariance matrix, popular
         approximations include:
 
-          - Spherical covariance (*cov* is a multiple of the identity matrix)
-          - Diagonal covariance (*cov* has non-negative elements, and only on
+          - Spherical covariance (`cov` is a multiple of the identity matrix)
+          - Diagonal covariance (`cov` has non-negative elements, and only on
             the diagonal)
 
         This geometrical property can be seen in two dimensions by plotting
@@ -4507,6 +4516,7 @@ cdef class RandomState:
             with self.lock:
                 for i in reversed(range(1, n)):
                     j = random_interval(&self.rng_state, i)
+                    if i == j : continue # i == j is not needed and memcpy is undefined.
                     buf[...] = x[j]
                     x[j] = x[i]
                     x[i] = buf

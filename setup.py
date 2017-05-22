@@ -173,7 +173,11 @@ class BinaryDistribution(Distribution):
 
 
 try:
-    subprocess.call(['pandoc', '--from=markdown', '--to=rst', '--output=README.rst', 'README.md'])
+    import os
+    readme_orig_time = os.path.getmtime('README.md')
+    readme_mod_time = os.path.getmtime('README.rst')
+    if readme_orig_time > readme_mod_time:
+        subprocess.call(['pandoc', '--from=markdown', '--to=rst', '--output=README.rst', 'README.md'])
 except:
     pass
 # Generate files and extensions
