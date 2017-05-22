@@ -1,7 +1,7 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.pcg64.dirichlet &#8212; randomstate 1.12+25.g580c7c8 documentation</title>
+    <title>randomstate.prng.pcg64.dirichlet &#8212; randomstate 1.12+26.g0c87fb4 documentation</title>
     
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.12+25.g580c7c8',
+        VERSION:     '1.12+26.g0c87fb4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="randomstate.prng.pcg64.exponential" href="randomstate.prng.pcg64.exponential.html" />
@@ -43,7 +43,7 @@
    
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -56,7 +56,7 @@
         <li class="right" >
           <a href="randomstate.prng.pcg64.chisquare.html" title="randomstate.prng.pcg64.chisquare"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../pcg64.html" accesskey="U">64-bit PCG Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -147,20 +147,27 @@
 Dirichlet-distributed random variable can be seen as a multivariate
 generalization of a Beta distribution. Dirichlet pdf is the conjugate
 prior of a multinomial in Bayesian inference.</p>
-<dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
-<li><strong>alpha</strong> (<em>array</em>) -- Parameter of the distribution (k dimension for sample of
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>alpha</strong> (<em>array</em>) – Parameter of the distribution (k dimension for sample of
 dimension k).</li>
-<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) -- Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
+<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
 <code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  Default is None, in which case a
 single value is returned.</li>
 </ul>
-</dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first"><strong>samples</strong> -- The drawn samples, of shape (size, alpha.ndim).</p>
-</dd>
-<dt class="field-name">Return type</dt><dd class="field-body"><p class="first last">ndarray,</p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>samples</strong> – The drawn samples, of shape (size, alpha.ndim).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray,</p>
+</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Notes</p>
 <div class="math">
 \[X \approx \prod_{i=1}^{k}{x^{\alpha_i-1}_i}\]</div>
@@ -173,15 +180,15 @@ Dirichlet distributed.</p>
 <table class="docutils footnote" frame="void" id="id1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[1]</td><td>David McKay, &quot;Information Theory, Inference and Learning
-Algorithms,&quot; chapter 23,
+<tr><td class="label">[1]</td><td>David McKay, “Information Theory, Inference and Learning
+Algorithms,” chapter 23,
 <a class="reference external" href="http://www.inference.phy.cam.ac.uk/mackay/">http://www.inference.phy.cam.ac.uk/mackay/</a></td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[2]</td><td>Wikipedia, &quot;Dirichlet distribution&quot;,
+<tr><td class="label">[2]</td><td>Wikipedia, “Dirichlet distribution”,
 <a class="reference external" href="http://en.wikipedia.org/wiki/Dirichlet_distribution">http://en.wikipedia.org/wiki/Dirichlet_distribution</a></td></tr>
 </tbody>
 </table>
@@ -234,7 +241,7 @@ the pieces.</p>
         <li class="right" >
           <a href="randomstate.prng.pcg64.chisquare.html" title="randomstate.prng.pcg64.chisquare"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../pcg64.html" >64-bit PCG Randomstate</a> &#187;</li> 
       </ul>
     </div>

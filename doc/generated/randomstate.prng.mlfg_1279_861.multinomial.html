@@ -1,7 +1,7 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.mlfg_1279_861.multinomial &#8212; randomstate 1.12+25.g580c7c8 documentation</title>
+    <title>randomstate.prng.mlfg_1279_861.multinomial &#8212; randomstate 1.12+26.g0c87fb4 documentation</title>
     
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.12+25.g580c7c8',
+        VERSION:     '1.12+26.g0c87fb4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="randomstate.prng.mlfg_1279_861.multivariate_normal" href="randomstate.prng.mlfg_1279_861.multivariate_normal.html" />
@@ -43,7 +43,7 @@
    
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -56,7 +56,7 @@
         <li class="right" >
           <a href="randomstate.prng.mlfg_1279_861.logseries.html" title="randomstate.prng.mlfg_1279_861.logseries"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mlfg.html" accesskey="U">MLFG(1279, 861, *)  Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -149,27 +149,34 @@ where the outcome can be 1 through 6.  Each sample drawn from the
 distribution represents <cite>n</cite> such experiments.  Its values,
 <code class="docutils literal"><span class="pre">X_i</span> <span class="pre">=</span> <span class="pre">[X_0,</span> <span class="pre">X_1,</span> <span class="pre">...,</span> <span class="pre">X_p]</span></code>, represent the number of times the
 outcome was <code class="docutils literal"><span class="pre">i</span></code>.</p>
-<dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
-<li><strong>n</strong> (<em>int</em>) -- Number of experiments.</li>
-<li><strong>pvals</strong> (<em>sequence of floats</em><em>, </em><em>length p</em>) -- Probabilities of each of the <code class="docutils literal"><span class="pre">p</span></code> different outcomes.  These
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n</strong> (<em>int</em>) – Number of experiments.</li>
+<li><strong>pvals</strong> (<em>sequence of floats</em><em>, </em><em>length p</em>) – Probabilities of each of the <code class="docutils literal"><span class="pre">p</span></code> different outcomes.  These
 should sum to 1 (however, the last element is always assumed to
 account for the remaining probability, as long as
 <code class="docutils literal"><span class="pre">sum(pvals[:-1])</span> <span class="pre">&lt;=</span> <span class="pre">1)</span></code>.</li>
-<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) -- Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
+<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
 <code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  Default is None, in which case a
 single value is returned.</li>
 </ul>
-</dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first"><p><strong>out</strong> -- The drawn samples, of shape <em>size</em>, if that was provided.  If not,
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p><strong>out</strong> – The drawn samples, of shape <em>size</em>, if that was provided.  If not,
 the shape is <code class="docutils literal"><span class="pre">(N,)</span></code>.</p>
 <p>In other words, each entry <code class="docutils literal"><span class="pre">out[i,j,...,:]</span></code> is an N-dimensional
 value drawn from the distribution.</p>
 </p>
-</dd>
-<dt class="field-name">Return type</dt><dd class="field-body"><p class="first last">ndarray</p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Examples</p>
 <p>Throw a dice 20 times:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mf">6.</span><span class="p">]</span><span class="o">*</span><span class="mi">6</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -238,7 +245,7 @@ other should be sampled like so:</p>
         <li class="right" >
           <a href="randomstate.prng.mlfg_1279_861.logseries.html" title="randomstate.prng.mlfg_1279_861.logseries"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mlfg.html" >MLFG(1279, 861, *)  Randomstate</a> &#187;</li> 
       </ul>
     </div>

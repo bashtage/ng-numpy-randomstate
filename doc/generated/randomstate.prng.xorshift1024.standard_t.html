@@ -1,7 +1,7 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.xorshift1024.standard_t &#8212; randomstate 1.12+25.g580c7c8 documentation</title>
+    <title>randomstate.prng.xorshift1024.standard_t &#8212; randomstate 1.12+26.g0c87fb4 documentation</title>
     
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.12+25.g580c7c8',
+        VERSION:     '1.12+26.g0c87fb4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="randomstate.prng.xorshift1024.triangular" href="randomstate.prng.xorshift1024.triangular.html" />
@@ -43,7 +43,7 @@
    
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -56,7 +56,7 @@
         <li class="right" >
           <a href="randomstate.prng.xorshift1024.standard_normal.html" title="randomstate.prng.xorshift1024.standard_normal"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../xorshift1024.html" accesskey="U">XorShift1024* Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -142,25 +142,32 @@
 <dl class="function">
 <dt id="randomstate.prng.xorshift1024.standard_t">
 <code class="descclassname">randomstate.prng.xorshift1024.</code><code class="descname">standard_t</code><span class="sig-paren">(</span><em>df</em>, <em>size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.xorshift1024.standard_t" title="Permalink to this definition">¶</a></dt>
-<dd><p>Draw samples from a standard Student's t distribution with <cite>df</cite> degrees
+<dd><p>Draw samples from a standard Student’s t distribution with <cite>df</cite> degrees
 of freedom.</p>
 <p>A special case of the hyperbolic distribution.  As <cite>df</cite> gets
 large, the result resembles that of the standard normal
 distribution (<cite>standard_normal</cite>).</p>
-<dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
-<li><strong>df</strong> (<em>int</em><em> or </em><em>array_like of ints</em>) -- Degrees of freedom, should be &gt; 0.</li>
-<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) -- Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>int</em><em> or </em><em>array_like of ints</em>) – Degrees of freedom, should be &gt; 0.</li>
+<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
 <code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  If size is <code class="docutils literal"><span class="pre">None</span></code> (default),
 a single value is returned if <code class="docutils literal"><span class="pre">df</span></code> is a scalar.  Otherwise,
 <code class="docutils literal"><span class="pre">np.array(df).size</span></code> samples are drawn.</li>
 </ul>
-</dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first"><strong>out</strong> -- Drawn samples from the parameterized standard Student's t distribution.</p>
-</dd>
-<dt class="field-name">Return type</dt><dd class="field-body"><p class="first last">ndarray or scalar</p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>out</strong> – Drawn samples from the parameterized standard Student’s t distribution.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray or scalar</p>
+</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Notes</p>
 <p>The probability density function for the t distribution is</p>
 <div class="math">
@@ -178,15 +185,15 @@ a pseudonym, and so he used the name Student.</p>
 <table class="docutils footnote" frame="void" id="id1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id3">[1]</a></td><td>Dalgaard, Peter, &quot;Introductory Statistics With R&quot;,
+<tr><td class="label"><a class="fn-backref" href="#id3">[1]</a></td><td>Dalgaard, Peter, “Introductory Statistics With R”,
 Springer, 2002.</td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[2]</td><td>Wikipedia, &quot;Student's t-distribution&quot;
-<a class="reference external" href="http://en.wikipedia.org/wiki/Student's_t-distribution">http://en.wikipedia.org/wiki/Student's_t-distribution</a></td></tr>
+<tr><td class="label">[2]</td><td>Wikipedia, “Student’s t-distribution”
+<a class="reference external" href="http://en.wikipedia.org/wiki/Student's_t-distribution">http://en.wikipedia.org/wiki/Student’s_t-distribution</a></td></tr>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
@@ -257,7 +264,7 @@ probability of about 99% of being true.</p>
         <li class="right" >
           <a href="randomstate.prng.xorshift1024.standard_normal.html" title="randomstate.prng.xorshift1024.standard_normal"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../xorshift1024.html" >XorShift1024* Randomstate</a> &#187;</li> 
       </ul>
     </div>

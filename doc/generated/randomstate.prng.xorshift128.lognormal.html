@@ -1,7 +1,7 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.xorshift128.lognormal &#8212; randomstate 1.12+25.g580c7c8 documentation</title>
+    <title>randomstate.prng.xorshift128.lognormal &#8212; randomstate 1.12+26.g0c87fb4 documentation</title>
     
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.12+25.g580c7c8',
+        VERSION:     '1.12+26.g0c87fb4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="randomstate.prng.xorshift128.logseries" href="randomstate.prng.xorshift128.logseries.html" />
@@ -43,7 +43,7 @@
    
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -56,7 +56,7 @@
         <li class="right" >
           <a href="randomstate.prng.xorshift128.logistic.html" title="randomstate.prng.xorshift128.logistic"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../xorshift128.html" accesskey="U">XorShift128+ Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -147,22 +147,29 @@
 standard deviation, and array shape.  Note that the mean and standard
 deviation are not the values for the distribution itself, but of the
 underlying normal distribution it is derived from.</p>
-<dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
-<li><strong>mean</strong> (<em>float</em><em> or </em><em>array_like of floats</em><em>, </em><em>optional</em>) -- Mean value of the underlying normal distribution. Default is 0.</li>
-<li><strong>sigma</strong> (<em>float</em><em> or </em><em>array_like of floats</em><em>, </em><em>optional</em>) -- Standard deviation of the underlying normal distribution. Should
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mean</strong> (<em>float</em><em> or </em><em>array_like of floats</em><em>, </em><em>optional</em>) – Mean value of the underlying normal distribution. Default is 0.</li>
+<li><strong>sigma</strong> (<em>float</em><em> or </em><em>array_like of floats</em><em>, </em><em>optional</em>) – Standard deviation of the underlying normal distribution. Should
 be greater than zero. Default is 1.</li>
-<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) -- Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
+<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
 <code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  If size is <code class="docutils literal"><span class="pre">None</span></code> (default),
 a single value is returned if <code class="docutils literal"><span class="pre">mean</span></code> and <code class="docutils literal"><span class="pre">sigma</span></code> are both scalars.
 Otherwise, <code class="docutils literal"><span class="pre">np.broadcast(mean,</span> <span class="pre">sigma).size</span></code> samples are drawn.</li>
 </ul>
-</dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first"><strong>out</strong> -- Drawn samples from the parameterized log-normal distribution.</p>
-</dd>
-<dt class="field-name">Return type</dt><dd class="field-body"><p class="first last">ndarray or scalar</p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>out</strong> – Drawn samples from the parameterized log-normal distribution.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray or scalar</p>
+</td>
+</tr>
+</tbody>
+</table>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
@@ -188,8 +195,8 @@ variables.</p>
 <table class="docutils footnote" frame="void" id="id1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[1]</td><td>Limpert, E., Stahel, W. A., and Abbt, M., &quot;Log-normal
-Distributions across the Sciences: Keys and Clues,&quot;
+<tr><td class="label">[1]</td><td>Limpert, E., Stahel, W. A., and Abbt, M., “Log-normal
+Distributions across the Sciences: Keys and Clues,”
 BioScience, Vol. 51, No. 5, May, 2001.
 <a class="reference external" href="http://stat.ethz.ch/~stahel/lognormal/bioscience.pdf">http://stat.ethz.ch/~stahel/lognormal/bioscience.pdf</a></td></tr>
 </tbody>
@@ -197,8 +204,8 @@ BioScience, Vol. 51, No. 5, May, 2001.
 <table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[2]</td><td>Reiss, R.D. and Thomas, M., &quot;Statistical Analysis of Extreme
-Values,&quot; Basel: Birkhauser Verlag, 2001, pp. 31-32.</td></tr>
+<tr><td class="label">[2]</td><td>Reiss, R.D. and Thomas, M., “Statistical Analysis of Extreme
+Values,” Basel: Birkhauser Verlag, 2001, pp. 31-32.</td></tr>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
@@ -283,7 +290,7 @@ function.</p>
         <li class="right" >
           <a href="randomstate.prng.xorshift128.logistic.html" title="randomstate.prng.xorshift128.logistic"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../xorshift128.html" >XorShift128+ Randomstate</a> &#187;</li> 
       </ul>
     </div>

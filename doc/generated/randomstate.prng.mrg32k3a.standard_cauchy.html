@@ -1,7 +1,7 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.mrg32k3a.standard_cauchy &#8212; randomstate 1.12+25.g580c7c8 documentation</title>
+    <title>randomstate.prng.mrg32k3a.standard_cauchy &#8212; randomstate 1.12+26.g0c87fb4 documentation</title>
     
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.12+25.g580c7c8',
+        VERSION:     '1.12+26.g0c87fb4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="randomstate.prng.mrg32k3a.standard_exponential" href="randomstate.prng.mrg32k3a.standard_exponential.html" />
@@ -43,7 +43,7 @@
    
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -56,7 +56,7 @@
         <li class="right" >
           <a href="randomstate.prng.mrg32k3a.rayleigh.html" title="randomstate.prng.mrg32k3a.rayleigh"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mrg32k3a.html" accesskey="U">MRG32K3A Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -144,13 +144,20 @@
 <code class="descclassname">randomstate.prng.mrg32k3a.</code><code class="descname">standard_cauchy</code><span class="sig-paren">(</span><em>size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.mrg32k3a.standard_cauchy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw samples from a standard Cauchy distribution with mode = 0.</p>
 <p>Also known as the Lorentz distribution.</p>
-<dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) -- Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
 <code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  Default is None, in which case a
-single value is returned.</dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><strong>samples</strong> -- The drawn samples.</dd>
-<dt class="field-name">Return type</dt><dd class="field-body">ndarray or scalar</dd>
-</dl>
+single value is returned.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>samples</strong> – The drawn samples.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray or scalar</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Notes</p>
 <p>The probability density function for the full Cauchy distribution is</p>
 <div class="math">
@@ -170,15 +177,15 @@ very much like a Gaussian distribution, but with heavier tails.</p>
 <table class="docutils footnote" frame="void" id="id1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[1]</td><td>NIST/SEMATECH e-Handbook of Statistical Methods, &quot;Cauchy
-Distribution&quot;,
+<tr><td class="label">[1]</td><td>NIST/SEMATECH e-Handbook of Statistical Methods, “Cauchy
+Distribution”,
 <a class="reference external" href="http://www.itl.nist.gov/div898/handbook/eda/section3/eda3663.htm">http://www.itl.nist.gov/div898/handbook/eda/section3/eda3663.htm</a></td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[2]</td><td>Weisstein, Eric W. &quot;Cauchy Distribution.&quot; From MathWorld--A
+<tr><td class="label">[2]</td><td>Weisstein, Eric W. “Cauchy Distribution.” From MathWorld–A
 Wolfram Web Resource.
 <a class="reference external" href="http://mathworld.wolfram.com/CauchyDistribution.html">http://mathworld.wolfram.com/CauchyDistribution.html</a></td></tr>
 </tbody>
@@ -186,7 +193,7 @@ Wolfram Web Resource.
 <table class="docutils footnote" frame="void" id="id3" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[3]</td><td>Wikipedia, &quot;Cauchy distribution&quot;
+<tr><td class="label">[3]</td><td>Wikipedia, “Cauchy distribution”
 <a class="reference external" href="http://en.wikipedia.org/wiki/Cauchy_distribution">http://en.wikipedia.org/wiki/Cauchy_distribution</a></td></tr>
 </tbody>
 </table>
@@ -232,7 +239,7 @@ Wolfram Web Resource.
         <li class="right" >
           <a href="randomstate.prng.mrg32k3a.rayleigh.html" title="randomstate.prng.mrg32k3a.rayleigh"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mrg32k3a.html" >MRG32K3A Randomstate</a> &#187;</li> 
       </ul>
     </div>

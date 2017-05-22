@@ -1,7 +1,7 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate&#39;s documentation &#8212; randomstate 1.12+25.g580c7c8 documentation</title>
+    <title>randomstate’s documentation &#8212; randomstate 1.12+26.g0c87fb4 documentation</title>
     
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.12+25.g580c7c8',
+        VERSION:     '1.12+26.g0c87fb4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Parallel Random Number Generation" href="parallel.html" />
@@ -42,7 +42,7 @@
    
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -52,7 +52,7 @@
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -117,24 +117,24 @@
             <ol class="breadcrumb">
               <li><a href="#">Docs</a></li>
               
-              <li>randomstate's documentation</li>
+              <li>randomstate’s documentation</li>
             </ol>
           </div>
           
           <div class="document clearer body">
             
   <div class="section" id="randomstate-s-documentation">
-<h1>randomstate's documentation<a class="headerlink" href="#randomstate-s-documentation" title="Permalink to this headline">¶</a></h1>
+<h1>randomstate’s documentation<a class="headerlink" href="#randomstate-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p>This package contains drop-in replacements for the NumPy RandomState object
 that change the core random number generator.</p>
 <div class="section" id="what-s-new-or-different">
-<h2>What's New or Different<a class="headerlink" href="#what-s-new-or-different" title="Permalink to this headline">¶</a></h2>
+<h2>What’s New or Different<a class="headerlink" href="#what-s-new-or-different" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">randomstate.entropy.random_entropy</span></code> provides access to the system
 source of randomness that is used in cryptographic applications (e.g.,
 <code class="docutils literal"><span class="pre">/dev/urandom</span></code> on Unix).</li>
 <li>The normal generator supports a 256-step Ziggurat method which is 2-6 times
-faster than NumPy's <code class="docutils literal"><span class="pre">standard_normal</span></code>.  This generator can be accessed
+faster than NumPy’s <code class="docutils literal"><span class="pre">standard_normal</span></code>.  This generator can be accessed
 by passing the keyword argument <code class="docutils literal"><span class="pre">method='zig'</span></code>.</li>
 </ul>
 <div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">from</span> <span class="nn">randomstate</span> <span class="kn">import</span> <span class="n">standard_normal</span>
@@ -215,35 +215,35 @@ one of two ways:</p>
 <div class="section" id="supported-generators">
 <h2>Supported Generators<a class="headerlink" href="#supported-generators" title="Permalink to this headline">¶</a></h2>
 <p>The main innovation is the inclusion of a number of alternative pseudo-random number
-generators, 'in addition' to the standard PRNG in NumPy.  The included PRNGs are:</p>
+generators, ‘in addition’ to the standard PRNG in NumPy.  The included PRNGs are:</p>
 <ul class="simple">
 <li>MT19937 - The standard NumPy generator.  Produces identical results to NumPy
-using the same seed/state. See <a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/routines.random.html">NumPy's documentation</a>.</li>
+using the same seed/state. See <a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/routines.random.html">NumPy’s documentation</a>.</li>
 <li>dSFMT - A SSE2 enables version of the MT19937 generator.  Theoretically the
 same, but with a different state and so it is not possible to produce a
-sequence identical to MT19937. See the <a class="reference external" href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/">dSFMT authors' page</a>.</li>
+sequence identical to MT19937. See the <a class="reference external" href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/">dSFMT authors’ page</a>.</li>
 <li>XoroShiro128+ - Improved version of XorShift128+ with improved performance
 and better statistical quality. Like the XorShift generators, can be jumped
 to produce multiple streams in parallel applications. See
 <a class="reference internal" href="generated/randomstate.prng.xoroshiro128plus.jump.html#randomstate.prng.xoroshiro128plus.jump" title="randomstate.prng.xoroshiro128plus.jump"><code class="xref py py-meth docutils literal"><span class="pre">randomstate.prng.xoroshiro128plus.jump()</span></code></a> for details. More information
-about this PRNG is available at the <a class="reference external" href="http://xoroshiro.di.unimi.it/">xorshift and xoroshiro authors' page</a>.</li>
+about this PRNG is available at the <a class="reference external" href="http://xoroshiro.di.unimi.it/">xorshift and xoroshiro authors’ page</a>.</li>
 <li>XorShit128+ and XorShift1024* - Vast fast generators based on the XSadd
-generator. These generators can be rapidly 'jumped' and so can be used in
+generator. These generators can be rapidly ‘jumped’ and so can be used in
 parallel applications. See the documentation for
 <a class="reference internal" href="generated/randomstate.prng.xorshift1024.jump.html#randomstate.prng.xorshift1024.jump" title="randomstate.prng.xorshift1024.jump"><code class="xref py py-meth docutils literal"><span class="pre">randomstate.prng.xorshift1024.jump()</span></code></a> for details. More information
 about these PRNGs is available at the
-<a class="reference external" href="http://xoroshiro.di.unimi.it/">xorshift and xoroshiro authors' page</a>.</li>
+<a class="reference external" href="http://xoroshiro.di.unimi.it/">xorshift and xoroshiro authors’ page</a>.</li>
 <li>PCG-32 and PCG-64 - Fast generators that support many parallel streams and
 can be advanced by an arbitrary amount. See the documentation for
 <a class="reference internal" href="generated/randomstate.prng.pcg64.advance.html#randomstate.prng.pcg64.advance" title="randomstate.prng.pcg64.advance"><code class="xref py py-meth docutils literal"><span class="pre">randomstate.prng.pcg64.advance()</span></code></a>.  PCG-32 only as a period of
 <span class="math">\(2^{64}\)</span> while PCG-64 has a period of <span class="math">\(2^{128}\)</span>. See the
-<a class="reference external" href="http://www.pcg-random.org/">PCG author's page</a> for more details about this class of PRNG.</li>
+<a class="reference external" href="http://www.pcg-random.org/">PCG author’s page</a> for more details about this class of PRNG.</li>
 <li>Multiplicative Lagged Fibonacci Generator MLFG(1279, 861, *) - A directly
 implemented multiplicative lagged Fibonacci generator with a very large
 period and good performance. Future plans include multiple stream support.
 See the <a class="reference external" href="https://en.wikipedia.org/wiki/Lagged_Fibonacci_generator">wiki page on Fibonacci generators</a>.</li>
-<li>MRG32K3A - a classic and popular generator by L'Ecuyer. Future plans
-include multiple stream support. See the <a class="reference external" href="http://simul.iro.umontreal.ca/">MRG32K3A author's page</a>. Lower
+<li>MRG32K3A - a classic and popular generator by L’Ecuyer. Future plans
+include multiple stream support. See the <a class="reference external" href="http://simul.iro.umontreal.ca/">MRG32K3A author’s page</a>. Lower
 performance than more modern generators.</li>
 </ul>
 <div class="section" id="new-features">
@@ -389,7 +389,7 @@ performance than more modern generators.</li>
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

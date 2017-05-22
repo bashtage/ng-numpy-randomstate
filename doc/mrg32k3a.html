@@ -1,7 +1,7 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>MRG32K3A Randomstate &#8212; randomstate 1.12+25.g580c7c8 documentation</title>
+    <title>MRG32K3A Randomstate &#8212; randomstate 1.12+26.g0c87fb4 documentation</title>
     
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.12+25.g580c7c8',
+        VERSION:     '1.12+26.g0c87fb4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="randomstate.prng.mrg32k3a.seed" href="generated/randomstate.prng.mrg32k3a.seed.html" />
@@ -43,7 +43,7 @@
    
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -56,7 +56,7 @@
         <li class="right" >
           <a href="generated/randomstate.prng.mlfg_1279_861.zipf.html" title="randomstate.prng.mlfg_1279_861.zipf"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -141,8 +141,8 @@
 <dl class="class">
 <dt id="randomstate.prng.mrg32k3a.RandomState">
 <em class="property">class </em><code class="descclassname">randomstate.prng.mrg32k3a.</code><code class="descname">RandomState</code><span class="sig-paren">(</span><em>seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.mrg32k3a.RandomState" title="Permalink to this definition">¶</a></dt>
-<dd><p>Container for L'Ecuyer MRG32K3A pseudo-random number generator.</p>
-<p>MRG32K3A is a 32-bit implementation of L'Ecuyer's combined multiple
+<dd><p>Container for L’Ecuyer MRG32K3A pseudo-random number generator.</p>
+<p>MRG32K3A is a 32-bit implementation of L’Ecuyer’s combined multiple
 recursive generator <a class="footnote-reference" href="#id4" id="id1">[1]</a>, <a class="footnote-reference" href="#id5" id="id2">[2]</a>. MRG32K3A has a period of <span class="math">\(2^{191}\)</span>,
 supports jumping ahead and is suitable for parallel applications.</p>
 <p><code class="docutils literal"><span class="pre">mrg32k3a.RandomState</span></code> exposes a number of methods for generating random
@@ -159,14 +159,19 @@ parameters will always produce the same results. This is different from
 <code class="docutils literal"><span class="pre">numpy.random.RandomState</span></code> guarantee. This is done to simplify improving
 random number generators.  To ensure identical results, you must use the
 same release version.</p>
-<dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><strong>seed</strong> (<em>{None</em><em>, </em><em>int</em><em>, </em><em>array_like}</em><em>, </em><em>optional</em>) -- Random seed initializing the pseudo-random number generator.
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>seed</strong> (<em>{None</em><em>, </em><em>int</em><em>, </em><em>array_like}</em><em>, </em><em>optional</em>) – Random seed initializing the pseudo-random number generator.
 Can be an integer in [0, 2**64-1], array of integers in
 [0, 2**64-1] or <code class="docutils literal"><span class="pre">None</span></code> (the default). If <cite>seed</cite> is <code class="docutils literal"><span class="pre">None</span></code>,
 then <code class="docutils literal"><span class="pre">mrg32k3a.RandomState</span></code> will try to read data from
 <code class="docutils literal"><span class="pre">/dev/urandom</span></code> (or the Windows analog) if available. If
-unavailable, a 64-bit hash of the time and process ID is used.</dd>
-</dl>
+unavailable, a 64-bit hash of the time and process ID is used.</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Notes</p>
 <p>The state of the MRG32KA PRNG is represented by 6 64-bit integers.</p>
 <p>This implementation is integer based and produces integers in the interval
@@ -206,29 +211,29 @@ array and using the same value as a scalar will produce the same initial state.<
 <table class="docutils footnote" frame="void" id="id4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>&quot;Software developed by the Canada Research Chair in Stochastic
-Simulation and Optimization&quot;, <a class="reference external" href="http://simul.iro.umontreal.ca/">http://simul.iro.umontreal.ca/</a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>“Software developed by the Canada Research Chair in Stochastic
+Simulation and Optimization”, <a class="reference external" href="http://simul.iro.umontreal.ca/">http://simul.iro.umontreal.ca/</a></td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id5" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Pierre L'Ecuyer, (1999) &quot;Good Parameters and Implementations for
-Combined Multiple Recursive Random Number Generators.&quot;, Operations
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Pierre L’Ecuyer, (1999) “Good Parameters and Implementations for
+Combined Multiple Recursive Random Number Generators.”, Operations
 Research 47(1):159-164</td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id6" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>L'ecuyer, Pierre, Richard Simard, E. Jack Chen, and W. David Kelton.
-&quot;An object-oriented random-number package with many long streams
-and substreams.&quot; Operations research 50, no. 6, pp. 1073-1075, 2002.</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>L’ecuyer, Pierre, Richard Simard, E. Jack Chen, and W. David Kelton.
+“An object-oriented random-number package with many long streams
+and substreams.” Operations research 50, no. 6, pp. 1073-1075, 2002.</td></tr>
 </tbody>
 </table>
 </dd></dl>
 
-<table class="longtable table table-bordered">
+<table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
@@ -248,13 +253,13 @@ and substreams.&quot; Operations research 50, no. 6, pp. 1073-1075, 2002.</td></
 </div>
 <div class="section" id="parallel-generation">
 <h2>Parallel generation<a class="headerlink" href="#parallel-generation" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table table-bordered">
+<table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.jump.html#randomstate.prng.mrg32k3a.jump" title="randomstate.prng.mrg32k3a.jump"><code class="xref py py-obj docutils literal"><span class="pre">jump</span></code></a>(iter&nbsp;=&nbsp;1)</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.jump.html#randomstate.prng.mrg32k3a.jump" title="randomstate.prng.mrg32k3a.jump"><code class="xref py py-obj docutils literal"><span class="pre">jump</span></code></a>(iter&nbsp;=&nbsp;1)</td>
 <td>Jumps the state of the random number generator as-if 2**127 random numbers have been generated.</td>
 </tr>
 </tbody>
@@ -262,17 +267,17 @@ and substreams.&quot; Operations research 50, no. 6, pp. 1073-1075, 2002.</td></
 </div>
 <div class="section" id="simple-random-data">
 <h2>Simple random data<a class="headerlink" href="#simple-random-data" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table table-bordered">
+<table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.rand.html#randomstate.prng.mrg32k3a.rand" title="randomstate.prng.mrg32k3a.rand"><code class="xref py py-obj docutils literal"><span class="pre">rand</span></code></a>(d0,&nbsp;d1,&nbsp;...,&nbsp;dn[,&nbsp;dtype])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.rand.html#randomstate.prng.mrg32k3a.rand" title="randomstate.prng.mrg32k3a.rand"><code class="xref py py-obj docutils literal"><span class="pre">rand</span></code></a>(d0,&nbsp;d1,&nbsp;…,&nbsp;dn[,&nbsp;dtype])</td>
 <td>Random values in a given shape.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.randn.html#randomstate.prng.mrg32k3a.randn" title="randomstate.prng.mrg32k3a.randn"><code class="xref py py-obj docutils literal"><span class="pre">randn</span></code></a>(d0,&nbsp;d1,&nbsp;...,&nbsp;dn[,&nbsp;method,&nbsp;dtype])</td>
-<td>Return a sample (or samples) from the &quot;standard normal&quot; distribution.</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.randn.html#randomstate.prng.mrg32k3a.randn" title="randomstate.prng.mrg32k3a.randn"><code class="xref py py-obj docutils literal"><span class="pre">randn</span></code></a>(d0,&nbsp;d1,&nbsp;…,&nbsp;dn[,&nbsp;method,&nbsp;dtype])</td>
+<td>Return a sample (or samples) from the “standard normal” distribution.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.randint.html#randomstate.prng.mrg32k3a.randint" title="randomstate.prng.mrg32k3a.randint"><code class="xref py py-obj docutils literal"><span class="pre">randint</span></code></a>(low[,&nbsp;high,&nbsp;size,&nbsp;dtype])</td>
 <td>Return random integers from <cite>low</cite> (inclusive) to <cite>high</cite> (exclusive).</td>
@@ -284,13 +289,13 @@ and substreams.&quot; Operations research 50, no. 6, pp. 1073-1075, 2002.</td></
 <td>Return random floats in the half-open interval [0.0, 1.0).</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.random.html#randomstate.prng.mrg32k3a.random" title="randomstate.prng.mrg32k3a.random"><code class="xref py py-obj docutils literal"><span class="pre">random</span></code></a></td>
-<td>random_sample(size=None, dtype='d', out=None)</td>
+<td>random_sample(size=None, dtype=’d’, out=None)</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.ranf.html#randomstate.prng.mrg32k3a.ranf" title="randomstate.prng.mrg32k3a.ranf"><code class="xref py py-obj docutils literal"><span class="pre">ranf</span></code></a></td>
-<td>random_sample(size=None, dtype='d', out=None)</td>
+<td>random_sample(size=None, dtype=’d’, out=None)</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.sample.html#randomstate.prng.mrg32k3a.sample" title="randomstate.prng.mrg32k3a.sample"><code class="xref py py-obj docutils literal"><span class="pre">sample</span></code></a></td>
-<td>random_sample(size=None, dtype='d', out=None)</td>
+<td>random_sample(size=None, dtype=’d’, out=None)</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.choice.html#randomstate.prng.mrg32k3a.choice" title="randomstate.prng.mrg32k3a.choice"><code class="xref py py-obj docutils literal"><span class="pre">choice</span></code></a>(a[,&nbsp;size,&nbsp;replace,&nbsp;p])</td>
 <td>Generates a random sample from a given 1-D array</td>
@@ -309,7 +314,7 @@ and substreams.&quot; Operations research 50, no. 6, pp. 1073-1075, 2002.</td></
 </div>
 <div class="section" id="permutations">
 <h2>Permutations<a class="headerlink" href="#permutations" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table table-bordered">
+<table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
@@ -326,7 +331,7 @@ and substreams.&quot; Operations research 50, no. 6, pp. 1073-1075, 2002.</td></
 </div>
 <div class="section" id="distributions">
 <h2>Distributions<a class="headerlink" href="#distributions" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table table-bordered">
+<table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
@@ -377,7 +382,7 @@ and substreams.&quot; Operations research 50, no. 6, pp. 1073-1075, 2002.</td></
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.multinomial.html#randomstate.prng.mrg32k3a.multinomial" title="randomstate.prng.mrg32k3a.multinomial"><code class="xref py py-obj docutils literal"><span class="pre">multinomial</span></code></a>(n,&nbsp;pvals[,&nbsp;size])</td>
 <td>Draw samples from a multinomial distribution.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.multivariate_normal.html#randomstate.prng.mrg32k3a.multivariate_normal" title="randomstate.prng.mrg32k3a.multivariate_normal"><code class="xref py py-obj docutils literal"><span class="pre">multivariate_normal</span></code></a>(mean,&nbsp;cov[,&nbsp;size,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.multivariate_normal.html#randomstate.prng.mrg32k3a.multivariate_normal" title="randomstate.prng.mrg32k3a.multivariate_normal"><code class="xref py py-obj docutils literal"><span class="pre">multivariate_normal</span></code></a>(mean,&nbsp;cov[,&nbsp;size,&nbsp;…)</td>
 <td>Draw random samples from a multivariate normal distribution.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.negative_binomial.html#randomstate.prng.mrg32k3a.negative_binomial" title="randomstate.prng.mrg32k3a.negative_binomial"><code class="xref py py-obj docutils literal"><span class="pre">negative_binomial</span></code></a>(n,&nbsp;p[,&nbsp;size])</td>
@@ -417,7 +422,7 @@ and substreams.&quot; Operations research 50, no. 6, pp. 1073-1075, 2002.</td></
 <td>Draw samples from a standard Normal distribution (mean=0, stdev=1).</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.standard_t.html#randomstate.prng.mrg32k3a.standard_t" title="randomstate.prng.mrg32k3a.standard_t"><code class="xref py py-obj docutils literal"><span class="pre">standard_t</span></code></a>(df[,&nbsp;size])</td>
-<td>Draw samples from a standard Student's t distribution with <cite>df</cite> degrees of freedom.</td>
+<td>Draw samples from a standard Student’s t distribution with <cite>df</cite> degrees of freedom.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.mrg32k3a.triangular.html#randomstate.prng.mrg32k3a.triangular" title="randomstate.prng.mrg32k3a.triangular"><code class="xref py py-obj docutils literal"><span class="pre">triangular</span></code></a>(left,&nbsp;mode,&nbsp;right[,&nbsp;size])</td>
 <td>Draw samples from the triangular distribution over the interval <code class="docutils literal"><span class="pre">[left,</span> <span class="pre">right]</span></code>.</td>
@@ -472,7 +477,7 @@ and substreams.&quot; Operations research 50, no. 6, pp. 1073-1075, 2002.</td></
         <li class="right" >
           <a href="generated/randomstate.prng.mlfg_1279_861.zipf.html" title="randomstate.prng.mlfg_1279_861.zipf"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

@@ -1,7 +1,7 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>32-bit PCG Randomstate &#8212; randomstate 1.12+25.g580c7c8 documentation</title>
+    <title>32-bit PCG Randomstate &#8212; randomstate 1.12+26.g0c87fb4 documentation</title>
     
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.12+25.g580c7c8',
+        VERSION:     '1.12+26.g0c87fb4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="randomstate.prng.pcg32.seed" href="generated/randomstate.prng.pcg32.seed.html" />
@@ -43,7 +43,7 @@
    
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -56,7 +56,7 @@
         <li class="right" >
           <a href="generated/randomstate.prng.xorshift1024.zipf.html" title="randomstate.prng.xorshift1024.zipf"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -142,7 +142,7 @@
 <dt id="randomstate.prng.pcg32.RandomState">
 <em class="property">class </em><code class="descclassname">randomstate.prng.pcg32.</code><code class="descname">RandomState</code><span class="sig-paren">(</span><em>seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.pcg32.RandomState" title="Permalink to this definition">¶</a></dt>
 <dd><p>Container for the PCG-32 pseudo-random number generator.</p>
-<p>PCG-32 is a 64-bit implementation of O'Neill's permutation congruential
+<p>PCG-32 is a 64-bit implementation of O’Neill’s permutation congruential
 generator (<a class="footnote-reference" href="#id3" id="id1">[1]</a>, <a class="footnote-reference" href="#id4" id="id2">[2]</a>). PCG-32 has a period of <span class="math">\(2^{64}\)</span> and supports advancing
 an arbitrary number of steps as well as <span class="math">\(2^{63}\)</span> streams.</p>
 <p><code class="docutils literal"><span class="pre">pcg32.RandomState</span></code> exposes a number of methods for generating random
@@ -159,20 +159,25 @@ parameters will always produce the same results. This is different from
 <code class="docutils literal"><span class="pre">numpy.random.RandomState</span></code> guarantee. This is done to simplify improving
 random number generators.  To ensure identical results, you must use the
 same release version.</p>
-<dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
-<li><strong>seed</strong> (<em>{None</em><em>, </em><em>long}</em><em>, </em><em>optional</em>) -- Random seed initializing the pseudo-random number generator.
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>seed</strong> (<em>{None</em><em>, </em><em>long}</em><em>, </em><em>optional</em>) – Random seed initializing the pseudo-random number generator.
 Can be an integer in [0, 2**64] or <code class="docutils literal"><span class="pre">None</span></code> (the default).
 If <cite>seed</cite> is <code class="docutils literal"><span class="pre">None</span></code>, then <code class="docutils literal"><span class="pre">pcg32.RandomState</span></code> will try to read data
 from <code class="docutils literal"><span class="pre">/dev/urandom</span></code> (or the Windows analog) if available. If
 unavailable, a 64-bit hash of the time and process ID is used.</li>
-<li><strong>inc</strong> (<em>{None</em><em>, </em><em>int}</em><em>, </em><em>optional</em>) -- Stream to return.
+<li><strong>inc</strong> (<em>{None</em><em>, </em><em>int}</em><em>, </em><em>optional</em>) – Stream to return.
 Can be an integer in [0, 2**64] or <code class="docutils literal"><span class="pre">None</span></code> (the default).  If <cite>inc</cite> is
 <code class="docutils literal"><span class="pre">None</span></code>, then 1 is used.  Can be used with the same seed to
 produce multiple streams using other values of inc.</li>
 </ul>
-</dd>
-</dl>
+</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Notes</p>
 <p>Supports the method advance to advance the PRNG an arbitrary number of steps.
 The state of the PCG-32 PRNG is represented by 2 64-bit unsigned integers.</p>
@@ -203,20 +208,20 @@ In addition, a second 64-bit unsigned integer is used to set the stream.</p>
 <table class="docutils footnote" frame="void" id="id3" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>&quot;PCG, A Family of Better Random Number Generators&quot;,
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>“PCG, A Family of Better Random Number Generators”,
 <a class="reference external" href="http://www.pcg-random.org/">http://www.pcg-random.org/</a></td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>O'Neill, Melissa E. &quot;PCG: A Family of Simple Fast Space-Efficient
-Statistically Good Algorithms for Random Number Generation&quot;</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>O’Neill, Melissa E. “PCG: A Family of Simple Fast Space-Efficient
+Statistically Good Algorithms for Random Number Generation”</td></tr>
 </tbody>
 </table>
 </dd></dl>
 
-<table class="longtable table table-bordered">
+<table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
@@ -236,13 +241,13 @@ Statistically Good Algorithms for Random Number Generation&quot;</td></tr>
 </div>
 <div class="section" id="parallel-generation">
 <h2>Parallel generation<a class="headerlink" href="#parallel-generation" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table table-bordered">
+<table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.advance.html#randomstate.prng.pcg32.advance" title="randomstate.prng.pcg32.advance"><code class="xref py py-obj docutils literal"><span class="pre">advance</span></code></a>(delta)</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.advance.html#randomstate.prng.pcg32.advance" title="randomstate.prng.pcg32.advance"><code class="xref py py-obj docutils literal"><span class="pre">advance</span></code></a>(delta)</td>
 <td>Advance the PRNG as-if delta drawn have occurred.</td>
 </tr>
 </tbody>
@@ -250,17 +255,17 @@ Statistically Good Algorithms for Random Number Generation&quot;</td></tr>
 </div>
 <div class="section" id="simple-random-data">
 <h2>Simple random data<a class="headerlink" href="#simple-random-data" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table table-bordered">
+<table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.rand.html#randomstate.prng.pcg32.rand" title="randomstate.prng.pcg32.rand"><code class="xref py py-obj docutils literal"><span class="pre">rand</span></code></a>(d0,&nbsp;d1,&nbsp;...,&nbsp;dn[,&nbsp;dtype])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.rand.html#randomstate.prng.pcg32.rand" title="randomstate.prng.pcg32.rand"><code class="xref py py-obj docutils literal"><span class="pre">rand</span></code></a>(d0,&nbsp;d1,&nbsp;…,&nbsp;dn[,&nbsp;dtype])</td>
 <td>Random values in a given shape.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.randn.html#randomstate.prng.pcg32.randn" title="randomstate.prng.pcg32.randn"><code class="xref py py-obj docutils literal"><span class="pre">randn</span></code></a>(d0,&nbsp;d1,&nbsp;...,&nbsp;dn[,&nbsp;method,&nbsp;dtype])</td>
-<td>Return a sample (or samples) from the &quot;standard normal&quot; distribution.</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.randn.html#randomstate.prng.pcg32.randn" title="randomstate.prng.pcg32.randn"><code class="xref py py-obj docutils literal"><span class="pre">randn</span></code></a>(d0,&nbsp;d1,&nbsp;…,&nbsp;dn[,&nbsp;method,&nbsp;dtype])</td>
+<td>Return a sample (or samples) from the “standard normal” distribution.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.randint.html#randomstate.prng.pcg32.randint" title="randomstate.prng.pcg32.randint"><code class="xref py py-obj docutils literal"><span class="pre">randint</span></code></a>(low[,&nbsp;high,&nbsp;size,&nbsp;dtype])</td>
 <td>Return random integers from <cite>low</cite> (inclusive) to <cite>high</cite> (exclusive).</td>
@@ -272,13 +277,13 @@ Statistically Good Algorithms for Random Number Generation&quot;</td></tr>
 <td>Return random floats in the half-open interval [0.0, 1.0).</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.random.html#randomstate.prng.pcg32.random" title="randomstate.prng.pcg32.random"><code class="xref py py-obj docutils literal"><span class="pre">random</span></code></a></td>
-<td>random_sample(size=None, dtype='d', out=None)</td>
+<td>random_sample(size=None, dtype=’d’, out=None)</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.ranf.html#randomstate.prng.pcg32.ranf" title="randomstate.prng.pcg32.ranf"><code class="xref py py-obj docutils literal"><span class="pre">ranf</span></code></a></td>
-<td>random_sample(size=None, dtype='d', out=None)</td>
+<td>random_sample(size=None, dtype=’d’, out=None)</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.sample.html#randomstate.prng.pcg32.sample" title="randomstate.prng.pcg32.sample"><code class="xref py py-obj docutils literal"><span class="pre">sample</span></code></a></td>
-<td>random_sample(size=None, dtype='d', out=None)</td>
+<td>random_sample(size=None, dtype=’d’, out=None)</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.choice.html#randomstate.prng.pcg32.choice" title="randomstate.prng.pcg32.choice"><code class="xref py py-obj docutils literal"><span class="pre">choice</span></code></a>(a[,&nbsp;size,&nbsp;replace,&nbsp;p])</td>
 <td>Generates a random sample from a given 1-D array</td>
@@ -297,7 +302,7 @@ Statistically Good Algorithms for Random Number Generation&quot;</td></tr>
 </div>
 <div class="section" id="permutations">
 <h2>Permutations<a class="headerlink" href="#permutations" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table table-bordered">
+<table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
@@ -314,7 +319,7 @@ Statistically Good Algorithms for Random Number Generation&quot;</td></tr>
 </div>
 <div class="section" id="distributions">
 <h2>Distributions<a class="headerlink" href="#distributions" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table table-bordered">
+<table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
@@ -365,7 +370,7 @@ Statistically Good Algorithms for Random Number Generation&quot;</td></tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.multinomial.html#randomstate.prng.pcg32.multinomial" title="randomstate.prng.pcg32.multinomial"><code class="xref py py-obj docutils literal"><span class="pre">multinomial</span></code></a>(n,&nbsp;pvals[,&nbsp;size])</td>
 <td>Draw samples from a multinomial distribution.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.multivariate_normal.html#randomstate.prng.pcg32.multivariate_normal" title="randomstate.prng.pcg32.multivariate_normal"><code class="xref py py-obj docutils literal"><span class="pre">multivariate_normal</span></code></a>(mean,&nbsp;cov[,&nbsp;size,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.multivariate_normal.html#randomstate.prng.pcg32.multivariate_normal" title="randomstate.prng.pcg32.multivariate_normal"><code class="xref py py-obj docutils literal"><span class="pre">multivariate_normal</span></code></a>(mean,&nbsp;cov[,&nbsp;size,&nbsp;…)</td>
 <td>Draw random samples from a multivariate normal distribution.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.negative_binomial.html#randomstate.prng.pcg32.negative_binomial" title="randomstate.prng.pcg32.negative_binomial"><code class="xref py py-obj docutils literal"><span class="pre">negative_binomial</span></code></a>(n,&nbsp;p[,&nbsp;size])</td>
@@ -405,7 +410,7 @@ Statistically Good Algorithms for Random Number Generation&quot;</td></tr>
 <td>Draw samples from a standard Normal distribution (mean=0, stdev=1).</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.standard_t.html#randomstate.prng.pcg32.standard_t" title="randomstate.prng.pcg32.standard_t"><code class="xref py py-obj docutils literal"><span class="pre">standard_t</span></code></a>(df[,&nbsp;size])</td>
-<td>Draw samples from a standard Student's t distribution with <cite>df</cite> degrees of freedom.</td>
+<td>Draw samples from a standard Student’s t distribution with <cite>df</cite> degrees of freedom.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/randomstate.prng.pcg32.triangular.html#randomstate.prng.pcg32.triangular" title="randomstate.prng.pcg32.triangular"><code class="xref py py-obj docutils literal"><span class="pre">triangular</span></code></a>(left,&nbsp;mode,&nbsp;right[,&nbsp;size])</td>
 <td>Draw samples from the triangular distribution over the interval <code class="docutils literal"><span class="pre">[left,</span> <span class="pre">right]</span></code>.</td>
@@ -460,7 +465,7 @@ Statistically Good Algorithms for Random Number Generation&quot;</td></tr>
         <li class="right" >
           <a href="generated/randomstate.prng.xorshift1024.zipf.html" title="randomstate.prng.xorshift1024.zipf"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+25.g580c7c8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.12+26.g0c87fb4 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">
