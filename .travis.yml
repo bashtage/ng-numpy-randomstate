@@ -67,6 +67,9 @@ script:
       make html
       cd ${BUILD_DIR}
       doctr deploy doc
+      if [[ ${TRAVIS_TAG}} ]]; then
+        doctr deploy doc --no-require-master
+      fi;
     fi;
   - |
     if [ ${PYTHON} = "3.6" ]; then
