@@ -13,6 +13,8 @@ from setuptools.extension import Extension
 from setuptools.dist import Distribution
 import versioneer
 
+DEVELOP = False
+
 try:
     import Cython.Tempita as tempita
 except ImportError:
@@ -219,7 +221,7 @@ else:
     files = glob.glob('./randomstate/*.in')
     for templated_file in files:
         output_file_name = os.path.splitext(templated_file)[0]
-        if (os.path.exists(output_file_name) and
+        if (DEVELOP and os.path.exists(output_file_name) and
                 (os.path.getmtime(templated_file) < os.path.getmtime(output_file_name))):
             continue
         with open(templated_file, 'r') as source_file:
@@ -227,7 +229,7 @@ else:
         with open(output_file_name, 'w') as output_file:
             output_file.write(template.substitute())
 
-ext_modules = cythonize(extensions)
+ext_modules = cythonize(extensions, force=not DEVELOP)
 
 classifiers = ['Development Status :: 5 - Production/Stable',
                'Environment :: Console',
