@@ -290,6 +290,10 @@ class RNG(object):
         vals = self.rs.chisquare(2.0, 10)
         assert_(len(vals) == 10)
         params_1(self.rs.chisquare)
+    
+    def test_complex_normal(self):
+        vals = self.rs.complex_normal(2.0+7.0j, 10.0, 5.0-5.0j, size=10)
+        assert_(len(vals) == 10)
 
     def test_exponential(self):
         vals = self.rs.exponential(2.0, 10)

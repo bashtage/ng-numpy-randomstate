@@ -50,6 +50,7 @@ Distributions
    beta
    binomial
    chisquare
+   complex_normal
    dirichlet
    exponential
    f
