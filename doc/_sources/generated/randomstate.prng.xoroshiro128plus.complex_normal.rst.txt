@@ -1,0 +1,6 @@
+randomstate\.prng\.xoroshiro128plus\.complex\_normal
+====================================================
+
+.. currentmodule:: randomstate.prng.xoroshiro128plus
+
+.. autofunction:: complex_normal

@@ -1,0 +1,6 @@
+randomstate\.prng\.mlfg\_1279\_861\.complex\_normal
+===================================================
+
+.. currentmodule:: randomstate.prng.mlfg_1279_861
+
+.. autofunction:: complex_normal

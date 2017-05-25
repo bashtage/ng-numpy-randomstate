@@ -1,0 +1,6 @@
+randomstate\.prng\.pcg32\.complex\_normal
+=========================================
+
+.. currentmodule:: randomstate.prng.pcg32
+
+.. autofunction:: complex_normal
