@@ -16,12 +16,12 @@ from libc cimport string
 from libc.stdint cimport (uint8_t, uint16_t, uint32_t, uint64_t,
                           int8_t, int16_t, int32_t, int64_t, intptr_t)
 from libc.stdlib cimport malloc, free
-
-from cpython cimport Py_INCREF
+from libc.math cimport sqrt
+from cpython cimport Py_INCREF, PyComplex_FromDoubles
 
 import randomstate
 from binomial cimport binomial_t
-from cython_overrides cimport PyFloat_AsDouble, PyInt_AsLong
+from cython_overrides cimport PyFloat_AsDouble, PyInt_AsLong, PyComplex_RealAsDouble, PyComplex_ImagAsDouble
 from randomstate.entropy import random_entropy
 
 np.import_array()
@@ -1686,6 +1686,150 @@ cdef class RandomState:
                         scale, 'scale', CONS_NON_NEGATIVE,
                         0.0, '', CONS_NONE,
                         None)
+
+    def complex_normal(self, loc=0.0, gamma=1.0, relation=0.0, size=None,
+                       method=__normal_method):
+        """
+        normal(loc=0.0, gamma=1.0, relation=0.0, size=None, method='bm')
+
+        Draw random samples from a complex normal (Gaussian) distribution.
+
+        The complex normal is closely related to a bivariate normal
+        distribution where one of the dimensions is complex.
+
+        Parameters
+        ----------
+        loc : complex or array_like of complex
+            Mean of the distribution.
+        gamma : float, complex or array_like of float or complex
+            Variance of the distribution
+        relation : float, complex or array_like of float or complex
+            Relation between the two component normals
+        size : int or tuple of ints, optional
+            Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+            ``m * n * k`` samples are drawn.  If size is ``None`` (default),
+            a single value is returned if ``loc``, ``gamma`` and ``relation``
+            are all scalars. Otherwise,
+            ``np.broadcast(loc, gamma, relation).size`` samples are drawn.
+        method : str, optional
+            Either 'bm' or 'zig'. 'bm' uses the default Box-Muller
+            transformations method.  'zig' uses the much faster Ziggurat
+            method of Marsaglia and Tsang.
+
+        Returns
+        -------
+        out : ndarray or scalar
+            Drawn samples from the parameterized complex normal distribution.
+
+        See Also
+        --------
+        numpy.random.normal : random values from a real-valued normal
+            distribution
+
+        Notes
+        -----
+        **EXPERIMENTAL** Not part of official NumPy RandomState, may change until
+        formal release on PyPi
+        
+        Complex normals are generated from a bivariate normal where the
+        variance of the real component is 0.5 Re(gamma + relation), the
+        variance of the imaginary component is 0.5 Re(gamma - relation), and
+        the covariance between the two is 0.5 Im(relation).  The implied
+        covariance matrix must be positive semi-definite and so both variances
+        must be zero and the covariance must be weakly smaller than the
+        product of the two standard deviations.
+
+        References
+        ----------
+        .. [1] Wikipedia, "Complex normal distribution",
+               https://en.wikipedia.org/wiki/Complex_normal_distribution
+        .. [2] Leigh J. Halliwell, "Complex Random Variables" in "Casualty
+               Actuarial Society E-Forum", Fall 2015.
+
+        Examples
+        --------
+        Draw samples from the distribution:
+
+        >>> s = np.random.complex_normal(size=1000)
+        """
+        cdef np.ndarray ogamma, orelation, oloc
+        cdef double fgamma_r, fgamma_i, frelation_r, frelation_i, frho, f_v_real , f_v_imag, \
+            floc_r, floc_i, f_real, f_imag
+
+        oloc = <np.ndarray>np.PyArray_FROM_OTF(loc, np.NPY_COMPLEX128, np.NPY_ALIGNED)
+        ogamma = <np.ndarray>np.PyArray_FROM_OTF(gamma, np.NPY_COMPLEX128, np.NPY_ALIGNED)
+        orelation = <np.ndarray>np.PyArray_FROM_OTF(relation, np.NPY_COMPLEX128, np.NPY_ALIGNED)
+
+        if np.PyArray_NDIM(ogamma) == np.PyArray_NDIM(orelation) == np.PyArray_NDIM(oloc) == 0:
+            floc_r = PyComplex_RealAsDouble(loc)
+            floc_i = PyComplex_ImagAsDouble(loc)
+            fgamma_r = PyComplex_RealAsDouble(gamma)
+            fgamma_i = PyComplex_ImagAsDouble(gamma)
+            frelation_r = PyComplex_RealAsDouble(relation)
+            frelation_i = PyComplex_ImagAsDouble(relation)
+
+            f_v_real = fgamma_r + frelation_r
+            f_v_imag = fgamma_r - frelation_r
+            if fgamma_i != 0:
+                raise ValueError('Im(gamma) != 0')
+            if f_v_imag < 0:
+                raise ValueError('Re(gamma - relation) < 0')
+            if f_v_real < 0:
+                raise ValueError('Re(gamma + relation) < 0')
+            f_rho = 0.0
+            if f_v_imag > 0 and f_v_real > 0:
+                f_rho = frelation_i / sqrt(f_v_imag * f_v_real)
+            if f_rho > 1.0 or f_rho < -1.0:
+                raise ValueError('Im(relation) ** 2 > Re(gamma ** 2 - relation** 2)')
+
+            if size is None:
+                f_real, f_imag = self.standard_normal(size=2, method=method)
+                
+                f_imag *= sqrt(1 - f_rho * f_rho)
+                f_imag += f_rho * f_real
+                f_real *= sqrt(0.5 * f_v_real)
+                f_imag *= sqrt(0.5 * f_v_imag)
+                
+                return PyComplex_FromDoubles(f_real, f_imag)
+                
+            real = self.standard_normal(size=size, method=method)
+            imag = self.standard_normal(size=size, method=method)
+
+            imag *= sqrt(1 - f_rho * f_rho)
+            imag += f_rho * real
+            real *= sqrt(0.5 * f_v_real)
+            imag *= sqrt(0.5 * f_v_imag)
+
+            return floc_r + real + (floc_i + imag) * (0+1.0j)
+
+        gpc = ogamma + orelation
+        gmc = ogamma - orelation
+        v_real = 0.5 * np.real(gpc)
+        if np.any(np.less(v_real, 0)):
+            raise ValueError('Re(gamma + relation) < 0')
+        v_imag = 0.5 * np.real(gmc)
+        if np.any(np.less(v_imag, 0)):
+            raise ValueError('Re(gamma - relation) < 0')
+        if np.any(np.not_equal(np.imag(ogamma), 0)):
+            raise ValueError('Im(gamma) != 0')
+
+        cov = 0.5 * np.imag(orelation)
+        rho = np.zeros_like(cov)
+        idx = (v_real.flat > 0) & (v_imag.flat > 0)
+        rho.flat[idx] = cov.flat[idx]  / np.sqrt(v_real.flat[idx] * v_imag.flat[idx])
+        if np.any(cov.flat[~idx] != 0) or np.any(np.abs(rho) > 1):
+            raise ValueError('Im(relation) ** 2 > Re(gamma ** 2 - relation ** 2)')
+
+        if size is None:
+            size = np.broadcast(loc, gpc).shape
+        real = self.standard_normal(size, method=method)
+        imag = self.standard_normal(size, method=method)
+        imag *= np.sqrt(1-rho ** 2)
+        imag += rho * real
+        real *= np.sqrt(v_real)
+        imag *= np.sqrt(v_imag)
+        
+        return oloc + real + (0+1.0j) * imag
 
     def beta(self, a, b, size=None):
         """
@@ -4593,6 +4737,7 @@ randn = _rand.randn
 random_integers = _rand.random_integers
 standard_normal = _rand.standard_normal
 normal = _rand.normal
+complex_normal = _rand.complex_normal
 beta = _rand.beta
 exponential = _rand.exponential
 standard_exponential = _rand.standard_exponential

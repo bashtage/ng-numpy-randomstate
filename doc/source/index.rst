@@ -8,6 +8,8 @@ What's New or Different
 * ``randomstate.entropy.random_entropy`` provides access to the system
   source of randomness that is used in cryptographic applications (e.g.,
   ``/dev/urandom`` on Unix).
+* Simulate from the complex normal distribution
+  (:meth:`~randomstate.prng.mt19937.complex_normal`)
 * The normal generator supports a 256-step Ziggurat method which is 2-6 times
   faster than NumPy's ``standard_normal``.  This generator can be accessed
   by passing the keyword argument ``method='zig'``.

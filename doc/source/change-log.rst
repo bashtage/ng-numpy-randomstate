@@ -3,6 +3,14 @@
 Change Log
 ==========
 
+Since Version 1.13
+------------------
+* Add complex normal (:meth:`~randomstate.prng.mt19937.complex_normal`)
+
+Version 1.13
+------------
+* Synchronize with NumPy 1.13 release
+
 Version 1.12
 ------------
 * Synchronize with NumPy 1.12 release
