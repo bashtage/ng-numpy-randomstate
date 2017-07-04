@@ -14,7 +14,7 @@ which is fast, has a long period and supports using ``jump`` to advance the
 state. The random numbers generated are reproducible in the sense that the
 same seed will produce the same outputs.
 
-::
+.. code-block:: python
 
     import randomstate
     import multiprocessing
