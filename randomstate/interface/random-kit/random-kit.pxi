@@ -1,4 +1,5 @@
 DEF RS_RNG_NAME = u'mt19937'
+DEF RS_RNG_JUMPABLE = 1
 DEF RS_NORMAL_METHOD = u'bm'
 DEF RK_STATE_LEN = 624
 DEF RS_SEED_NBYTES = 1
@@ -28,6 +29,8 @@ cdef extern from "distributions.h":
     cdef void set_seed(aug_state* state, uint32_t seed)
 
     cdef void set_seed_by_array(aug_state* state, uint32_t *init_key, int key_length)
+
+    cdef void jump_state(aug_state* state)
 
 ctypedef randomkit_state rng_t
 
@@ -68,6 +71,13 @@ incorrect. Incorrect values will be fixed and the version in which the fix
 was made will be noted in the relevant docstring. Extension of existing
 parameter ranges and the addition of new parameters is allowed as long the
 previous behavior remains unchanged.
+
+``mt19937.RandomState`` can be used in parallel applications by
+calling the method ``jump`` which advances the state as-if :math:`2^{128}`
+random numbers have been generated [2]_. This allows the original sequence to
+be split so that distinct segments can be used in each worker process.  All
+generators should be initialized with the same seed to ensure that the
+segments come from the same sequence. 
 
 Parameters
 ----------

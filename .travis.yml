@@ -21,7 +21,7 @@ matrix:
   - env:
     - PYTHON=3.4
     - NUMPY=1.10
-    - CYTHON=0.23
+    - CYTHON=0.24
   - env:
     - PYTHON=3.5
   - env:

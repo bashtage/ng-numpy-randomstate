@@ -128,7 +128,13 @@ class RNG(object):
         state = self.rs.get_state()
         if hasattr(self.rs, 'jump'):
             self.rs.jump()
-            assert_(not comp_state(state, self.rs.get_state()))
+            jumped_state = self.rs.get_state()
+            assert_(not comp_state(state, jumped_state))
+            self.rs.random_sample(2*3*5*7*11*13*17)
+            self.rs.set_state(state)
+            self.rs.jump()
+            rejumped_state = self.rs.get_state()
+            assert_(comp_state(jumped_state, rejumped_state))
         else:
             raise SkipTest
 

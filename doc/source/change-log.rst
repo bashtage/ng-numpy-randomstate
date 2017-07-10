@@ -33,6 +33,7 @@ Since Version 1.13
 * Add SIMD-oriented Fast Mersenne Twister
   (`SFMT <http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/>`_) generator.
 * Add complex normal (:meth:`~randomstate.prng.mt19937.complex_normal`)
+* Added support for jumping the MT19937 generator
 
 Version 1.13
 ------------

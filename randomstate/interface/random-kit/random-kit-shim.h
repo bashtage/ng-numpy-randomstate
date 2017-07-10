@@ -7,6 +7,7 @@
 
 #include "../../src/common/binomial.h"
 #include "../../src/common/entropy.h"
+#include "../../src/random-kit/random-kit-jump.h"
 #include "../../src/random-kit/random-kit.h"
 
 typedef struct s_aug_state {
@@ -47,5 +48,4 @@ extern void set_seed_by_array(aug_state* state, uint32_t *init_key, int key_leng
 
 extern void set_seed(aug_state* state, uint32_t seed);
 
-
-
+extern void jump_state(aug_state* state);

@@ -1,4 +1,6 @@
 #include "random-kit-shim.h"
+#include "random-kit-poly.h"
+
 
 extern inline uint32_t random_uint32(aug_state* state);
 
@@ -23,4 +25,9 @@ void entropy_init(aug_state* state)
     uint32_t seeds[1];
     entropy_fill((void*) seeds, sizeof(seeds));
     set_seed(state,  seeds[0]);
+}
+
+void jump_state(aug_state* state)
+{
+    randomkit_jump(state->rng, poly);
 }

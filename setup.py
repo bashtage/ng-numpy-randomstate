@@ -102,7 +102,7 @@ for rng in rngs:
         include_dirs += [join(mod_dir, 'src', 'pcg')]
 
     elif rng == 'RNG_MT19937':
-        sources += [join(mod_dir, 'src', 'random-kit', p) for p in ('random-kit.c',)]
+        sources += [join(mod_dir, 'src', 'random-kit', p) for p in ('random-kit.c','random-kit-jump.c')]
         sources += [join(mod_dir, 'interface', 'random-kit', 'random-kit-shim.c')]
 
         defs = [('RS_RANDOMKIT', '1')]
