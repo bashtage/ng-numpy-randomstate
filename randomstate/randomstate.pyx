@@ -1803,9 +1803,15 @@ cdef class RandomState:
                 f_imag *= sqrt(0.5 * f_v_imag)
                 
                 return PyComplex_FromDoubles(f_real, f_imag)
-                
-            real = self.standard_normal(size=size, method=method)
-            imag = self.standard_normal(size=size, method=method)
+
+            if np.PyArray_IsAnyScalar(size):
+                size = (size,)
+            else:
+                size = tuple(size)
+
+            norms = self.standard_normal(size=size + (2,), method=method)
+            real = norms[...,0]
+            imag = norms[...,1]
 
             imag *= sqrt(1 - f_rho * f_rho)
             imag += f_rho * real
@@ -1834,8 +1840,15 @@ cdef class RandomState:
 
         if size is None:
             size = np.broadcast(loc, gpc).shape
-        real = self.standard_normal(size, method=method)
-        imag = self.standard_normal(size, method=method)
+        elif np.PyArray_IsAnyScalar(size):
+            size = (size,)
+        else:
+            size = tuple(size)
+
+        norms = self.standard_normal(size + (2,), method=method)
+        real = norms[...,0]
+        imag = norms[...,1]
+
         imag *= np.sqrt(1-rho ** 2)
         imag += rho * real
         real *= np.sqrt(v_real)
