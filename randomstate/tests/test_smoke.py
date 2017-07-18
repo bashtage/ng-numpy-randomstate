@@ -1,13 +1,9 @@
 import pickle
 import time
-
-try:
-    import cPickle
-except ImportError:
-    cPickle = pickle
+from unittest import SkipTest
 import sys
 import os
-import unittest
+
 import numpy as np
 import randomstate.entropy as entropy
 from randomstate.prng.mlfg_1279_861 import mlfg_1279_861
@@ -20,8 +16,6 @@ from randomstate.prng.xorshift128 import xorshift128
 from randomstate.prng.xoroshiro128plus import xoroshiro128plus
 from randomstate.prng.dsfmt import dsfmt
 from numpy.testing import assert_almost_equal, assert_equal, assert_raises, assert_, assert_array_equal
-
-from nose import SkipTest
 
 
 def params_0(f):
@@ -290,9 +284,9 @@ class RNG(object):
         vals = self.rs.chisquare(2.0, 10)
         assert_(len(vals) == 10)
         params_1(self.rs.chisquare)
-    
+
     def test_complex_normal(self):
-        vals = self.rs.complex_normal(2.0+7.0j, 10.0, 5.0-5.0j, size=10)
+        vals = self.rs.complex_normal(2.0 + 7.0j, 10.0, 5.0 - 5.0j, size=10)
         assert_(len(vals) == 10)
 
     def test_exponential(self):
@@ -474,8 +468,8 @@ class RNG(object):
         assert_((type(self.rs) == type(unpick)))
         assert_(comp_state(self.rs.get_state(), unpick.get_state()))
 
-        pick = cPickle.dumps(self.rs)
-        unpick = cPickle.loads(pick)
+        pick = pickle.dumps(self.rs)
+        unpick = pickle.loads(pick)
         assert_((type(self.rs) == type(unpick)))
         assert_(comp_state(self.rs.get_state(), unpick.get_state()))
 
@@ -722,7 +716,7 @@ class TestMT19937(RNG):
         assert_((state[4] == state2['gauss']['gauss']))
 
 
-class TestPCG32(RNG, unittest.TestCase):
+class TestPCG32(RNG):
     @classmethod
     def setup_class(cls):
         cls.mod = pcg32
@@ -753,7 +747,7 @@ class TestPCG32(RNG, unittest.TestCase):
         assert_raises(TypeError, self.rs.seed, seed)
 
 
-class TestPCG64(RNG, unittest.TestCase):
+class TestPCG64(RNG):
     @classmethod
     def setup_class(cls):
         cls.mod = pcg64
@@ -785,7 +779,7 @@ class TestPCG64(RNG, unittest.TestCase):
         assert_raises(TypeError, self.rs.seed, seed)
 
 
-class TestXorShift128(RNG, unittest.TestCase):
+class TestXorShift128(RNG):
     @classmethod
     def setup_class(cls):
         cls.mod = xorshift128
@@ -797,7 +791,7 @@ class TestXorShift128(RNG, unittest.TestCase):
         cls._extra_setup()
 
 
-class TestXoroShiro128Plus(RNG, unittest.TestCase):
+class TestXoroShiro128Plus(RNG):
     @classmethod
     def setup_class(cls):
         cls.mod = xoroshiro128plus
@@ -809,7 +803,7 @@ class TestXoroShiro128Plus(RNG, unittest.TestCase):
         cls._extra_setup()
 
 
-class TestXorShift1024(RNG, unittest.TestCase):
+class TestXorShift1024(RNG):
     @classmethod
     def setup_class(cls):
         cls.mod = xorshift1024
@@ -821,7 +815,7 @@ class TestXorShift1024(RNG, unittest.TestCase):
         cls._extra_setup()
 
 
-class TestMLFG(RNG, unittest.TestCase):
+class TestMLFG(RNG):
     @classmethod
     def setup_class(cls):
         cls.mod = mlfg_1279_861
@@ -833,7 +827,7 @@ class TestMLFG(RNG, unittest.TestCase):
         cls._extra_setup()
 
 
-class TestMRG32k3A(RNG, unittest.TestCase):
+class TestMRG32k3A(RNG):
     @classmethod
     def setup_class(cls):
         cls.mod = mrg32k3a
@@ -845,7 +839,7 @@ class TestMRG32k3A(RNG, unittest.TestCase):
         cls.seed_vector_bits = 64
 
 
-class TestDSFMT(RNG, unittest.TestCase):
+class TestDSFMT(RNG):
     @classmethod
     def setup_class(cls):
         cls.mod = dsfmt
@@ -857,7 +851,7 @@ class TestDSFMT(RNG, unittest.TestCase):
         cls.seed_vector_bits = 32
 
 
-class TestEntropy(unittest.TestCase):
+class TestEntropy(object):
     def test_entropy(self):
         e1 = entropy.random_entropy()
         e2 = entropy.random_entropy()

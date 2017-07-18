@@ -1,4 +1,3 @@
-import unittest
 import numpy as np
 import numpy.random
 from numpy.testing import assert_allclose, assert_array_equal, assert_equal
@@ -38,7 +37,7 @@ def compare_2_input(f1, f2, is_np=False, is_scalar=False):
               ((np.array([a] * 10), b), {}),
               ((a, np.array([b] * 10)), {}),
               ((a, np.array([b] * 10)), {'size': 10}),
-              ((np.reshape(np.array([[a] * 100]), (100,1)), np.array([b] * 10)), {'size': (100, 10)}),
+              ((np.reshape(np.array([[a] * 100]), (100, 1)), np.array([b] * 10)), {'size': (100, 10)}),
               ((np.ones((7, 31), dtype=dtype) * a, np.array([b] * 31)), {'size': (7, 31)}),
               ((np.ones((7, 31), dtype=dtype) * a, np.array([b] * 31)), {'size': (10, 7, 31)})]
 
@@ -50,7 +49,7 @@ def compare_2_input(f1, f2, is_np=False, is_scalar=False):
         v1 = f1(*i[0], **i[1])
         v2 = f2(*i[0], **i[1])
         assert_allclose(v1, v2)
-        print('OK!'*20)
+        print('OK!' * 20)
 
 
 def compare_3_input(f1, f2, is_np=False):
@@ -79,7 +78,7 @@ def compare_3_input(f1, f2, is_np=False):
         assert_allclose(v1, v2)
 
 
-class TestAgainstNumPy(unittest.TestCase):
+class TestAgainstNumPy(object):
     @classmethod
     def setup_class(cls):
         cls.np = numpy.random
@@ -107,7 +106,7 @@ class TestAgainstNumPy(unittest.TestCase):
         assert (state[1] == state2['state'][0]).all()
         assert (state[2] == state2['state'][1])
         assert (state[3] == state2['gauss']['has_gauss'])
-        assert_allclose(state[4],state2['gauss']['gauss'])
+        assert_allclose(state[4], state2['gauss']['gauss'])
 
     def test_common_seed(self):
         self.rs.seed(1234)
@@ -512,15 +511,13 @@ class TestAgainstNumPy(unittest.TestCase):
     def test_dir(self):
         nprs_d = dir(self.nprs)
         rs_d = dir(self.rs)
-        assert(len(set(nprs_d).difference(rs_d)) == 0)
+        assert (len(set(nprs_d).difference(rs_d)) == 0)
 
         npmod = dir(numpy.random)
         mod = dir(randomstate)
         known_exlcuded = ['__all__', 'Tester', 'info', 'bench',
                           '__RandomState_ctor', 'mtrand', 'test',
-                          '__warningregistry__','_numpy_tester']
+                          '__warningregistry__', '_numpy_tester']
         mod += known_exlcuded
         diff = set(npmod).difference(mod)
         assert_equal(len(diff), 0)
-
-

@@ -11,12 +11,6 @@ env:
   global:
     - secure: "aupv9PPJZh7WjV2fl8fnxvztT5HHPz0j3pPkaMrxWT5fhWhbL/RYSqkkCh+GZiYFnDToXEdiNLuj2UD3CsRNu1ry9RuI9f9KcBgL9udacu2XC00c8XMl1Puiy02RjHe17DAHmAyoTEcckDoHyoKHM6rfyYCjGEDoqJuW6VfJr0KdNUE9bZSdj+kDQgQT0cilaHywzLnHg0v7K83vp2MG0BELV4vcB/OU/BmFeekjqNWaYHDHP0Ur+WG7FoOpGyG3dqO+Hlutx8tXlwjVHgTjkd6vJOU/3AHjWFfrNd9Z6Pzi2afCBZjLXHOeHm8X4Be4Gd9EJnWpARRev+6bgXVCyVZsaRscXPsdl0ylmYFROiUqIlvnqjPRDTRhq4kA72Fvtsf6RzTHX0CdDyctVMw3RoasrA9yRRg7SQYuTn1yKCpEpSGeDWjHo1/PqyBTvGdAwTse9jitBxyw3lC3dXAQDpQo5Smk5ZFwBS+9T0tm8QR1P63Nv9TeK9yjsJe/cytb5ZP495FKBJ1iBntjhOfhoahKbcFcVZjyZZYQZ5f1pVcZoKI4iTuBZup060ZmDRXjwStR2N63za9DocY6oVIyHaLcrgiej8KqvBeqWCxNvMNdiw/4O47/4T6qsvsjdceSUBkR8yPyuL3NfkZXUzzxdWwkNKHynxYYLprKZqHqfUU="
 
-services:
-    - docker
-
-before_install:
-    - docker pull ubuntu:16.04
-
 matrix:
   fast_finish: true
   include:
@@ -35,31 +29,28 @@ matrix:
     
 before_install:
   - if [ ${TRAVIS_OS_NAME} = "osx" ]; then wget https://repo.continuum.io/miniconda/Miniconda-latest-MacOSX-x86_64.sh -O miniconda.sh; fi
-  - if [ ${TRAVIS_OS_NAME} = "linux" ]; then wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh; fi
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b
-  - export PATH=$HOME/miniconda/bin:$PATH
-  - export PATH=$HOME/miniconda2/bin:$PATH
-  - conda config --set always_yes yes
+  - if [ ${TRAVIS_OS_NAME} = "linux" ]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh; fi
+  - chmod +x miniconda3.sh
+  - ./miniconda3.sh -b
+  - export PATH=/home/travis/miniconda3/bin:$PATH
+  - conda config --set always_yes true
   - conda update --all --quiet
   - PKGS="python=${PYTHON}"
   - PKGS="${PKGS} numpy"; if [ ${NUMPY} ]; then PKGS="${PKGS}=${NUMPY}"; fi
   - PKGS="${PKGS} Cython"; if [ ${CYTHON} ]; then PKGS="${PKGS}=${CYTHON}"; fi
   - PKGS="${PKGS} pandas"; if [ ${PANDAS} ]; then PKGS="${PKGS}=${PANDAS}"; fi
-
-# Install packages
-install:
-  - conda create -n randomstate-test ${PKGS} nose pip setuptools matplotlib pyyaml --quiet
+  - export BUILD_DIR=$PWD
+  - conda create -n randomstate-test ${PKGS} pytest pip setuptools matplotlib pyyaml nose --quiet
   - source activate randomstate-test
   - pip install tempita sphinx guzzle_sphinx_theme ipython -q
+
+install:
+  - python setup.py develop
   - python setup.py install
-  - export BUILD_DIR=$PWD
-  - cd $HOME
 
 script:
   - set -e
-  - nosetests randomstate
-  - cd $BUILD_DIR/randomstate
+  - pytest randomstate
   - |
     if [ ${PYTHON} = 3.5 ]; then
       conda install -c conda-forge doctr

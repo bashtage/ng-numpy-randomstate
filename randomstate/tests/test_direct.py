@@ -1,8 +1,6 @@
 import os
 import sys
 from os.path import join
-from unittest import TestCase
-from nose import SkipTest
 
 import numpy as np
 from randomstate.prng.mlfg_1279_861 import mlfg_1279_861
@@ -210,16 +208,17 @@ class Base(object):
     def test_seed_out_of_range(self):
         # GH #82
         rs = self.RandomState(*self.data1['seed'])
-        assert_raises(ValueError, rs.seed, 2 ** (2 * self.bits+1))
+        assert_raises(ValueError, rs.seed, 2 ** (2 * self.bits + 1))
         assert_raises(ValueError, rs.seed, -1)
 
     def test_seed_out_of_range_array(self):
         # GH #82
         rs = self.RandomState(*self.data1['seed'])
-        assert_raises(ValueError, rs.seed, [2 ** (2 * self.bits+1)])
+        assert_raises(ValueError, rs.seed, [2 ** (2 * self.bits + 1)])
         assert_raises(ValueError, rs.seed, [-1])
 
-class TestXorshift128(Base, TestCase):
+
+class TestXorshift128(Base):
     @classmethod
     def setup_class(cls):
         cls.RandomState = xorshift128.RandomState
@@ -231,7 +230,7 @@ class TestXorshift128(Base, TestCase):
         cls.seed_error_type = TypeError
 
 
-class TestXoroshiro128plus(Base, TestCase):
+class TestXoroshiro128plus(Base):
     @classmethod
     def setup_class(cls):
         cls.RandomState = xoroshiro128plus.RandomState
@@ -241,7 +240,8 @@ class TestXoroshiro128plus(Base, TestCase):
         cls.data2 = cls._read_csv(join(pwd, './data/xoroshiro128plus-testset-2.csv'))
         cls.seed_error_type = TypeError
 
-class TestXorshift1024(Base, TestCase):
+
+class TestXorshift1024(Base):
     @classmethod
     def setup_class(cls):
         cls.RandomState = xorshift1024.RandomState
@@ -251,7 +251,8 @@ class TestXorshift1024(Base, TestCase):
         cls.data2 = cls._read_csv(join(pwd, './data/xorshift1024-testset-2.csv'))
         cls.seed_error_type = TypeError
 
-class TestMT19937(Base, TestCase):
+
+class TestMT19937(Base):
     @classmethod
     def setup_class(cls):
         cls.RandomState = mt19937.RandomState
@@ -266,14 +267,14 @@ class TestMT19937(Base, TestCase):
         rs = self.RandomState(*self.data1['seed'])
         assert_raises(ValueError, rs.seed, 2 ** (self.bits + 1))
         assert_raises(ValueError, rs.seed, -1)
-        assert_raises(ValueError, rs.seed, 2 ** (2 * self.bits+1))
+        assert_raises(ValueError, rs.seed, 2 ** (2 * self.bits + 1))
 
     def test_seed_out_of_range_array(self):
         # GH #82
         rs = self.RandomState(*self.data1['seed'])
         assert_raises(ValueError, rs.seed, [2 ** (self.bits + 1)])
         assert_raises(ValueError, rs.seed, [-1])
-        assert_raises(TypeError, rs.seed, [2 ** (2 * self.bits+1)])
+        assert_raises(TypeError, rs.seed, [2 ** (2 * self.bits + 1)])
 
     def test_seed_float(self):
         # GH #82
@@ -292,7 +293,7 @@ class TestMT19937(Base, TestCase):
         assert_raises(TypeError, rs.seed, [0, np.pi])
 
 
-class TestPCG32(Base, TestCase):
+class TestPCG32(Base):
     @classmethod
     def setup_class(cls):
         cls.RandomState = pcg32.RandomState
@@ -307,10 +308,10 @@ class TestPCG32(Base, TestCase):
         rs = self.RandomState(*self.data1['seed'])
         assert_raises(TypeError, rs.seed, [2 ** (self.bits + 1)])
         assert_raises(TypeError, rs.seed, [-1])
-        assert_raises(TypeError, rs.seed, [2 ** (2 * self.bits+1)])
+        assert_raises(TypeError, rs.seed, [2 ** (2 * self.bits + 1)])
 
 
-class TestPCG64(Base, TestCase):
+class TestPCG64(Base):
     @classmethod
     def setup_class(cls):
         cls.RandomState = pcg64.RandomState
@@ -325,10 +326,10 @@ class TestPCG64(Base, TestCase):
         rs = self.RandomState(*self.data1['seed'])
         assert_raises(TypeError, rs.seed, [2 ** (self.bits + 1)])
         assert_raises(TypeError, rs.seed, [-1])
-        assert_raises(TypeError, rs.seed, [2 ** (2 * self.bits+1)])
+        assert_raises(TypeError, rs.seed, [2 ** (2 * self.bits + 1)])
 
 
-class TestMRG32K3A(Base, TestCase):
+class TestMRG32K3A(Base):
     @classmethod
     def setup_class(cls):
         cls.RandomState = mrg32k3a.RandomState
@@ -339,7 +340,7 @@ class TestMRG32K3A(Base, TestCase):
         cls.seed_error_type = TypeError
 
 
-class TestMLFG(Base, TestCase):
+class TestMLFG(Base):
     @classmethod
     def setup_class(cls):
         cls.RandomState = mlfg_1279_861.RandomState
@@ -361,7 +362,7 @@ class TestMLFG(Base, TestCase):
         assert_equal(uints, mod_data)
 
 
-class TestDSFMT(Base, TestCase):
+class TestDSFMT(Base):
     @classmethod
     def setup_class(cls):
         cls.RandomState = dsfmt.RandomState
