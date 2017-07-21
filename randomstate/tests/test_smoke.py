@@ -15,6 +15,7 @@ from randomstate.prng.xorshift1024 import xorshift1024
 from randomstate.prng.xorshift128 import xorshift128
 from randomstate.prng.xoroshiro128plus import xoroshiro128plus
 from randomstate.prng.dsfmt import dsfmt
+from randomstate.prng.sfmt import sfmt
 from numpy.testing import assert_almost_equal, assert_equal, assert_raises, assert_, assert_array_equal
 
 
@@ -812,6 +813,18 @@ class TestXorShift1024(RNG):
         cls.rs = cls.mod.RandomState(*cls.seed)
         cls.initial_state = cls.rs.get_state()
         cls.seed_vector_bits = 64
+        cls._extra_setup()
+
+
+class TestSFMT(RNG):
+    @classmethod
+    def setup_class(cls):
+        cls.mod = sfmt
+        cls.advance = None
+        cls.seed = [12345]
+        cls.rs = cls.mod.RandomState(*cls.seed)
+        cls.initial_state = cls.rs.get_state()
+        cls.seed_vector_bits = 32
         cls._extra_setup()
 
 

@@ -7,6 +7,7 @@ from .mrg32k3a import mrg32k3a
 from .pcg32 import pcg32
 from .pcg64 import pcg64
 from .dsfmt import dsfmt
+from .sfmt import sfmt
 
 def __generic_ctor(mod_name='mt19937'):
     """
@@ -46,6 +47,8 @@ def __generic_ctor(mod_name='mt19937'):
         mod = xorshift1024
     elif mod_name == 'dsfmt':
         mod = dsfmt
+    elif mod_name == 'sfmt':
+        mod = sfmt
     else:
         raise ValueError(str(mod_name) + ' is not a known PRNG module.')
 

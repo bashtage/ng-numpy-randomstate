@@ -50,6 +50,8 @@ IF RS_RNG_MOD_NAME == 'mlfg_1279_861':
     include "interface/mlfg-1279-861/mlfg-1279-861.pxi"
 IF RS_RNG_MOD_NAME == 'dsfmt':
     include "interface/dSFMT/dSFMT.pxi"
+IF RS_RNG_MOD_NAME == 'sfmt':
+    include "interface/sfmt/sfmt.pxi"
 
 IF RS_NORMAL_METHOD == u'bm':
     __normal_method = u'bm'
@@ -188,6 +190,8 @@ cdef class RandomState:
             self.rng_state.binomial = &self.binomial_info
             IF RS_RNG_MOD_NAME == 'dsfmt':
                 self.rng_state.buffered_uniforms = <double *>PyArray_malloc_aligned(2 * DSFMT_N * sizeof(double))
+            IF RS_RNG_MOD_NAME == 'sfmt':
+                self.rng_state.buffered_uint64 = <uint64_t *>PyArray_malloc_aligned(2 * SFMT_N * sizeof(uint64_t))
             self.lock = Lock()
             self.__version = 0
 

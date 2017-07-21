@@ -23,7 +23,7 @@ else:
     scale_64 = 2
 
 RNGS = ['mlfg_1279_861', 'mrg32k3a', 'pcg64', 'pcg32', 'mt19937', 'xorshift128', 'xorshift1024',
-        'xoroshiro128plus', 'dsfmt', 'random']
+        'xoroshiro128plus', 'dsfmt', 'sfmt', 'random']
 
 
 def timer(code, setup):
@@ -41,6 +41,7 @@ def run_timer(dist, command, numpy_command=None, setup='', random_type=''):
 
     res = {}
     for rng in RNGS:
+        print(str(rng))
         mod = 'randomstate.prng' if rng != 'random' else 'numpy'
         key = '-'.join((mod, rng, dist)).replace('"', '')
         command = numpy_command if 'numpy' in mod else command

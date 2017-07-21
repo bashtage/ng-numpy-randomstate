@@ -12,6 +12,7 @@ from randomstate.prng.xorshift1024 import xorshift1024
 from randomstate.prng.xorshift128 import xorshift128
 from randomstate.prng.xoroshiro128plus import xoroshiro128plus
 from randomstate.prng.dsfmt import dsfmt
+from randomstate.prng.sfmt import sfmt
 from numpy.testing import assert_equal, assert_allclose, assert_array_equal, \
     assert_raises
 
@@ -249,6 +250,17 @@ class TestXorshift1024(Base):
         cls.dtype = np.uint64
         cls.data1 = cls._read_csv(join(pwd, './data/xorshift1024-testset-1.csv'))
         cls.data2 = cls._read_csv(join(pwd, './data/xorshift1024-testset-2.csv'))
+        cls.seed_error_type = TypeError
+
+
+class TestSFMT(Base):
+    @classmethod
+    def setup_class(cls):
+        cls.RandomState = sfmt.RandomState
+        cls.bits = 64
+        cls.dtype = np.uint64
+        cls.data1 = cls._read_csv(join(pwd, './data/sfmt-testset-1.csv'))
+        cls.data2 = cls._read_csv(join(pwd, './data/sfmt-testset-2.csv'))
         cls.seed_error_type = TypeError
 
 
