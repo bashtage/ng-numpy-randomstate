@@ -723,7 +723,7 @@ cdef class RandomState:
 
         return array
 
-    def random_raw(self, size=None):
+    def random_raw(self, size=None, output=True):
         """
         random_raw(self, size=None)
 
@@ -735,6 +735,9 @@ cdef class RandomState:
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
+        output : bool, optional
+            Output values.  Used for performance testing since the generated 
+            values are not returned.
 
         Returns
         -------
@@ -755,6 +758,17 @@ cdef class RandomState:
         cdef aug_state* rng_state
         rng_state = &self.rng_state
 
+        if not output:
+            if size is None:
+                with self.lock:
+                    random_raw_values(rng_state)
+                return None
+            n = np.asarray(size).sum()
+            with self.lock, nogil:
+                for i in range(n):
+                    random_raw_values(rng_state)
+            return None
+        
         if size is None:
             with self.lock:
                 return random_raw_values(rng_state)
