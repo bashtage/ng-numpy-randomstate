@@ -41,7 +41,6 @@ def run_timer(dist, command, numpy_command=None, setup='', random_type=''):
 
     res = {}
     for rng in RNGS:
-        print(str(rng))
         mod = 'randomstate.prng' if rng != 'random' else 'numpy'
         key = '-'.join((mod, rng, dist)).replace('"', '')
         command = numpy_command if 'numpy' in mod else command
@@ -65,6 +64,15 @@ def run_timer(dist, command, numpy_command=None, setup='', random_type=''):
     print_legend('Speed-up relative to NumPy')
     print(p.sort_index())
     print('-' * 80)
+
+
+def timer_raw():
+    dist = 'random_raw'
+    command = 'rs.random_raw(size=1000000, output=False)'
+    info = np.iinfo(np.int32)
+    command_numpy = 'rs.random_integers({max},size=1000000)'
+    command_numpy=command_numpy.format(max=info.max)
+    run_timer(dist, command, command_numpy, SETUP, 'Standard normals (Ziggurat)')
 
 
 def timer_uniform():
@@ -108,6 +116,7 @@ def timer_normal_zig():
 
 
 if __name__ == '__main__':
+    timer_raw()
     timer_uniform()
     timer_32bit()
     timer_64bit()
