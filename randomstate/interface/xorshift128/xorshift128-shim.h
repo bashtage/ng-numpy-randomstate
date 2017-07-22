@@ -47,9 +47,7 @@ inline uint64_t random_raw_values(aug_state* state)
 
 inline double random_double(aug_state* state)
 {
-    uint64_t rn;
-    rn = random_uint64(state);
-    return (rn >> 11) * (1.0 / 9007199254740992.0);
+    return (random_uint64(state) >> 11) * (1.0 / 9007199254740992.0);
 }
 
 extern void set_seed(aug_state* state, uint64_t seed);

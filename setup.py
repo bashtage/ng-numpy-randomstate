@@ -32,7 +32,7 @@ configs = []
 
 rngs = ['RNG_DSFMT', 'RNG_MLFG_1279_861', 'RNG_MRG32K3A', 'RNG_MT19937',
         'RNG_PCG32', 'RNG_PCG64', 'RNG_XORSHIFT128', 'RNG_XOROSHIRO128PLUS',
-        'RNG_XORSHIFT1024']
+        'RNG_XORSHIFT1024', 'RNG_SFMT']
 
 compile_rngs = rngs[:]
 
@@ -157,6 +157,17 @@ for rng in rngs:
             defs += [('HAVE_SSE2', '1')]
 
         include_dirs += [join(mod_dir, 'src', 'dSFMT')]
+    elif rng == 'RNG_SFMT':
+        sources += [join(mod_dir, 'src', 'sfmt', 'sfmt.c')]
+        # sources += [join(mod_dir, 'src', 'sfmt', 'sfmt-jump.c')]
+        sources += [join(mod_dir, 'interface', 'sfmt', 'sfmt-shim.c')]
+        # TODO: HAVE_SSE2 should only be for platforms that have SSE2
+        # TODO: But how to reliably detect?
+        defs = [('RS_SFMT', '1')]
+        if USE_SSE2:
+            defs += [('HAVE_SSE2', '1')]
+
+        include_dirs += [join(mod_dir, 'src', 'sfmt')]
 
     config = {'file_name': file_name,
               'sources': sources,

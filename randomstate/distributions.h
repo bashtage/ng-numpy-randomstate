@@ -40,6 +40,8 @@ typedef int bool;
 #include "interface/mlfg-1279-861/mlfg-1279-861-shim.h"
 #elif defined(RS_DSFMT)
 #include "interface/dSFMT/dSFMT-shim.h"
+#elif defined(RS_SFMT)
+#include "interface/sfmt/sfmt-shim.h"
 #else
 #error Unknown RNG!!!  Unknown RNG!!!  Unknown RNG!!!
 #endif
