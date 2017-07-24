@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.zipf
+=============================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: zipf

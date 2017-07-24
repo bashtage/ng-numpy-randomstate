@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.power
+==============================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: power

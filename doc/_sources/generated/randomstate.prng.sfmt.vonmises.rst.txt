@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.vonmises
+=================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: vonmises

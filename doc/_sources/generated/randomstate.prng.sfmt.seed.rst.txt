@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.seed
+=============================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: seed

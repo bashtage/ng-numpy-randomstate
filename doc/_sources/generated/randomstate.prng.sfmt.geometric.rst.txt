@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.geometric
+==================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: geometric

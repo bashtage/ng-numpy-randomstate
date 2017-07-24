@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.rayleigh
+=================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: rayleigh

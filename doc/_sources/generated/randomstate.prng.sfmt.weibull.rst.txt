@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.weibull
+================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: weibull

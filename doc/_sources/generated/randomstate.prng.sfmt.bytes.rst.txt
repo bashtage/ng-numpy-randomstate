@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.bytes
+==============================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: bytes

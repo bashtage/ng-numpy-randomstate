@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.chisquare
+==================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: chisquare

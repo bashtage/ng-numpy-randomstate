@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.poisson
+================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: poisson

@@ -127,6 +127,7 @@ Individual Pseudo Random Number Generators
 
    MT19937 <mt19937>
    dSFMT <dsfmt>
+   SFMT <sfmt>
    XorShift128+ <xorshift128>
    XoroShiro128+ <xoroshiro128plus>
    XorShift1024* <xorshift1024>

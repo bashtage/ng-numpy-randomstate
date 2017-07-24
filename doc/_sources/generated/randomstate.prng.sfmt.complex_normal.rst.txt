@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.complex\_normal
+========================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: complex_normal

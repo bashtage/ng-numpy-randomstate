@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.triangular
+===================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: triangular

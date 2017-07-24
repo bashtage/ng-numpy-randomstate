@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.hypergeometric
+=======================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: hypergeometric

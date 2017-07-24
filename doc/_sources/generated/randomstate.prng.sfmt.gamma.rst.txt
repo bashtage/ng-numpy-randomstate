@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.gamma
+==============================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: gamma

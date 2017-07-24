@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.noncentral\_f
+======================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: noncentral_f

@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.multinomial
+====================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: multinomial

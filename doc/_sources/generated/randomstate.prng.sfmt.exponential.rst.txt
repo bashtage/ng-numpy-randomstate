@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.exponential
+====================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: exponential

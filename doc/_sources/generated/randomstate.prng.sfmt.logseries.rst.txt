@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.logseries
+==================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: logseries

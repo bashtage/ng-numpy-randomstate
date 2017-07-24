@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.negative\_binomial
+===========================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: negative_binomial

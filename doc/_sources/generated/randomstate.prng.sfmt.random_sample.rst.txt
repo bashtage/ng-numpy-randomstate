@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.random\_sample
+=======================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: random_sample

@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.get\_state
+===================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: get_state

@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.choice
+===============================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: choice

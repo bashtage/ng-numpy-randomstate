@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.shuffle
+================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: shuffle

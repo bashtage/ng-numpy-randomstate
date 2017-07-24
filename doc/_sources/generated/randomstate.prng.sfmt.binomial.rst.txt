@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.binomial
+=================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: binomial

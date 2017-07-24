@@ -1,0 +1,6 @@
+randomstate\.prng\.sfmt\.uniform
+================================
+
+.. currentmodule:: randomstate.prng.sfmt
+
+.. autofunction:: uniform
