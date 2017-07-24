@@ -1782,7 +1782,6 @@ cdef class RandomState:
 
         >>> s = np.random.complex_normal(size=1000)
         """
-        # TODO: What about loc??
         cdef np.ndarray ogamma, orelation, oloc, randoms
         cdef double *randoms_data
         cdef double fgamma_r, fgamma_i, frelation_r, frelation_i, frho, f_v_real , f_v_imag, \
@@ -1823,7 +1822,7 @@ cdef class RandomState:
                 f_real *= sqrt(0.5 * f_v_real)
                 f_imag *= sqrt(0.5 * f_v_imag)
                 
-                return PyComplex_FromDoubles(f_real, f_imag)
+                return PyComplex_FromDoubles(floc_r + f_real, floc_i + f_imag)
 
             randoms = <np.ndarray>np.empty(size, np.complex128)
             randoms_data = <double *>np.PyArray_DATA(randoms)
@@ -1837,8 +1836,8 @@ cdef class RandomState:
                 for i in range(n):
                     random_gauss_zig_double_fill(&self.rng_state, 1, &f_real)
                     random_gauss_zig_double_fill(&self.rng_state, 1, &f_imag)
-                    randoms_data[j+1] = i_scale * (f_rho * f_real + i_r_scale * f_imag)
-                    randoms_data[j] = r_scale * f_real
+                    randoms_data[j+1] = floc_i + i_scale * (f_rho * f_real + i_r_scale * f_imag)
+                    randoms_data[j] = floc_r + r_scale * f_real
                     j += 2
 
             return randoms
