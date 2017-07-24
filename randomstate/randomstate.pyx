@@ -1782,9 +1782,12 @@ cdef class RandomState:
 
         >>> s = np.random.complex_normal(size=1000)
         """
-        cdef np.ndarray ogamma, orelation, oloc
+        # TODO: What about loc??
+        cdef np.ndarray ogamma, orelation, oloc, randoms
+        cdef double *randoms_data
         cdef double fgamma_r, fgamma_i, frelation_r, frelation_i, frho, f_v_real , f_v_imag, \
-            floc_r, floc_i, f_real, f_imag
+            floc_r, floc_i, f_real, f_imag, i_r_scale, r_scale, i_scale
+        cdef np.npy_intp i, j, n,
 
         oloc = <np.ndarray>np.PyArray_FROM_OTF(loc, np.NPY_COMPLEX128, np.NPY_ALIGNED)
         ogamma = <np.ndarray>np.PyArray_FROM_OTF(gamma, np.NPY_COMPLEX128, np.NPY_ALIGNED)
@@ -1813,8 +1816,8 @@ cdef class RandomState:
                 raise ValueError('Im(relation) ** 2 > Re(gamma ** 2 - relation** 2)')
 
             if size is None:
-                f_real, f_imag = self.standard_normal(size=2, method=method)
-                
+                random_gauss_zig_double_fill(&self.rng_state, 1, &f_real)
+                random_gauss_zig_double_fill(&self.rng_state, 1, &f_imag)
                 f_imag *= sqrt(1 - f_rho * f_rho)
                 f_imag += f_rho * f_real
                 f_real *= sqrt(0.5 * f_v_real)
@@ -1822,21 +1825,23 @@ cdef class RandomState:
                 
                 return PyComplex_FromDoubles(f_real, f_imag)
 
-            if np.PyArray_IsAnyScalar(size):
-                size = (size,)
-            else:
-                size = tuple(size)
+            randoms = <np.ndarray>np.empty(size, np.complex128)
+            randoms_data = <double *>np.PyArray_DATA(randoms)
+            n = np.PyArray_SIZE(randoms)
 
-            norms = self.standard_normal(size=size + (2,), method=method)
-            real = norms[...,0]
-            imag = norms[...,1]
+            i_r_scale = sqrt(1 - f_rho * f_rho)
+            r_scale = sqrt(0.5 * f_v_real)
+            i_scale = sqrt(0.5 * f_v_imag)
+            j = 0
+            with self.lock, nogil:
+                for i in range(n):
+                    random_gauss_zig_double_fill(&self.rng_state, 1, &f_real)
+                    random_gauss_zig_double_fill(&self.rng_state, 1, &f_imag)
+                    randoms_data[j+1] = i_scale * (f_rho * f_real + i_r_scale * f_imag)
+                    randoms_data[j] = r_scale * f_real
+                    j += 2
 
-            imag *= sqrt(1 - f_rho * f_rho)
-            imag += f_rho * real
-            real *= sqrt(0.5 * f_v_real)
-            imag *= sqrt(0.5 * f_v_imag)
-
-            return floc_r + real + (floc_i + imag) * (0+1.0j)
+            return randoms
 
         gpc = ogamma + orelation
         gmc = ogamma - orelation

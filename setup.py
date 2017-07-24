@@ -240,7 +240,7 @@ else:
         with open(output_file_name, 'w') as output_file:
             output_file.write(template.substitute())
 
-ext_modules = cythonize(extensions, force=not DEVELOP)
+ext_modules = cythonize(extensions, force=not DEVELOP, annotate=True)
 
 classifiers = ['Development Status :: 5 - Production/Stable',
                'Environment :: Console',
