@@ -45,11 +45,9 @@ def compare_2_input(f1, f2, is_np=False, is_scalar=False):
         inputs = inputs[:3]
 
     for i in inputs:
-        print(i[0], i[1])
         v1 = f1(*i[0], **i[1])
         v2 = f2(*i[0], **i[1])
         assert_allclose(v1, v2)
-        print('OK!' * 20)
 
 
 def compare_3_input(f1, f2, is_np=False):

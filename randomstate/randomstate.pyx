@@ -1795,11 +1795,12 @@ cdef class RandomState:
 
         >>> s = np.random.complex_normal(size=1000)
         """
+        if method != u'zig' or method != u'bm':
+            raise ValueError("method must be either 'bm' or 'zig'")
         cdef np.ndarray ogamma, orelation, oloc, randoms, v_real, v_imag, rho
         cdef double *randoms_data
         cdef double fgamma_r, fgamma_i, frelation_r, frelation_i, frho, f_v_real , f_v_imag, \
             floc_r, floc_i, f_real, f_imag, i_r_scale, r_scale, i_scale, f_rho
-        cdef complex cloc
         cdef np.npy_intp i, j, n
         cdef np.broadcast it
 
@@ -1830,8 +1831,13 @@ cdef class RandomState:
                 raise ValueError('Im(relation) ** 2 > Re(gamma ** 2 - relation** 2)')
 
             if size is None:
-                random_gauss_zig_double_fill(&self.rng_state, 1, &f_real)
-                random_gauss_zig_double_fill(&self.rng_state, 1, &f_imag)
+                if method == u'zig':
+                    random_gauss_zig_double_fill(&self.rng_state, 1, &f_real)
+                    random_gauss_zig_double_fill(&self.rng_state, 1, &f_imag)
+                else:
+                    random_gauss_fill(&self.rng_state, 1, &f_real)
+                    random_gauss_fill(&self.rng_state, 1, &f_imag)
+
                 f_imag *= sqrt(1 - f_rho * f_rho)
                 f_imag += f_rho * f_real
                 f_real *= sqrt(0.5 * f_v_real)
@@ -1847,13 +1853,22 @@ cdef class RandomState:
             r_scale = sqrt(0.5 * f_v_real)
             i_scale = sqrt(0.5 * f_v_imag)
             j = 0
-            with self.lock: # , nogil:
-                for i in range(n):
-                    random_gauss_zig_double_fill(&self.rng_state, 1, &f_real)
-                    random_gauss_zig_double_fill(&self.rng_state, 1, &f_imag)
-                    randoms_data[j+1] = floc_i + i_scale * (f_rho * f_real + i_r_scale * f_imag)
-                    randoms_data[j] = floc_r + r_scale * f_real
-                    j += 2
+            with self.lock, nogil:
+                if method == u'zig':
+                    for i in range(n):
+                        random_gauss_zig_double_fill(&self.rng_state, 1, &f_real)
+                        random_gauss_zig_double_fill(&self.rng_state, 1, &f_imag)
+                        randoms_data[j+1] = floc_i + i_scale * (f_rho * f_real + i_r_scale * f_imag)
+                        randoms_data[j] = floc_r + r_scale * f_real
+                        j += 2
+                else:
+                    for i in range(n):
+                        random_gauss_fill(&self.rng_state, 1, &f_real)
+                        random_gauss_fill(&self.rng_state, 1, &f_imag)
+                        randoms_data[j+1] = floc_i + i_scale * (f_rho * f_real + i_r_scale * f_imag)
+                        randoms_data[j] = floc_r + r_scale * f_real
+                        j += 2
+
 
             return randoms
 
@@ -1885,9 +1900,11 @@ cdef class RandomState:
         n = np.PyArray_SIZE(randoms)
 
         it = np.PyArray_MultiIterNew5(randoms, oloc, v_real, v_imag, rho)
-        # TODO: Box-Muller
         with self.lock, nogil:
-            random_gauss_zig_double_fill(&self.rng_state, 2 * n, randoms_data)
+            if method == u'zig':
+                random_gauss_zig_double_fill(&self.rng_state, 2 * n, randoms_data)
+            else:
+                random_gauss_fill(&self.rng_state, 2 * n, randoms_data)
         with nogil:
             j = 0
             for i in range(n):
