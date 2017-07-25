@@ -164,6 +164,19 @@ cdef double kahan_sum(double *darr, np.npy_intp n):
         sum = t
     return sum
 
+cdef inline void compute_complex(double *rv_r, double *rv_i, double loc_r,
+                                 double loc_i, double var_r, double var_i, double rho) nogil:
+    cdef double scale_c, scale_i, scale_r
+
+    scale_c = sqrt(1 - rho * rho)
+    scale_r = sqrt(var_r)
+    scale_i = sqrt(var_i)
+
+    rv_i[0] = loc_i + scale_i * (rho * rv_r[0]  + scale_c * rv_i[0])
+    rv_r[0] = loc_r + scale_r * rv_r[0]
+
+
+
 cdef object _ensure_string(object s):
     try:
         return ''.join(map(chr, s))
@@ -1782,9 +1795,14 @@ cdef class RandomState:
 
         >>> s = np.random.complex_normal(size=1000)
         """
-        cdef np.ndarray ogamma, orelation, oloc
+        if method != u'zig' or method != u'bm':
+            raise ValueError("method must be either 'bm' or 'zig'")
+        cdef np.ndarray ogamma, orelation, oloc, randoms, v_real, v_imag, rho
+        cdef double *randoms_data
         cdef double fgamma_r, fgamma_i, frelation_r, frelation_i, frho, f_v_real , f_v_imag, \
-            floc_r, floc_i, f_real, f_imag
+            floc_r, floc_i, f_real, f_imag, i_r_scale, r_scale, i_scale, f_rho
+        cdef np.npy_intp i, j, n
+        cdef np.broadcast it
 
         oloc = <np.ndarray>np.PyArray_FROM_OTF(loc, np.NPY_COMPLEX128, np.NPY_ALIGNED)
         ogamma = <np.ndarray>np.PyArray_FROM_OTF(gamma, np.NPY_COMPLEX128, np.NPY_ALIGNED)
@@ -1813,37 +1831,53 @@ cdef class RandomState:
                 raise ValueError('Im(relation) ** 2 > Re(gamma ** 2 - relation** 2)')
 
             if size is None:
-                f_real, f_imag = self.standard_normal(size=2, method=method)
-                
+                if method == u'zig':
+                    random_gauss_zig_double_fill(&self.rng_state, 1, &f_real)
+                    random_gauss_zig_double_fill(&self.rng_state, 1, &f_imag)
+                else:
+                    random_gauss_fill(&self.rng_state, 1, &f_real)
+                    random_gauss_fill(&self.rng_state, 1, &f_imag)
+
                 f_imag *= sqrt(1 - f_rho * f_rho)
                 f_imag += f_rho * f_real
                 f_real *= sqrt(0.5 * f_v_real)
                 f_imag *= sqrt(0.5 * f_v_imag)
                 
-                return PyComplex_FromDoubles(f_real, f_imag)
+                return PyComplex_FromDoubles(floc_r + f_real, floc_i + f_imag)
 
-            if np.PyArray_IsAnyScalar(size):
-                size = (size,)
-            else:
-                size = tuple(size)
+            randoms = <np.ndarray>np.empty(size, np.complex128)
+            randoms_data = <double *>np.PyArray_DATA(randoms)
+            n = np.PyArray_SIZE(randoms)
 
-            norms = self.standard_normal(size=size + (2,), method=method)
-            real = norms[...,0]
-            imag = norms[...,1]
+            i_r_scale = sqrt(1 - f_rho * f_rho)
+            r_scale = sqrt(0.5 * f_v_real)
+            i_scale = sqrt(0.5 * f_v_imag)
+            j = 0
+            with self.lock, nogil:
+                if method == u'zig':
+                    for i in range(n):
+                        random_gauss_zig_double_fill(&self.rng_state, 1, &f_real)
+                        random_gauss_zig_double_fill(&self.rng_state, 1, &f_imag)
+                        randoms_data[j+1] = floc_i + i_scale * (f_rho * f_real + i_r_scale * f_imag)
+                        randoms_data[j] = floc_r + r_scale * f_real
+                        j += 2
+                else:
+                    for i in range(n):
+                        random_gauss_fill(&self.rng_state, 1, &f_real)
+                        random_gauss_fill(&self.rng_state, 1, &f_imag)
+                        randoms_data[j+1] = floc_i + i_scale * (f_rho * f_real + i_r_scale * f_imag)
+                        randoms_data[j] = floc_r + r_scale * f_real
+                        j += 2
 
-            imag *= sqrt(1 - f_rho * f_rho)
-            imag += f_rho * real
-            real *= sqrt(0.5 * f_v_real)
-            imag *= sqrt(0.5 * f_v_imag)
 
-            return floc_r + real + (floc_i + imag) * (0+1.0j)
+            return randoms
 
         gpc = ogamma + orelation
         gmc = ogamma - orelation
-        v_real = 0.5 * np.real(gpc)
+        v_real = <np.ndarray>(0.5 * np.real(gpc))
         if np.any(np.less(v_real, 0)):
             raise ValueError('Re(gamma + relation) < 0')
-        v_imag = 0.5 * np.real(gmc)
+        v_imag = <np.ndarray>(0.5 * np.real(gmc))
         if np.any(np.less(v_imag, 0)):
             raise ValueError('Re(gamma - relation) < 0')
         if np.any(np.not_equal(np.imag(ogamma), 0)):
@@ -1856,23 +1890,34 @@ cdef class RandomState:
         if np.any(cov.flat[~idx] != 0) or np.any(np.abs(rho) > 1):
             raise ValueError('Im(relation) ** 2 > Re(gamma ** 2 - relation ** 2)')
 
-        if size is None:
-            size = np.broadcast(loc, gpc).shape
-        elif np.PyArray_IsAnyScalar(size):
-            size = (size,)
+        if size is not None:
+            randoms = <np.ndarray>np.empty(size, np.complex128)
         else:
-            size = tuple(size)
+            it = np.PyArray_MultiIterNew4(oloc, v_real, v_imag, rho)
+            randoms = <np.ndarray>np.empty(it.shape, np.complex128)
 
-        norms = self.standard_normal(size + (2,), method=method)
-        real = norms[...,0]
-        imag = norms[...,1]
+        randoms_data = <double *>np.PyArray_DATA(randoms)
+        n = np.PyArray_SIZE(randoms)
 
-        imag *= np.sqrt(1-rho ** 2)
-        imag += rho * real
-        real *= np.sqrt(v_real)
-        imag *= np.sqrt(v_imag)
-        
-        return oloc + real + (0+1.0j) * imag
+        it = np.PyArray_MultiIterNew5(randoms, oloc, v_real, v_imag, rho)
+        with self.lock, nogil:
+            if method == u'zig':
+                random_gauss_zig_double_fill(&self.rng_state, 2 * n, randoms_data)
+            else:
+                random_gauss_fill(&self.rng_state, 2 * n, randoms_data)
+        with nogil:
+            j = 0
+            for i in range(n):
+                floc_r= (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
+                floc_i= (<double*>np.PyArray_MultiIter_DATA(it, 1))[1]
+                f_v_real = (<double*>np.PyArray_MultiIter_DATA(it, 2))[0]
+                f_v_imag = (<double*>np.PyArray_MultiIter_DATA(it, 3))[0]
+                f_rho = (<double*>np.PyArray_MultiIter_DATA(it, 4))[0]
+                compute_complex(&randoms_data[j], &randoms_data[j+1], floc_r, floc_i, f_v_real, f_v_imag, f_rho)
+                j += 2
+                np.PyArray_MultiIter_NEXT(it)
+
+        return randoms
 
     def beta(self, a, b, size=None):
         """

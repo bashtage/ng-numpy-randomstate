@@ -287,8 +287,60 @@ class RNG(object):
         params_1(self.rs.chisquare)
 
     def test_complex_normal(self):
-        vals = self.rs.complex_normal(2.0 + 7.0j, 10.0, 5.0 - 5.0j, size=10)
+        st = self.rs.get_state()
+        vals = self.rs.complex_normal(2.0 + 7.0j, 10.0, 5.0 - 5.0j, size=10, method='zig')
         assert_(len(vals) == 10)
+
+        self.rs.set_state(st)
+        vals2 = [self.rs.complex_normal(2.0 + 7.0j, 10.0, 5.0 - 5.0j, method='zig') for _ in range(10)]
+        np.testing.assert_allclose(vals, vals2)
+
+        self.rs.set_state(st)
+        vals3 = self.rs.complex_normal(2.0 + 7.0j * np.ones(10), 10.0 * np.ones(1), 5.0 - 5.0j, method='zig')
+        np.testing.assert_allclose(vals, vals3)
+
+        self.rs.set_state(st)
+        norms = self.rs.standard_normal(size=20, method='zig')
+        norms = np.reshape(norms, (10, 2))
+        cov = 0.5 * (-5.0)
+        v_real = 7.5
+        v_imag = 2.5
+        rho = cov / np.sqrt(v_real * v_imag)
+        imag = 7 + np.sqrt(v_imag) * (rho * norms[:, 0] + np.sqrt(1 - rho ** 2) * norms[:, 1])
+        real = 2 + np.sqrt(v_real) * norms[:, 0]
+        vals4 = [re + im * (0 + 1.0j) for re, im in zip(real, imag)]
+
+        np.testing.assert_allclose(vals4, vals)
+
+    def test_complex_normal_bm(self):
+        st = self.rs.get_state()
+        vals = self.rs.complex_normal(2.0 + 7.0j, 10.0, 5.0 - 5.0j, size=10, method='bm')
+        assert_(len(vals) == 10)
+
+        self.rs.set_state(st)
+        vals2 = [self.rs.complex_normal(2.0 + 7.0j, 10.0, 5.0 - 5.0j, method='bm') for _ in range(10)]
+        np.testing.assert_allclose(vals, vals2)
+
+        self.rs.set_state(st)
+        vals3 = self.rs.complex_normal(2.0 + 7.0j * np.ones(10), 10.0 * np.ones(1), 5.0 - 5.0j, method='bm')
+        np.testing.assert_allclose(vals, vals3)
+
+    def test_complex_normal_zero_variance(self):
+        st = self.rs.get_state()
+        c = self.rs.complex_normal(0, 1.0, 1.0)
+        assert_almost_equal(c.imag, 0.0)
+        self.rs.set_state(st)
+        n = self.rs.standard_normal()
+        np.testing.assert_allclose(c, n, atol=1e-8)
+
+        st = self.rs.get_state()
+        c = self.rs.complex_normal(0, 1.0, -1.0)
+        assert_almost_equal(c.real, 0.0)
+        self.rs.set_state(st)
+        self.rs.standard_normal()
+        n = self.rs.standard_normal()
+        assert_almost_equal(c.real, 0.0)
+        np.testing.assert_allclose(c.imag, n, atol=1e-8)
 
     def test_exponential(self):
         vals = self.rs.exponential(2.0, 10)
