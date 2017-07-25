@@ -1,0 +1,44 @@
+a {
+    color: #180CD2;
+}
+table a:not(.btn),
+.table a:not(.btn) {
+    text-decoration: none;
+}
+body {
+    font-size: 16px;
+}
+code {
+    font-size: 100%;
+}
+table {
+    font-size: 16px;
+}
+.navbar {
+    font-size: 16px;
+}
+.navbar .dropdown-menu > li > a,
+.navbar .dropdown-menu > li > a:focus {
+    font-size: 15px;
+}
+thead tr {
+    background-color: #337ab7;
+    color: #ffffff;
+}
+thead tr th {
+    padding: 6px 3px;
+}
+tbody tr:nth-child(even) {
+    background: #f0f0f0
+}
+tbody tr:hover td {
+    background-color: #ddd;
+}
+tbody tr td {
+    text-align: right;
+    padding: 5px;
+}
+tbody tr td:first-child {
+    text-align: left;
+    padding-left: 5px;
+}
