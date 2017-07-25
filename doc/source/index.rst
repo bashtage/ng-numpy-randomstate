@@ -117,6 +117,7 @@ New Features
    Using in Parallel Applications <parallel>
    Multithreaded Generation <multithreading>
    Reading System Entropy <entropy>
+   Comparing Performance <performance>
 
 
 Individual Pseudo Random Number Generators

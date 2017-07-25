@@ -77,7 +77,7 @@ index = {'randint': 'Random Integers',
          'binomial': 'Binomial'}
 
 cols = {'sfmt': 'SFMT', 'dsfmt': 'dSFMT',
-        'xoroshiro128plus': 'xoroshirt128+',
+        'xoroshiro128plus': 'xoroshiro128+',
         'xorshift1024': 'xorshift1024', 'pcg64': 'PCG64',
         'mt19937': 'MT19937', 'random': 'NumPy MT19937'}
 
@@ -90,6 +90,29 @@ from io import StringIO
 
 sio = StringIO()
 results.to_csv(sio)
+sio.seek(0)
+lines = sio.readlines()
+for i, line in enumerate(lines):
+    if i == 0:
+        line = '    :header: ' + line
+    else:
+        line = '    ' + line
+    lines[i] = line
+
+lines.insert(1, '    \n')
+lines.insert(1, '    :widths: 14,14,14,14,14,14,14,14\n')
+lines.insert(0, '.. csv-table::\n')
+print(''.join(lines))
+
+
+std_results = (results.T / results.iloc[:,-3]).T
+overall = np.exp(np.mean(np.log(std_results)))
+overall.name = 'Overall'
+std_results = std_results.append(overall)
+std_results = np.round(std_results, 2)
+
+sio = StringIO()
+std_results.to_csv(sio)
 sio.seek(0)
 lines = sio.readlines()
 for i, line in enumerate(lines):
