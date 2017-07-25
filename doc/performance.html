@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Performance &#8212; randomstate 1.13.1+20.g83eb7ce documentation</title>
+    <title>Performance &#8212; randomstate 1.13.1+21.gc4ecd02 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+20.g83eb7ce',
+        VERSION:     '1.13.1+21.gc4ecd02',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,6 +34,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="MT19937 Randomstate" href="mt19937.html" />
+    <link rel="prev" title="System Entropy" href="entropy.html" />
   
    
 
@@ -45,7 +47,16 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+20.g83eb7ce documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mt19937.html" title="MT19937 Randomstate"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="entropy.html" title="System Entropy"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+21.gc4ecd02 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -65,10 +76,15 @@
   <div class="sidebar-toc">
     
     
-      <ul>
+      <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="parallel.html">Using in Parallel Applications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="multithreading.html">Multithreaded Generation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="entropy.html">Reading System Entropy</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Comparing Performance</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#recommendation">Recommendation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#timings">Timings</a></li>
+</ul>
+</li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="mt19937.html">MT19937</a></li>
@@ -117,8 +133,30 @@
           
           <div class="document clearer body">
             
-  <div class="section" id="performance">
-<h1>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-randomstate">
+<span id="performance"></span><h1>Performance<a class="headerlink" href="#module-randomstate" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="recommendation">
+<h2>Recommendation<a class="headerlink" href="#recommendation" title="Permalink to this headline">¶</a></h2>
+<p>The recommended generator for single use is <cite>xoroshiro128+</cite>
+(<code class="xref py py-class docutils literal"><span class="pre">xoroshiro128plus</span></code>).  The recommended generator
+for use in large-scale parallel applications is
+<cite>xorshift1024*</cite> (<code class="xref py py-class docutils literal"><span class="pre">xorshift1024</span></code>)
+where the <cite>jump</cite> method is used to advance the state.</p>
+</div>
+<div class="section" id="timings">
+<h2>Timings<a class="headerlink" href="#timings" title="Permalink to this headline">¶</a></h2>
+<p>The timings below are ns/random value.  The fastest generator is the
+raw generator (<cite>random_raw</cite>) which does not make any transformation
+to the underlying random value.  <cite>xoroshiro128+</cite> is the fastest, followed by
+<cite>xorshift1024*</cite> and the two SIMD aware MT generators.  The original MT19937
+generator is much slower since it requires 2 32-bit values to equal the output
+of the faster generators.</p>
+<p>Integer performance has a similar ordering although <cite>dSFMT</cite> is slower since
+it generates 53-bit floating point values rather than integer values. On the
+other hand, it is very fast for uniforms, although slower than <cite>xoroshiro128+</cite>.</p>
+<p>The patterm is similar for other, more complex generators. The normal
+performance of NumPy’s MT19937 is much lower than the other since it
+uses the Box-Muller transformation rather than the Ziggurat generator.</p>
 <table border="1" class="colwidths-given docutils">
 <colgroup>
 <col width="13%" />
@@ -136,127 +174,288 @@
 <th class="head">MT19937</th>
 <th class="head">SFMT</th>
 <th class="head">dSFMT</th>
-<th class="head">xoroshirt128+</th>
+<th class="head">xoroshiro128+</th>
 <th class="head">xorshift1024</th>
 <th class="head">PCG64</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>Random Integers</td>
-<td>16.05</td>
-<td>8.68</td>
-<td>15.92</td>
-<td>9.08</td>
-<td>16.97</td>
-<td>16.19</td>
-<td>17.76</td>
-</tr>
-<tr class="row-odd"><td>Raw</td>
+<tr class="row-even"><td>Raw</td>
 <td>&#160;</td>
-<td>12.11</td>
-<td>9.61</td>
-<td>15.79</td>
-<td>12.37</td>
-<td>16.32</td>
-<td>24.21</td>
+<td>5.07</td>
+<td>1.98</td>
+<td>1.91</td>
+<td>1.08</td>
+<td>1.49</td>
+<td>3.16</td>
+</tr>
+<tr class="row-odd"><td>Random Integers</td>
+<td>4.84</td>
+<td>3.32</td>
+<td>2.36</td>
+<td>3.36</td>
+<td>1.99</td>
+<td>2.53</td>
+<td>2.32</td>
 </tr>
 <tr class="row-even"><td>Uniforms</td>
-<td>21.58</td>
-<td>18.82</td>
-<td>11.18</td>
-<td>7.5</td>
-<td>11.32</td>
-<td>13.55</td>
-<td>22.9</td>
+<td>10.41</td>
+<td>6.53</td>
+<td>2.7</td>
+<td>2.7</td>
+<td>1.58</td>
+<td>2.31</td>
+<td>2.47</td>
 </tr>
 <tr class="row-odd"><td>Normal</td>
-<td>54.74</td>
-<td>28.82</td>
-<td>11.84</td>
-<td>17.5</td>
-<td>18.03</td>
-<td>22.63</td>
-<td>26.19</td>
-</tr>
-<tr class="row-even"><td>Exponential</td>
-<td>25.53</td>
-<td>37.37</td>
-<td>16.71</td>
-<td>15.66</td>
-<td>26.58</td>
-<td>32.37</td>
-<td>36.58</td>
-</tr>
-<tr class="row-odd"><td>Laplace</td>
-<td>45.66</td>
-<td>35.66</td>
-<td>47.37</td>
-<td>40.27</td>
-<td>43.56</td>
-<td>31.58</td>
-<td>34.87</td>
+<td>69.4</td>
+<td>15.34</td>
+<td>9.93</td>
+<td>11.57</td>
+<td>9.56</td>
+<td>11.69</td>
+<td>11.64</td>
 </tr>
 <tr class="row-even"><td>Complex Normal</td>
 <td>&#160;</td>
-<td>52.5</td>
-<td>63.03</td>
-<td>75.66</td>
-<td>52.5</td>
-<td>42.5</td>
-<td>76.45</td>
-</tr>
-<tr class="row-odd"><td>Gamma</td>
-<td>93.03</td>
-<td>63.29</td>
-<td>66.32</td>
-<td>46.84</td>
-<td>70.92</td>
-<td>76.71</td>
-<td>103.56</td>
-</tr>
-<tr class="row-even"><td>Poisson</td>
-<td>83.16</td>
-<td>116.85</td>
-<td>65.27</td>
-<td>60.92</td>
-<td>64.87</td>
-<td>74.61</td>
-<td>112.9</td>
+<td>40.57</td>
+<td>28.05</td>
+<td>31.91</td>
+<td>25.8</td>
+<td>31.9</td>
+<td>31.86</td>
 </tr>
 <tr class="row-odd"><td>Binomial</td>
-<td>97.77</td>
-<td>90.93</td>
-<td>110.01</td>
-<td>104.87</td>
-<td>104.48</td>
-<td>104.61</td>
-<td>94.87</td>
+<td>77.46</td>
+<td>71.08</td>
+<td>65.77</td>
+<td>65.71</td>
+<td>66.18</td>
+<td>67.23</td>
+<td>69.51</td>
+</tr>
+<tr class="row-even"><td>Gamma</td>
+<td>107.42</td>
+<td>97.66</td>
+<td>86.5</td>
+<td>86.09</td>
+<td>82.31</td>
+<td>87.42</td>
+<td>86.41</td>
+</tr>
+<tr class="row-odd"><td>Exponential</td>
+<td>112.54</td>
+<td>104.16</td>
+<td>96.23</td>
+<td>95.22</td>
+<td>93.98</td>
+<td>98.15</td>
+<td>98.36</td>
+</tr>
+<tr class="row-even"><td>Laplace</td>
+<td>116.09</td>
+<td>114.2</td>
+<td>102.35</td>
+<td>100.21</td>
+<td>100.5</td>
+<td>105.9</td>
+<td>104.82</td>
+</tr>
+<tr class="row-odd"><td>Poisson</td>
+<td>151.65</td>
+<td>135.11</td>
+<td>105.1</td>
+<td>103.89</td>
+<td>102.43</td>
+<td>116.29</td>
+<td>114.34</td>
 </tr>
 <tr class="row-even"><td>Neg. Binomial</td>
-<td>290.81</td>
-<td>201.85</td>
-<td>218.83</td>
-<td>211.99</td>
-<td>214.35</td>
-<td>230.01</td>
-<td>280.67</td>
+<td>476.34</td>
+<td>453.07</td>
+<td>429.23</td>
+<td>426.31</td>
+<td>423.45</td>
+<td>429.81</td>
+<td>430.05</td>
 </tr>
 <tr class="row-odd"><td>Multinomial</td>
-<td>586.87</td>
-<td>597.8</td>
-<td>456.21</td>
-<td>535.16</td>
-<td>547.66</td>
-<td>562.27</td>
-<td>610.95</td>
+<td>1166.63</td>
+<td>1146.25</td>
+<td>1111.39</td>
+<td>1097.51</td>
+<td>1095.43</td>
+<td>1103.77</td>
+<td>1109.79</td>
 </tr>
 </tbody>
 </table>
+<p>The next table presents the performance relative to <cite>xoroshiro128+</cite>. The overall
+performance was computed using a geometric mean.</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">&#160;</th>
+<th class="head">NumPy MT19937</th>
+<th class="head">MT19937</th>
+<th class="head">SFMT</th>
+<th class="head">dSFMT</th>
+<th class="head">xoroshiro128+</th>
+<th class="head">xorshift1024</th>
+<th class="head">PCG64</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Raw</td>
+<td>&#160;</td>
+<td>4.69</td>
+<td>1.83</td>
+<td>1.77</td>
+<td>1.0</td>
+<td>1.38</td>
+<td>2.93</td>
+</tr>
+<tr class="row-odd"><td>Random Integers</td>
+<td>2.43</td>
+<td>1.67</td>
+<td>1.19</td>
+<td>1.69</td>
+<td>1.0</td>
+<td>1.27</td>
+<td>1.17</td>
+</tr>
+<tr class="row-even"><td>Uniforms</td>
+<td>6.59</td>
+<td>4.13</td>
+<td>1.71</td>
+<td>1.71</td>
+<td>1.0</td>
+<td>1.46</td>
+<td>1.56</td>
+</tr>
+<tr class="row-odd"><td>Normal</td>
+<td>7.26</td>
+<td>1.6</td>
+<td>1.04</td>
+<td>1.21</td>
+<td>1.0</td>
+<td>1.22</td>
+<td>1.22</td>
+</tr>
+<tr class="row-even"><td>Complex Normal</td>
+<td>&#160;</td>
+<td>1.57</td>
+<td>1.09</td>
+<td>1.24</td>
+<td>1.0</td>
+<td>1.24</td>
+<td>1.23</td>
+</tr>
+<tr class="row-odd"><td>Binomial</td>
+<td>1.17</td>
+<td>1.07</td>
+<td>0.99</td>
+<td>0.99</td>
+<td>1.0</td>
+<td>1.02</td>
+<td>1.05</td>
+</tr>
+<tr class="row-even"><td>Gamma</td>
+<td>1.31</td>
+<td>1.19</td>
+<td>1.05</td>
+<td>1.05</td>
+<td>1.0</td>
+<td>1.06</td>
+<td>1.05</td>
+</tr>
+<tr class="row-odd"><td>Exponential</td>
+<td>1.2</td>
+<td>1.11</td>
+<td>1.02</td>
+<td>1.01</td>
+<td>1.0</td>
+<td>1.04</td>
+<td>1.05</td>
+</tr>
+<tr class="row-even"><td>Laplace</td>
+<td>1.16</td>
+<td>1.14</td>
+<td>1.02</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.05</td>
+<td>1.04</td>
+</tr>
+<tr class="row-odd"><td>Poisson</td>
+<td>1.48</td>
+<td>1.32</td>
+<td>1.03</td>
+<td>1.01</td>
+<td>1.0</td>
+<td>1.14</td>
+<td>1.12</td>
+</tr>
+<tr class="row-even"><td>Neg. Binomial</td>
+<td>1.12</td>
+<td>1.07</td>
+<td>1.01</td>
+<td>1.01</td>
+<td>1.0</td>
+<td>1.02</td>
+<td>1.02</td>
+</tr>
+<tr class="row-odd"><td>Multinomial</td>
+<td>1.06</td>
+<td>1.05</td>
+<td>1.01</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.01</td>
+<td>1.01</td>
+</tr>
+<tr class="row-even"><td>Overall</td>
+<td>1.84</td>
+<td>1.55</td>
+<td>1.14</td>
+<td>1.19</td>
+<td>1.0</td>
+<td>1.15</td>
+<td>1.22</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">All timings were taken using Linux and gcc 5.4 on a i7-5600U processor.</p>
+</div>
+</div>
 </div>
 
 
           </div>
             
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="entropy.html" title="previous chapter (use the left arrow)">System Entropy</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="mt19937.html" title="next chapter (use the right arrow)">MT19937 Randomstate</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
         </div>
         <div class="clearfix"></div>
     </div>
@@ -266,7 +465,16 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+20.g83eb7ce documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mt19937.html" title="MT19937 Randomstate"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="entropy.html" title="System Entropy"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+21.gc4ecd02 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">
