@@ -1795,7 +1795,7 @@ cdef class RandomState:
 
         >>> s = np.random.complex_normal(size=1000)
         """
-        if method != u'zig' or method != u'bm':
+        if method != u'zig' and method != u'bm':
             raise ValueError("method must be either 'bm' or 'zig'")
         cdef np.ndarray ogamma, orelation, oloc, randoms, v_real, v_imag, rho
         cdef double *randoms_data

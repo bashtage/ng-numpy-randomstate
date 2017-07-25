@@ -85,3 +85,21 @@ results.columns = [cols[c] for c in results]
 results.index = [index[i] for i in results.index]
 
 print(results)
+
+from io import StringIO
+
+sio = StringIO()
+results.to_csv(sio)
+sio.seek(0)
+lines = sio.readlines()
+for i, line in enumerate(lines):
+    if i == 0:
+        line = '    :header: ' + line
+    else:
+        line = '    ' + line
+    lines[i] = line
+
+lines.insert(1, '    \n')
+lines.insert(1, '    :widths: 14,14,14,14,14,14,14,14\n')
+lines.insert(0, '.. csv-table::\n')
+print(''.join(lines))
