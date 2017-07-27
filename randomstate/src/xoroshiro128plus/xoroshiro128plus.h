@@ -20,7 +20,7 @@ void xoroshiro128plus_seed_by_array(xoroshiro128plus_state* state, uint64_t *see
 
 void xoroshiro128plus_init_state(xoroshiro128plus_state* state, uint64_t seed, uint64_t inc);
 
-static inline uint64_t rotl(const uint64_t x, int k) {
+inline uint64_t rotl(const uint64_t x, int k) {
 	return (x << k) | (x >> (64 - k));
 }
 

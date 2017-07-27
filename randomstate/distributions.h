@@ -163,3 +163,11 @@ extern void random_gauss_zig_julia_fill(aug_state *state, npy_intp count, double
 extern void random_gauss_zig_float_fill(aug_state *state, npy_intp count, float *out);
 
 extern void random_gauss_zig_double_fill(aug_state *state, npy_intp count, double *out);
+
+extern double random_standard_exponential_zig(aug_state* state);
+
+extern void random_standard_exponential_zig_double_fill(aug_state* state, npy_intp count, double *out);
+
+extern float random_standard_exponential_zig_float(aug_state* state);
+
+extern void random_standard_exponential_zig_float_fill(aug_state* state, npy_intp count, float *out);
