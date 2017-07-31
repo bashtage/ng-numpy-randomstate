@@ -80,6 +80,7 @@ cdef extern from "distributions.h":
     cdef double random_gauss_zig(aug_state* state) nogil
     cdef double random_gauss_zig_julia(aug_state* state) nogil
     cdef double random_standard_exponential(aug_state* state) nogil
+    cdef double random_standard_exponential_ziggurat(aug_state* state) nogil
     cdef double random_standard_cauchy(aug_state* state) nogil
 
     cdef double random_exponential(aug_state *state, double scale) nogil
@@ -124,12 +125,14 @@ cdef extern from "distributions.h":
 
     cdef void random_gauss_zig_float_fill(aug_state *state, intptr_t count, float *out) nogil
     cdef void random_uniform_fill_float(aug_state *state, intptr_t cnt, double *out) nogil
+    cdef void random_standard_exponential_zig_float_fill(aug_state* state, intptr_t count, float *out) nogil
     cdef void random_standard_exponential_fill_float(aug_state* state, intptr_t count, float *out) nogil
     cdef void random_gauss_fill_float(aug_state* state, intptr_t count, float *out) nogil
 
     cdef void random_gauss_zig_double_fill(aug_state* state, intptr_t count, double *out) nogil
     cdef void random_uniform_fill_double(aug_state *state, intptr_t cnt, double *out) nogil
     cdef void random_standard_exponential_fill_double(aug_state* state, intptr_t count, double *out) nogil
+    cdef void random_standard_exponential_zig_double_fill(aug_state* state, intptr_t count, double *out) nogil
     cdef void random_gauss_fill(aug_state* state, intptr_t count, double *out) nogil
     cdef void random_gauss_zig_julia_fill(aug_state* state, intptr_t count, double *out) nogil
 
@@ -2014,9 +2017,9 @@ cdef class RandomState:
                     0.0, '', CONS_NONE,
                     None)
 
-    def standard_exponential(self, size=None, dtype=np.float64, out=None):
+    def standard_exponential(self, size=None, dtype=np.float64, method=u'inv', out=None):
         """
-        standard_exponential(size=None, dtype=np.float64, out=None)
+        standard_exponential(size=None, dtype=np.float64, method='inv', out=None)
 
         Draw samples from the standard exponential distribution.
 
@@ -2033,6 +2036,9 @@ cdef class RandomState:
             Desired dtype of the result. All dtypes are determined by their
             name, either 'float64' or 'float32'. The default value is
             'float64'.
+        method : str, optional
+            Either 'inv' or 'zig'. 'inv' uses the default inverse CDF method.
+            'zig' uses the much faster Ziggurat method of Marsaglia and Tsang.
         out : ndarray, optional
             Alternative output array in which to place the result. If size is not None,
             it must have the same shape as the provided size and must match the type of
@@ -2048,17 +2054,28 @@ cdef class RandomState:
         Output a 3x8000 array:
 
         >>> n = np.random.standard_exponential((3, 8000))
-
         """
+        if method != u'zig' and method != u'inv':
+            raise ValueError("method must be either 'bm' or 'zig'")
         key = np.dtype(dtype).name
         if key == 'float64':
-            return double_fill(&self.rng_state,
-                               &random_standard_exponential_fill_double,
-                               size, self.lock, out)
+            if method == 'zig':
+                return double_fill(&self.rng_state,
+                                   &random_standard_exponential_zig_double_fill,
+                                   size, self.lock, out)
+            else:
+                return double_fill(&self.rng_state,
+                                   &random_standard_exponential_fill_double,
+                                   size, self.lock, out)
         elif key == 'float32':
-            return float_fill(&self.rng_state,
-                              &random_standard_exponential_fill_float,
-                              size, self.lock, out)
+            if method == 'zig':
+                return float_fill(&self.rng_state,
+                                   &random_standard_exponential_zig_float_fill,
+                                   size, self.lock, out)
+            else:
+                return float_fill(&self.rng_state,
+                                  &random_standard_exponential_fill_float,
+                                  size, self.lock, out)
         else:
             raise TypeError('Unsupported dtype "%s" for standard_exponential'
                             % key)

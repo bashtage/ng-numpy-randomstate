@@ -1557,3 +1557,99 @@ void random_bounded_bool_fill(aug_state *state, npy_bool off, npy_bool rng, npy_
         out[i] = (buf & 0x00000001) != 0;
     }
 }
+
+static inline double standard_exponential_zig_double(aug_state* state);
+
+static double standard_exponential_zig_double_unlikely(aug_state* state, uint8_t idx, double x)
+{
+    if (idx == 0)
+    {
+        return ziggurat_exp_r - log(random_double(state));
+    }
+    else if ((fe_double[idx - 1] - fe_double[idx]) * random_double(state) + fe_double[idx] < exp(-x))
+    {
+        return x;
+    }
+    else
+    {
+        return standard_exponential_zig_double(state);
+    }
+}
+
+static inline double standard_exponential_zig_double(aug_state* state)
+{
+    uint64_t ri;
+    uint8_t idx;
+    double x;
+    ri = random_uint64(state);
+    ri >>= 3;
+    idx = ri & 0xFF;
+    ri >>= 8;
+    x = ri * we_double[idx];
+    if (ri < ke_double[idx]){
+        return x;  // 98.9% of the time we return here 1st try
+    }
+    return standard_exponential_zig_double_unlikely(state, idx, x);
+}
+
+double random_standard_exponential_zig_double(aug_state* state)
+{
+    return standard_exponential_zig_double(state);
+}
+
+void random_standard_exponential_zig_double_fill(aug_state* state, npy_intp count, double *out)
+{
+    npy_intp i;
+    for (i=0; i < count; i++) {
+        out[i] = standard_exponential_zig_double(state);
+    }
+}
+
+static inline float standard_exponential_zig_float(aug_state* state);
+
+static double standard_exponential_zig_float_unlikely(aug_state* state, uint8_t idx, float x)
+{
+    if (idx == 0)
+    {
+        // TODO: Replace with float ?
+        return ziggurat_exp_r - logf(random_float(state));
+    }
+    else if ((fe_float[idx - 1] - fe_float[idx]) * random_float(state) + fe_float[idx] < expf(-x))
+    {
+        return x;
+    }
+    else
+    {
+        return standard_exponential_zig_float(state);
+    }
+}
+
+static inline float standard_exponential_zig_float(aug_state* state)
+{
+    uint32_t ri;
+    uint8_t idx;
+    float x;
+    ri = random_uint32(state);
+    ri >>= 1;
+    idx = ri & 0xFF;
+    ri >>= 8;
+    x = ri * we_float[idx];
+    if (ri < ke_float[idx]){
+        return x;  // 98.9% of the time we return here 1st try
+    }
+    return standard_exponential_zig_float_unlikely(state, idx, x);
+}
+
+
+float random_standard_exponential_zig_float(aug_state* state)
+{
+    return standard_exponential_zig_float(state);
+}
+
+void random_standard_exponential_zig_float_fill(aug_state* state, npy_intp count, float *out)
+{
+    npy_intp i;
+    for (i=0; i < count; i++) {
+        out[i] = standard_exponential_zig_float(state);
+    }
+}

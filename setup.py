@@ -36,12 +36,12 @@ rngs = ['RNG_DSFMT', 'RNG_MLFG_1279_861', 'RNG_MRG32K3A', 'RNG_MT19937',
 
 compile_rngs = rngs[:]
 
-extra_defs = [('_CRT_SECURE_NO_WARNINGS','1')] if os.name == 'nt' else []
+extra_defs = [('_CRT_SECURE_NO_WARNINGS', '1')] if os.name == 'nt' else []
 extra_link_args = ['/LTCG', 'Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []
 base_extra_compile_args = [] if os.name == 'nt' else ['-std=c99']
 if USE_SSE2:
     if os.name == 'nt':
-        base_extra_compile_args += ['/wd4146','/GL']
+        base_extra_compile_args += ['/wd4146', '/GL']
         if struct.calcsize('P') < 8:
             base_extra_compile_args += ['/arch:SSE2']
     else:
@@ -187,6 +187,7 @@ class BinaryDistribution(Distribution):
 
 try:
     import os
+
     readme_orig_time = os.path.getmtime('README.md')
     readme_mod_time = os.path.getmtime('README.rst')
     if readme_orig_time > readme_mod_time:
