@@ -5,7 +5,22 @@ Change Log
 
 Since Version 1.13
 ------------------
-* Add SIMD-oriented Fast Mersenne Twister (`SFMT <http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/>`) generator.
+* Add Ziggurat generator for standard exponential
+  (:meth:`~randomstate.prng.mt19937.standard_exponential`) for both floats and
+  doubles
+
+.. ipython:: python
+
+   import numpy as np
+   import randomstate as rs
+   rs.seed(23456)
+   rs.standard_exponential(3, method='zig') # New method
+
+   rs.standard_exponential(3, method='inv') # Old method
+
+
+* Add SIMD-oriented Fast Mersenne Twister
+  (`SFMT <http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/>`_) generator.
 * Add complex normal (:meth:`~randomstate.prng.mt19937.complex_normal`)
 
 Version 1.13

@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.dsfmt.standard_exponential &#8212; randomstate 1.13.1+22.g97a5511 documentation</title>
+    <title>randomstate.prng.dsfmt.standard_exponential &#8212; randomstate 1.13.1+24.g13fd21b documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.13.1+22.g97a5511',
+        VERSION:     '1.13.1+24.g13fd21b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="randomstate.prng.dsfmt.standard_cauchy.html" title="randomstate.prng.dsfmt.standard_cauchy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+22.g97a5511 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+24.g13fd21b documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../dsfmt.html" accesskey="U">dSFMT Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -146,7 +146,7 @@
 <h1>randomstate.prng.dsfmt.standard_exponential<a class="headerlink" href="#randomstate-prng-dsfmt-standard-exponential" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="randomstate.prng.dsfmt.standard_exponential">
-<code class="descclassname">randomstate.prng.dsfmt.</code><code class="descname">standard_exponential</code><span class="sig-paren">(</span><em>size=None</em>, <em>dtype=np.float64</em>, <em>out=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.dsfmt.standard_exponential" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">randomstate.prng.dsfmt.</code><code class="descname">standard_exponential</code><span class="sig-paren">(</span><em>size=None</em>, <em>dtype=np.float64</em>, <em>method='inv'</em>, <em>out=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.dsfmt.standard_exponential" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw samples from the standard exponential distribution.</p>
 <p><cite>standard_exponential</cite> is identical to the exponential distribution
 with a scale parameter of 1.</p>
@@ -161,6 +161,8 @@ single value is returned.</li>
 <li><strong>dtype</strong> (<em>dtype</em><em>, </em><em>optional</em>) – Desired dtype of the result. All dtypes are determined by their
 name, either ‘float64’ or ‘float32’. The default value is
 ‘float64’.</li>
+<li><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – Either ‘inv’ or ‘zig’. ‘inv’ uses the default inverse CDF method.
+‘zig’ uses the much faster Ziggurat method of Marsaglia and Tsang.</li>
 <li><strong>out</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Alternative output array in which to place the result. If size is not None,
 it must have the same shape as the provided size and must match the type of
 the output values.</li>
@@ -217,7 +219,7 @@ the output values.</li>
         <li class="right" >
           <a href="randomstate.prng.dsfmt.standard_cauchy.html" title="randomstate.prng.dsfmt.standard_cauchy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+22.g97a5511 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+24.g13fd21b documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../dsfmt.html" >dSFMT Randomstate</a> &#187;</li> 
       </ul>
     </div>

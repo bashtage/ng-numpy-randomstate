@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate’s documentation &#8212; randomstate 1.13.1+22.g97a5511 documentation</title>
+    <title>randomstate’s documentation &#8212; randomstate 1.13.1+24.g13fd21b documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+22.g97a5511',
+        VERSION:     '1.13.1+24.g13fd21b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -55,7 +55,7 @@
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+22.g97a5511 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+24.g13fd21b documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -140,16 +140,22 @@ source of randomness that is used in cryptographic applications (e.g.,
 <code class="docutils literal"><span class="pre">/dev/urandom</span></code> on Unix).</li>
 <li>Simulate from the complex normal distribution
 (<a class="reference internal" href="generated/randomstate.prng.mt19937.complex_normal.html#randomstate.prng.mt19937.complex_normal" title="randomstate.prng.mt19937.complex_normal"><code class="xref py py-meth docutils literal"><span class="pre">complex_normal()</span></code></a>)</li>
-<li>The normal generator supports a 256-step Ziggurat method which is 2-6 times
-faster than NumPy’s <code class="docutils literal"><span class="pre">standard_normal</span></code>.  This generator can be accessed
-by passing the keyword argument <code class="docutils literal"><span class="pre">method='zig'</span></code>.</li>
+<li>The both the normal and exponential generators support 256-step Ziggurat
+methods which are 2-6 times faster than NumPy’s default implementation in
+<code class="docutils literal"><span class="pre">standard_normal</span></code> or <code class="docutils literal"><span class="pre">standard_exponential</span></code>.  This Ziggurat generator can
+be accessed by passing the keyword argument <code class="docutils literal"><span class="pre">method='zig'</span></code>.</li>
 </ul>
-<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">from</span> <span class="nn">randomstate</span> <span class="kn">import</span> <span class="n">standard_normal</span>
+<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">from</span> <span class="nn">randomstate</span> <span class="kn">import</span> <span class="n">standard_normal</span><span class="p">,</span> <span class="n">standard_exponential</span>
 
 <span class="gp">In [2]: </span><span class="n">standard_normal</span><span class="p">(</span><span class="mi">100000</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;zig&#39;</span><span class="p">)</span>
 <span class="gh">Out[2]: </span><span class="go"></span>
 <span class="go">array([ 0.61476676,  1.24423325, -0.04875128, ..., -1.00860609,</span>
 <span class="go">       -0.43730628,  0.31712586])</span>
+
+<span class="gp">In [3]: </span><span class="n">standard_exponential</span><span class="p">(</span><span class="mi">100000</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;zig&#39;</span><span class="p">)</span>
+<span class="go">                                                                                                           Out[3]: </span>
+<span class="go">array([ 4.7286494 ,  0.05907936,  0.85920809, ...,  0.1852424 ,</span>
+<span class="go">        0.36951594,  1.55643659])</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -163,19 +169,19 @@ select distributions<ul>
 </ul>
 </li>
 </ul>
-<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [3]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
-<span class="gp">In [4]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
+<span class="gp">In [5]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
 
-<span class="gp">In [5]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">In [6]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="gp">In [6]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-<span class="gh">Out[6]: </span><span class="go">array([ 0.5488135 ,  0.71518937,  0.60276338])</span>
+<span class="gp">In [7]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gh">Out[7]: </span><span class="go">array([ 0.5488135 ,  0.71518937,  0.60276338])</span>
 
-<span class="gp">In [7]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">In [8]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="gp">In [8]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-<span class="gh">Out[8]: </span><span class="go">array([ 0.54881346,  0.59284461,  0.71518934], dtype=float32)</span>
+<span class="gp">In [9]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="gh">Out[9]: </span><span class="go">array([ 0.54881346,  0.59284461,  0.71518934], dtype=float32)</span>
 </pre></div>
 </div>
 <ul>
@@ -187,22 +193,22 @@ select distributions</p>
 <li>Standard Gammas (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_gamma.html#randomstate.prng.mt19937.standard_gamma" title="randomstate.prng.mt19937.standard_gamma"><code class="xref py py-meth docutils literal"><span class="pre">standard_gamma()</span></code></a>)</li>
 <li>Standard Exponentials (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_exponential.html#randomstate.prng.mt19937.standard_exponential" title="randomstate.prng.mt19937.standard_exponential"><code class="xref py py-meth docutils literal"><span class="pre">standard_exponential()</span></code></a>)</li>
 </ul>
-<p>This allows mulththreading to fill large arrays in chunks using suitable
+<p>This allows multithreading to fill large arrays in chunks using suitable
 PRNGs in parallel.</p>
 </li>
 </ul>
-<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [9]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [10]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
-<span class="gp">In [10]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
+<span class="gp">In [11]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
 
-<span class="gp">In [11]: </span><span class="n">existing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">In [12]: </span><span class="n">existing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 
-<span class="gp">In [12]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">In [13]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="gp">In [13]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">existing</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
-<span class="gh">Out[13]: </span><span class="go">array([ 0.5488135 ,  0.71518937])</span>
+<span class="gp">In [14]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">existing</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+<span class="gh">Out[14]: </span><span class="go">array([ 0.5488135 ,  0.71518937])</span>
 
-<span class="gp">In [14]: </span><span class="k">print</span><span class="p">(</span><span class="n">existing</span><span class="p">)</span>
+<span class="gp">In [15]: </span><span class="k">print</span><span class="p">(</span><span class="n">existing</span><span class="p">)</span>
 <span class="go">                                           [ 0.5488135   0.71518937  0.          0.        ]</span>
 </pre></div>
 </div>
@@ -413,7 +419,7 @@ performance than more modern generators.</li>
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+22.g97a5511 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+24.g13fd21b documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">
