@@ -15,9 +15,8 @@ Since Version 1.13
    import numpy as np
    import randomstate as rs
    rs.seed(23456)
-   rs.standard_gamma(3, method='zig') # New method
-
-   rs.standard_gamma(3, method='inv') # Old method
+   rs.standard_gamma(2, size=3, method='zig') # New method
+   rs.standard_gamma(2, size=3, method='inv') # Old method
 
 * Add Ziggurat generator for standard exponential
   (:meth:`~randomstate.prng.mt19937.standard_exponential`) for both floats and
@@ -29,7 +28,6 @@ Since Version 1.13
    import randomstate as rs
    rs.seed(23456)
    rs.standard_exponential(3, method='zig') # New method
-
    rs.standard_exponential(3, method='inv') # Old method
 
 * Add SIMD-oriented Fast Mersenne Twister
@@ -80,7 +78,6 @@ Version 1.11.2
    import randomstate as rs
    rs.seed(23456)
    rs.random_sample(3, dtype=np.float64)
-
    rs.seed(23456)
    rs.random_sample(3, dtype=np.float32)
 
