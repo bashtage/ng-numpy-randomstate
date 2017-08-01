@@ -18,10 +18,21 @@ What's New or Different
 
 .. ipython:: python
 
-  from randomstate import standard_normal, standard_exponential
-  x = standard_normal(100000, method='zig')
-  y = standard_exponential(100000, method='zig')
-  z = standard_gamma(100000, method='zig')
+  from randomstate.prng.xoroshiro128plus import standard_normal
+  %timeit standard_normal(1000000, method='bm')
+  %timeit standard_normal(1000000, method='zig')
+
+.. ipython:: python
+
+  from randomstate.prng.xoroshiro128plus import standard_exponential
+  %timeit standard_exponential(1000000, method='inv')
+  %timeit standard_exponential(1000000, method='zig')
+
+.. ipython:: python
+
+  from randomstate.prng.xoroshiro128plus import standard_gamma
+  %timeit standard_gamma(3.0, 1000000, method='inv')
+  %timeit standard_gamma(3.0, 1000000, method='zig')
 
 * Optional ``dtype`` argument that accepts ``np.float32`` or ``np.float64``
   to produce either single or double prevision uniform random variables for
@@ -34,12 +45,11 @@ What's New or Different
 
 .. ipython:: python
 
-  import numpy as np
   import randomstate as rs
   rs.seed(0)
-  rs.random_sample(3, dtype=np.float64)
+  rs.random_sample(3, dtype='d')
   rs.seed(0)
-  rs.random_sample(3, dtype=np.float32)
+  rs.random_sample(3, dtype='f')
 
 * Optional ``out`` argument that allows existing arrays to be filled for
   select distributions
