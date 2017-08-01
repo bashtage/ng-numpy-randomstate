@@ -26,7 +26,7 @@ functions = {'randint': {'low': 2 ** 31, 'dtype': 'uint32'},
              'random_sample': {},
              'random_raw': {'output': False},
              'standard_exponential': {'method': 'zig'},
-             'standard_gamma': {'shape': 2.4},
+             'standard_gamma': {'shape': 2.4, 'method': 'zig'},
              'standard_normal': {'method': 'zig'},
              'multinomial': {'n': 20, 'pvals': [1.0 / 6.0] * np.ones(6)},
              'negative_binomial': {'n': 5, 'p': 0.16},
@@ -41,7 +41,7 @@ def timer(prng: str, fn: str, args: dict):
         # Differences with NumPy
         if fn in ('random_raw', 'complex_normal'):
             return np.nan
-        if fn in ('standard_normal','standard_exponential'):
+        if fn in ('standard_normal','standard_exponential', 'standard_gamma'):
             args = {k: v for k, v in args.items() if k != 'method'}
     elif prng == 'mt19937' and fn == 'random_raw':  # To make comparable
         args['size'] = 2 * args['size']
@@ -110,6 +110,10 @@ overall = np.exp(np.mean(np.log(std_results)))
 overall.name = 'Overall'
 std_results = std_results.append(overall)
 std_results = np.round(std_results, 2)
+
+print('\n\n' + '*'*80)
+print(std_results)
+print('\n'*4)
 
 sio = StringIO()
 std_results.to_csv(sio)
