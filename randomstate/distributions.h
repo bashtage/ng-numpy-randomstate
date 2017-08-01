@@ -171,3 +171,7 @@ extern void random_standard_exponential_zig_double_fill(aug_state* state, npy_in
 extern float random_standard_exponential_zig_float(aug_state* state);
 
 extern void random_standard_exponential_zig_float_fill(aug_state* state, npy_intp count, float *out);
+
+extern double random_standard_gamma_zig_double(aug_state* state, double shape);
+
+extern float random_standard_gamma_zig_float(aug_state* state, float shape);

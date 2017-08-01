@@ -9,6 +9,10 @@
  *
  */
 
+/* Internal Prototypes */
+static inline double standard_exponential_zig_double(aug_state* state);
+static inline float standard_exponential_zig_float(aug_state* state);
+
 static inline float random_float(aug_state* state)
 {
     return (random_uint32(state) >> 9) * (1.0f / 8388608.0f);
@@ -1558,8 +1562,6 @@ void random_bounded_bool_fill(aug_state *state, npy_bool off, npy_bool rng, npy_
     }
 }
 
-static inline double standard_exponential_zig_double(aug_state* state);
-
 static double standard_exponential_zig_double_unlikely(aug_state* state, uint8_t idx, double x)
 {
     if (idx == 0)
@@ -1605,9 +1607,7 @@ void random_standard_exponential_zig_double_fill(aug_state* state, npy_intp coun
     }
 }
 
-static inline float standard_exponential_zig_float(aug_state* state);
-
-static double standard_exponential_zig_float_unlikely(aug_state* state, uint8_t idx, float x)
+static float standard_exponential_zig_float_unlikely(aug_state* state, uint8_t idx, float x)
 {
     if (idx == 0)
     {
@@ -1652,4 +1652,122 @@ void random_standard_exponential_zig_float_fill(aug_state* state, npy_intp count
     for (i=0; i < count; i++) {
         out[i] = standard_exponential_zig_float(state);
     }
+}
+
+static inline double standard_gamma_zig_double(aug_state* state, double shape)
+{
+    double b, c;
+    double U, V, X, Y;
+
+    if (shape == 1.0)
+    {
+        return standard_exponential_zig_double(state);
+    }
+    else if (shape < 1.0)
+    {
+        for (;;)
+        {
+            U = random_double(state);
+            V = standard_exponential_zig_double(state);
+            if (U <= 1.0 - shape)
+            {
+                X = pow(U, 1./shape);
+                if (X <= V)
+                {
+                    return X;
+                }
+            }
+            else
+            {
+                Y = -log((1-U)/shape);
+                X = pow(1.0 - shape + shape*Y, 1./shape);
+                if (X <= (V + Y))
+                {
+                    return X;
+                }
+            }
+        }
+    }
+    else
+    {
+        b = shape - 1./3.;
+        c = 1./sqrt(9*b);
+        for (;;)
+        {
+            do
+            {
+                X = gauss_zig_double(state);
+                V = 1.0 + c*X;
+            } while (V <= 0.0);
+
+            V = V*V*V;
+            U = random_double(state);
+            if (U < 1.0 - 0.0331*(X*X)*(X*X)) return (b*V);
+            if (log(U) < 0.5*X*X + b*(1. - V + log(V))) return (b*V);
+        }
+    }
+}
+
+static inline float standard_gamma_zig_float(aug_state* state, float shape)
+{
+    float b, c;
+    float U, V, X, Y;
+
+    if (shape == 1.0f)
+    {
+        return standard_exponential_zig_float(state);
+    }
+    else if (shape < 1.0f)
+    {
+        for (;;)
+        {
+            U = random_float(state);
+            V = standard_exponential_zig_float(state);
+            if (U <= 1.0f - shape)
+            {
+                X = powf(U, 1.0f/shape);
+                if (X <= V)
+                {
+                    return X;
+                }
+            }
+            else
+            {
+                Y = -logf((1.0f-U)/shape);
+                X = powf(1.0f - shape + shape*Y, 1.0f/shape);
+                if (X <= (V + Y))
+                {
+                    return X;
+                }
+            }
+        }
+    }
+    else
+    {
+        b = shape - 1.0f/3.0f;
+        c = 1.0f / sqrtf(9.0f*b);
+        for (;;)
+        {
+            do
+            {
+                X = gauss_zig_float(state);
+                V = 1.0f + c*X;
+            } while (V <= 0.0f);
+
+            V = V*V*V;
+            U = random_float(state);
+            if (U < 1.0f - 0.0331f * (X*X)*(X*X)) return (b*V);
+            if (logf(U) < 0.5f * X*X + b*(1.0f - V + logf(V))) return (b*V);
+        }
+    }
+}
+
+double random_standard_gamma_zig_double(aug_state* state, double shape)
+{
+    return standard_gamma_zig_double(state, shape);
+}
+
+float random_standard_gamma_zig_float(aug_state* state, float shape)
+{
+    return standard_gamma_zig_float(state, shape);
 }
