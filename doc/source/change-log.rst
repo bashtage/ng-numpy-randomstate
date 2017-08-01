@@ -5,6 +5,20 @@ Change Log
 
 Since Version 1.13
 ------------------
+* Add Ziggurat generation for standard gamma
+  (:meth:`~randomstate.prng.mt19937.standard_gamma`) for both floats and
+  doubles.  The gamma generator uses a rejection sampler that
+  depends on random double, normal and/or exponential values.
+
+.. ipython:: python
+
+   import numpy as np
+   import randomstate as rs
+   rs.seed(23456)
+   rs.standard_gamma(3, method='zig') # New method
+
+   rs.standard_gamma(3, method='inv') # Old method
+
 * Add Ziggurat generator for standard exponential
   (:meth:`~randomstate.prng.mt19937.standard_exponential`) for both floats and
   doubles
@@ -17,7 +31,6 @@ Since Version 1.13
    rs.standard_exponential(3, method='zig') # New method
 
    rs.standard_exponential(3, method='inv') # Old method
-
 
 * Add SIMD-oriented Fast Mersenne Twister
   (`SFMT <http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/>`_) generator.
@@ -83,19 +96,16 @@ Version 1.11.1
 
 Version 1.11
 ------------
-
 * Update to recent changes in NumPy's RandomState
 * Expose system entropy through :meth:`randomstate.entropy.random_entropy`
 * Add vector initialization for all PRNGs
 
 Version 1.10.1
 --------------
-
 * Added support for jumping the MRG32K3A generator
 * Added support for jumping the dSFMT generator
 * Update to recent changes in NumPy's RandomState
 
 Version 1.10
 ------------
-
 * This is the initial release with compatibility with NumPy 1.10

@@ -10,16 +10,18 @@ What's New or Different
   ``/dev/urandom`` on Unix).
 * Simulate from the complex normal distribution
   (:meth:`~randomstate.prng.mt19937.complex_normal`)
-* The both the normal and exponential generators support 256-step Ziggurat
-  methods which are 2-6 times faster than NumPy's default implementation in
-  ``standard_normal`` or ``standard_exponential``.  This Ziggurat generator can
-  be accessed by passing the keyword argument ``method='zig'``.
+* The normal, exponential and gamma generators support 256-step Ziggurat
+  methods which are 2-10 times faster than NumPy's default implementation in
+  ``standard_normal``, ``standard_exponential`` or ``standard_gamma``.
+  The Ziggurat generator can be accessed by passing the keyword
+  argument ``method='zig'``.
 
 .. ipython:: python
 
   from randomstate import standard_normal, standard_exponential
-  standard_normal(100000, method='zig')
-  standard_exponential(100000, method='zig')
+  x = standard_normal(100000, method='zig')
+  y = standard_exponential(100000, method='zig')
+  z = standard_gamma(100000, method='zig')
 
 * Optional ``dtype`` argument that accepts ``np.float32`` or ``np.float64``
   to produce either single or double prevision uniform random variables for

@@ -74,6 +74,7 @@ cdef extern from "distributions.h":
     cdef float random_standard_uniform_float(aug_state* state) nogil
     cdef float random_gamma_float(aug_state *state, double shape, float scale) nogil
     cdef float random_standard_gamma_float(aug_state* state, float shape) nogil
+    cdef float random_standard_gamma_zig_float(aug_state* state, float shape) nogil
 
     cdef double random_standard_uniform_double(aug_state* state) nogil
     cdef double random_gauss(aug_state* state) nogil
@@ -85,6 +86,7 @@ cdef extern from "distributions.h":
 
     cdef double random_exponential(aug_state *state, double scale) nogil
     cdef double random_standard_gamma(aug_state* state, double shape) nogil
+    cdef double random_standard_gamma_zig_double(aug_state* state, double shape) nogil
     cdef double random_pareto(aug_state *state, double a) nogil
     cdef double random_weibull(aug_state *state, double a) nogil
     cdef double random_power(aug_state *state, double a) nogil
@@ -2080,9 +2082,10 @@ cdef class RandomState:
             raise TypeError('Unsupported dtype "%s" for standard_exponential'
                             % key)
 
-    def standard_gamma(self, shape, size=None, dtype=np.float64, out=None):
+    def standard_gamma(self, shape, size=None, dtype=np.float64, method='inv',
+                       out=None):
         """
-        standard_gamma(shape, size=None, dtype=np.float64)
+        standard_gamma(shape, size=None, dtype=np.float64, method='inv', out=None)
 
         Draw samples from a standard Gamma distribution.
 
@@ -2101,6 +2104,9 @@ cdef class RandomState:
         dtype : dtype, optional
             Desired dtype of the result, either ``np.float64`` (default)
             or ``np.float32``.
+        method : str, optional
+            Either 'inv' or 'zig'. 'inv' uses the default inverse CDF method.
+            'zig' uses the much faster Ziggurat method of Marsaglia and Tsang.
         out : ndarray, optional
             Alternative output array in which to place the result. If size is
             not None, it must have the same shape as the provided size and
@@ -2154,19 +2160,33 @@ cdef class RandomState:
         ...                       (sps.gamma(shape) * scale**shape))
         >>> plt.plot(bins, y, linewidth=2, color='r')
         >>> plt.show()
-
         """
+        if method != u'zig' and method != u'inv':
+            raise ValueError("method must be either 'inv' or 'zig'")
         key = np.dtype(dtype).name
         if key == 'float64':
-            return cont(&self.rng_state, &random_standard_gamma,
-                        size, self.lock, 1,
-                        shape, 'shape', CONS_NON_NEGATIVE,
-                        0.0, '', CONS_NONE,
-                        0.0, '', CONS_NONE, out)
+            if method == 'inv':
+                return cont(&self.rng_state, &random_standard_gamma,
+                            size, self.lock, 1,
+                            shape, 'shape', CONS_NON_NEGATIVE,
+                            0.0, '', CONS_NONE,
+                            0.0, '', CONS_NONE, out)
+            else:
+                return cont(&self.rng_state, &random_standard_gamma_zig_double,
+                            size, self.lock, 1,
+                            shape, 'shape', CONS_NON_NEGATIVE,
+                            0.0, '', CONS_NONE,
+                            0.0, '', CONS_NONE, out)
         if key == 'float32':
-            return cont_float(&self.rng_state, &random_standard_gamma_float,
-                              size, self.lock, shape, 'shape', CONS_NON_NEGATIVE,
-                              out)
+            if method == 'inv':
+                return cont_float(&self.rng_state, &random_standard_gamma_float,
+                                  size, self.lock, shape, 'shape', CONS_NON_NEGATIVE,
+                                  out)
+            else:
+                return cont_float(&self.rng_state, &random_standard_gamma_zig_float,
+                                  size, self.lock, shape, 'shape', CONS_NON_NEGATIVE,
+                                  out)
+
         else:
             raise TypeError('Unsupported dtype "%s" for standard_gamma' % key)
 

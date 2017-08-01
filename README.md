@@ -22,22 +22,24 @@ z = rnd.randn(10,10)
 * Default random generator is identical to NumPy's RandomState (i.e., 
 same seed, same random numbers).
 * Support for random number generators that support independent streams 
-and jumping ahead so that substreams can be generated
-* Faster random number generation, especially for Normals using the 
-Ziggurat method
+and jumping ahead so that sub-streams can be generated
+* Faster random number generation, especially for normal, standard
+  exponential and standard gamma using the Ziggurat method
 
 ```python
 import randomstate as rnd
 w = rnd.standard_normal(10000, method='zig')
+x = rnd.standard_exponential(10000, method='zig')
+y = rnd.standard_gamma(5.5, 10000, method='zig')
 ```
 
 * Support for 32-bit floating randoms for core generators. 
   Currently supported:
 
     * Uniforms (`random_sample`)
-    * Exponentials (`standard_exponential`) 
+    * Exponentials (`standard_exponential`, both Inverse CDF and Ziggurat)
     * Normals (`standard_normal`, both Box-Muller and Ziggurat)
-    * Standard Gammas (via `standard_gamma`) 
+    * Standard Gammas (via `standard_gamma`, both Inverse CDF and Ziggurat)
   
   **WARNING**: The 32-bit generators are **experimental** and subject 
   to change.
@@ -64,7 +66,10 @@ The RNGs include:
 * [dSFMT](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/) a 
   SSE2-aware version of the MT19937 generator that is especially fast at 
   generating doubles
-* [xorshift128+](http://xorshift.di.unimi.it/), 
+* [SFMT](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/) a
+  SSE2-aware version of the MT19937 generator that is optimized for
+  integer values
+* [xorshift128+](http://xorshift.di.unimi.it/),
   [xoroshiro128+](http://xoroshiro.di.unimi.it/) and
   [xorshift1024*](http://xorshift.di.unimi.it/)
 * [PCG32](http://www.pcg-random.org/) and 
@@ -76,14 +81,18 @@ The RNGs include:
 
 ### New Features
 * `standard_normal`, `normal`, `randn` and `multivariate_normal` all 
-support an additional `method` keyword argument which can be `bm` or 
-`zig` where `bm` corresponds to the current method using the Box-Muller 
-transformation and `zig` uses the much faster (100%+) Ziggurat method.
+  support an additional `method` keyword argument which can be `bm` or
+  `zig` where `bm` corresponds to the current method using the Box-Muller
+  transformation and `zig` uses the much faster (100%+) Ziggurat method.
+* `standard_exponential` and `standard_gamma` both support an additional
+  `method` keyword argument which can be `inv` or
+  `zig` where `inv` corresponds to the current method using the inverse
+  CDF and `zig` uses the much faster (100%+) Ziggurat method.
 * Core random number generators can produce either single precision
-(`np.float32`) or double precision (`np.float64`, the default) using
-an the optional keyword argument `dtype`
+  (`np.float32`) or double precision (`np.float64`, the default) using
+  an the optional keyword argument `dtype`
 * Core random number generators can fill existing arrays using the
-`out` keyword argument
+  `out` keyword argument
 
 
 ### New Functions
@@ -110,8 +119,8 @@ will produce an identical sequence of random numbers for a given seed.
   * Linux 32/64 bit, Python 2.7, 3.4, 3.5, 3.6 (probably works on 2.6 and 3.3)
   * PC-BSD (FreeBSD) 64-bit, Python 2.7
   * OSX 64-bit, Python 2.7
-  * Windows 32/64 bit (only tested on Python 2.7 and 3.5, but should 
-    work on 3.3/3.4)
+  * Windows 32/64 bit (only tested on Python 2.7, 3.5 and 3.6, but
+    should work on 3.3/3.4)
 
 ## Version
 The version matched the latest version of NumPy where 
@@ -138,7 +147,7 @@ Building requires:
   * Cython (0.22, 0.23, 0.24, 0.25)
   * tempita (0.5+), if not provided by Cython
  
-Testing requires nose (1.3+).
+Testing requires pytest (3.0+).
 
 **Note:** it might work with other versions but only tested with these 
 versions. 
