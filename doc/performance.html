@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Performance &#8212; randomstate 1.13.1+26.g487cd1f documentation</title>
+    <title>Performance &#8212; randomstate 1.13.1+27.g6188349 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+26.g487cd1f',
+        VERSION:     '1.13.1+27.g6188349',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="entropy.html" title="System Entropy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+26.g487cd1f documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+27.g6188349 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -185,111 +185,111 @@ uses the Box-Muller transformation rather than the Ziggurat generator.</p>
 <tbody valign="top">
 <tr class="row-even"><td>Raw</td>
 <td>&#160;</td>
-<td>5.07</td>
-<td>1.98</td>
-<td>1.91</td>
-<td>1.08</td>
-<td>1.49</td>
-<td>3.16</td>
+<td>4.21</td>
+<td>1.81</td>
+<td>1.7</td>
+<td>1.06</td>
+<td>1.5</td>
+<td>2.67</td>
 </tr>
 <tr class="row-odd"><td>Random Integers</td>
-<td>4.84</td>
-<td>3.32</td>
-<td>2.36</td>
-<td>3.36</td>
-<td>1.99</td>
-<td>2.53</td>
-<td>2.32</td>
+<td>4.56</td>
+<td>3.11</td>
+<td>2.09</td>
+<td>2.96</td>
+<td>1.93</td>
+<td>2.34</td>
+<td>2.22</td>
 </tr>
 <tr class="row-even"><td>Uniforms</td>
-<td>10.41</td>
-<td>6.53</td>
-<td>2.7</td>
-<td>2.7</td>
-<td>1.58</td>
-<td>2.31</td>
-<td>2.47</td>
+<td>9.77</td>
+<td>6.13</td>
+<td>2.41</td>
+<td>2.22</td>
+<td>1.46</td>
+<td>2.37</td>
+<td>2.56</td>
 </tr>
 <tr class="row-odd"><td>Normal</td>
-<td>69.4</td>
-<td>15.34</td>
-<td>9.93</td>
-<td>11.57</td>
-<td>9.56</td>
-<td>11.69</td>
-<td>11.64</td>
+<td>62.47</td>
+<td>13.77</td>
+<td>9.11</td>
+<td>10.89</td>
+<td>7.8</td>
+<td>10.48</td>
+<td>10.67</td>
 </tr>
-<tr class="row-even"><td>Complex Normal</td>
+<tr class="row-even"><td>Exponential</td>
+<td>98.35</td>
+<td>9.85</td>
+<td>5.72</td>
+<td>7.22</td>
+<td>5.56</td>
+<td>6.32</td>
+<td>10.88</td>
+</tr>
+<tr class="row-odd"><td>Complex Normal</td>
 <td>&#160;</td>
-<td>40.57</td>
-<td>28.05</td>
-<td>31.91</td>
-<td>25.8</td>
-<td>31.9</td>
-<td>31.86</td>
-</tr>
-<tr class="row-odd"><td>Binomial</td>
-<td>77.46</td>
-<td>71.08</td>
-<td>65.77</td>
-<td>65.71</td>
-<td>66.18</td>
-<td>67.23</td>
-<td>69.51</td>
+<td>37.07</td>
+<td>24.41</td>
+<td>27.88</td>
+<td>23.31</td>
+<td>27.78</td>
+<td>28.34</td>
 </tr>
 <tr class="row-even"><td>Gamma</td>
-<td>107.42</td>
-<td>97.66</td>
-<td>86.5</td>
-<td>86.09</td>
-<td>82.31</td>
-<td>87.42</td>
-<td>86.41</td>
+<td>97.99</td>
+<td>44.94</td>
+<td>38.27</td>
+<td>33.41</td>
+<td>31.2</td>
+<td>34.18</td>
+<td>34.09</td>
 </tr>
-<tr class="row-odd"><td>Exponential</td>
-<td>112.54</td>
-<td>104.16</td>
-<td>96.23</td>
-<td>95.22</td>
-<td>93.98</td>
-<td>98.15</td>
-<td>98.36</td>
+<tr class="row-odd"><td>Binomial</td>
+<td>87.99</td>
+<td>79.95</td>
+<td>78.85</td>
+<td>77.12</td>
+<td>76.88</td>
+<td>76.09</td>
+<td>76.99</td>
 </tr>
 <tr class="row-even"><td>Laplace</td>
-<td>116.09</td>
-<td>114.2</td>
-<td>102.35</td>
-<td>100.21</td>
-<td>100.5</td>
-<td>105.9</td>
-<td>104.82</td>
+<td>101.73</td>
+<td>103.95</td>
+<td>91.57</td>
+<td>89.02</td>
+<td>91.94</td>
+<td>93.61</td>
+<td>92.13</td>
 </tr>
 <tr class="row-odd"><td>Poisson</td>
-<td>151.65</td>
-<td>135.11</td>
-<td>105.1</td>
-<td>103.89</td>
-<td>102.43</td>
-<td>116.29</td>
-<td>114.34</td>
+<td>131.93</td>
+<td>119.95</td>
+<td>99.42</td>
+<td>94.84</td>
+<td>92.71</td>
+<td>100.28</td>
+<td>101.17</td>
 </tr>
 <tr class="row-even"><td>Neg. Binomial</td>
-<td>476.34</td>
-<td>453.07</td>
-<td>429.23</td>
-<td>426.31</td>
-<td>423.45</td>
-<td>429.81</td>
-<td>430.05</td>
+<td>433.77</td>
+<td>416.69</td>
+<td>410.2</td>
+<td>397.71</td>
+<td>389.21</td>
+<td>396.14</td>
+<td>394.78</td>
 </tr>
 <tr class="row-odd"><td>Multinomial</td>
-<td>1166.63</td>
-<td>1146.25</td>
-<td>1111.39</td>
-<td>1097.51</td>
-<td>1095.43</td>
-<td>1103.77</td>
-<td>1109.79</td>
+<td>1072.82</td>
+<td>1043.98</td>
+<td>1021.58</td>
+<td>1019.22</td>
+<td>1016.7</td>
+<td>1013.15</td>
+<td>1018.41</td>
 </tr>
 </tbody>
 </table>
@@ -320,126 +320,126 @@ performance was computed using a geometric mean.</p>
 <tbody valign="top">
 <tr class="row-even"><td>Raw</td>
 <td>&#160;</td>
-<td>4.69</td>
-<td>1.83</td>
-<td>1.77</td>
+<td>3.97</td>
+<td>1.71</td>
+<td>1.6</td>
 <td>1.0</td>
-<td>1.38</td>
-<td>2.93</td>
+<td>1.42</td>
+<td>2.52</td>
 </tr>
 <tr class="row-odd"><td>Random Integers</td>
-<td>2.43</td>
-<td>1.67</td>
-<td>1.19</td>
-<td>1.69</td>
+<td>2.36</td>
+<td>1.61</td>
+<td>1.08</td>
+<td>1.53</td>
 <td>1.0</td>
-<td>1.27</td>
-<td>1.17</td>
+<td>1.21</td>
+<td>1.15</td>
 </tr>
 <tr class="row-even"><td>Uniforms</td>
-<td>6.59</td>
-<td>4.13</td>
-<td>1.71</td>
-<td>1.71</td>
+<td>6.69</td>
+<td>4.2</td>
+<td>1.65</td>
+<td>1.52</td>
 <td>1.0</td>
-<td>1.46</td>
-<td>1.56</td>
+<td>1.62</td>
+<td>1.75</td>
 </tr>
 <tr class="row-odd"><td>Normal</td>
-<td>7.26</td>
-<td>1.6</td>
-<td>1.04</td>
-<td>1.21</td>
-<td>1.0</td>
-<td>1.22</td>
-<td>1.22</td>
-</tr>
-<tr class="row-even"><td>Complex Normal</td>
-<td>&#160;</td>
-<td>1.57</td>
-<td>1.09</td>
-<td>1.24</td>
-<td>1.0</td>
-<td>1.24</td>
-<td>1.23</td>
-</tr>
-<tr class="row-odd"><td>Binomial</td>
+<td>8.01</td>
+<td>1.77</td>
 <td>1.17</td>
-<td>1.07</td>
-<td>0.99</td>
-<td>0.99</td>
+<td>1.4</td>
 <td>1.0</td>
-<td>1.02</td>
+<td>1.34</td>
+<td>1.37</td>
+</tr>
+<tr class="row-even"><td>Exponential</td>
+<td>17.69</td>
+<td>1.77</td>
+<td>1.03</td>
+<td>1.3</td>
+<td>1.0</td>
+<td>1.14</td>
+<td>1.96</td>
+</tr>
+<tr class="row-odd"><td>Complex Normal</td>
+<td>&#160;</td>
+<td>1.59</td>
 <td>1.05</td>
+<td>1.2</td>
+<td>1.0</td>
+<td>1.19</td>
+<td>1.22</td>
 </tr>
 <tr class="row-even"><td>Gamma</td>
-<td>1.31</td>
-<td>1.19</td>
-<td>1.05</td>
-<td>1.05</td>
+<td>3.14</td>
+<td>1.44</td>
+<td>1.23</td>
+<td>1.07</td>
 <td>1.0</td>
-<td>1.06</td>
-<td>1.05</td>
+<td>1.1</td>
+<td>1.09</td>
 </tr>
-<tr class="row-odd"><td>Exponential</td>
-<td>1.2</td>
-<td>1.11</td>
-<td>1.02</td>
-<td>1.01</td>
-<td>1.0</td>
+<tr class="row-odd"><td>Binomial</td>
+<td>1.14</td>
 <td>1.04</td>
-<td>1.05</td>
+<td>1.03</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>0.99</td>
+<td>1.0</td>
 </tr>
 <tr class="row-even"><td>Laplace</td>
-<td>1.16</td>
-<td>1.14</td>
+<td>1.11</td>
+<td>1.13</td>
+<td>1.0</td>
+<td>0.97</td>
+<td>1.0</td>
 <td>1.02</td>
 <td>1.0</td>
-<td>1.0</td>
-<td>1.05</td>
-<td>1.04</td>
 </tr>
 <tr class="row-odd"><td>Poisson</td>
-<td>1.48</td>
-<td>1.32</td>
-<td>1.03</td>
-<td>1.01</td>
+<td>1.42</td>
+<td>1.29</td>
+<td>1.07</td>
+<td>1.02</td>
 <td>1.0</td>
-<td>1.14</td>
-<td>1.12</td>
+<td>1.08</td>
+<td>1.09</td>
 </tr>
 <tr class="row-even"><td>Neg. Binomial</td>
-<td>1.12</td>
+<td>1.11</td>
 <td>1.07</td>
-<td>1.01</td>
-<td>1.01</td>
+<td>1.05</td>
+<td>1.02</td>
 <td>1.0</td>
 <td>1.02</td>
-<td>1.02</td>
+<td>1.01</td>
 </tr>
 <tr class="row-odd"><td>Multinomial</td>
 <td>1.06</td>
-<td>1.05</td>
-<td>1.01</td>
+<td>1.03</td>
 <td>1.0</td>
 <td>1.0</td>
-<td>1.01</td>
-<td>1.01</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
 </tr>
 <tr class="row-even"><td>Overall</td>
-<td>1.84</td>
-<td>1.55</td>
-<td>1.14</td>
-<td>1.19</td>
-<td>1.0</td>
+<td>2.61</td>
+<td>1.62</td>
 <td>1.15</td>
-<td>1.22</td>
+<td>1.2</td>
+<td>1.0</td>
+<td>1.16</td>
+<td>1.28</td>
 </tr>
 </tbody>
 </table>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">All timings were taken using Linux and gcc 5.4 on a i7-5600U processor.</p>
+<p class="last">All timings were taken using Linux and gcc 5.4 on a i5-3570 processor.</p>
 </div>
 </div>
 </div>
@@ -477,7 +477,7 @@ performance was computed using a geometric mean.</p>
         <li class="right" >
           <a href="entropy.html" title="System Entropy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+26.g487cd1f documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+27.g6188349 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">
