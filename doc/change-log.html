@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Change Log &#8212; randomstate 1.13.1+24.g13fd21b documentation</title>
+    <title>Change Log &#8212; randomstate 1.13.1+26.g487cd1f documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+24.g13fd21b',
+        VERSION:     '1.13.1+26.g487cd1f',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -55,7 +55,7 @@
         <li class="right" >
           <a href="generated/randomstate.prng.mrg32k3a.zipf.html" title="randomstate.prng.mrg32k3a.zipf"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+24.g13fd21b documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+26.g487cd1f documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -145,9 +145,10 @@
 <div class="section" id="since-version-1-13">
 <h2>Since Version 1.13<a class="headerlink" href="#since-version-1-13" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Add Ziggurat generator for standard exponential
-(<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_exponential.html#randomstate.prng.mt19937.standard_exponential" title="randomstate.prng.mt19937.standard_exponential"><code class="xref py py-meth docutils literal"><span class="pre">standard_exponential()</span></code></a>) for both floats and
-doubles</li>
+<li>Add Ziggurat generation for standard gamma
+(<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_gamma.html#randomstate.prng.mt19937.standard_gamma" title="randomstate.prng.mt19937.standard_gamma"><code class="xref py py-meth docutils literal"><span class="pre">standard_gamma()</span></code></a>) for both floats and
+doubles.  The gamma generator uses a rejection sampler that
+depends on random double, normal and/or exponential values.</li>
 </ul>
 <div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
@@ -155,11 +156,29 @@ doubles</li>
 
 <span class="gp">In [3]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">23456</span><span class="p">)</span>
 
-<span class="gp">In [4]: </span><span class="n">rs</span><span class="o">.</span><span class="n">standard_exponential</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;zig&#39;</span><span class="p">)</span> <span class="c1"># New method</span>
-<span class="gh">Out[4]: </span><span class="go">array([ 0.57465034,  0.7605474 ,  2.57592118])</span>
+<span class="gp">In [4]: </span><span class="n">rs</span><span class="o">.</span><span class="n">standard_gamma</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;zig&#39;</span><span class="p">)</span> <span class="c1"># New method</span>
+<span class="gh">Out[4]: </span><span class="go">3.9545904537846974</span>
 
-<span class="gp">In [5]: </span><span class="n">rs</span><span class="o">.</span><span class="n">standard_exponential</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;inv&#39;</span><span class="p">)</span> <span class="c1"># Old method</span>
-<span class="go">                                                       Out[5]: array([ 0.37352726,  0.17668242,  0.45267949])</span>
+<span class="gp">In [5]: </span><span class="n">rs</span><span class="o">.</span><span class="n">standard_gamma</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;inv&#39;</span><span class="p">)</span> <span class="c1"># Old method</span>
+<span class="go">                           Out[5]: 2.337499061686417</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Add Ziggurat generator for standard exponential
+(<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_exponential.html#randomstate.prng.mt19937.standard_exponential" title="randomstate.prng.mt19937.standard_exponential"><code class="xref py py-meth docutils literal"><span class="pre">standard_exponential()</span></code></a>) for both floats and
+doubles</li>
+</ul>
+<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [6]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="gp">In [7]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
+
+<span class="gp">In [8]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">23456</span><span class="p">)</span>
+
+<span class="gp">In [9]: </span><span class="n">rs</span><span class="o">.</span><span class="n">standard_exponential</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;zig&#39;</span><span class="p">)</span> <span class="c1"># New method</span>
+<span class="gh">Out[9]: </span><span class="go">array([ 0.57465034,  0.7605474 ,  2.57592118])</span>
+
+<span class="gp">In [10]: </span><span class="n">rs</span><span class="o">.</span><span class="n">standard_exponential</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;inv&#39;</span><span class="p">)</span> <span class="c1"># Old method</span>
+<span class="go">                                                       Out[10]: array([ 0.37352726,  0.17668242,  0.45267949])</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -219,19 +238,19 @@ number generators.<ul>
 <li>Added keyword argument <cite>dtype</cite> to <cite>random_sample</cite> which allows for single
 precision as well as double precision uniforms to be generated.</li>
 </ul>
-<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [6]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [11]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
-<span class="gp">In [7]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
+<span class="gp">In [12]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
 
-<span class="gp">In [8]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">23456</span><span class="p">)</span>
+<span class="gp">In [13]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">23456</span><span class="p">)</span>
 
-<span class="gp">In [9]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-<span class="gh">Out[9]: </span><span class="go">array([ 0.32180029,  0.32730047,  0.92742231])</span>
+<span class="gp">In [14]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gh">Out[14]: </span><span class="go">array([ 0.32180029,  0.32730047,  0.92742231])</span>
 
-<span class="gp">In [10]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">23456</span><span class="p">)</span>
+<span class="gp">In [15]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">23456</span><span class="p">)</span>
 
-<span class="gp">In [11]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-<span class="gh">Out[11]: </span><span class="go">array([ 0.32180023,  0.12272525,  0.32730043], dtype=float32)</span>
+<span class="gp">In [16]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="gh">Out[16]: </span><span class="go">array([ 0.32180023,  0.12272525,  0.32730043], dtype=float32)</span>
 </pre></div>
 </div>
 </div>
@@ -296,7 +315,7 @@ array.</li>
         <li class="right" >
           <a href="generated/randomstate.prng.mrg32k3a.zipf.html" title="randomstate.prng.mrg32k3a.zipf"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+24.g13fd21b documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+26.g487cd1f documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

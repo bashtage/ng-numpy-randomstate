@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.mrg32k3a.standard_gamma &#8212; randomstate 1.13.1+24.g13fd21b documentation</title>
+    <title>randomstate.prng.mrg32k3a.standard_gamma &#8212; randomstate 1.13.1+26.g487cd1f documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.13.1+24.g13fd21b',
+        VERSION:     '1.13.1+26.g487cd1f',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="randomstate.prng.mrg32k3a.standard_exponential.html" title="randomstate.prng.mrg32k3a.standard_exponential"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+24.g13fd21b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+26.g487cd1f documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mrg32k3a.html" accesskey="U">MRG32K3A Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -146,7 +146,7 @@
 <h1>randomstate.prng.mrg32k3a.standard_gamma<a class="headerlink" href="#randomstate-prng-mrg32k3a-standard-gamma" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="randomstate.prng.mrg32k3a.standard_gamma">
-<code class="descclassname">randomstate.prng.mrg32k3a.</code><code class="descname">standard_gamma</code><span class="sig-paren">(</span><em>shape</em>, <em>size=None</em>, <em>dtype=np.float64</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.mrg32k3a.standard_gamma" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">randomstate.prng.mrg32k3a.</code><code class="descname">standard_gamma</code><span class="sig-paren">(</span><em>shape</em>, <em>size=None</em>, <em>dtype=np.float64</em>, <em>method='inv'</em>, <em>out=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.mrg32k3a.standard_gamma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw samples from a standard Gamma distribution.</p>
 <p>Samples are drawn from a Gamma distribution with specified parameters,
 shape (sometimes designated “k”) and scale=1.</p>
@@ -162,6 +162,8 @@ a single value is returned if <code class="docutils literal"><span class="pre">s
 <code class="docutils literal"><span class="pre">np.array(shape).size</span></code> samples are drawn.</li>
 <li><strong>dtype</strong> (<em>dtype</em><em>, </em><em>optional</em>) – Desired dtype of the result, either <code class="docutils literal"><span class="pre">np.float64</span></code> (default)
 or <code class="docutils literal"><span class="pre">np.float32</span></code>.</li>
+<li><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – Either ‘inv’ or ‘zig’. ‘inv’ uses the default inverse CDF method.
+‘zig’ uses the much faster Ziggurat method of Marsaglia and Tsang.</li>
 <li><strong>out</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Alternative output array in which to place the result. If size is
 not None, it must have the same shape as the provided size and
 must match the type of the output values.</li>
@@ -262,7 +264,7 @@ the probability density function:</p>
         <li class="right" >
           <a href="randomstate.prng.mrg32k3a.standard_exponential.html" title="randomstate.prng.mrg32k3a.standard_exponential"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+24.g13fd21b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+26.g487cd1f documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mrg32k3a.html" >MRG32K3A Randomstate</a> &#187;</li> 
       </ul>
     </div>
