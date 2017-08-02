@@ -1,7 +1,6 @@
 #pragma once
 #include "random-kit.h"
 #include <stdlib.h>
-#include <malloc.h>
 
 /* parameters for computing Jump */
 #define W_SIZE 32 /* size of unsigned long */
