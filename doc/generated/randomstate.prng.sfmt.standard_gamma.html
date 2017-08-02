@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.sfmt.standard_gamma &#8212; randomstate 1.13.1+34.g4d4228e documentation</title>
+    <title>randomstate.prng.sfmt.standard_gamma &#8212; randomstate 1.13.1+35.g8bd5a71 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.13.1+34.g4d4228e',
+        VERSION:     '1.13.1+35.g8bd5a71',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="randomstate.prng.sfmt.standard_exponential.html" title="randomstate.prng.sfmt.standard_exponential"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+34.g4d4228e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+35.g8bd5a71 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../sfmt.html" accesskey="U">SFMT Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -146,7 +146,7 @@
 <h1>randomstate.prng.sfmt.standard_gamma<a class="headerlink" href="#randomstate-prng-sfmt-standard-gamma" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="randomstate.prng.sfmt.standard_gamma">
-<code class="descclassname">randomstate.prng.sfmt.</code><code class="descname">standard_gamma</code><span class="sig-paren">(</span><em>shape</em>, <em>size=None</em>, <em>dtype=np.float64</em>, <em>method='inv'</em>, <em>out=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.sfmt.standard_gamma" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">randomstate.prng.sfmt.</code><code class="descname">standard_gamma</code><span class="sig-paren">(</span><em>shape</em>, <em>size=None</em>, <em>dtype='d'</em>, <em>method='inv'</em>, <em>out=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.sfmt.standard_gamma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw samples from a standard Gamma distribution.</p>
 <p>Samples are drawn from a Gamma distribution with specified parameters,
 shape (sometimes designated “k”) and scale=1.</p>
@@ -160,8 +160,9 @@ shape (sometimes designated “k”) and scale=1.</p>
 <code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  If size is <code class="docutils literal"><span class="pre">None</span></code> (default),
 a single value is returned if <code class="docutils literal"><span class="pre">shape</span></code> is a scalar.  Otherwise,
 <code class="docutils literal"><span class="pre">np.array(shape).size</span></code> samples are drawn.</li>
-<li><strong>dtype</strong> (<em>dtype</em><em>, </em><em>optional</em>) – Desired dtype of the result, either <code class="docutils literal"><span class="pre">np.float64</span></code> (default)
-or <code class="docutils literal"><span class="pre">np.float32</span></code>.</li>
+<li><strong>dtype</strong> (<em>{str</em><em>, </em><em>dtype}</em><em>, </em><em>optional</em>) – Desired dtype of the result, either ‘d’ (or ‘float64’) or ‘f’
+(or ‘float32’). All dtypes are determined by their name. The
+default value is ‘d’.</li>
 <li><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – Either ‘inv’ or ‘zig’. ‘inv’ uses the default inverse CDF method.
 ‘zig’ uses the much faster Ziggurat method of Marsaglia and Tsang.</li>
 <li><strong>out</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Alternative output array in which to place the result. If size is
@@ -264,7 +265,7 @@ the probability density function:</p>
         <li class="right" >
           <a href="randomstate.prng.sfmt.standard_exponential.html" title="randomstate.prng.sfmt.standard_exponential"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+34.g4d4228e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+35.g8bd5a71 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../sfmt.html" >SFMT Randomstate</a> &#187;</li> 
       </ul>
     </div>
