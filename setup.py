@@ -163,7 +163,7 @@ for rng in rngs:
         sources += [join(mod_dir, 'interface', 'sfmt', 'sfmt-shim.c')]
         # TODO: HAVE_SSE2 should only be for platforms that have SSE2
         # TODO: But how to reliably detect?
-        defs = [('RS_SFMT', '1')]
+        defs = [('RS_SFMT', '1'), ('SFMT_MEXP', '19937')]
         if USE_SSE2:
             defs += [('HAVE_SSE2', '1')]
 

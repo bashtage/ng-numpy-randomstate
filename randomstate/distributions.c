@@ -1611,8 +1611,7 @@ static float standard_exponential_zig_float_unlikely(aug_state* state, uint8_t i
 {
     if (idx == 0)
     {
-        // TODO: Replace with float ?
-        return ziggurat_exp_r - logf(random_float(state));
+        return ziggurat_exp_r_f - logf(random_float(state));
     }
     else if ((fe_float[idx - 1] - fe_float[idx]) * random_float(state) + fe_float[idx] < expf(-x))
     {
