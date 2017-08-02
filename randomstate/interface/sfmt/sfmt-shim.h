@@ -65,4 +65,4 @@ extern void set_seed_by_array(aug_state *state, uint32_t init_key[],
 
 extern void set_seed(aug_state *state, uint32_t seed);
 
-// extern void jump_state(aug_state* state);
+extern void jump_state(aug_state* state);

@@ -1,4 +1,5 @@
 DEF RS_RNG_NAME = u'sfmt'
+DEF RS_RNG_JUMPABLE = 1
 DEF SFMT_MEXP = 19937
 DEF SFMT_N = 156 # (SFMT_MEXP / 128 + 1)
 DEF RS_SEED_NBYTES = 1
@@ -121,6 +122,23 @@ number of probability distributions to choose from.
 >>> seed = random_entropy()
 >>> rs = [rnd.RandomState(seed) for _ in range(10)]
 
+**Parallel Features**
+
+``sfmt.RandomState`` can be used in parallel applications by
+calling the method ``jump`` which advances the state as-if :math:`2^{128}`
+random numbers have been generated [2]_. This allows the original sequence to
+be split so that distinct segments can be used in each worker process.  All
+generators should be initialized with the same seed to ensure that the
+segments come from the same sequence.
+
+>>> from randomstate.entropy import random_entropy
+>>> import randomstate.prng.sfmt as rnd
+>>> seed = random_entropy()
+>>> rs = [rnd.RandomState(seed) for _ in range(10)]
+# Advance rs[i] by i jumps
+>>> for i in range(10):
+        rs[i].jump(i)
+        
 **State and Seeding**
 
 The ``sfmt.RandomState`` state vector consists of a 624 element array of
@@ -139,4 +157,26 @@ state values.
 .. [1] Mutsuo Saito and Makoto Matsumoto, "SIMD-oriented Fast Mersenne
        Twister: a 128-bit Pseudorandom Number Generator." Monte Carlo
        and Quasi-Monte Carlo Methods 2006, Springer, pp. 607 -- 622, 2008.
+"""
+
+DEF JUMP_DOCSTRING = u"""
+jump(iter = 1)
+
+Jumps the state of the random number generator as-if 2**128 random numbers
+have been generated.
+
+Parameters
+----------
+iter : integer, positive
+    Number of times to jump the state of the prng.
+
+Returns
+-------
+out : None
+    Returns 'None' on success.
+
+Notes
+-----
+Jumping the rng state resets any pre-computed random numbers. This is required
+to ensure exact reproducibility.
 """
