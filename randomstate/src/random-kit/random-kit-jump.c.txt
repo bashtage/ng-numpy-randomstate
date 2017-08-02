@@ -1,0 +1,194 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+/* parameters of Mersenne Twister */
+#define N 624
+#define M 397
+#define MATRIX_A 0x9908b0dfUL   /* constant vector a */
+#define UPPER_MASK 0x80000000UL /* most significant w-r bits */
+#define LOWER_MASK 0x7fffffffUL /* least significant r bits */
+
+/* parameters for computing Jump */
+#define W_SIZE 32 /* size of unsigned long */
+#define MEXP 19937
+#define P_SIZE ((MEXP/W_SIZE)+1)
+#define LSB 0x00000001ul
+#define QQ 7
+#define LL 128  /* LL = 2^(QQ) */
+
+typedef struct{
+  unsigned long s[N];
+  int ptr;
+}State;
+
+/* initial state */
+State s0;
+
+
+void randomkit_jump(randomkit_state * state, const char * jump_str)
+{
+  unsigned long h[LL];
+  randomkit_state vec_h[LL];
+
+  pf = (unsigned long *)calloc(P_SIZE, sizeof(unsigned long));
+  for (i=MEXP-1; i>-1; i--){
+    if (jump_str[i] == '1')
+      set_coef(pf, i, 1);
+  }
+
+  gen_vec_h(state, &vec_h, &h);
+  calc_state(pf, state, &vec_h);
+  free(pf);
+}
+
+void gen_vec_h(randomkit_state *state, randomkit_state *vec_h, unsigned long *h)
+{
+  int i;
+  unsigned long k, g;
+  State v;
+
+  gray_code(h);
+
+  copy_state(&vec_h[0], state);
+
+  for(i=0; i<QQ; i++)
+    gen_next(&vec_h[0]);
+
+  for (i=1; i<LL; i++){
+    copy_state(&v, state);
+    g = h[i] ^ h[i-1];
+    for (k=1; k<g; k=(k<<1))
+      gen_next(&v);
+    copy_state(&vec_h[h[i]], &vec_h[h[i-1]]);
+    add_state(&vec_h[h[i]], &v);
+  }
+}
+
+void gray_code(unsigned long *h)
+{
+  unsigned int i, j=1, l=1, term = LL;
+
+  h[0] = 0;
+
+  for (i=1; i<=QQ; i++){
+      l = (l << 1);
+      term = (term >> 1);
+      for (; j<l; j++)
+	  h[j] = h[l-j-1] ^ term;
+  }
+}
+
+
+void copy_state(randomkit_state *target_state, randomkit_state *state)
+{
+  int i;
+
+  for(i=0; i<N; i++)
+    target_state->key[i] = state->key[i];
+
+  target_state->pos = state->pos;
+}
+
+/* next state generating function */
+void gen_next(randomkit_state *state)
+{
+  int num;
+  unsigned long y;
+  static unsigned long mag02[2]={0x0ul, MATRIX_A};
+
+  num = state->pos;
+  if (num < N-M){
+      y = (state->key[num] & UPPER_MASK) | (state->key[num+1] & LOWER_MASK);
+      ss->key[num] = ss->key[num+M] ^ (y >> 1) ^ mag02[y % 2];
+      ss->pos++;
+  }
+  else if (num < N-1){
+      y = (ss->key[num] & UPPER_MASK) | (ss->key[num+1] & LOWER_MASK);
+      ss->key[num] = ss->key[num+(M-N)] ^ (y >> 1) ^ mag02[y % 2];
+      ss->pos++;
+  }
+  else if (num == N-1){
+      y = (ss->key[N-1] & UPPER_MASK) | (ss->key[0] & LOWER_MASK);
+      ss->key[N-1] = ss->key[M-1] ^ (y >> 1) ^ mag02[y % 2];
+      ss->pos = 0;
+  }
+}
+
+void add_state(randomkit_state *s1, randomkit_state *s2)
+{
+  int i, pt1=s1->pos, pt2=s2->pos;
+
+  if (pt2-pt1 >= 0){
+    for (i=0; i<N-pt2; i++)
+      s1->key[i+pt1] ^= s2->key[i+pt2];
+    for(; i<N-pt1; i++)
+      s1->key[i+pt1] ^= s2->key[i+(pt2-N)];
+    for(; i<N; i++)
+      s1->key[i+(pt1-N)] ^= s2->key[i+(pt2-N)];
+  }
+  else{
+    for (i=0; i<N-pt1; i++)
+      s1->key[i+pt1] ^= s2->key[i+pt2];
+    for(; i<N-pt2; i++)
+      s1->key[i+(pt1-N)] ^= s2->key[i+pt2];
+    for(; i<N; i++)
+      s1->key[i+(pt1-N)] ^= s2->key[i+(pt2-N)];
+  }
+}
+
+
+/* compute pf(ss) using Sliding window algorithm */
+void calc_state(unsigned long *pf, randomkit_state *state, randomkit_state *vec_h)
+{
+  randomkit_state *temp1;
+  int i=MEXP-1, j, digit, skip=0;
+
+  temp1 = (randomkit_state *)calloc(1, sizeof(randomkit_state));
+
+  while (get_coef(pf,i) == 0)
+    i--;
+
+  for (; i>=QQ; i--){
+    if (get_coef(pf,i) != 0){
+      for (j=0; j<QQ+1; j++)
+	gen_next(temp1);
+      digit = 0;
+      for (j=0; j<QQ; j++)
+	digit = (digit << 1) ^ get_coef(pf, i-j-1);
+      add_state(temp1, &vec_h[digit]);
+      i -= QQ;
+    }
+    else
+      gen_next(temp1);
+  }
+
+  for (; i>-1; i--){
+    gen_next(temp1);
+    if (get_coef(pf,i) == 1)
+      add_state(temp1, ss);
+    else
+      ;
+  }
+  return(temp1);
+}
+
+
+/* 32-bits function */
+/* return the i-th coefficient of the polynomial pf */
+unsigned long get_coef(unsigned long *pf, unsigned int deg)
+{
+  if ((pf[deg >> 5] & (LSB << (deg & 0x1ful))) != 0)
+    return(1);
+  else
+    return(0);
+}
+
+/* 32-bit function */
+/* set the coefficient of the polynomial pf with v */
+void set_coef(unsigned long *pf, unsigned int deg, unsigned long v)
+{
+  if (v != 0)
+    pf[deg >> 5] ^= (LSB << (deg & 0x1ful));
+  else
+    ;
+}

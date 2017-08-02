@@ -1,3 +1,4 @@
+#pragma once
 #include <math.h>
 #ifdef _WIN32
 #include "../common/stdint.h"

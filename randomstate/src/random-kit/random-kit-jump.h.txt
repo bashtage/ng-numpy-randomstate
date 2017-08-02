@@ -1,0 +1,17 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+/* operations for polynomials */
+void random_poly(unsigned long *);
+void gray_code(void);
+unsigned long get_coef(unsigned long *, unsigned int);
+void set_coef(unsigned long *, unsigned int, unsigned long);
+
+/* operations for states */
+State *calc_state(unsigned long *, State *);
+void copy_state(State *, State *);
+State *horner1(unsigned long *, State *);
+void gen_next(State *);
+void add_state(State *, State *);
+int compare_state(State *, State *);
+void gen_vec_h(State *);
