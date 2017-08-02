@@ -72,13 +72,6 @@ was made will be noted in the relevant docstring. Extension of existing
 parameter ranges and the addition of new parameters is allowed as long the
 previous behavior remains unchanged.
 
-``mt19937.RandomState`` can be used in parallel applications by
-calling the method ``jump`` which advances the state as-if :math:`2^{128}`
-random numbers have been generated [2]_. This allows the original sequence to
-be split so that distinct segments can be used in each worker process.  All
-generators should be initialized with the same seed to ensure that the
-segments come from the same sequence. 
-
 Parameters
 ----------
 seed : {None, int, array_like}, optional
@@ -96,4 +89,54 @@ pseudo-random number generator with a number of methods that are similar
 to the ones available in ``RandomState``. ``RandomState``, besides being
 NumPy-aware, has the advantage that it provides a much larger number
 of probability distributions to choose from.
+
+**Parallel Features**
+
+``mt19937.RandomState`` can be used in parallel applications by
+calling the method ``jump`` which advances the state as-if :math:`2^{128}`
+random numbers have been generated ([1]_, [2]_). This allows the original sequence to
+be split so that distinct segments can be used in each worker process.  All
+generators should be initialized with the same seed to ensure that the
+segments come from the same sequence.
+
+>>> from randomstate.entropy import random_entropy
+>>> import randomstate.prng.mt19937 as rnd
+>>> seed = random_entropy()
+>>> rs = [rnd.RandomState(seed) for _ in range(10)]
+# Advance rs[i] by i jumps
+>>> for i in range(10):
+        rs[i].jump(i)
+
+References
+----------
+.. [1] Hiroshi Haramoto, Makoto Matsumoto, and Pierre L\'Ecuyer, "A Fast
+       Jump Ahead Algorithm for Linear Recurrences in a Polynomial Space",
+       Sequences and Their Applications - SETA, 290--298, 2008.        
+.. [2] Hiroshi Haramoto, Makoto Matsumoto, Takuji Nishimura, François 
+       Panneton, Pierre L\'Ecuyer, "Efficient Jump Ahead for F2-Linear
+       Random Number Generators", INFORMS JOURNAL ON COMPUTING, Vol. 20, 
+       No. 3, Summer 2008, pp. 385-390.
+
+"""
+
+DEF JUMP_DOCSTRING = u"""
+jump(iter = 1)
+
+Jumps the state of the random number generator as-if 2**128 random numbers
+have been generated.
+
+Parameters
+----------
+iter : integer, positive
+    Number of times to jump the state of the prng.
+
+Returns
+-------
+out : None
+    Returns 'None' on success.
+
+Notes
+-----
+Jumping the rng state resets any pre-computed random numbers. This is required
+to ensure exact reproducibility.
 """

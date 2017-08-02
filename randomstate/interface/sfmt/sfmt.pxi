@@ -81,7 +81,7 @@ RandomState(seed=None)
 
 Container for the SIMD-based Mersenne Twister pseudo-random number generator.
 
-``dSFMT.RandomState`` exposes a number of methods for generating random
+``sfmt.RandomState`` exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions [1]_ . In addition
 to the distribution-specific arguments, each method takes a keyword argument
 `size` that defaults to ``None``. If `size` is ``None``, then a single
@@ -91,8 +91,8 @@ then an array with that shape is filled and returned.
 
 **No Compatibility Guarantee**
 
-``dSFMT.RandomState`` does not make a guarantee that a fixed seed and a
-fixed series of calls to ``dSFMT.RandomState`` methods using the same
+``sfmt.RandomState`` does not make a guarantee that a fixed seed and a
+fixed series of calls to ``sfmt.RandomState`` methods using the same
 parameters will always produce the same results. This is different from
 ``numpy.random.RandomState`` guarantee. This is done to simplify improving
 random number generators.  To ensure identical results, you must use the
@@ -104,7 +104,7 @@ seed : {None, int, array_like}, optional
     Random seed initializing the pseudo-random number generator.
     Can be an integer in [0, 2**32-1], array of integers in
     [0, 2**32-1] or ``None`` (the default). If `seed` is ``None``,
-    then ``dSFMT.RandomState`` will try to read entropy from
+    then ``sfmt.RandomState`` will try to read entropy from
     ``/dev/urandom`` (or the Windows analog) if available to
     produce a 64-bit seed. If unavailable, the a 64-bit hash of the time
     and process ID is used.
@@ -154,9 +154,14 @@ hashing function is used as the initial state. Using a single 32-bit value
 for the seed can only initialize a small range of the possible initial
 state values.
 
+References
+----------
 .. [1] Mutsuo Saito and Makoto Matsumoto, "SIMD-oriented Fast Mersenne
        Twister: a 128-bit Pseudorandom Number Generator." Monte Carlo
        and Quasi-Monte Carlo Methods 2006, Springer, pp. 607 -- 622, 2008.
+.. [2] Hiroshi Haramoto, Makoto Matsumoto, and Pierre L\'Ecuyer, "A Fast
+       Jump Ahead Algorithm for Linear Recurrences in a Polynomial Space",
+       Sequences and Their Applications - SETA, 290--298, 2008.
 """
 
 DEF JUMP_DOCSTRING = u"""

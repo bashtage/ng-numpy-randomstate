@@ -53,9 +53,10 @@ RandomState(seed=None)
 Container for the xorshift1024* pseudo-random number generator.
 
 xorshift1024* is a 64-bit implementation of Saito and Matsumoto's XSadd
-generator [1]_. xorshift1024* has a period of :math:`2^{1024} - 1` and
-supports jumping the sequence in increments of :math:`2^{512}`, which allows
-multiple non-overlapping sequences to be generated.
+generator [1]_ (see also [2]_, [3]_, [4]_). xorshift1024* has a period of 
+:math:`2^{1024} - 1` and supports jumping the sequence in increments of 
+:math:`2^{512}`, which allows multiple non-overlapping sequences to be 
+generated.
 
 ``xorshift1024.RandomState`` exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the

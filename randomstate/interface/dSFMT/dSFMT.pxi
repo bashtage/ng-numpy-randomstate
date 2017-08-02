@@ -155,6 +155,8 @@ hashing function is used as the initial state. Using a single 32-bit value
 for the seed can only initialize a small range of the possible initial
 state values.
 
+References
+----------
 .. [1] Mutsuo Saito and Makoto Matsumoto, "SIMD-oriented Fast Mersenne
        Twister: a 128-bit Pseudorandom Number Generator." Monte Carlo
        and Quasi-Monte Carlo Methods 2006, Springer, pp. 607 -- 622, 2008.
