@@ -831,10 +831,10 @@ cdef class RandomState:
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
-        dtype : dtype, optional
-            Desired dtype of the result. All dtypes are determined by their
-            name, either 'float64' or 'float32'. The default value is
-            'float64'.
+        dtype : {str, dtype}, optional
+            Desired dtype of the result, either 'd' (or 'float64') or 'f'
+            (or 'float32'). All dtypes are determined by their name. The
+            default value is 'd'.
         out : ndarray, optional
             Alternative output array in which to place the result. If size is not None,
             it must have the same shape as the provided size and must match the type of
@@ -958,7 +958,7 @@ cdef class RandomState:
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
-        dtype : dtype, optional
+        dtype : {str, dtype}, optional
             Desired dtype of the result. All dtypes are determined by their
             name, i.e., 'int64', 'int', etc, so byteorder is not available
             and a specific precision may have different C types depending
@@ -1362,7 +1362,7 @@ cdef class RandomState:
 
     def rand(self, *args, dtype=np.float64):
         """
-        rand(d0, d1, ..., dn, dtype='float64')
+        rand(d0, d1, ..., dn, dtype='d')
 
         Random values in a given shape.
 
@@ -1375,10 +1375,10 @@ cdef class RandomState:
         d0, d1, ..., dn : int, optional
             The dimensions of the returned array, should all be positive.
             If no argument is given a single Python float is returned.
-        dtype : dtype, optional
-            Desired dtype of the result. All dtypes are determined by their
-            name, either 'float64' or 'float32'. The default value is
-            'float64'.
+        dtype : {str, dtype}, optional
+            Desired dtype of the result, either 'd' (or 'float64') or 'f'
+            (or 'float32'). All dtypes are determined by their name. The
+            default value is 'd'.
 
         Returns
         -------
@@ -1410,7 +1410,7 @@ cdef class RandomState:
 
     def randn(self, *args, method=__normal_method, dtype=np.float64):
         """
-        randn(d0, d1, ..., dn, method='bm', dtype='float64')
+        randn(d0, d1, ..., dn, method='bm', dtype='d')
 
         Return a sample (or samples) from the "standard normal" distribution.
 
@@ -1431,12 +1431,13 @@ cdef class RandomState:
             The dimensions of the returned array, should be all positive.
             If no argument is given a single Python float is returned.
         method : str, optional
-            Either 'bm' or 'zig'. 'bm' uses the default Box-Muller transformations
-            method.  'zig' uses the much faster Ziggurat method of Marsaglia and Tsang.
-        dtype : dtype, optional
-            Desired dtype of the result. All dtypes are determined by their
-            name, either 'float64' or 'float32'. The default value is
-            'float64'.
+            Either 'bm' or 'zig'. 'bm' uses the default Box-Muller
+            transformations method.  'zig' uses the much faster Ziggurat
+            method of Marsaglia and Tsang.
+        dtype : {str, dtype}, optional
+            Desired dtype of the result, either 'd' (or 'float64') or 'f'
+            (or 'float32'). All dtypes are determined by their name. The
+            default value is 'd'.
 
         Returns
         -------
@@ -1582,10 +1583,10 @@ cdef class RandomState:
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
-        dtype : dtype, optional
-            Desired dtype of the result. All dtypes are determined by their
-            name, either 'float64' or 'float32'. The default value is
-            'float64'.
+        dtype : {str, dtype}, optional
+            Desired dtype of the result, either 'd' (or 'float64') or 'f'
+            (or 'float32'). All dtypes are determined by their name. The
+            default value is 'd'.
         method : str, optional
             Either 'bm' or 'zig'. 'bm' uses the default Box-Muller transformations
             method.  'zig' uses the much faster Ziggurat method of Marsaglia and Tsang.
@@ -2021,7 +2022,7 @@ cdef class RandomState:
 
     def standard_exponential(self, size=None, dtype=np.float64, method=u'inv', out=None):
         """
-        standard_exponential(size=None, dtype=np.float64, method='inv', out=None)
+        standard_exponential(size=None, dtype='d', method='inv', out=None)
 
         Draw samples from the standard exponential distribution.
 
@@ -2035,16 +2036,16 @@ cdef class RandomState:
             ``m * n * k`` samples are drawn.  Default is None, in which case a
             single value is returned.
         dtype : dtype, optional
-            Desired dtype of the result. All dtypes are determined by their
-            name, either 'float64' or 'float32'. The default value is
-            'float64'.
+            Desired dtype of the result, either 'd' (or 'float64') or 'f'
+            (or 'float32'). All dtypes are determined by their name. The
+            default value is 'd'.
         method : str, optional
             Either 'inv' or 'zig'. 'inv' uses the default inverse CDF method.
             'zig' uses the much faster Ziggurat method of Marsaglia and Tsang.
         out : ndarray, optional
-            Alternative output array in which to place the result. If size is not None,
-            it must have the same shape as the provided size and must match the type of
-            the output values.
+            Alternative output array in which to place the result. If size is
+            not None, it must have the same shape as the provided size and must
+            match the type of the output values.
 
         Returns
         -------
@@ -2085,7 +2086,7 @@ cdef class RandomState:
     def standard_gamma(self, shape, size=None, dtype=np.float64, method='inv',
                        out=None):
         """
-        standard_gamma(shape, size=None, dtype=np.float64, method='inv', out=None)
+        standard_gamma(shape, size=None, dtype='d', method='inv', out=None)
 
         Draw samples from a standard Gamma distribution.
 
@@ -2101,9 +2102,10 @@ cdef class RandomState:
             ``m * n * k`` samples are drawn.  If size is ``None`` (default),
             a single value is returned if ``shape`` is a scalar.  Otherwise,
             ``np.array(shape).size`` samples are drawn.
-        dtype : dtype, optional
-            Desired dtype of the result, either ``np.float64`` (default)
-            or ``np.float32``.
+        dtype : {str, dtype}, optional
+            Desired dtype of the result, either 'd' (or 'float64') or 'f'
+            (or 'float32'). All dtypes are determined by their name. The
+            default value is 'd'.
         method : str, optional
             Either 'inv' or 'zig'. 'inv' uses the default inverse CDF method.
             'zig' uses the much faster Ziggurat method of Marsaglia and Tsang.
