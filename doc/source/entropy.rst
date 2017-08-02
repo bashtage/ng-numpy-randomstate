@@ -1,4 +1,6 @@
 System Entropy
 ==============
 
-.. autofunction:: randomstate.entropy.random_entropy
+.. module:: randomstate.entropy
+
+.. autofunction:: random_entropy

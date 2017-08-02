@@ -1,4 +1,5 @@
 #include "sfmt-shim.h"
+#include "sfmt-poly.h"
 
 extern inline uint32_t random_uint32(aug_state *state);
 
@@ -33,7 +34,7 @@ void entropy_init(aug_state *state) {
   set_seed(state, seeds[0]);
 }
 
-// void jump_state(aug_state* state)
-//{
-//    dSFMT_jump(state->rng, poly_128);
-//}
+void jump_state(aug_state* state)
+{
+    SFMT_jump(state->rng, poly_128);
+}

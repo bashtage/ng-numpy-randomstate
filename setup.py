@@ -151,7 +151,6 @@ for rng in rngs:
         sources += [join(mod_dir, 'src', 'dSFMT', 'dSFMT-jump.c')]
         sources += [join(mod_dir, 'interface', 'dSFMT', 'dSFMT-shim.c')]
         # TODO: HAVE_SSE2 should only be for platforms that have SSE2
-        # TODO: But how to reliably detect?
         defs = [('RS_DSFMT', '1'), ('DSFMT_MEXP', '19937')]
         if USE_SSE2:
             defs += [('HAVE_SSE2', '1')]
@@ -159,10 +158,9 @@ for rng in rngs:
         include_dirs += [join(mod_dir, 'src', 'dSFMT')]
     elif rng == 'RNG_SFMT':
         sources += [join(mod_dir, 'src', 'sfmt', 'sfmt.c')]
-        # sources += [join(mod_dir, 'src', 'sfmt', 'sfmt-jump.c')]
+        sources += [join(mod_dir, 'src', 'sfmt', 'sfmt-jump.c')]
         sources += [join(mod_dir, 'interface', 'sfmt', 'sfmt-shim.c')]
         # TODO: HAVE_SSE2 should only be for platforms that have SSE2
-        # TODO: But how to reliably detect?
         defs = [('RS_SFMT', '1'), ('SFMT_MEXP', '19937')]
         if USE_SSE2:
             defs += [('HAVE_SSE2', '1')]
