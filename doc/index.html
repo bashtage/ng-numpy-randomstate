@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate’s documentation &#8212; randomstate 1.13.1+28.gfd9c111 documentation</title>
+    <title>randomstate’s documentation &#8212; randomstate 1.13.1+30.gb1fd9ad documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+28.gfd9c111',
+        VERSION:     '1.13.1+30.gb1fd9ad',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -55,7 +55,7 @@
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+28.gfd9c111 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+30.gb1fd9ad documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -151,8 +151,8 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [2]: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;bm&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">36.7 ms +- 39.4 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">9.37 ms +- 86.7 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">35.5 ms +- 48.2 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">9 ms +- 344 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_exponential</span>
@@ -160,8 +160,8 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [5]: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">47.6 ms +- 269 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">5.54 ms +- 129 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">46.9 ms +- 160 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">5.04 ms +- 24.9 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_gamma</span>
@@ -169,8 +169,8 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [8]: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">54.3 ms +- 994 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">29.1 ms +- 1.55 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">50.5 ms +- 56.2 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">29.3 ms +- 131 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -244,7 +244,9 @@ one of two ways:</p>
 generators, ‘in addition’ to the standard PRNG in NumPy.  The included PRNGs are:</p>
 <ul class="simple">
 <li>MT19937 - The standard NumPy generator.  Produces identical results to NumPy
-using the same seed/state. See <a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/routines.random.html">NumPy’s documentation</a>.</li>
+using the same seed/state. Adds a jump function that advances the generator
+as-if 2**128 draws have been made (<a class="reference internal" href="generated/randomstate.prng.mt19937.jump.html#randomstate.prng.mt19937.jump" title="randomstate.prng.mt19937.jump"><code class="xref py py-meth docutils literal"><span class="pre">randomstate.prng.mt19937.jump()</span></code></a>).
+See <a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/routines.random.html">NumPy’s documentation</a>.</li>
 <li>dSFMT - A SSE2 enables version of the MT19937 generator.  Theoretically the
 same, but with a different state and so it is not possible to produce a
 sequence identical to MT19937. See the <a class="reference external" href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/">dSFMT authors’ page</a>.</li>
@@ -297,6 +299,7 @@ performance than more modern generators.</li>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="mt19937.html">MT19937</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="mt19937.html#random-generator">Random generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mt19937.html#parallel-generation">Parallel generation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mt19937.html#simple-random-data">Simple random data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mt19937.html#permutations">Permutations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mt19937.html#distributions">Distributions</a></li>
@@ -432,7 +435,7 @@ performance than more modern generators.</li>
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+28.gfd9c111 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+30.gb1fd9ad documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

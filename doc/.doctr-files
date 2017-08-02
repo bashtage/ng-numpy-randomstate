@@ -176,6 +176,7 @@ doc/_sources/generated/randomstate.prng.mt19937.geometric.rst.txt
 doc/_sources/generated/randomstate.prng.mt19937.get_state.rst.txt
 doc/_sources/generated/randomstate.prng.mt19937.gumbel.rst.txt
 doc/_sources/generated/randomstate.prng.mt19937.hypergeometric.rst.txt
+doc/_sources/generated/randomstate.prng.mt19937.jump.rst.txt
 doc/_sources/generated/randomstate.prng.mt19937.laplace.rst.txt
 doc/_sources/generated/randomstate.prng.mt19937.logistic.rst.txt
 doc/_sources/generated/randomstate.prng.mt19937.lognormal.rst.txt
@@ -837,6 +838,7 @@ doc/generated/randomstate.prng.mt19937.geometric.html
 doc/generated/randomstate.prng.mt19937.get_state.html
 doc/generated/randomstate.prng.mt19937.gumbel.html
 doc/generated/randomstate.prng.mt19937.hypergeometric.html
+doc/generated/randomstate.prng.mt19937.jump.html
 doc/generated/randomstate.prng.mt19937.laplace.html
 doc/generated/randomstate.prng.mt19937.logistic.html
 doc/generated/randomstate.prng.mt19937.lognormal.html

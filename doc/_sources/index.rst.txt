@@ -88,7 +88,9 @@ The main innovation is the inclusion of a number of alternative pseudo-random nu
 generators, 'in addition' to the standard PRNG in NumPy.  The included PRNGs are:
 
 * MT19937 - The standard NumPy generator.  Produces identical results to NumPy
-  using the same seed/state. See `NumPy's documentation`_.
+  using the same seed/state. Adds a jump function that advances the generator
+  as-if 2**128 draws have been made (:meth:`randomstate.prng.mt19937.jump`).
+  See `NumPy's documentation`_.
 * dSFMT - A SSE2 enables version of the MT19937 generator.  Theoretically the
   same, but with a different state and so it is not possible to produce a
   sequence identical to MT19937. See the `dSFMT authors' page`_.

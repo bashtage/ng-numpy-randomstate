@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>MT19937 Randomstate &#8212; randomstate 1.13.1+28.gfd9c111 documentation</title>
+    <title>MT19937 Randomstate &#8212; randomstate 1.13.1+30.gb1fd9ad documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+28.gfd9c111',
+        VERSION:     '1.13.1+30.gb1fd9ad',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="performance.html" title="Performance"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+28.gfd9c111 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+30.gb1fd9ad documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -88,6 +88,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">MT19937</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#random-generator">Random generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parallel-generation">Parallel generation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#simple-random-data">Simple random data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#permutations">Permutations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#distributions">Distributions</a></li>
@@ -162,6 +163,12 @@ incorrect. Incorrect values will be fixed and the version in which the fix
 was made will be noted in the relevant docstring. Extension of existing
 parameter ranges and the addition of new parameters is allowed as long the
 previous behavior remains unchanged.</p>
+<p><code class="docutils literal"><span class="pre">mt19937.RandomState</span></code> can be used in parallel applications by
+calling the method <code class="docutils literal"><span class="pre">jump</span></code> which advances the state as-if <span class="math">\(2^{128}\)</span>
+random numbers have been generated <a href="#id2"><span class="problematic" id="id3"><span id="id1"></span>[2]_</span></a>. This allows the original sequence to
+be split so that distinct segments can be used in each worker process.  All
+generators should be initialized with the same seed to ensure that the
+segments come from the same sequence.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -197,6 +204,20 @@ of probability distributions to choose from.</p>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mt19937.set_state.html#randomstate.prng.mt19937.set_state" title="randomstate.prng.mt19937.set_state"><code class="xref py py-obj docutils literal"><span class="pre">set_state</span></code></a>(state)</td>
 <td>Set the internal state of the generator from a tuple.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="parallel-generation">
+<h2>Parallel generation<a class="headerlink" href="#parallel-generation" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mt19937.jump.html#randomstate.prng.mt19937.jump" title="randomstate.prng.mt19937.jump"><code class="xref py py-obj docutils literal"><span class="pre">jump</span></code></a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -419,7 +440,7 @@ of probability distributions to choose from.</p>
         <li class="right" >
           <a href="performance.html" title="Performance"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+28.gfd9c111 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+30.gb1fd9ad documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">
