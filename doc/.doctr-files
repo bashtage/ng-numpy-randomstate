@@ -338,6 +338,7 @@ doc/_sources/generated/randomstate.prng.sfmt.geometric.rst.txt
 doc/_sources/generated/randomstate.prng.sfmt.get_state.rst.txt
 doc/_sources/generated/randomstate.prng.sfmt.gumbel.rst.txt
 doc/_sources/generated/randomstate.prng.sfmt.hypergeometric.rst.txt
+doc/_sources/generated/randomstate.prng.sfmt.jump.rst.txt
 doc/_sources/generated/randomstate.prng.sfmt.laplace.rst.txt
 doc/_sources/generated/randomstate.prng.sfmt.logistic.rst.txt
 doc/_sources/generated/randomstate.prng.sfmt.lognormal.rst.txt
@@ -1000,6 +1001,7 @@ doc/generated/randomstate.prng.sfmt.geometric.html
 doc/generated/randomstate.prng.sfmt.get_state.html
 doc/generated/randomstate.prng.sfmt.gumbel.html
 doc/generated/randomstate.prng.sfmt.hypergeometric.html
+doc/generated/randomstate.prng.sfmt.jump.html
 doc/generated/randomstate.prng.sfmt.laplace.html
 doc/generated/randomstate.prng.sfmt.logistic.html
 doc/generated/randomstate.prng.sfmt.lognormal.html

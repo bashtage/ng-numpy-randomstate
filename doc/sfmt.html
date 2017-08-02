@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>SFMT Randomstate &#8212; randomstate 1.13.1+32.g2f66258 documentation</title>
+    <title>SFMT Randomstate &#8212; randomstate 1.13.1+34.g4d4228e documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+32.g2f66258',
+        VERSION:     '1.13.1+34.g4d4228e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="generated/randomstate.prng.dsfmt.zipf.html" title="randomstate.prng.dsfmt.zipf"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+32.g2f66258 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+34.g4d4228e documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -90,6 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dsfmt.html">dSFMT</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">SFMT</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#random-generator">Random generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parallel-generation">Parallel generation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#simple-random-data">Simple random data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#permutations">Permutations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#distributions">Distributions</a></li>
@@ -147,7 +148,7 @@
 <em class="property">class </em><code class="descclassname">randomstate.prng.sfmt.</code><code class="descname">RandomState</code><span class="sig-paren">(</span><em>seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.sfmt.RandomState" title="Permalink to this definition">¶</a></dt>
 <dd><p>Container for the SIMD-based Mersenne Twister pseudo-random number generator.</p>
 <p><code class="docutils literal"><span class="pre">dSFMT.RandomState</span></code> exposes a number of methods for generating random
-numbers drawn from a variety of probability distributions <a class="footnote-reference" href="#id2" id="id1">[1]</a> . In addition
+numbers drawn from a variety of probability distributions <a class="footnote-reference" href="#id3" id="id1">[1]</a> . In addition
 to the distribution-specific arguments, each method takes a keyword argument
 <cite>size</cite> that defaults to <code class="docutils literal"><span class="pre">None</span></code>. If <cite>size</cite> is <code class="docutils literal"><span class="pre">None</span></code>, then a single
 value is generated and returned. If <cite>size</cite> is an integer, then a 1-D
@@ -186,6 +187,22 @@ number of probability distributions to choose from.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span> <span class="o">=</span> <span class="p">[</span><span class="n">rnd</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
 </pre></div>
 </div>
+<p><strong>Parallel Features</strong></p>
+<p><code class="docutils literal"><span class="pre">sfmt.RandomState</span></code> can be used in parallel applications by
+calling the method <code class="docutils literal"><span class="pre">jump</span></code> which advances the state as-if <span class="math">\(2^{128}\)</span>
+random numbers have been generated <a href="#id4"><span class="problematic" id="id5"><span id="id2"></span>[2]_</span></a>. This allows the original sequence to
+be split so that distinct segments can be used in each worker process.  All
+generators should be initialized with the same seed to ensure that the
+segments come from the same sequence.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">randomstate.entropy</span> <span class="k">import</span> <span class="n">random_entropy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">randomstate.prng.sfmt</span> <span class="k">as</span> <span class="nn">rnd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seed</span> <span class="o">=</span> <span class="n">random_entropy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span> <span class="o">=</span> <span class="p">[</span><span class="n">rnd</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="go"># Advance rs[i] by i jumps</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+<span class="go">        rs[i].jump(i)</span>
+</pre></div>
+</div>
 <p><strong>State and Seeding</strong></p>
 <p>The <code class="docutils literal"><span class="pre">sfmt.RandomState</span></code> state vector consists of a 624 element array of
 32-bit unsigned integers plus a single integer value between 0 and 624
@@ -198,7 +215,7 @@ used as an input (or inputs) for a hashing function, and the output of the
 hashing function is used as the initial state. Using a single 32-bit value
 for the seed can only initialize a small range of the possible initial
 state values.</p>
-<table class="docutils footnote" frame="void" id="id2" rules="none">
+<table class="docutils footnote" frame="void" id="id3" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Mutsuo Saito and Makoto Matsumoto, “SIMD-oriented Fast Mersenne
@@ -222,6 +239,20 @@ and Quasi-Monte Carlo Methods 2006, Springer, pp. 607 – 622, 2008.</td></tr>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.sfmt.set_state.html#randomstate.prng.sfmt.set_state" title="randomstate.prng.sfmt.set_state"><code class="xref py py-obj docutils literal"><span class="pre">set_state</span></code></a>(state)</td>
 <td>Set the internal state of the generator from a tuple.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="parallel-generation">
+<h2>Parallel generation<a class="headerlink" href="#parallel-generation" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.sfmt.jump.html#randomstate.prng.sfmt.jump" title="randomstate.prng.sfmt.jump"><code class="xref py py-obj docutils literal"><span class="pre">jump</span></code></a>(iter&nbsp;=&nbsp;1)</td>
+<td>Jumps the state of the random number generator as-if 2**128 random numbers have been generated.</td>
 </tr>
 </tbody>
 </table>
@@ -444,7 +475,7 @@ and Quasi-Monte Carlo Methods 2006, Springer, pp. 607 – 622, 2008.</td></tr>
         <li class="right" >
           <a href="generated/randomstate.prng.dsfmt.zipf.html" title="randomstate.prng.dsfmt.zipf"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+32.g2f66258 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+34.g4d4228e documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

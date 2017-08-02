@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Change Log &#8212; randomstate 1.13.1+32.g2f66258 documentation</title>
+    <title>Change Log &#8212; randomstate 1.13.1+34.g4d4228e documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+32.g2f66258',
+        VERSION:     '1.13.1+34.g4d4228e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -55,7 +55,7 @@
         <li class="right" >
           <a href="generated/randomstate.prng.mrg32k3a.zipf.html" title="randomstate.prng.mrg32k3a.zipf"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+32.g2f66258 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+34.g4d4228e documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -95,7 +95,7 @@
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#since-version-1-13">Since Version 1.13</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-13-2">Version 1.13.2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-13">Version 1.13</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-12">Version 1.12</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-11-4">Version 1.11.4</a></li>
@@ -142,8 +142,8 @@
             
   <div class="section" id="change-log">
 <span id="id1"></span><h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="since-version-1-13">
-<h2>Since Version 1.13<a class="headerlink" href="#since-version-1-13" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="version-1-13-2">
+<h2>Version 1.13.2<a class="headerlink" href="#version-1-13-2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Add Ziggurat generation for standard gamma
 (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_gamma.html#randomstate.prng.mt19937.standard_gamma" title="randomstate.prng.mt19937.standard_gamma"><code class="xref py py-meth docutils literal"><span class="pre">standard_gamma()</span></code></a>) for both floats and
@@ -186,6 +186,7 @@ doubles</li>
 (<a class="reference external" href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/">SFMT</a>) generator.</li>
 <li>Add complex normal (<a class="reference internal" href="generated/randomstate.prng.mt19937.complex_normal.html#randomstate.prng.mt19937.complex_normal" title="randomstate.prng.mt19937.complex_normal"><code class="xref py py-meth docutils literal"><span class="pre">complex_normal()</span></code></a>)</li>
 <li>Added support for jumping the MT19937 generator</li>
+<li>Added support for jumping the SFMT generator</li>
 </ul>
 </div>
 <div class="section" id="version-1-13">
@@ -220,8 +221,10 @@ number generators.<ul>
 <ul>
 <li><p class="first">Extended 32-bit generation to</p>
 <ul class="simple">
-<li>Uniforms (<a class="reference internal" href="generated/randomstate.prng.mt19937.random_sample.html#randomstate.prng.mt19937.random_sample" title="randomstate.prng.mt19937.random_sample"><code class="xref py py-meth docutils literal"><span class="pre">random_sample()</span></code></a> and <a class="reference internal" href="generated/randomstate.prng.mt19937.rand.html#randomstate.prng.mt19937.rand" title="randomstate.prng.mt19937.rand"><code class="xref py py-meth docutils literal"><span class="pre">rand()</span></code></a>)</li>
-<li>Normals (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_normal.html#randomstate.prng.mt19937.standard_normal" title="randomstate.prng.mt19937.standard_normal"><code class="xref py py-meth docutils literal"><span class="pre">standard_normal()</span></code></a> and <a class="reference internal" href="generated/randomstate.prng.mt19937.randn.html#randomstate.prng.mt19937.randn" title="randomstate.prng.mt19937.randn"><code class="xref py py-meth docutils literal"><span class="pre">randn()</span></code></a>)</li>
+<li>Uniforms (<a class="reference internal" href="generated/randomstate.prng.mt19937.random_sample.html#randomstate.prng.mt19937.random_sample" title="randomstate.prng.mt19937.random_sample"><code class="xref py py-meth docutils literal"><span class="pre">random_sample()</span></code></a> and
+<a class="reference internal" href="generated/randomstate.prng.mt19937.rand.html#randomstate.prng.mt19937.rand" title="randomstate.prng.mt19937.rand"><code class="xref py py-meth docutils literal"><span class="pre">rand()</span></code></a>)</li>
+<li>Normals (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_normal.html#randomstate.prng.mt19937.standard_normal" title="randomstate.prng.mt19937.standard_normal"><code class="xref py py-meth docutils literal"><span class="pre">standard_normal()</span></code></a> and
+<a class="reference internal" href="generated/randomstate.prng.mt19937.randn.html#randomstate.prng.mt19937.randn" title="randomstate.prng.mt19937.randn"><code class="xref py py-meth docutils literal"><span class="pre">randn()</span></code></a>)</li>
 <li>Standard Gammas (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_gamma.html#randomstate.prng.mt19937.standard_gamma" title="randomstate.prng.mt19937.standard_gamma"><code class="xref py py-meth docutils literal"><span class="pre">standard_gamma()</span></code></a>)</li>
 <li>Standard Exponentials (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_exponential.html#randomstate.prng.mt19937.standard_exponential" title="randomstate.prng.mt19937.standard_exponential"><code class="xref py py-meth docutils literal"><span class="pre">standard_exponential()</span></code></a>)</li>
 </ul>
@@ -269,7 +272,7 @@ array.</li>
 <h2>Version 1.11<a class="headerlink" href="#version-1-11" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Update to recent changes in NumPy’s RandomState</li>
-<li>Expose system entropy through <a class="reference internal" href="entropy.html#randomstate.entropy.random_entropy" title="randomstate.entropy.random_entropy"><code class="xref py py-meth docutils literal"><span class="pre">randomstate.entropy.random_entropy()</span></code></a></li>
+<li>Expose system entropy through <a class="reference internal" href="entropy.html#randomstate.entropy.random_entropy" title="randomstate.entropy.random_entropy"><code class="xref py py-func docutils literal"><span class="pre">randomstate.entropy.random_entropy()</span></code></a></li>
 <li>Add vector initialization for all PRNGs</li>
 </ul>
 </div>
@@ -316,7 +319,7 @@ array.</li>
         <li class="right" >
           <a href="generated/randomstate.prng.mrg32k3a.zipf.html" title="randomstate.prng.mrg32k3a.zipf"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+32.g2f66258 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+34.g4d4228e documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

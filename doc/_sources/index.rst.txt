@@ -5,14 +5,16 @@ that change the core random number generator.
 
 What's New or Different
 -----------------------
-* ``randomstate.entropy.random_entropy`` provides access to the system
+* :func:`randomstate.entropy.random_entropy` provides access to the system
   source of randomness that is used in cryptographic applications (e.g.,
   ``/dev/urandom`` on Unix).
 * Simulate from the complex normal distribution
   (:meth:`~randomstate.prng.mt19937.complex_normal`)
 * The normal, exponential and gamma generators support 256-step Ziggurat
   methods which are 2-10 times faster than NumPy's default implementation in
-  ``standard_normal``, ``standard_exponential`` or ``standard_gamma``.
+  :meth:`~randomstate.prng.mt19937.standard_normal`,
+  :meth:`~randomstate.prng.mt19937.standard_exponential` or
+  :meth:`~randomstate.prng.mt19937.standard_gamma`.
   The Ziggurat generator can be accessed by passing the keyword
   argument ``method='zig'``.
 
@@ -38,8 +40,10 @@ What's New or Different
   to produce either single or double prevision uniform random variables for
   select distributions
 
-  * Uniforms (:meth:`~randomstate.prng.mt19937.random_sample` and :meth:`~randomstate.prng.mt19937.rand`)
-  * Normals (:meth:`~randomstate.prng.mt19937.standard_normal` and :meth:`~randomstate.prng.mt19937.randn`)
+  * Uniforms (:meth:`~randomstate.prng.mt19937.random_sample` and
+    :meth:`~randomstate.prng.mt19937.rand`)
+  * Normals (:meth:`~randomstate.prng.mt19937.standard_normal` and
+    :meth:`~randomstate.prng.mt19937.randn`)
   * Standard Gammas (:meth:`~randomstate.prng.mt19937.standard_gamma`)
   * Standard Exponentials (:meth:`~randomstate.prng.mt19937.standard_exponential`)
 
@@ -91,16 +95,18 @@ generators, 'in addition' to the standard PRNG in NumPy.  The included PRNGs are
   using the same seed/state. Adds a jump function that advances the generator
   as-if 2**128 draws have been made (:meth:`randomstate.prng.mt19937.jump`).
   See `NumPy's documentation`_.
-* dSFMT - A SSE2 enables version of the MT19937 generator.  Theoretically the
-  same, but with a different state and so it is not possible to produce a
-  sequence identical to MT19937. See the `dSFMT authors' page`_.
-* XoroShiro128+ - Improved version of XorShift128+ with improved performance
-  and better statistical quality. Like the XorShift generators, can be jumped
+* SFMT and dSFMT - SSE2 enabled versions of the MT19937 generator.  Theoretically
+  the same, but with a different state and so it is not possible to produce a
+  sequence identical to MT19937. Both generators support ``jump`` and so can
+  be used in parallel applications. See the `dSFMT authors' page`_.
+* XoroShiro128+ - Improved version of XorShift128+ with better performance
+  and statistical quality. Like the XorShift generators, it can be jumped
   to produce multiple streams in parallel applications. See
-  :meth:`randomstate.prng.xoroshiro128plus.jump` for details. More information
-  about this PRNG is available at the `xorshift and xoroshiro authors' page`_.
+  :meth:`randomstate.prng.xoroshiro128plus.jump` for details.
+  More information about this PRNG is available at the
+  `xorshift and xoroshiro authors' page`_.
 * XorShit128+ and XorShift1024* - Vast fast generators based on the XSadd
-  generator. These generators can be rapidly 'jumped' and so can be used in
+  generator. These generators support ``jump`` and so can be used in
   parallel applications. See the documentation for
   :meth:`randomstate.prng.xorshift1024.jump` for details. More information
   about these PRNGs is available at the

@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate’s documentation &#8212; randomstate 1.13.1+32.g2f66258 documentation</title>
+    <title>randomstate’s documentation &#8212; randomstate 1.13.1+34.g4d4228e documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+32.g2f66258',
+        VERSION:     '1.13.1+34.g4d4228e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -55,7 +55,7 @@
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+32.g2f66258 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+34.g4d4228e documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -135,14 +135,16 @@ that change the core random number generator.</p>
 <div class="section" id="what-s-new-or-different">
 <h2>What’s New or Different<a class="headerlink" href="#what-s-new-or-different" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">randomstate.entropy.random_entropy</span></code> provides access to the system
+<li><a class="reference internal" href="entropy.html#randomstate.entropy.random_entropy" title="randomstate.entropy.random_entropy"><code class="xref py py-func docutils literal"><span class="pre">randomstate.entropy.random_entropy()</span></code></a> provides access to the system
 source of randomness that is used in cryptographic applications (e.g.,
 <code class="docutils literal"><span class="pre">/dev/urandom</span></code> on Unix).</li>
 <li>Simulate from the complex normal distribution
 (<a class="reference internal" href="generated/randomstate.prng.mt19937.complex_normal.html#randomstate.prng.mt19937.complex_normal" title="randomstate.prng.mt19937.complex_normal"><code class="xref py py-meth docutils literal"><span class="pre">complex_normal()</span></code></a>)</li>
 <li>The normal, exponential and gamma generators support 256-step Ziggurat
 methods which are 2-10 times faster than NumPy’s default implementation in
-<code class="docutils literal"><span class="pre">standard_normal</span></code>, <code class="docutils literal"><span class="pre">standard_exponential</span></code> or <code class="docutils literal"><span class="pre">standard_gamma</span></code>.
+<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_normal.html#randomstate.prng.mt19937.standard_normal" title="randomstate.prng.mt19937.standard_normal"><code class="xref py py-meth docutils literal"><span class="pre">standard_normal()</span></code></a>,
+<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_exponential.html#randomstate.prng.mt19937.standard_exponential" title="randomstate.prng.mt19937.standard_exponential"><code class="xref py py-meth docutils literal"><span class="pre">standard_exponential()</span></code></a> or
+<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_gamma.html#randomstate.prng.mt19937.standard_gamma" title="randomstate.prng.mt19937.standard_gamma"><code class="xref py py-meth docutils literal"><span class="pre">standard_gamma()</span></code></a>.
 The Ziggurat generator can be accessed by passing the keyword
 argument <code class="docutils literal"><span class="pre">method='zig'</span></code>.</li>
 </ul>
@@ -151,8 +153,8 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [2]: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;bm&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">39.8 ms +- 83.5 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">9.34 ms +- 46.9 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">40.2 ms +- 1.63 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">11 ms +- 388 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_exponential</span>
@@ -160,8 +162,8 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [5]: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">51.3 ms +- 76.4 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">5.54 ms +- 38.5 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">51.3 ms +- 1.03 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">6.1 ms +- 331 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_gamma</span>
@@ -169,16 +171,18 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [8]: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">55.8 ms +- 100 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">27.5 ms +- 175 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">55.5 ms +- 955 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">29.8 ms +- 1.15 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li>Optional <code class="docutils literal"><span class="pre">dtype</span></code> argument that accepts <code class="docutils literal"><span class="pre">np.float32</span></code> or <code class="docutils literal"><span class="pre">np.float64</span></code>
 to produce either single or double prevision uniform random variables for
 select distributions<ul>
-<li>Uniforms (<a class="reference internal" href="generated/randomstate.prng.mt19937.random_sample.html#randomstate.prng.mt19937.random_sample" title="randomstate.prng.mt19937.random_sample"><code class="xref py py-meth docutils literal"><span class="pre">random_sample()</span></code></a> and <a class="reference internal" href="generated/randomstate.prng.mt19937.rand.html#randomstate.prng.mt19937.rand" title="randomstate.prng.mt19937.rand"><code class="xref py py-meth docutils literal"><span class="pre">rand()</span></code></a>)</li>
-<li>Normals (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_normal.html#randomstate.prng.mt19937.standard_normal" title="randomstate.prng.mt19937.standard_normal"><code class="xref py py-meth docutils literal"><span class="pre">standard_normal()</span></code></a> and <a class="reference internal" href="generated/randomstate.prng.mt19937.randn.html#randomstate.prng.mt19937.randn" title="randomstate.prng.mt19937.randn"><code class="xref py py-meth docutils literal"><span class="pre">randn()</span></code></a>)</li>
+<li>Uniforms (<a class="reference internal" href="generated/randomstate.prng.mt19937.random_sample.html#randomstate.prng.mt19937.random_sample" title="randomstate.prng.mt19937.random_sample"><code class="xref py py-meth docutils literal"><span class="pre">random_sample()</span></code></a> and
+<a class="reference internal" href="generated/randomstate.prng.mt19937.rand.html#randomstate.prng.mt19937.rand" title="randomstate.prng.mt19937.rand"><code class="xref py py-meth docutils literal"><span class="pre">rand()</span></code></a>)</li>
+<li>Normals (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_normal.html#randomstate.prng.mt19937.standard_normal" title="randomstate.prng.mt19937.standard_normal"><code class="xref py py-meth docutils literal"><span class="pre">standard_normal()</span></code></a> and
+<a class="reference internal" href="generated/randomstate.prng.mt19937.randn.html#randomstate.prng.mt19937.randn" title="randomstate.prng.mt19937.randn"><code class="xref py py-meth docutils literal"><span class="pre">randn()</span></code></a>)</li>
 <li>Standard Gammas (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_gamma.html#randomstate.prng.mt19937.standard_gamma" title="randomstate.prng.mt19937.standard_gamma"><code class="xref py py-meth docutils literal"><span class="pre">standard_gamma()</span></code></a>)</li>
 <li>Standard Exponentials (<a class="reference internal" href="generated/randomstate.prng.mt19937.standard_exponential.html#randomstate.prng.mt19937.standard_exponential" title="randomstate.prng.mt19937.standard_exponential"><code class="xref py py-meth docutils literal"><span class="pre">standard_exponential()</span></code></a>)</li>
 </ul>
@@ -247,16 +251,18 @@ generators, ‘in addition’ to the standard PRNG in NumPy.  The included PRNGs
 using the same seed/state. Adds a jump function that advances the generator
 as-if 2**128 draws have been made (<a class="reference internal" href="generated/randomstate.prng.mt19937.jump.html#randomstate.prng.mt19937.jump" title="randomstate.prng.mt19937.jump"><code class="xref py py-meth docutils literal"><span class="pre">randomstate.prng.mt19937.jump()</span></code></a>).
 See <a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/routines.random.html">NumPy’s documentation</a>.</li>
-<li>dSFMT - A SSE2 enables version of the MT19937 generator.  Theoretically the
-same, but with a different state and so it is not possible to produce a
-sequence identical to MT19937. See the <a class="reference external" href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/">dSFMT authors’ page</a>.</li>
-<li>XoroShiro128+ - Improved version of XorShift128+ with improved performance
-and better statistical quality. Like the XorShift generators, can be jumped
+<li>SFMT and dSFMT - SSE2 enabled versions of the MT19937 generator.  Theoretically
+the same, but with a different state and so it is not possible to produce a
+sequence identical to MT19937. Both generators support <code class="docutils literal"><span class="pre">jump</span></code> and so can
+be used in parallel applications. See the <a class="reference external" href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/">dSFMT authors’ page</a>.</li>
+<li>XoroShiro128+ - Improved version of XorShift128+ with better performance
+and statistical quality. Like the XorShift generators, it can be jumped
 to produce multiple streams in parallel applications. See
-<a class="reference internal" href="generated/randomstate.prng.xoroshiro128plus.jump.html#randomstate.prng.xoroshiro128plus.jump" title="randomstate.prng.xoroshiro128plus.jump"><code class="xref py py-meth docutils literal"><span class="pre">randomstate.prng.xoroshiro128plus.jump()</span></code></a> for details. More information
-about this PRNG is available at the <a class="reference external" href="http://xoroshiro.di.unimi.it/">xorshift and xoroshiro authors’ page</a>.</li>
+<a class="reference internal" href="generated/randomstate.prng.xoroshiro128plus.jump.html#randomstate.prng.xoroshiro128plus.jump" title="randomstate.prng.xoroshiro128plus.jump"><code class="xref py py-meth docutils literal"><span class="pre">randomstate.prng.xoroshiro128plus.jump()</span></code></a> for details.
+More information about this PRNG is available at the
+<a class="reference external" href="http://xoroshiro.di.unimi.it/">xorshift and xoroshiro authors’ page</a>.</li>
 <li>XorShit128+ and XorShift1024* - Vast fast generators based on the XSadd
-generator. These generators can be rapidly ‘jumped’ and so can be used in
+generator. These generators support <code class="docutils literal"><span class="pre">jump</span></code> and so can be used in
 parallel applications. See the documentation for
 <a class="reference internal" href="generated/randomstate.prng.xorshift1024.jump.html#randomstate.prng.xorshift1024.jump" title="randomstate.prng.xorshift1024.jump"><code class="xref py py-meth docutils literal"><span class="pre">randomstate.prng.xorshift1024.jump()</span></code></a> for details. More information
 about these PRNGs is available at the
@@ -315,6 +321,7 @@ performance than more modern generators.</li>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sfmt.html">SFMT</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sfmt.html#random-generator">Random generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sfmt.html#parallel-generation">Parallel generation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sfmt.html#simple-random-data">Simple random data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sfmt.html#permutations">Permutations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sfmt.html#distributions">Distributions</a></li>
@@ -383,7 +390,7 @@ performance than more modern generators.</li>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="change-log.html">Change Log</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="change-log.html#since-version-1-13">Since Version 1.13</a></li>
+<li class="toctree-l2"><a class="reference internal" href="change-log.html#version-1-13-2">Version 1.13.2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="change-log.html#version-1-13">Version 1.13</a></li>
 <li class="toctree-l2"><a class="reference internal" href="change-log.html#version-1-12">Version 1.12</a></li>
 <li class="toctree-l2"><a class="reference internal" href="change-log.html#version-1-11-4">Version 1.11.4</a></li>
@@ -435,7 +442,7 @@ performance than more modern generators.</li>
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+32.g2f66258 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.1+34.g4d4228e documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

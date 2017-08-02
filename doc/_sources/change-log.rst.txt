@@ -3,8 +3,8 @@
 Change Log
 ==========
 
-Since Version 1.13
-------------------
+Version 1.13.2
+--------------
 * Add Ziggurat generation for standard gamma
   (:meth:`~randomstate.prng.mt19937.standard_gamma`) for both floats and
   doubles.  The gamma generator uses a rejection sampler that
@@ -34,6 +34,7 @@ Since Version 1.13
   (`SFMT <http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/>`_) generator.
 * Add complex normal (:meth:`~randomstate.prng.mt19937.complex_normal`)
 * Added support for jumping the MT19937 generator
+* Added support for jumping the SFMT generator
 
 Version 1.13
 ------------
@@ -59,8 +60,10 @@ Version 1.11.3
 --------------
 * Extended 32-bit generation to
 
-  * Uniforms (:meth:`~randomstate.prng.mt19937.random_sample` and :meth:`~randomstate.prng.mt19937.rand`)
-  * Normals (:meth:`~randomstate.prng.mt19937.standard_normal` and :meth:`~randomstate.prng.mt19937.randn`)
+  * Uniforms (:meth:`~randomstate.prng.mt19937.random_sample` and
+    :meth:`~randomstate.prng.mt19937.rand`)
+  * Normals (:meth:`~randomstate.prng.mt19937.standard_normal` and
+    :meth:`~randomstate.prng.mt19937.randn`)
   * Standard Gammas (:meth:`~randomstate.prng.mt19937.standard_gamma`)
   * Standard Exponentials (:meth:`~randomstate.prng.mt19937.standard_exponential`)
 
@@ -95,7 +98,7 @@ Version 1.11.1
 Version 1.11
 ------------
 * Update to recent changes in NumPy's RandomState
-* Expose system entropy through :meth:`randomstate.entropy.random_entropy`
+* Expose system entropy through :func:`randomstate.entropy.random_entropy`
 * Add vector initialization for all PRNGs
 
 Version 1.10.1
