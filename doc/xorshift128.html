@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>XorShift128+ Randomstate &#8212; randomstate 1.13.1+35.g8bd5a71 documentation</title>
+    <title>XorShift128+ Randomstate &#8212; randomstate 1.13.1+36.ga8ac5f4 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+35.g8bd5a71',
+        VERSION:     '1.13.1+36.ga8ac5f4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="generated/randomstate.prng.sfmt.zipf.html" title="randomstate.prng.sfmt.zipf"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+35.g8bd5a71 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+36.ga8ac5f4 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -148,9 +148,10 @@
 <em class="property">class </em><code class="descclassname">randomstate.prng.xorshift128.</code><code class="descname">RandomState</code><span class="sig-paren">(</span><em>seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.xorshift128.RandomState" title="Permalink to this definition">¶</a></dt>
 <dd><p>Container for the xorshift128+ pseudo-random number generator.</p>
 <p>xorshift128+ is a 64-bit implementation of Saito and Matsumoto’s XSadd
-generator <a class="footnote-reference" href="#id2" id="id1">[1]</a>. xorshift128+ has a period of <span class="math">\(2^{128} - 1\)</span> and
-supports jumping the sequence in increments of <span class="math">\(2^{64}\)</span>, which allows
-multiple non-overlapping sequences to be generated.</p>
+generator <a class="footnote-reference" href="#id5" id="id1">[1]</a> (see also <a class="footnote-reference" href="#id6" id="id2">[2]</a>, <a class="footnote-reference" href="#id7" id="id3">[3]</a>, <a class="footnote-reference" href="#id8" id="id4">[4]</a>). xorshift128+ has a period of
+<span class="math">\(2^{128} - 1\)</span> and supports jumping the sequence in increments of
+<span class="math">\(2^{64}\)</span>, which allows multiple non-overlapping sequences to be
+generated.</p>
 <p><code class="docutils literal"><span class="pre">xorshift128.RandomState</span></code> exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the
 distribution-specific arguments, each method takes a keyword argument
@@ -209,31 +210,31 @@ value of the seed array until the seed array is exhausted. When using an array
 the initial state for the SplitMix64 state is 0 so that using a single element
 array and using the same value as a scalar will produce the same initial state.</p>
 <p class="rubric">References</p>
-<table class="docutils footnote" frame="void" id="id2" rules="none">
+<table class="docutils footnote" frame="void" id="id5" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>“xorshift*/xorshift+ generators and the PRNG shootout”,
 <a class="reference external" href="http://xorshift.di.unimi.it/">http://xorshift.di.unimi.it/</a></td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id3" rules="none">
+<table class="docutils footnote" frame="void" id="id6" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[2]</td><td>Marsaglia, George. “Xorshift RNGs.” Journal of Statistical Software
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Marsaglia, George. “Xorshift RNGs.” Journal of Statistical Software
 [Online], 8.14, pp. 1 - 6, .2003.</td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id4" rules="none">
+<table class="docutils footnote" frame="void" id="id7" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[3]</td><td>Sebastiano Vigna. “An experimental exploration of Marsaglia’s xorshift
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>Sebastiano Vigna. “An experimental exploration of Marsaglia’s xorshift
 generators, scrambled.” CoRR, abs/1402.6246, 2014.</td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id5" rules="none">
+<table class="docutils footnote" frame="void" id="id8" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[4]</td><td>Sebastiano Vigna. “Further scramblings of Marsaglia’s xorshift
+<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>Sebastiano Vigna. “Further scramblings of Marsaglia’s xorshift
 generators.” CoRR, abs/1403.0930, 2014.</td></tr>
 </tbody>
 </table>
@@ -489,7 +490,7 @@ generators.” CoRR, abs/1403.0930, 2014.</td></tr>
         <li class="right" >
           <a href="generated/randomstate.prng.sfmt.zipf.html" title="randomstate.prng.sfmt.zipf"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+35.g8bd5a71 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+36.ga8ac5f4 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

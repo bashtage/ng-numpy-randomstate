@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>MT19937 Randomstate &#8212; randomstate 1.13.1+35.g8bd5a71 documentation</title>
+    <title>MT19937 Randomstate &#8212; randomstate 1.13.1+36.ga8ac5f4 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+35.g8bd5a71',
+        VERSION:     '1.13.1+36.ga8ac5f4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="performance.html" title="Performance"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+35.g8bd5a71 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+36.ga8ac5f4 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -163,12 +163,6 @@ incorrect. Incorrect values will be fixed and the version in which the fix
 was made will be noted in the relevant docstring. Extension of existing
 parameter ranges and the addition of new parameters is allowed as long the
 previous behavior remains unchanged.</p>
-<p><code class="docutils literal"><span class="pre">mt19937.RandomState</span></code> can be used in parallel applications by
-calling the method <code class="docutils literal"><span class="pre">jump</span></code> which advances the state as-if <span class="math">\(2^{128}\)</span>
-random numbers have been generated <a href="#id2"><span class="problematic" id="id3"><span id="id1"></span>[2]_</span></a>. This allows the original sequence to
-be split so that distinct segments can be used in each worker process.  All
-generators should be initialized with the same seed to ensure that the
-segments come from the same sequence.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -188,6 +182,40 @@ pseudo-random number generator with a number of methods that are similar
 to the ones available in <code class="docutils literal"><span class="pre">RandomState</span></code>. <code class="docutils literal"><span class="pre">RandomState</span></code>, besides being
 NumPy-aware, has the advantage that it provides a much larger number
 of probability distributions to choose from.</p>
+<p><strong>Parallel Features</strong></p>
+<p><code class="docutils literal"><span class="pre">mt19937.RandomState</span></code> can be used in parallel applications by
+calling the method <code class="docutils literal"><span class="pre">jump</span></code> which advances the state as-if <span class="math">\(2^{128}\)</span>
+random numbers have been generated (<a class="footnote-reference" href="#id3" id="id1">[1]</a>, <a class="footnote-reference" href="#id4" id="id2">[2]</a>). This allows the original sequence to
+be split so that distinct segments can be used in each worker process.  All
+generators should be initialized with the same seed to ensure that the
+segments come from the same sequence.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">randomstate.entropy</span> <span class="k">import</span> <span class="n">random_entropy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">randomstate.prng.mt19937</span> <span class="k">as</span> <span class="nn">rnd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seed</span> <span class="o">=</span> <span class="n">random_entropy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span> <span class="o">=</span> <span class="p">[</span><span class="n">rnd</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="go"># Advance rs[i] by i jumps</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+<span class="go">        rs[i].jump(i)</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Hiroshi Haramoto, Makoto Matsumoto, and Pierre L’Ecuyer, “A Fast
+Jump Ahead Algorithm for Linear Recurrences in a Polynomial Space”,
+Sequences and Their Applications - SETA, 290–298, 2008.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Hiroshi Haramoto, Makoto Matsumoto, Takuji Nishimura, François
+Panneton, Pierre L’Ecuyer, “Efficient Jump Ahead for F2-Linear
+Random Number Generators”, INFORMS JOURNAL ON COMPUTING, Vol. 20,
+No. 3, Summer 2008, pp. 385-390.</td></tr>
+</tbody>
+</table>
 </dd></dl>
 
 <table border="1" class="longtable docutils">
@@ -216,8 +244,8 @@ of probability distributions to choose from.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mt19937.jump.html#randomstate.prng.mt19937.jump" title="randomstate.prng.mt19937.jump"><code class="xref py py-obj docutils literal"><span class="pre">jump</span></code></a></td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/randomstate.prng.mt19937.jump.html#randomstate.prng.mt19937.jump" title="randomstate.prng.mt19937.jump"><code class="xref py py-obj docutils literal"><span class="pre">jump</span></code></a>(iter&nbsp;=&nbsp;1)</td>
+<td>Jumps the state of the random number generator as-if 2**128 random numbers have been generated.</td>
 </tr>
 </tbody>
 </table>
@@ -440,7 +468,7 @@ of probability distributions to choose from.</p>
         <li class="right" >
           <a href="performance.html" title="Performance"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+35.g8bd5a71 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+36.ga8ac5f4 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

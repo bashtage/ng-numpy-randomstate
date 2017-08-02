@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.mt19937.jump &#8212; randomstate 1.13.1+35.g8bd5a71 documentation</title>
+    <title>randomstate.prng.mt19937.jump &#8212; randomstate 1.13.1+36.ga8ac5f4 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.13.1+35.g8bd5a71',
+        VERSION:     '1.13.1+36.ga8ac5f4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="randomstate.prng.mt19937.set_state.html" title="randomstate.prng.mt19937.set_state"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+35.g8bd5a71 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+36.ga8ac5f4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mt19937.html" accesskey="U">MT19937 Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -146,8 +146,25 @@
 <h1>randomstate.prng.mt19937.jump<a class="headerlink" href="#randomstate-prng-mt19937-jump" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="randomstate.prng.mt19937.jump">
-<code class="descclassname">randomstate.prng.mt19937.</code><code class="descname">jump</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.mt19937.jump" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">randomstate.prng.mt19937.</code><code class="descname">jump</code><span class="sig-paren">(</span><em>iter = 1</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.mt19937.jump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Jumps the state of the random number generator as-if 2**128 random numbers
+have been generated.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>iter</strong> (<em>integer</em><em>, </em><em>positive</em>) – Number of times to jump the state of the prng.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>out</strong> – Returns ‘None’ on success.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Jumping the rng state resets any pre-computed random numbers. This is required
+to ensure exact reproducibility.</p>
+</dd></dl>
 
 </div>
 
@@ -184,7 +201,7 @@
         <li class="right" >
           <a href="randomstate.prng.mt19937.set_state.html" title="randomstate.prng.mt19937.set_state"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+35.g8bd5a71 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.1+36.ga8ac5f4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mt19937.html" >MT19937 Randomstate</a> &#187;</li> 
       </ul>
     </div>

@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>SFMT Randomstate &#8212; randomstate 1.13.1+35.g8bd5a71 documentation</title>
+    <title>SFMT Randomstate &#8212; randomstate 1.13.1+36.ga8ac5f4 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.1+35.g8bd5a71',
+        VERSION:     '1.13.1+36.ga8ac5f4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="generated/randomstate.prng.dsfmt.zipf.html" title="randomstate.prng.dsfmt.zipf"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+35.g8bd5a71 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+36.ga8ac5f4 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -147,7 +147,7 @@
 <dt id="randomstate.prng.sfmt.RandomState">
 <em class="property">class </em><code class="descclassname">randomstate.prng.sfmt.</code><code class="descname">RandomState</code><span class="sig-paren">(</span><em>seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.sfmt.RandomState" title="Permalink to this definition">¶</a></dt>
 <dd><p>Container for the SIMD-based Mersenne Twister pseudo-random number generator.</p>
-<p><code class="docutils literal"><span class="pre">dSFMT.RandomState</span></code> exposes a number of methods for generating random
+<p><code class="docutils literal"><span class="pre">sfmt.RandomState</span></code> exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions <a class="footnote-reference" href="#id3" id="id1">[1]</a> . In addition
 to the distribution-specific arguments, each method takes a keyword argument
 <cite>size</cite> that defaults to <code class="docutils literal"><span class="pre">None</span></code>. If <cite>size</cite> is <code class="docutils literal"><span class="pre">None</span></code>, then a single
@@ -155,8 +155,8 @@ value is generated and returned. If <cite>size</cite> is an integer, then a 1-D
 array filled with generated values is returned. If <cite>size</cite> is a tuple,
 then an array with that shape is filled and returned.</p>
 <p><strong>No Compatibility Guarantee</strong></p>
-<p><code class="docutils literal"><span class="pre">dSFMT.RandomState</span></code> does not make a guarantee that a fixed seed and a
-fixed series of calls to <code class="docutils literal"><span class="pre">dSFMT.RandomState</span></code> methods using the same
+<p><code class="docutils literal"><span class="pre">sfmt.RandomState</span></code> does not make a guarantee that a fixed seed and a
+fixed series of calls to <code class="docutils literal"><span class="pre">sfmt.RandomState</span></code> methods using the same
 parameters will always produce the same results. This is different from
 <code class="docutils literal"><span class="pre">numpy.random.RandomState</span></code> guarantee. This is done to simplify improving
 random number generators.  To ensure identical results, you must use the
@@ -168,7 +168,7 @@ same release version.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>seed</strong> (<em>{None</em><em>, </em><em>int</em><em>, </em><em>array_like}</em><em>, </em><em>optional</em>) – Random seed initializing the pseudo-random number generator.
 Can be an integer in [0, 2**32-1], array of integers in
 [0, 2**32-1] or <code class="docutils literal"><span class="pre">None</span></code> (the default). If <cite>seed</cite> is <code class="docutils literal"><span class="pre">None</span></code>,
-then <code class="docutils literal"><span class="pre">dSFMT.RandomState</span></code> will try to read entropy from
+then <code class="docutils literal"><span class="pre">sfmt.RandomState</span></code> will try to read entropy from
 <code class="docutils literal"><span class="pre">/dev/urandom</span></code> (or the Windows analog) if available to
 produce a 64-bit seed. If unavailable, the a 64-bit hash of the time
 and process ID is used.</td>
@@ -190,7 +190,7 @@ number of probability distributions to choose from.</p>
 <p><strong>Parallel Features</strong></p>
 <p><code class="docutils literal"><span class="pre">sfmt.RandomState</span></code> can be used in parallel applications by
 calling the method <code class="docutils literal"><span class="pre">jump</span></code> which advances the state as-if <span class="math">\(2^{128}\)</span>
-random numbers have been generated <a href="#id4"><span class="problematic" id="id5"><span id="id2"></span>[2]_</span></a>. This allows the original sequence to
+random numbers have been generated <a class="footnote-reference" href="#id4" id="id2">[2]</a>. This allows the original sequence to
 be split so that distinct segments can be used in each worker process.  All
 generators should be initialized with the same seed to ensure that the
 segments come from the same sequence.</p>
@@ -215,12 +215,21 @@ used as an input (or inputs) for a hashing function, and the output of the
 hashing function is used as the initial state. Using a single 32-bit value
 for the seed can only initialize a small range of the possible initial
 state values.</p>
+<p class="rubric">References</p>
 <table class="docutils footnote" frame="void" id="id3" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Mutsuo Saito and Makoto Matsumoto, “SIMD-oriented Fast Mersenne
 Twister: a 128-bit Pseudorandom Number Generator.” Monte Carlo
 and Quasi-Monte Carlo Methods 2006, Springer, pp. 607 – 622, 2008.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Hiroshi Haramoto, Makoto Matsumoto, and Pierre L’Ecuyer, “A Fast
+Jump Ahead Algorithm for Linear Recurrences in a Polynomial Space”,
+Sequences and Their Applications - SETA, 290–298, 2008.</td></tr>
 </tbody>
 </table>
 </dd></dl>
@@ -475,7 +484,7 @@ and Quasi-Monte Carlo Methods 2006, Springer, pp. 607 – 622, 2008.</td></tr>
         <li class="right" >
           <a href="generated/randomstate.prng.dsfmt.zipf.html" title="randomstate.prng.dsfmt.zipf"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+35.g8bd5a71 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.1+36.ga8ac5f4 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">
