@@ -2,6 +2,11 @@
 
 Change Log
 ==========
+Since 1.13.2
+------------
+* Allow (:meth:`~randomstate.prng.mt19937.randint`) to broadcast inputs
+* Sync with upstream NumPy changes
+* Add protection against negative inputs in (:meth:`~randomstate.prng.mt19937.dirichlet`)
 
 Version 1.13.2
 --------------
