@@ -1,15 +1,18 @@
 from __future__ import division, absolute_import, print_function
 
-import numpy as np
-from numpy.testing import (
-        TestCase, run_module_suite, assert_, assert_raises, assert_equal,
-        assert_warns, assert_no_warnings, assert_array_equal,
-        assert_array_almost_equal)
 import sys
 import warnings
+
+import numpy as np
+from numpy.testing import (
+    TestCase, run_module_suite, assert_, assert_raises, assert_equal,
+    assert_warns, assert_no_warnings, assert_array_equal,
+    assert_array_almost_equal)
+
 import randomstate as random
 from randomstate.compat import suppress_warnings
 from randomstate.prng.mt19937 import mt19937
+
 
 class TestSeed(TestCase):
     def test_scalar(self):
@@ -90,7 +93,7 @@ class TestSetState(TestCase):
         self.seed = 1234567890
         self.prng = random.RandomState(self.seed)
         self.state = self.prng.get_state()
-        self.legacy_state = self.prng.get_state(legacy=True)         # Use legacy to get old NumPy state
+        self.legacy_state = self.prng.get_state(legacy=True)  # Use legacy to get old NumPy state
 
     def test_basic(self):
         old = self.prng.tomaxint(16)
@@ -135,7 +138,6 @@ class TestSetState(TestCase):
 
 
 class TestRandint(TestCase):
-
     rfunc = random.randint
 
     # valid integer/boolean types
@@ -185,10 +187,10 @@ class TestRandint(TestCase):
     def test_in_bounds_fuzz(self):
         # Don't use fixed seed
         mt19937.seed()
-        
+
         for dt in self.itype[1:]:
             for ubnd in [4, 8, 16]:
-                vals = self.rfunc(2, ubnd, size=2**16, dtype=dt)
+                vals = self.rfunc(2, ubnd, size=2 ** 16, dtype=dt)
                 assert_(vals.max() < ubnd)
                 assert_(vals.min() >= 2)
 
@@ -480,9 +482,9 @@ class TestRandomDist(TestCase):
         mt19937.seed(self.seed)
         actual = mt19937.beta(.1, .9, size=(3, 2))
         desired = np.array(
-                [[1.45341850513746058e-02, 5.31297615662868145e-04],
-                 [1.85366619058432324e-06, 4.19214516800110563e-03],
-                 [1.58405155108498093e-04, 1.26252891949397652e-04]])
+            [[1.45341850513746058e-02, 5.31297615662868145e-04],
+             [1.85366619058432324e-06, 4.19214516800110563e-03],
+             [1.58405155108498093e-04, 1.26252891949397652e-04]])
         assert_array_almost_equal(actual, desired, decimal=15)
 
     def test_binomial(self):
@@ -512,6 +514,8 @@ class TestRandomDist(TestCase):
                             [[0.59266909280647828, 0.40733090719352177],
                              [0.56974431743975207, 0.43025568256024799]]])
         assert_array_almost_equal(actual, desired, decimal=15)
+        bad_alpha = np.array([5.4e-01, -1.0e-16])
+        assert_raises(ValueError, mt19937.dirichlet, bad_alpha)
 
     def test_dirichlet_size(self):
         # gh-3173
@@ -660,7 +664,7 @@ class TestRandomDist(TestCase):
         cov = [[1, 0], [0, 1]]
         size = (3, 2)
         actual = mt19937.multivariate_normal(mean, cov, size)
-        desired = np.array([[[1.463620246718631, 11.73759122771936 ],
+        desired = np.array([[[1.463620246718631, 11.73759122771936],
                              [1.622445133300628, 9.771356667546383]],
                             [[2.154490787682787, 12.170324946056553],
                              [1.719909438201865, 9.230548443648306]],
@@ -720,7 +724,7 @@ class TestRandomDist(TestCase):
     def test_noncentral_f(self):
         mt19937.seed(self.seed)
         actual = mt19937.noncentral_f(dfnum=5, dfden=2, nonc=1,
-                                        size=(3, 2))
+                                      size=(3, 2))
         desired = np.array([[1.40598099674926669, 0.34207973179285761],
                             [3.57715069265772545, 7.92632662577829805],
                             [0.43741599463544162, 1.1774208752428319]])
@@ -742,9 +746,9 @@ class TestRandomDist(TestCase):
         mt19937.seed(self.seed)
         actual = mt19937.pareto(a=.123456789, size=(3, 2))
         desired = np.array(
-                [[2.46852460439034849e+03, 1.41286880810518346e+03],
-                 [5.28287797029485181e+07, 6.57720981047328785e+07],
-                 [1.40840323350391515e+02, 1.98390255135251704e+05]])
+            [[2.46852460439034849e+03, 1.41286880810518346e+03],
+             [5.28287797029485181e+07, 6.57720981047328785e+07],
+             [1.40840323350391515e+02, 1.98390255135251704e+05]])
         # For some reason on 32-bit x86 Ubuntu 12.10 the [1, 0] entry in this
         # matrix differs by 24 nulps. Discussion:
         #   http://mail.scipy.org/pipermail/numpy-discussion/2012-September/063801.html
@@ -765,9 +769,9 @@ class TestRandomDist(TestCase):
         lambig = np.iinfo('l').max
         lamneg = -1
         assert_raises(ValueError, mt19937.poisson, lamneg)
-        assert_raises(ValueError, mt19937.poisson, [lamneg]*10)
+        assert_raises(ValueError, mt19937.poisson, [lamneg] * 10)
         assert_raises(ValueError, mt19937.poisson, lambig)
-        assert_raises(ValueError, mt19937.poisson, [lambig]*10)
+        assert_raises(ValueError, mt19937.poisson, [lambig] * 10)
 
     def test_power(self):
         mt19937.seed(self.seed)
@@ -856,8 +860,8 @@ class TestRandomDist(TestCase):
 
         func = mt19937.uniform
         assert_raises(OverflowError, func, -np.inf, 0)
-        assert_raises(OverflowError, func,  0,      np.inf)
-        assert_raises(OverflowError, func,  fmin,   fmax)
+        assert_raises(OverflowError, func, 0, np.inf)
+        assert_raises(OverflowError, func, fmin, fmax)
         assert_raises(OverflowError, func, [-np.inf], [0])
         assert_raises(OverflowError, func, [0], [np.inf])
 
@@ -886,7 +890,7 @@ class TestRandomDist(TestCase):
 
         throwing_int = np.array(1).view(ThrowingInteger)
         assert_raises(TypeError, mt19937.hypergeometric, throwing_int, 1, 1)
-        
+
     def test_vonmises(self):
         mt19937.seed(self.seed)
         actual = mt19937.vonmises(mu=1.23, kappa=1.54, size=(3, 2))
@@ -1485,6 +1489,7 @@ class TestBroadcast(TestCase):
         assert_raises(ValueError, logseries, bad_p_one * 3)
         assert_raises(ValueError, logseries, bad_p_two * 3)
 
+
 class TestThread(TestCase):
     # make sure each state produces the same sequence even in threads
     def setUp(self):
@@ -1515,17 +1520,21 @@ class TestThread(TestCase):
     def test_normal(self):
         def gen_random(state, out):
             out[...] = state.normal(size=10000)
+
         self.check_function(gen_random, sz=(10000,))
 
     def test_exp(self):
         def gen_random(state, out):
             out[...] = state.exponential(scale=np.ones((100, 1000)))
+
         self.check_function(gen_random, sz=(100, 1000))
 
     def test_multinomial(self):
         def gen_random(state, out):
-            out[...] = state.multinomial(10, [1/6.]*6, size=10000)
+            out[...] = state.multinomial(10, [1 / 6.] * 6, size=10000)
+
         self.check_function(gen_random, sz=(10000, 6))
+
 
 # See Issue #4263
 class TestSingleEltArrayInput(TestCase):
@@ -1581,23 +1590,23 @@ class TestSingleEltArrayInput(TestCase):
             out = func(self.argOne, argTwo[0])
             self.assertEqual(out.shape, self.tgtShape)
 
-# TODO: Uncomment once randint can broadcast arguments
-#    def test_randint(self):
-#        itype = [np.bool, np.int8, np.uint8, np.int16, np.uint16,
-#                 np.int32, np.uint32, np.int64, np.uint64]
-#        func = mt19937.randint
-#        high = np.array([1])
-#        low = np.array([0])
-#
-#        for dt in itype:
-#            out = func(low, high, dtype=dt)
-#            self.assert_equal(out.shape, self.tgtShape)
-#
-#            out = func(low[0], high, dtype=dt)
-#            self.assert_equal(out.shape, self.tgtShape)
-#
-#            out = func(low, high[0], dtype=dt)
-#            self.assert_equal(out.shape, self.tgtShape)
+        # TODO: Uncomment once randint can broadcast arguments
+        #    def test_randint(self):
+        #        itype = [np.bool, np.int8, np.uint8, np.int16, np.uint16,
+        #                 np.int32, np.uint32, np.int64, np.uint64]
+        #        func = mt19937.randint
+        #        high = np.array([1])
+        #        low = np.array([0])
+        #
+        #        for dt in itype:
+        #            out = func(low, high, dtype=dt)
+        #            self.assert_equal(out.shape, self.tgtShape)
+        #
+        #            out = func(low[0], high, dtype=dt)
+        #            self.assert_equal(out.shape, self.tgtShape)
+        #
+        #            out = func(low, high[0], dtype=dt)
+        #            self.assert_equal(out.shape, self.tgtShape)
 
     def test_three_arg_funcs(self):
         funcs = [mt19937.noncentral_f, mt19937.triangular,
@@ -1612,6 +1621,7 @@ class TestSingleEltArrayInput(TestCase):
 
             out = func(self.argOne, self.argTwo[0], self.argThree)
             self.assertEqual(out.shape, self.tgtShape)
+
 
 if __name__ == "__main__":
     run_module_suite()

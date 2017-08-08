@@ -4689,6 +4689,8 @@ cdef class RandomState:
 
         k           = len(alpha)
         alpha_arr   = <np.ndarray>np.PyArray_FROM_OTF(alpha, np.NPY_DOUBLE, np.NPY_ALIGNED)
+        if np.any(np.less_equal(alpha_arr, 0)):
+            raise ValueError('alpha <= 0')
         alpha_data  = <double*>np.PyArray_DATA(alpha_arr)
 
         if size is None:
