@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.mrg32k3a.randint &#8212; randomstate 1.13.2+5.g397dc91 documentation</title>
+    <title>randomstate.prng.mrg32k3a.randint &#8212; randomstate 1.13.2+7.g0a55ecb documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.13.2+5.g397dc91',
+        VERSION:     '1.13.2+7.g0a55ecb',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="randomstate.prng.mrg32k3a.randn.html" title="randomstate.prng.mrg32k3a.randn"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+5.g397dc91 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+7.g0a55ecb documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mrg32k3a.html" accesskey="U">MRG32K3A Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -156,11 +156,12 @@ the specified dtype in the “half-open” interval [<cite>low</cite>, <cite>hig
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>low</strong> (<em>int</em>) – Lowest (signed) integer to be drawn from the distribution (unless
+<li><strong>low</strong> (<em>int</em><em> or </em><em>array-like of ints</em>) – Lowest (signed) integers to be drawn from the distribution (unless
 <code class="docutils literal"><span class="pre">high=None</span></code>, in which case this parameter is one above the
 <em>highest</em> such integer).</li>
-<li><strong>high</strong> (<em>int</em><em>, </em><em>optional</em>) – If provided, one above the largest (signed) integer to be drawn
-from the distribution (see above for behavior if <code class="docutils literal"><span class="pre">high=None</span></code>).</li>
+<li><strong>high</strong> (<em>int</em><em> or </em><em>array-like of ints</em><em>, </em><em>optional</em>) – If provided, one above the largest (signed) integer to be drawn
+from the distribution (see above for behavior if <code class="docutils literal"><span class="pre">high=None</span></code>).
+If array-like, must contain integer values</li>
 <li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
 <code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  Default is None, in which case a
 single value is returned.</li>
@@ -204,6 +205,22 @@ distribution, or a single such random int if <cite>size</cite> not provided.</p>
 <span class="go">       [3, 2, 2, 0]])</span>
 </pre></div>
 </div>
+<p>Generate a 1 x 3 array with 3 different upper bounds</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="go">array([2, 2, 9])</span>
+</pre></div>
+</div>
+<p>Generate a 1 by 3 array with 3 different lower bounds</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">array([9, 8, 7])</span>
+</pre></div>
+</div>
+<p>Generate a 2 by 4 array using broadcasting with dtype of uint8</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[[</span><span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">20</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="go">array([[ 8,  6,  9,  7],</span>
+<span class="go">       [ 1, 16,  9, 12]], dtype=uint8)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
@@ -241,7 +258,7 @@ distribution, or a single such random int if <cite>size</cite> not provided.</p>
         <li class="right" >
           <a href="randomstate.prng.mrg32k3a.randn.html" title="randomstate.prng.mrg32k3a.randn"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+5.g397dc91 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+7.g0a55ecb documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mrg32k3a.html" >MRG32K3A Randomstate</a> &#187;</li> 
       </ul>
     </div>
