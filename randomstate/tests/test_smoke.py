@@ -5,6 +5,8 @@ import sys
 import os
 
 import numpy as np
+import pytest
+
 import randomstate.entropy as entropy
 from randomstate.prng.mlfg_1279_861 import mlfg_1279_861
 from randomstate.prng.mrg32k3a import mrg32k3a
@@ -17,6 +19,12 @@ from randomstate.prng.xoroshiro128plus import xoroshiro128plus
 from randomstate.prng.dsfmt import dsfmt
 from randomstate.prng.sfmt import sfmt
 from numpy.testing import assert_almost_equal, assert_equal, assert_raises, assert_, assert_array_equal
+
+
+@pytest.fixture(scope='module', params=(np.bool, np.int8, np.int16, np.int32, np.int64,
+                                        np.uint8, np.uint16, np.uint32, np.uint64))
+def dtype(request):
+    return request.param
 
 
 def params_0(f):
@@ -749,6 +757,65 @@ class RNG(object):
         existing = np.zeros(size, dtype=np.float64)
         assert_raises(TypeError, rs.standard_gamma, 1.0, out=existing, dtype=np.float32)
         assert_raises(ValueError, rs.standard_gamma, 1.0, out=existing[::3])
+
+    def test_randint_broadcast(self, dtype):
+        if dtype == np.bool:
+            upper = 2
+            lower = 0
+        else:
+            info = np.iinfo(dtype)
+            upper = int(info.max) + 1
+            lower = info.min
+        self._reset_state()
+        a = self.rs.randint(lower, [upper] * 10, dtype=dtype)
+        self._reset_state()
+        b = self.rs.randint([lower] * 10, upper, dtype=dtype)
+        assert_equal(a, b)
+        self._reset_state()
+        c = self.rs.randint(lower, upper, size=10, dtype=dtype)
+        assert_equal(a, c)
+        self._reset_state()
+        d = self.rs.randint(np.array([lower] * 10), np.array([upper], dtype=np.object), size=10, dtype=dtype)
+        assert_equal(a, d)
+        self._reset_state()
+        e = self.rs.randint(np.array([lower] * 10), np.array([upper] * 10), size=10, dtype=dtype)
+        assert_equal(a, e)
+
+        self._reset_state()
+        a = self.rs.randint(0, upper, size=10, dtype=dtype)
+        self._reset_state()
+        b = self.rs.randint([upper] * 10, dtype=dtype)
+        assert_equal(a, b)
+
+    def test_randint_numpy(self, dtype):
+        high = np.array([1])
+        low = np.array([0])
+
+        out = self.rs.randint(low, high, dtype=dtype)
+        assert out.shape == (1,)
+
+        out = self.rs.randint(low[0], high, dtype=dtype)
+        assert out.shape == (1,)
+
+        out = self.rs.randint(low, high[0], dtype=dtype)
+        assert out.shape == (1,)
+
+    def test_randint_broadcast_errors(self, dtype):
+        if dtype == np.bool:
+            upper = 2
+            lower = 0
+        else:
+            info = np.iinfo(dtype)
+            upper = int(info.max) + 1
+            lower = info.min
+        with pytest.raises(ValueError):
+            self.rs.randint(lower, [upper + 1] * 10, dtype=dtype)
+        with pytest.raises(ValueError):
+            self.rs.randint(lower - 1, [upper] * 10, dtype=dtype)
+        with pytest.raises(ValueError):
+            self.rs.randint([lower - 1], [upper] * 10, dtype=dtype)
+        with pytest.raises(ValueError):
+            self.rs.randint([0], [0], dtype=dtype)
 
 
 class TestMT19937(RNG):

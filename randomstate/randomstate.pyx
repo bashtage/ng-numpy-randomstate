@@ -947,13 +947,14 @@ cdef class RandomState:
 
         Parameters
         ----------
-        low : int
-            Lowest (signed) integer to be drawn from the distribution (unless
+        low : int or array-like of ints
+            Lowest (signed) integers to be drawn from the distribution (unless
             ``high=None``, in which case this parameter is one above the
             *highest* such integer).
-        high : int, optional
+        high : int or array-like of ints, optional
             If provided, one above the largest (signed) integer to be drawn
             from the distribution (see above for behavior if ``high=None``).
+            If array-like, must contain integer values
         size : int or tuple of ints, optional
             Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
             ``m * n * k`` samples are drawn.  Default is None, in which case a
@@ -992,6 +993,21 @@ cdef class RandomState:
         array([[4, 0, 2, 1],
                [3, 2, 2, 0]])
 
+        Generate a 1 x 3 array with 3 different upper bounds
+
+        >>> np.random.randint(1, [3, 5, 10])
+        array([2, 2, 9])
+
+        Generate a 1 by 3 array with 3 different lower bounds
+
+        >>> np.random.randint([1, 5, 7], 10)
+        array([9, 8, 7])
+
+        Generate a 2 by 4 array using broadcasting with dtype of uint8
+
+        >>> np.random.randint([1, 3, 5, 7], [[10], [20]], dtype=np.uint8)
+        array([[ 8,  6,  9,  7],
+               [ 1, 16,  9, 12]], dtype=uint8)
         """
         if high is None:
             high = low
@@ -1003,43 +1019,68 @@ cdef class RandomState:
 
         lowbnd, highbnd = _randint_type[key]
 
-        # TODO: Do not cast these inputs to Python int
-        #
-        # This is a workaround until gh-8851 is resolved (bug in NumPy
-        # integer comparison and subtraction involving uint64 and non-
-        # uint64). Afterwards, remove these two lines.
-        ilow = int(low)
-        ihigh = int(high)
-        
-        if ilow < lowbnd:
-            raise ValueError("low is out of bounds for %s" % (key,))
-        if ihigh > highbnd:
-            raise ValueError("high is out of bounds for %s" % (key,))
-        if ilow >= ihigh:
-            raise ValueError("low >= high")
+        low = np.asarray(low)
+        high = np.asarray(high)
+
+        if low.shape == high.shape == ():
+            # TODO: Do not cast these inputs to Python int
+            #
+            # This is a workaround until gh-8851 is resolved (bug in NumPy
+            # integer comparison and subtraction involving uint64 and non-
+            # uint64). Afterwards, remove these two lines.
+            ilow = int(low)
+            ihigh = int(high)
+
+            if ilow < lowbnd:
+                raise ValueError("low is out of bounds for %s" % (key,))
+            if ihigh > highbnd:
+                raise ValueError("high is out of bounds for %s" % (key,))
+            if ilow >= ihigh:
+                raise ValueError("low >= high")
+
+            if key == 'int32':
+                ret = _rand_int32(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            elif key == 'int64':
+                ret = _rand_int64(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            elif key == 'int16':
+                ret = _rand_int16(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            elif key == 'int8':
+                ret = _rand_int8(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            elif key == 'uint64':
+                ret = _rand_uint64(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            elif key == 'uint32':
+                ret = _rand_uint32(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            elif key == 'uint16':
+                ret = _rand_uint16(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            elif key == 'uint8':
+                ret = _rand_uint8(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            elif key == 'bool':
+                ret = _rand_bool(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+
+            if size is None:
+                if dtype in (np.bool, np.int, np.long):
+                    return dtype(ret)
+            return ret
 
         if key == 'int32':
-            ret = _rand_int32(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int32_broadcast(low, high, size, &self.rng_state, self.lock)
         elif key == 'int64':
-            ret = _rand_int64(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int64_broadcast(low, high, size, &self.rng_state, self.lock)
         elif key == 'int16':
-            ret = _rand_int16(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int16_broadcast(low, high, size, &self.rng_state, self.lock)
         elif key == 'int8':
-            ret = _rand_int8(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            ret = _rand_int8_broadcast(low, high, size, &self.rng_state, self.lock)
         elif key == 'uint64':
-            ret = _rand_uint64(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint64_broadcast(low, high, size, &self.rng_state, self.lock)
         elif key == 'uint32':
-            ret = _rand_uint32(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint32_broadcast(low, high, size, &self.rng_state, self.lock)
         elif key == 'uint16':
-            ret = _rand_uint16(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint16_broadcast(low, high, size, &self.rng_state, self.lock)
         elif key == 'uint8':
-            ret = _rand_uint8(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            ret = _rand_uint8_broadcast(low, high, size, &self.rng_state, self.lock)
         elif key == 'bool':
-            ret = _rand_bool(ilow, ihigh - 1, size, &self.rng_state, self.lock)
+            ret = _rand_bool_broadcast(low, high, size, &self.rng_state, self.lock)
 
-        if size is None:
-            if dtype in (np.bool, np.int, np.long):
-                return dtype(ret)
         return ret
 
     def bytes(self, np.npy_intp length):
