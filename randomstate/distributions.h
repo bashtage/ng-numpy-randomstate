@@ -14,15 +14,15 @@ typedef int bool;
 #endif
 
 #ifndef min
-#define min(x,y) ((x<y)?x:y)
-#define max(x,y) ((x>y)?x:y)
+#define min(x, y) ((x < y) ? x : y)
+#define max(x, y) ((x > y) ? x : y)
 #endif
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338328
 #endif
 
-#if  defined(RS_PCG32)
+#if defined(RS_PCG32)
 #include "interface/pcg-32/pcg-32-shim.h"
 #elif defined(RS_PCG64)
 #include "interface/pcg-64/pcg-64-shim.h"
@@ -46,21 +46,21 @@ typedef int bool;
 #error Unknown RNG!!!  Unknown RNG!!!  Unknown RNG!!!
 #endif
 
-extern int64_t random_positive_int64(aug_state* state);
+extern int64_t random_positive_int64(aug_state *state);
 
-extern int32_t random_positive_int32(aug_state* state);
+extern int32_t random_positive_int32(aug_state *state);
 
-extern float random_standard_uniform_float(aug_state* state);
+extern float random_standard_uniform_float(aug_state *state);
 
-extern double random_standard_uniform_double(aug_state* state);
+extern double random_standard_uniform_double(aug_state *state);
 
-extern double random_standard_exponential(aug_state* state);
+extern double random_standard_exponential(aug_state *state);
 
-extern double random_gauss(aug_state* state);
+extern double random_gauss(aug_state *state);
 
-extern double random_standard_gamma(aug_state* state, double shape);
+extern double random_standard_gamma(aug_state *state, double shape);
 
-extern float random_standard_gamma_float(aug_state* state, float shape);
+extern float random_standard_gamma_float(aug_state *state, float shape);
 
 extern double random_normal(aug_state *state, double loc, double scale);
 
@@ -102,9 +102,9 @@ extern double random_lognormal(aug_state *state, double mean, double sigma);
 
 extern double random_rayleigh(aug_state *state, double mode);
 
-extern double random_gauss_zig(aug_state* state);
+extern double random_gauss_zig(aug_state *state);
 
-extern double random_gauss_zig_julia(aug_state* state);
+extern double random_gauss_zig_julia(aug_state *state);
 
 extern double random_noncentral_chisquare(aug_state *state, double df, double nonc);
 
@@ -130,11 +130,11 @@ extern long random_zipf(aug_state *state, double a);
 
 extern long random_hypergeometric(aug_state *state, long good, long bad, long sample);
 
-extern long random_positive_int(aug_state* state);
+extern long random_positive_int(aug_state *state);
 
-extern unsigned long random_uint(aug_state* state);
+extern unsigned long random_uint(aug_state *state);
 
-extern unsigned long random_interval(aug_state* state, unsigned long max);
+extern unsigned long random_interval(aug_state *state, unsigned long max);
 
 extern void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, npy_intp cnt, uint64_t *out);
 
@@ -146,17 +146,17 @@ extern void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng
 
 extern void random_bounded_bool_fill(aug_state *state, npy_bool off, npy_bool rng, npy_intp cnt, npy_bool *out);
 
-extern void random_uniform_fill_float(aug_state* state, npy_intp count, float *out);
+extern void random_uniform_fill_float(aug_state *state, npy_intp count, float *out);
 
-extern void random_uniform_fill_double(aug_state* state, npy_intp count, double *out);
+extern void random_uniform_fill_double(aug_state *state, npy_intp count, double *out);
 
-extern void random_standard_exponential_fill_double(aug_state* state, npy_intp count, double *out);
+extern void random_standard_exponential_fill_double(aug_state *state, npy_intp count, double *out);
 
-extern void random_standard_exponential_fill_float(aug_state* state, npy_intp count, float *out);
+extern void random_standard_exponential_fill_float(aug_state *state, npy_intp count, float *out);
 
-extern void random_gauss_fill(aug_state* state, npy_intp count, double *out);
+extern void random_gauss_fill(aug_state *state, npy_intp count, double *out);
 
-extern void random_gauss_fill_float(aug_state* state, npy_intp count, float *out);
+extern void random_gauss_fill_float(aug_state *state, npy_intp count, float *out);
 
 extern void random_gauss_zig_julia_fill(aug_state *state, npy_intp count, double *out);
 
@@ -164,17 +164,17 @@ extern void random_gauss_zig_float_fill(aug_state *state, npy_intp count, float 
 
 extern void random_gauss_zig_double_fill(aug_state *state, npy_intp count, double *out);
 
-extern double random_standard_exponential_zig(aug_state* state);
+extern double random_standard_exponential_zig(aug_state *state);
 
-extern void random_standard_exponential_zig_double_fill(aug_state* state, npy_intp count, double *out);
+extern void random_standard_exponential_zig_double_fill(aug_state *state, npy_intp count, double *out);
 
-extern float random_standard_exponential_zig_float(aug_state* state);
+extern float random_standard_exponential_zig_float(aug_state *state);
 
-extern void random_standard_exponential_zig_float_fill(aug_state* state, npy_intp count, float *out);
+extern void random_standard_exponential_zig_float_fill(aug_state *state, npy_intp count, float *out);
 
-extern double random_standard_gamma_zig_double(aug_state* state, double shape);
+extern double random_standard_gamma_zig_double(aug_state *state, double shape);
 
-extern float random_standard_gamma_zig_float(aug_state* state, float shape);
+extern float random_standard_gamma_zig_float(aug_state *state, float shape);
 
 extern uint64_t random_bounded_uint64(aug_state *state, uint64_t off, uint64_t rng, uint64_t mask);
 

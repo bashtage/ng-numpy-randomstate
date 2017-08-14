@@ -21,7 +21,6 @@ cdef inline uint64_t _gen_mask(uint64_t max_val) nogil:
     mask |= mask >> 16
     mask |= mask >> 32
     return mask
-
 {{
 py:
 bc_ctypes = (('uint32', 'uint32', 'uint64', 'NPY_UINT64', 0, 0, 0, '0X100000000ULL'),
@@ -32,11 +31,8 @@ bc_ctypes = (('uint32', 'uint32', 'uint64', 'NPY_UINT64', 0, 0, 0, '0X100000000U
           ('int16', 'uint16', 'uint32', 'NPY_INT32', 1, 16, '-0x8000LL', '0x8000LL' ),
           ('int8', 'uint8', 'uint16', 'NPY_INT16', 3, 8, '-0x80LL', '0x80LL' ),
 )}}
-
 {{for  nptype, utype, nptype_up, npctype, remaining, bitshift, lb, ub in bc_ctypes}}
-
 {{ py: otype = nptype + '_' if nptype == 'bool' else nptype }}
-
 cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *state, object lock):
     """
     _rand_{{nptype}}(low, high, size, *state, lock)
@@ -50,27 +46,27 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
 
     Parameters
     ----------
-    low : int
+    low : int or array-like
         Lowest (signed) integer to be drawn from the distribution (unless
         ``high=None``, in which case this parameter is the *highest* such
         integer).
-    high : int
+    high : int or array-like
         If provided, the largest (signed) integer to be drawn from the
         distribution (see above for behavior if ``high=None``).
     size : int or tuple of ints
         Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
         ``m * n * k`` samples are drawn.  Default is None, in which case a
         single value is returned.
-    rngstate : encapsulated pointer to rk_state
-        The specific type depends on the python version. In Python 2 it is
-        a PyCObject, in Python 3 a PyCapsule object.
+    state : augmented random state
+        State to use in the core random number generators
+    lock : threading.Lock
+        Lock to prevent multiple using a single RandomState simultaneously
 
     Returns
     -------
     out : python scalar or ndarray of np.{{nptype}}
           `size`-shaped array of random integers from the appropriate
           distribution, or a single such random int if `size` not provided.
-
     """
     cdef {{utype}}_t rng, last_rng, off, val, mask, out_val
     cdef uint32_t buf
@@ -150,34 +146,37 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
 
     return out_arr
 {{endfor}}
-
-
 {{
 py:
 big_bc_ctypes = (('uint64', 'uint64', 'NPY_UINT64', '0x0ULL', '0xFFFFFFFFFFFFFFFFULL'),
                  ('int64', 'uint64', 'NPY_INT64', '-0x8000000000000000LL', '0x7FFFFFFFFFFFFFFFLL' )
 )}}
-
 {{for  nptype, utype, npctype, lb, ub in big_bc_ctypes}}
-
 {{ py: otype = nptype}}
-
 cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *state, object lock):
     """
-    Generate bounded random {{nptype}} values
+    _rand_{{nptype}}(low, high, size, *state, lock)
+
+    Return random np.{{nptype}} integers between `low` and `high`, inclusive.
+
+    Return random integers from the "discrete uniform" distribution in the
+    closed interval [`low`, `high`).  If `high` is None (the default),
+    then results are from [0, `low`). On entry the arguments are presumed
+    to have been validated for size and order for the np.{{nptype}} type.
 
     Parameters
     ----------
     low : int or array-like
-        Array containing the lowest (signed) integers to be drawn from the
-        distribution.
+        Lowest (signed) integer to be drawn from the distribution (unless
+        ``high=None``, in which case this parameter is the *highest* such
+        integer).
     high : int or array-like
-        Array containing the the open interval bound for the distribution.
+        If provided, the largest (signed) integer to be drawn from the
+        distribution (see above for behavior if ``high=None``).
     size : int or tuple of ints
         Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-        ``m * n * k`` samples are drawn.  Default is None, in which case
-        the output shape is determined by the broadcast shapes of low and
-        high
+        ``m * n * k`` samples are drawn.  Default is None, in which case a
+        single value is returned.
     state : augmented random state
         State to use in the core random number generators
     lock : threading.Lock
@@ -185,10 +184,9 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
 
     Returns
     -------
-    out : ndarray of np.{{nptype}}
-          array of random integers from the appropriate distribution where the
-          size is determined by size if provided or the broadcast shape of low
-          and high
+    out : python scalar or ndarray of np.{{nptype}}
+          `size`-shaped array of random integers from the appropriate
+          distribution, or a single such random int if `size` not provided.
     """
     cdef np.ndarray low_arr, high_arr, out_arr, highm1_arr
     cdef np.npy_intp i, cnt
@@ -279,5 +277,4 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
             np.PyArray_MultiIter_NEXT(it)
 
     return out_arr
-
 {{endfor}}

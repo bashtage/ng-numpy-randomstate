@@ -215,7 +215,7 @@ for config in configs:
     write_config(config_file_name, config)
     shutil.copystat(join(mod_dir, 'randomstate.pyx'), config_file_name)
 
-    ext = Extension('randomstate.prng.' + config['file_name'] + '.' + config['file_name'],
+    ext = Extension(name='randomstate.prng.' + config['file_name'] + '.' + config['file_name'],
                     sources=config['sources'],
                     include_dirs=config['include_dirs'],
                     define_macros=config['defs'] + extra_defs,
@@ -254,16 +254,17 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Operating System :: Unix',
                'Programming Language :: C',
                'Programming Language :: Cython',
-               'Programming Language :: Python :: 2.6',
                'Programming Language :: Python :: 2.7',
                'Programming Language :: Python :: 3.3',
                'Programming Language :: Python :: 3.4',
                'Programming Language :: Python :: 3.5',
+               'Programming Language :: Python :: 3.6',
                'Topic :: Adaptive Technologies',
                'Topic :: Artistic Software',
                'Topic :: Office/Business :: Financial',
                'Topic :: Scientific/Engineering',
                'Topic :: Security :: Cryptography']
+
 
 setup(name='randomstate',
       version=versioneer.get_version(),
