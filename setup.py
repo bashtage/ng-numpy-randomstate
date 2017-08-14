@@ -34,7 +34,7 @@ rngs = ['RNG_DSFMT', 'RNG_MLFG_1279_861', 'RNG_MRG32K3A', 'RNG_MT19937',
         'RNG_PCG32', 'RNG_PCG64', 'RNG_XORSHIFT128', 'RNG_XOROSHIRO128PLUS',
         'RNG_XORSHIFT1024', 'RNG_SFMT']
 
-compile_rngs = rngs[:1]
+compile_rngs = rngs[:]
 
 extra_defs = [('_CRT_SECURE_NO_WARNINGS', '1')] if os.name == 'nt' else []
 extra_link_args = ['/LTCG', 'Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []

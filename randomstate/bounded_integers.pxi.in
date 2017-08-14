@@ -100,7 +100,7 @@ py:
 bc_ctypes = (('uint32', 'uint32', 'uint64', 'NPY_UINT64', 0, 0, 0, '0X100000000ULL'),
           ('uint16', 'uint16', 'uint32', 'NPY_UINT32', 1, 16, 0, '0X10000UL'),
           ('uint8', 'uint8', 'uint16', 'NPY_UINT16', 3, 8, 0, '0X100UL'),
-          ('bool','uint8', 'uint8', 'NPY_UINT8', 31, 1, 0, '0x2UL'),
+          ('bool','bool', 'uint8', 'NPY_UINT8', 31, 1, 0, '0x2UL'),
           ('int32', 'uint32', 'uint64', 'NPY_INT64', 0, 0, '-0x80000000LL', '0x80000000LL'),
           ('int16', 'uint16', 'uint32', 'NPY_INT32', 1, 16, '-0x8000LL', '0x8000LL' ),
           ('int8', 'uint8', 'uint16', 'NPY_INT16', 3, 8, '-0x80LL', '0x80LL' ),
@@ -145,11 +145,11 @@ cdef object _rand_{{nptype}}_combined(object low, object high, object size, aug_
           distribution, or a single such random int if `size` not provided.
 
     """
-    cdef {{utype}}_t off, val, mask
+    cdef {{utype}}_t rng, last_rng, off, val, mask, out_val
     cdef uint32_t buf
     cdef {{utype}}_t *out
     cdef {{utype}}_t *out_data
-    cdef {{nptype_up}}_t rng, last_rng, low_v, high_v
+    cdef {{nptype_up}}_t low_v, high_v
     cdef np.ndarray low_arr, high_arr, out_arr
     cdef np.npy_intp i, cnt
     cdef np.broadcast it
@@ -174,8 +174,8 @@ cdef object _rand_{{nptype}}_combined(object low, object high, object size, aug_
         off = <{{utype}}_t>(<{{nptype}}_t>low)
         if size is None:
             with lock:
-                random_bounded_{{utype}}_fill(state, off, rng, 1, out)
-            return np.{{otype}}(<{{nptype}}_t>out[0])
+                random_bounded_{{utype}}_fill(state, off, rng, 1, &out_val)
+            return np.{{otype}}(<{{nptype}}_t>out_val)
         else:
             out_arr = <np.ndarray>np.empty(size, np.{{nptype}})
             cnt = np.PyArray_SIZE(out_arr)
@@ -211,14 +211,14 @@ cdef object _rand_{{nptype}}_combined(object low, object high, object size, aug_
         for i in range(n):
             low_v = (<{{nptype_up}}_t*>np.PyArray_MultiIter_DATA(it, 0))[0]
             high_v = (<{{nptype_up}}_t*>np.PyArray_MultiIter_DATA(it, 1))[0]
-            rng = (high_v - 1) - low_v
+            rng = <{{utype}}_t>((high_v - 1) - low_v)
             off = <{{utype}}_t>(<{{nptype_up}}_t>low_v)
 
             if rng != last_rng:
                 # Smallest bit mask >= max
                 mask = <{{utype}}_t>_gen_mask(rng)
 
-            out[i] = random_buffered_bounded_{{utype}}(state, off, rng, mask, &buf_rem, &buf)
+            out_data[i] = random_buffered_bounded_{{utype}}(state, off, rng, mask, &buf_rem, &buf)
 
             np.PyArray_MultiIter_NEXT(it)
 

@@ -1403,7 +1403,7 @@ static inline uint64_t gen_mask(uint64_t max)
  */
 
 
-inline uint64_t random_bounded_uint64(aug_state *state, uint64_t off, uint64_t rng, uint64_t mask)
+static inline uint64_t bounded_uint64(aug_state *state, uint64_t off, uint64_t rng, uint64_t mask)
 {
     uint64_t val;
     if (rng == 0)
@@ -1418,8 +1418,13 @@ inline uint64_t random_bounded_uint64(aug_state *state, uint64_t off, uint64_t r
     return  off + val;
 }
 
+uint64_t random_bounded_uint64(aug_state *state, uint64_t off, uint64_t rng, uint64_t mask)
+{
+    return bounded_uint64(state, off, rng, mask);
+}
 
-inline uint32_t random_buffered_bounded_uint32(aug_state *state, uint32_t off, uint32_t rng, uint32_t mask, int *bcnt, uint32_t *buf)
+
+static inline uint32_t bounded_uint32(aug_state *state, uint32_t off, uint32_t rng, uint32_t mask)
 {
     /*
      * The buffer and buffer count are not used here but are included to allow
@@ -1435,7 +1440,15 @@ inline uint32_t random_buffered_bounded_uint32(aug_state *state, uint32_t off, u
     return off + val;
 }
 
-inline uint16_t random_buffered_bounded_uint16(aug_state *state, uint16_t off, uint16_t rng, uint16_t mask, int *bcnt, uint32_t *buf)
+uint32_t random_buffered_bounded_uint32(aug_state *state, uint32_t off, uint32_t rng, uint32_t mask, int *bcnt, uint32_t *buf)
+{
+    /*
+     *  Unused bcnt and buf are here only to allow templating with other uint generators
+     */
+    return bounded_uint32(state, off, rng, mask);
+}
+
+static inline buffered_bounded_uint16(aug_state *state, uint16_t off, uint16_t rng, uint16_t mask, int *bcnt, uint32_t *buf)
 {
     uint16_t val;
     if (rng == 0)
@@ -1455,7 +1468,12 @@ inline uint16_t random_buffered_bounded_uint16(aug_state *state, uint16_t off, u
     return  off + val;
 }
 
-inline uint8_t random_buffered_bounded_uint8(aug_state *state, uint8_t off, uint8_t rng, uint8_t mask, int *bcnt, uint32_t *buf)
+uint16_t random_buffered_bounded_uint16(aug_state *state, uint16_t off, uint16_t rng, uint16_t mask, int *bcnt, uint32_t *buf)
+{
+    return buffered_bounded_uint16(state, off, rng, mask, bcnt, buf);
+}
+
+static inline uint8_t buffered_bounded_uint8(aug_state *state, uint8_t off, uint8_t rng, uint8_t mask, int *bcnt, uint32_t *buf)
 {
     uint8_t val;
     if (rng == 0)
@@ -1474,6 +1492,31 @@ inline uint8_t random_buffered_bounded_uint8(aug_state *state, uint8_t off, uint
     return  off + val;
 }
 
+uint8_t random_buffered_bounded_uint8(aug_state *state, uint8_t off, uint8_t rng, uint8_t mask, int *bcnt, uint32_t *buf)
+{
+    return buffered_bounded_uint8(state, off, rng, mask, bcnt, buf);
+}
+
+static inline npy_bool buffered_bounded_bool(aug_state *state, npy_bool off, npy_bool rng, npy_bool mask, int *bcnt, uint32_t *buf)
+{
+    if (rng == 0)
+        return off;
+    if (!(bcnt[0])) {
+        buf[0] = random_uint32(state);
+        bcnt[0] = 31;
+    }
+    else {
+        buf[0] >>= 1;
+        bcnt[0] -= 1;
+    }
+    return (buf[0] & 0x00000001UL) != 0;
+}
+
+npy_bool random_buffered_bounded_bool(aug_state *state, npy_bool off, npy_bool rng, npy_bool mask, int *bcnt, uint32_t *buf)
+{
+    return buffered_bounded_bool(state, off, rng, mask, bcnt, buf);
+}
+
 void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, npy_intp cnt, uint64_t *out)
 {
     uint64_t mask;
@@ -1482,7 +1525,7 @@ void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, np
     /* Smallest bit mask >= max */
     mask = gen_mask(rng);
     for (i = 0; i < cnt; i++) {
-        out[i] = random_bounded_uint64(state, off, rng, mask);
+        out[i] = bounded_uint64(state, off, rng, mask);
     }
 }
 
@@ -1493,7 +1536,7 @@ void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, np
  */
 void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, npy_intp cnt, uint32_t *out)
 {
-    uint32_t val, mask;
+    uint32_t    mask;
     npy_intp i;
     uint32_t buf = 0;
     int bcnt = 0;
@@ -1501,7 +1544,7 @@ void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, np
     /* Smallest bit mask >= max */
     mask = (uint32_t)gen_mask(rng);
     for (i = 0; i < cnt; i++) {
-        out[i] =  random_buffered_bounded_uint32(state, off, rng, mask, &bcnt, &buf);
+        out[i] =  bounded_uint32(state, off, rng, mask, &bcnt, &buf);
     }
 }
 
@@ -1520,7 +1563,7 @@ void random_bounded_uint16_fill(aug_state *state, uint16_t off, uint16_t rng, np
     /* Smallest bit mask >= max */
     mask = (uint16_t)gen_mask(rng);
     for (i = 0; i < cnt; i++) {
-        out[i] = random_buffered_bounded_uint16(state, off, rng, mask, &bcnt, &buf);
+        out[i] = buffered_bounded_uint16(state, off, rng, mask, &bcnt, &buf);
     }
 }
 
@@ -1538,7 +1581,7 @@ void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, npy_i
     /* Smallest bit mask >= max */
     mask = (uint8_t)gen_mask(rng);
     for (i = 0; i < cnt; i++) {
-        out[i] = random_buffered_bounded_uint8(state, off, rng, mask, &bcnt, &buf);
+        out[i] = buffered_bounded_uint8(state, off, rng, mask, &bcnt, &buf);
     }
 
 }
@@ -1550,27 +1593,13 @@ void random_bounded_uint8_fill(aug_state *state, uint8_t off, uint8_t rng, npy_i
  */
 void random_bounded_bool_fill(aug_state *state, npy_bool off, npy_bool rng, npy_intp cnt, npy_bool *out)
 {
+    npy_bool mask = 0;
     npy_intp i;
     uint32_t buf = 0;
     int bcnt = 0;
 
-    if (rng == 0) {
-        for (i = 0; i < cnt; i++) {
-            out[i] = off;
-        }
-        return;
-    }
-
     for (i = 0; i < cnt; i++) {
-        if (!bcnt) {
-            buf = random_uint32(state);
-            bcnt = 31;
-        }
-        else {
-            buf >>= 1;
-            bcnt--;
-        }
-        out[i] = (buf & 0x00000001) != 0;
+        out[i] = buffered_bounded_bool(state, off, rng, mask, &bcnt, &buf);
     }
 }
 

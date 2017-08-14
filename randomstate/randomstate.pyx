@@ -68,7 +68,8 @@ cdef extern from "distributions.h":
     cdef uint32_t random_buffered_bounded_uint32(aug_state *state, uint32_t off, uint32_t rng, uint32_t mask, int *bcnt, uint32_t *buf) nogil
     cdef uint16_t random_buffered_bounded_uint16(aug_state *state, uint16_t off, uint16_t rng, uint16_t mask, int *bcnt, uint32_t *buf) nogil
     cdef uint8_t random_buffered_bounded_uint8(aug_state *state, uint8_t off, uint8_t rng, uint8_t mask, int *bcnt, uint32_t *buf) nogil
-
+    cdef np.npy_bool random_buffered_bounded_bool(aug_state *state, np.npy_bool off, np.npy_bool rng, np.npy_bool mask, int *bcnt, uint32_t *buf) nogil
+    
     cdef long random_positive_int(aug_state* state) nogil
     cdef unsigned long random_uint(aug_state* state) nogil
     cdef unsigned long random_interval(aug_state* state, unsigned long max) nogil
@@ -1021,6 +1022,27 @@ cdef class RandomState:
         if not key in _randint_type:
             raise TypeError('Unsupported dtype "%s" for randint' % key)
 
+        if key == 'int32':
+            ret =  _rand_int32_combined(low, high, size, &self.rng_state, self.lock)
+        elif key == 'int16':
+            ret =  _rand_int16_combined(low, high, size, &self.rng_state, self.lock)
+        elif key == 'int8':
+            ret =  _rand_int8_combined(low, high, size, &self.rng_state, self.lock)
+        elif key == 'uint32':
+            ret =  _rand_uint32_combined(low, high, size, &self.rng_state, self.lock)
+        elif key == 'uint16':
+            ret =  _rand_uint16_combined(low, high, size, &self.rng_state, self.lock)
+        elif key == 'uint8':
+            ret =  _rand_uint8_combined(low, high, size, &self.rng_state, self.lock)
+        elif key == 'bool':
+            ret =  _rand_bool_combined(low, high, size, &self.rng_state, self.lock)
+        
+        if key != 'int64' and key != 'uint64':
+            if size is None and dtype in (np.bool, np.int, np.long):
+                    if np.array(ret).shape == ():
+                        return dtype(ret)
+            return ret
+
         lowbnd, highbnd = _randint_type[key]
 
         low = np.asarray(low)
@@ -1042,22 +1064,10 @@ cdef class RandomState:
             if ilow >= ihigh:
                 raise ValueError("low >= high")
 
-            if key == 'int32':
-                ret = _rand_int32(ilow, ihigh - 1, size, &self.rng_state, self.lock)
-            elif key == 'int64':
+            if key == 'int64':
                 ret = _rand_int64(ilow, ihigh - 1, size, &self.rng_state, self.lock)
-            elif key == 'int16':
-                ret = _rand_int16(ilow, ihigh - 1, size, &self.rng_state, self.lock)
-            elif key == 'int8':
-                ret = _rand_int8(ilow, ihigh - 1, size, &self.rng_state, self.lock)
             elif key == 'uint64':
                 ret = _rand_uint64(ilow, ihigh - 1, size, &self.rng_state, self.lock)
-            elif key == 'uint32':
-                ret = _rand_uint32(ilow, ihigh - 1, size, &self.rng_state, self.lock)
-            elif key == 'uint16':
-                ret = _rand_uint16(ilow, ihigh - 1, size, &self.rng_state, self.lock)
-            elif key == 'uint8':
-                ret = _rand_uint8(ilow, ihigh - 1, size, &self.rng_state, self.lock)
             elif key == 'bool':
                 ret = _rand_bool(ilow, ihigh - 1, size, &self.rng_state, self.lock)
 
@@ -1066,22 +1076,10 @@ cdef class RandomState:
                     return dtype(ret)
             return ret
 
-        if key == 'int32':
-            ret = _rand_int32_broadcast(low, high, size, &self.rng_state, self.lock)
-        elif key == 'int64':
+        if key == 'int64':
             ret = _rand_int64_broadcast(low, high, size, &self.rng_state, self.lock)
-        elif key == 'int16':
-            ret = _rand_int16_broadcast(low, high, size, &self.rng_state, self.lock)
-        elif key == 'int8':
-            ret = _rand_int8_broadcast(low, high, size, &self.rng_state, self.lock)
         elif key == 'uint64':
             ret = _rand_uint64_broadcast(low, high, size, &self.rng_state, self.lock)
-        elif key == 'uint32':
-            ret = _rand_uint32_broadcast(low, high, size, &self.rng_state, self.lock)
-        elif key == 'uint16':
-            ret = _rand_uint16_broadcast(low, high, size, &self.rng_state, self.lock)
-        elif key == 'uint8':
-            ret = _rand_uint8_broadcast(low, high, size, &self.rng_state, self.lock)
         elif key == 'bool':
             ret = _rand_bool_broadcast(low, high, size, &self.rng_state, self.lock)
 

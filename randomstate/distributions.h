@@ -176,8 +176,12 @@ extern double random_standard_gamma_zig_double(aug_state* state, double shape);
 
 extern float random_standard_gamma_zig_float(aug_state* state, float shape);
 
-inline uint32_t random_buffered_bounded_uint32(aug_state *state, uint32_t off, uint32_t rng, uint32_t mask, int *bcnt, uint32_t *buf);
+extern uint64_t random_bounded_uint64(aug_state *state, uint64_t off, uint64_t rng, uint64_t mask);
 
-inline uint16_t random_buffered_bounded_uint16(aug_state *state, uint16_t off, uint16_t rng, uint16_t mask, int *bcnt, uint32_t *buf);
+extern uint32_t random_buffered_bounded_uint32(aug_state *state, uint32_t off, uint32_t rng, uint32_t mask, int *bcnt, uint32_t *buf);
 
-inline uint8_t random_buffered_bounded_uint8(aug_state *state, uint8_t off, uint8_t rng, uint8_t mask, int *bcnt, uint32_t *buf);
+extern uint16_t random_buffered_bounded_uint16(aug_state *state, uint16_t off, uint16_t rng, uint16_t mask, int *bcnt, uint32_t *buf);
+
+extern uint8_t random_buffered_bounded_uint8(aug_state *state, uint8_t off, uint8_t rng, uint8_t mask, int *bcnt, uint32_t *buf);
+
+extern npy_bool random_buffered_bounded_bool(aug_state *state, npy_bool off, npy_bool rng, npy_bool mask, int *bcnt, uint32_t *buf);
