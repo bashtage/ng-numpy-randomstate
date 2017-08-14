@@ -175,3 +175,9 @@ extern void random_standard_exponential_zig_float_fill(aug_state* state, npy_int
 extern double random_standard_gamma_zig_double(aug_state* state, double shape);
 
 extern float random_standard_gamma_zig_float(aug_state* state, float shape);
+
+inline uint32_t random_buffered_bounded_uint32(aug_state *state, uint32_t off, uint32_t rng, uint32_t mask, int *bcnt, uint32_t *buf);
+
+inline uint16_t random_buffered_bounded_uint16(aug_state *state, uint16_t off, uint16_t rng, uint16_t mask, int *bcnt, uint32_t *buf);
+
+inline uint8_t random_buffered_bounded_uint8(aug_state *state, uint8_t off, uint8_t rng, uint8_t mask, int *bcnt, uint32_t *buf);

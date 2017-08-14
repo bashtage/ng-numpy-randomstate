@@ -64,6 +64,10 @@ cdef extern from "distributions.h":
     cdef uint64_t random_uint64(aug_state* state) nogil
     cdef uint32_t random_uint32(aug_state* state) nogil
     cdef uint64_t random_raw_values(aug_state* state) nogil
+    
+    cdef uint32_t random_buffered_bounded_uint32(aug_state *state, uint32_t off, uint32_t rng, uint32_t mask, int *bcnt, uint32_t *buf) nogil
+    cdef uint16_t random_buffered_bounded_uint16(aug_state *state, uint16_t off, uint16_t rng, uint16_t mask, int *bcnt, uint32_t *buf) nogil
+    cdef uint8_t random_buffered_bounded_uint8(aug_state *state, uint8_t off, uint8_t rng, uint8_t mask, int *bcnt, uint32_t *buf) nogil
 
     cdef long random_positive_int(aug_state* state) nogil
     cdef unsigned long random_uint(aug_state* state) nogil

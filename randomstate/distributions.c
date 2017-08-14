@@ -1419,8 +1419,14 @@ inline uint64_t random_bounded_uint64(aug_state *state, uint64_t off, uint64_t r
 }
 
 
-inline uint32_t random_bounded_uint32(aug_state *state, uint32_t off, uint32_t rng, uint32_t mask)
+inline uint32_t random_buffered_bounded_uint32(aug_state *state, uint32_t off, uint32_t rng, uint32_t mask, int *bcnt, uint32_t *buf)
 {
+    /*
+     * The buffer and buffer count are not used here but are included to allow
+     * this function to be templated with the similar uint8 and uint16
+     * functions
+     */
+
     uint32_t val;
     if (rng == 0)
         return off;
@@ -1489,11 +1495,13 @@ void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, np
 {
     uint32_t val, mask;
     npy_intp i;
+    uint32_t buf = 0;
+    int bcnt = 0;
 
     /* Smallest bit mask >= max */
     mask = (uint32_t)gen_mask(rng);
     for (i = 0; i < cnt; i++) {
-        out[i] =  random_bounded_uint32(state, off, rng, mask);
+        out[i] =  random_buffered_bounded_uint32(state, off, rng, mask, &bcnt, &buf);
     }
 }
 
