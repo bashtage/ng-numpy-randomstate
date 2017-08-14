@@ -1536,15 +1536,13 @@ void random_bounded_uint64_fill(aug_state *state, uint64_t off, uint64_t rng, np
  */
 void random_bounded_uint32_fill(aug_state *state, uint32_t off, uint32_t rng, npy_intp cnt, uint32_t *out)
 {
-    uint32_t    mask;
+    uint32_t mask;
     npy_intp i;
-    uint32_t buf = 0;
-    int bcnt = 0;
 
     /* Smallest bit mask >= max */
     mask = (uint32_t)gen_mask(rng);
     for (i = 0; i < cnt; i++) {
-        out[i] =  bounded_uint32(state, off, rng, mask, &bcnt, &buf);
+        out[i] =  bounded_uint32(state, off, rng, mask);
     }
 }
 
