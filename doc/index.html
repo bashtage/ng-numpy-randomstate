@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate’s documentation &#8212; randomstate 1.13.2+7.g0a55ecb documentation</title>
+    <title>randomstate’s documentation &#8212; randomstate 1.13.2+14.g09186fe documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.13.2+7.g0a55ecb',
+        VERSION:     '1.13.2+14.g09186fe',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -55,7 +55,7 @@
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.2+7.g0a55ecb documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.2+14.g09186fe documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -153,8 +153,8 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [2]: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;bm&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">35.8 ms +- 124 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">9.05 ms +- 139 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">35.7 ms +- 79.3 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">9.02 ms +- 64.2 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_exponential</span>
@@ -162,8 +162,8 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [5]: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">47.4 ms +- 220 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">5.22 ms +- 44.5 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">47 ms +- 48.6 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">5.15 ms +- 25.1 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_gamma</span>
@@ -171,8 +171,8 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [8]: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">50.6 ms +- 78.5 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">25.5 ms +- 76.9 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">50.3 ms +- 69.1 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">25.6 ms +- 128 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -443,7 +443,7 @@ performance than more modern generators.</li>
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.2+7.g0a55ecb documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.2+14.g09186fe documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">
