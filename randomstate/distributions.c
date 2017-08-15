@@ -1495,7 +1495,7 @@ uint32_t random_buffered_bounded_uint32(aug_state *state, uint32_t off, uint32_t
     return bounded_uint32(state, off, rng, mask);
 }
 
-static NPY_INLINE buffered_bounded_uint16(aug_state *state, uint16_t off, uint16_t rng, uint16_t mask, int *bcnt, uint32_t *buf)
+static NPY_INLINE uint16_t buffered_bounded_uint16(aug_state *state, uint16_t off, uint16_t rng, uint16_t mask, int *bcnt, uint32_t *buf)
 {
     uint16_t val;
     if (rng == 0)

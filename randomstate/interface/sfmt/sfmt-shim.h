@@ -1,9 +1,11 @@
 #ifdef _WIN32
 #include "../../src/common/stdint.h"
-#define inline __forceinline
 #else
 #include <stdint.h>
 #endif
+
+#include "Python.h"
+#include "numpy/npy_common.h"
 
 #include "../../src/common/binomial.h"
 #include "../../src/common/entropy.h"
@@ -23,7 +25,7 @@ typedef struct s_aug_state {
   int buffer_loc;
 } aug_state;
 
-static inline uint64_t random_uint64_from_buffer(aug_state *state) {
+static NPY_INLINE uint64_t random_uint64_from_buffer(aug_state *state) {
   uint64_t out;
   if (state->buffer_loc >= (2 * SFMT_N)) {
     state->buffer_loc = 0;
@@ -34,7 +36,7 @@ static inline uint64_t random_uint64_from_buffer(aug_state *state) {
   return out;
 }
 
-static inline uint32_t random_uint32(aug_state *state) {
+static NPY_INLINE uint32_t random_uint32(aug_state *state) {
   uint64_t d;
   if (state->has_uint32) {
     state->has_uint32 = 0;
@@ -46,15 +48,15 @@ static inline uint32_t random_uint32(aug_state *state) {
   return (uint32_t)(d & 0xFFFFFFFFUL);
 }
 
-static inline uint64_t random_uint64(aug_state *state) {
+static NPY_INLINE uint64_t random_uint64(aug_state *state) {
   return random_uint64_from_buffer(state);
 }
 
-static inline double random_double(aug_state *state) {
+static NPY_INLINE double random_double(aug_state *state) {
   return (random_uint64_from_buffer(state) >> 11) * (1.0 / 9007199254740992.0);
 }
 
-static inline uint64_t random_raw_values(aug_state *state) {
+static NPY_INLINE uint64_t random_raw_values(aug_state *state) {
   return random_uint64_from_buffer(state);
 }
 
@@ -65,4 +67,4 @@ extern void set_seed_by_array(aug_state *state, uint32_t init_key[],
 
 extern void set_seed(aug_state *state, uint32_t seed);
 
-extern void jump_state(aug_state* state);
+extern void jump_state(aug_state *state);
