@@ -9,6 +9,7 @@
 
 #include "../../src/common/binomial.h"
 #include "../../src/common/entropy.h"
+#include "../../src/sfmt/sfmt-jump.h"
 #include "../../src/sfmt/sfmt.h"
 
 typedef struct s_aug_state {
