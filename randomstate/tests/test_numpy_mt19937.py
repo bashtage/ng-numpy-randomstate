@@ -156,6 +156,15 @@ class TestRandint(TestCase):
             assert_raises(ValueError, self.rfunc, ubnd, lbnd, dtype=dt)
             assert_raises(ValueError, self.rfunc, 1, 0, dtype=dt)
 
+    def test_bounds_checking_array(self):
+        for dt in self.itype:
+            lbnd = 0 if dt is bool else np.iinfo(dt).min
+            ubnd = 2 if dt is bool else np.iinfo(dt).max + 1
+            assert_raises(ValueError, self.rfunc, [lbnd - 1], [ubnd], dtype=dt)
+            assert_raises(ValueError, self.rfunc, [lbnd], [ubnd + 1], dtype=dt)
+            assert_raises(ValueError, self.rfunc, ubnd, [lbnd], dtype=dt)
+            assert_raises(ValueError, self.rfunc, [1], 0, dtype=dt)
+
     def test_rng_zero_and_extremes(self):
         for dt in self.itype:
             lbnd = 0 if dt is bool else np.iinfo(dt).min
@@ -170,6 +179,21 @@ class TestRandint(TestCase):
             tgt = (lbnd + ubnd) // 2
             assert_equal(self.rfunc(tgt, tgt + 1, size=1000, dtype=dt), tgt)
 
+    def test_rng_zero_and_extremes_array(self):
+        for dt in self.itype:
+            lbnd = 0 if dt is bool else np.iinfo(dt).min
+            ubnd = 2 if dt is bool else np.iinfo(dt).max + 1
+
+            tgt = ubnd - 1
+            print(dt)
+            assert_equal(self.rfunc([tgt], [tgt + 1], size=1000, dtype=dt), tgt)
+
+            tgt = lbnd
+            assert_equal(self.rfunc([tgt], [tgt + 1], size=1000, dtype=dt), tgt)
+
+            tgt = (lbnd + ubnd) // 2
+            assert_equal(self.rfunc([tgt], [tgt + 1], size=1000, dtype=dt), tgt)
+
     def test_full_range(self):
         # Test for ticket #1690
 
@@ -179,6 +203,20 @@ class TestRandint(TestCase):
 
             try:
                 self.rfunc(lbnd, ubnd, dtype=dt)
+            except Exception as e:
+                raise AssertionError("No error should have been raised, "
+                                     "but one was with the following "
+                                     "message:\n\n%s" % str(e))
+
+    def test_full_range_array(self):
+        # Test for ticket #1690
+
+        for dt in self.itype:
+            lbnd = 0 if dt is bool else np.iinfo(dt).min
+            ubnd = 2 if dt is bool else np.iinfo(dt).max + 1
+
+            try:
+                self.rfunc([lbnd], [ubnd], dtype=dt)
             except Exception as e:
                 raise AssertionError("No error should have been raised, "
                                      "but one was with the following "
@@ -273,6 +311,17 @@ class TestRandint(TestCase):
             sample = self.rfunc(lbnd, ubnd, dtype=dt)
             self.assertFalse(hasattr(sample, 'dtype'))
             self.assertEqual(type(sample), dt)
+
+
+    def test_respect_dtype_array(self):
+        # See gh-7203
+        for dt in self.itype:
+            lbnd = 0 if dt is bool else np.iinfo(dt).min
+            ubnd = 2 if dt is bool else np.iinfo(dt).max + 1
+            dt = np.bool_ if dt is bool else dt
+
+            sample = self.rfunc([lbnd], [ubnd], dtype=dt)
+            self.assertEqual(sample.dtype, dt)
 
 
 class TestRandomDist(TestCase):
