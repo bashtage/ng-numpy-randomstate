@@ -17,11 +17,12 @@ from libc.stdint cimport (uint8_t, uint16_t, uint32_t, uint64_t,
                           int8_t, int16_t, int32_t, int64_t, intptr_t)
 from libc.stdlib cimport malloc, free
 from libc.math cimport sqrt
-from cpython cimport Py_INCREF, PyComplex_FromDoubles
+from cpython cimport Py_INCREF, PyComplex_FromDoubles, PyComplex_RealAsDouble, \
+    PyComplex_ImagAsDouble, PyInt_AsLong, PyFloat_AsDouble
+
 
 import randomstate
 from binomial cimport binomial_t
-from cython_overrides cimport PyFloat_AsDouble, PyInt_AsLong, PyComplex_RealAsDouble, PyComplex_ImagAsDouble
 from randomstate.entropy import random_entropy
 
 np.import_array()
@@ -1810,7 +1811,7 @@ cdef class RandomState:
             raise ValueError("method must be either 'bm' or 'zig'")
         cdef np.ndarray ogamma, orelation, oloc, randoms, v_real, v_imag, rho
         cdef double *randoms_data
-        cdef double fgamma_r, fgamma_i, frelation_r, frelation_i, frho, f_v_real , f_v_imag, \
+        cdef double fgamma_r, fgamma_i, frelation_r, frelation_i, frho, fvar_r , fvar_i, \
             floc_r, floc_i, f_real, f_imag, i_r_scale, r_scale, i_scale, f_rho
         cdef np.npy_intp i, j, n
         cdef np.broadcast it
@@ -1825,19 +1826,19 @@ cdef class RandomState:
             fgamma_r = PyComplex_RealAsDouble(gamma)
             fgamma_i = PyComplex_ImagAsDouble(gamma)
             frelation_r = PyComplex_RealAsDouble(relation)
-            frelation_i = PyComplex_ImagAsDouble(relation)
+            frelation_i = 0.5 * PyComplex_ImagAsDouble(relation)
 
-            f_v_real = fgamma_r + frelation_r
-            f_v_imag = fgamma_r - frelation_r
+            fvar_r = 0.5 * (fgamma_r + frelation_r)
+            fvar_i = 0.5 * (fgamma_r - frelation_r)
             if fgamma_i != 0:
                 raise ValueError('Im(gamma) != 0')
-            if f_v_imag < 0:
+            if fvar_i < 0:
                 raise ValueError('Re(gamma - relation) < 0')
-            if f_v_real < 0:
+            if fvar_r < 0:
                 raise ValueError('Re(gamma + relation) < 0')
             f_rho = 0.0
-            if f_v_imag > 0 and f_v_real > 0:
-                f_rho = frelation_i / sqrt(f_v_imag * f_v_real)
+            if fvar_i > 0 and fvar_r > 0:
+                f_rho = frelation_i / sqrt(fvar_i * fvar_r)
             if f_rho > 1.0 or f_rho < -1.0:
                 raise ValueError('Im(relation) ** 2 > Re(gamma ** 2 - relation** 2)')
 
@@ -1849,7 +1850,7 @@ cdef class RandomState:
                     random_gauss_fill(&self.rng_state, 1, &f_real)
                     random_gauss_fill(&self.rng_state, 1, &f_imag)
 
-                compute_complex(&f_real, &f_imag, floc_r, floc_i, f_v_real, f_v_imag, f_rho)
+                compute_complex(&f_real, &f_imag, floc_r, floc_i, fvar_r, fvar_i, f_rho)
                 return PyComplex_FromDoubles(f_real, f_imag)
 
             randoms = <np.ndarray>np.empty(size, np.complex128)
@@ -1857,8 +1858,8 @@ cdef class RandomState:
             n = np.PyArray_SIZE(randoms)
 
             i_r_scale = sqrt(1 - f_rho * f_rho)
-            r_scale = sqrt(0.5 * f_v_real)
-            i_scale = sqrt(0.5 * f_v_imag)
+            r_scale = sqrt(fvar_r)
+            i_scale = sqrt(fvar_i)
             j = 0
             with self.lock, nogil:
                 if method == u'zig':
@@ -1916,10 +1917,10 @@ cdef class RandomState:
             for i in range(n):
                 floc_r= (<double*>np.PyArray_MultiIter_DATA(it, 1))[0]
                 floc_i= (<double*>np.PyArray_MultiIter_DATA(it, 1))[1]
-                f_v_real = (<double*>np.PyArray_MultiIter_DATA(it, 2))[0]
-                f_v_imag = (<double*>np.PyArray_MultiIter_DATA(it, 3))[0]
+                fvar_r = (<double*>np.PyArray_MultiIter_DATA(it, 2))[0]
+                fvar_i = (<double*>np.PyArray_MultiIter_DATA(it, 3))[0]
                 f_rho = (<double*>np.PyArray_MultiIter_DATA(it, 4))[0]
-                compute_complex(&randoms_data[j], &randoms_data[j+1], floc_r, floc_i, f_v_real, f_v_imag, f_rho)
+                compute_complex(&randoms_data[j], &randoms_data[j+1], floc_r, floc_i, fvar_r, fvar_i, f_rho)
                 j += 2
                 np.PyArray_MultiIter_NEXT(it)
 
