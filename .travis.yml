@@ -46,7 +46,6 @@ before_install:
 
 install:
   - python setup.py develop
-  - python setup.py install
 
 script:
   - set -e
