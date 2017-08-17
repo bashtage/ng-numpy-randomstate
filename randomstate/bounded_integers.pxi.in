@@ -80,7 +80,10 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
 
     low = np.asarray(low)
     high = np.asarray(high)
-    if low.shape == high.shape == ():
+    low_ndim = np.PyArray_NDIM(<np.ndarray>low)
+    high_ndim = np.PyArray_NDIM(<np.ndarray>high)
+    if ((low_ndim == 0 or (low_ndim==1 and low.size==1 and size is not None)) and
+            (high_ndim == 0 or (high_ndim==1 and high.size==1 and size is not None))):
         low = int(low) # TODO: Cast appropriately?
         high = int(high) # TODO: Cast appropriately?
 
@@ -199,7 +202,10 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
 
     low = np.asarray(low)
     high = np.asarray(high)
-    if low.shape == high.shape == ():
+    low_ndim = np.PyArray_NDIM(<np.ndarray>low)
+    high_ndim = np.PyArray_NDIM(<np.ndarray>high)
+    if ((low_ndim == 0 or (low_ndim==1 and low.size==1 and size is not None)) and
+            (high_ndim == 0 or (high_ndim==1 and high.size==1 and size is not None))):
         low = int(low) # TODO: Cast appropriately?
         high = int(high) # TODO: Cast appropriately?
         high -= 1  # Use a closed interval

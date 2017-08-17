@@ -160,10 +160,10 @@ class TestRandint(TestCase):
         for dt in self.itype:
             lbnd = 0 if dt is bool else np.iinfo(dt).min
             ubnd = 2 if dt is bool else np.iinfo(dt).max + 1
-            assert_raises(ValueError, self.rfunc, [lbnd - 1], [ubnd], dtype=dt)
-            assert_raises(ValueError, self.rfunc, [lbnd], [ubnd + 1], dtype=dt)
-            assert_raises(ValueError, self.rfunc, ubnd, [lbnd], dtype=dt)
-            assert_raises(ValueError, self.rfunc, [1], 0, dtype=dt)
+            assert_raises(ValueError, self.rfunc, [lbnd - 1] * 2, [ubnd] * 2, dtype=dt)
+            assert_raises(ValueError, self.rfunc, [lbnd] * 2, [ubnd + 1] * 2, dtype=dt)
+            assert_raises(ValueError, self.rfunc, ubnd, [lbnd] * 2, dtype=dt)
+            assert_raises(ValueError, self.rfunc, [1] * 2, 0, dtype=dt)
 
     def test_rng_zero_and_extremes(self):
         for dt in self.itype:
@@ -180,19 +180,25 @@ class TestRandint(TestCase):
             assert_equal(self.rfunc(tgt, tgt + 1, size=1000, dtype=dt), tgt)
 
     def test_rng_zero_and_extremes_array(self):
+        size = 1000
         for dt in self.itype:
             lbnd = 0 if dt is bool else np.iinfo(dt).min
             ubnd = 2 if dt is bool else np.iinfo(dt).max + 1
 
             tgt = ubnd - 1
-            print(dt)
-            assert_equal(self.rfunc([tgt], [tgt + 1], size=1000, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt], [tgt + 1], size=size, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt] * size, [tgt + 1]  * size, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt] * size, [tgt + 1]  * size, size=size, dtype=dt), tgt)
 
             tgt = lbnd
-            assert_equal(self.rfunc([tgt], [tgt + 1], size=1000, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt], [tgt + 1], size=size, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt] * size, [tgt + 1] * size, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt] * size, [tgt + 1] * size, size=size, dtype=dt), tgt)
 
             tgt = (lbnd + ubnd) // 2
-            assert_equal(self.rfunc([tgt], [tgt + 1], size=1000, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt], [tgt + 1], size=size, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt] * size, [tgt + 1] * size, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt] * size, [tgt + 1] * size, size=size, dtype=dt), tgt)
 
     def test_full_range(self):
         # Test for ticket #1690
@@ -221,6 +227,24 @@ class TestRandint(TestCase):
                 raise AssertionError("No error should have been raised, "
                                      "but one was with the following "
                                      "message:\n\n%s" % str(e))
+
+    def test_scalar_array_equiv(self):
+        for dt in self.itype:
+            lbnd = 0 if dt is bool else np.iinfo(dt).min
+            ubnd = 2 if dt is bool else np.iinfo(dt).max + 1
+
+            size = 1000
+            mt19937.seed(1234)
+            scalar = self.rfunc(lbnd, ubnd, size=size, dtype=dt)
+
+            mt19937.seed(1234)
+            scalar_array = self.rfunc(lbnd, ubnd, size=size, dtype=dt)
+
+            mt19937.seed(1234)
+            array = self.rfunc([lbnd] * size, [ubnd] * size, size=size, dtype=dt)
+            assert_array_equal(scalar, scalar_array)
+            assert_array_equal(scalar, array)
+
 
     def test_in_bounds_fuzz(self):
         # Don't use fixed seed
@@ -269,6 +293,27 @@ class TestRandint(TestCase):
         val = self.rfunc(0, 2, size=1000, dtype=bool).view(np.int8)
         res = hashlib.md5(val).hexdigest()
         assert_(tgt[np.dtype(bool).name] == res)
+
+    def test_repeatability_broadcasting(self):
+
+        for dt in self.itype:
+
+            lbnd = 0 if dt in (np.bool, bool, np.bool_) else np.iinfo(dt).min
+            ubnd = 2 if dt in (np.bool, bool, np.bool_) else np.iinfo(dt).max + 1
+
+            # view as little endian for hash
+            mt19937.seed(1234)
+            val = self.rfunc(lbnd, ubnd, size=1000, dtype=dt)
+
+            mt19937.seed(1234)
+            val_bc = self.rfunc([lbnd] * 1000, ubnd, dtype=dt)
+
+            assert_array_equal(val, val_bc)
+
+            mt19937.seed(1234)
+            val_bc = self.rfunc([lbnd] * 1000, [ubnd] * 1000, dtype=dt)
+
+            assert_array_equal(val, val_bc)
 
     def test_int64_uint64_corner_case(self):
         # When stored in Numpy arrays, `lbnd` is casted
@@ -321,6 +366,8 @@ class TestRandint(TestCase):
             dt = np.bool_ if dt is bool else dt
 
             sample = self.rfunc([lbnd], [ubnd], dtype=dt)
+            self.assertEqual(sample.dtype, dt)
+            sample = self.rfunc([lbnd] * 2, [ubnd] * 2, dtype=dt)
             self.assertEqual(sample.dtype, dt)
 
 
