@@ -83,8 +83,8 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
     high_ndim = np.PyArray_NDIM(<np.ndarray>high)
     if ((low_ndim == 0 or (low_ndim==1 and low.size==1 and size is not None)) and
             (high_ndim == 0 or (high_ndim==1 and high.size==1 and size is not None))):
-        low = int(low) # TODO: Cast appropriately?
-        high = int(high) # TODO: Cast appropriately?
+        low = int(low)
+        high = int(high)
 
         if low < {{lb}}:
             raise ValueError("low is out of bounds for {{nptype}}")
@@ -205,8 +205,8 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
     high_ndim = np.PyArray_NDIM(<np.ndarray>high)
     if ((low_ndim == 0 or (low_ndim==1 and low.size==1 and size is not None)) and
             (high_ndim == 0 or (high_ndim==1 and high.size==1 and size is not None))):
-        low = int(low) # TODO: Cast appropriately?
-        high = int(high) # TODO: Cast appropriately?
+        low = int(low)
+        high = int(high)
         high -= 1  # Use a closed interval
 
         if low < {{lb}}:

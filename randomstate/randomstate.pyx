@@ -360,11 +360,11 @@ cdef class RandomState:
                 IF RS_SEED_ARRAY_BITS == 32:
                     set_seed_by_array(&self.rng_state,
                                       <uint32_t *>np.PyArray_DATA(seed),
-                                      np.PyArray_DIM(seed, 0))
+                                      <int>np.PyArray_DIM(seed, 0))
                 ELSE:
                     set_seed_by_array(&self.rng_state,
                                       <uint64_t *>np.PyArray_DATA(seed),
-                                      np.PyArray_DIM(seed, 0))
+                                      <int>np.PyArray_DIM(seed, 0))
             self.__seed = seed
             self._reset_state_variables()
 
