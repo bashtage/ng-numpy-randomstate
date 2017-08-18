@@ -77,9 +77,8 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
     cdef np.broadcast it
     cdef int buf_rem = 0
 
-
-    low = np.asarray(low)
-    high = np.asarray(high)
+    low = np.array(low, copy=False)
+    high = np.array(high, copy=False)
     low_ndim = np.PyArray_NDIM(<np.ndarray>low)
     high_ndim = np.PyArray_NDIM(<np.ndarray>high)
     if ((low_ndim == 0 or (low_ndim==1 and low.size==1 and size is not None)) and
@@ -200,8 +199,8 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
     cdef {{nptype}}_t low_v, high_v
     cdef uint64_t rng, last_rng, val, mask, off, out_val
 
-    low = np.asarray(low)
-    high = np.asarray(high)
+    low = np.array(low, copy=False)
+    high = np.array(high, copy=False)
     low_ndim = np.PyArray_NDIM(<np.ndarray>low)
     high_ndim = np.PyArray_NDIM(<np.ndarray>high)
     if ((low_ndim == 0 or (low_ndim==1 and low.size==1 and size is not None)) and

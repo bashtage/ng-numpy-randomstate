@@ -37,8 +37,8 @@ rngs = ['RNG_DSFMT', 'RNG_MLFG_1279_861', 'RNG_MRG32K3A', 'RNG_MT19937',
 compile_rngs = rngs[:]
 
 extra_defs = [('_CRT_SECURE_NO_WARNINGS', '1')] if os.name == 'nt' else []
-extra_link_args = ['/LTCG', '/OPT:REF', 'Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []
-base_extra_compile_args = [] if os.name == 'nt' else ['-std=c99']
+extra_link_args = ['/LTCG', '/OPT:REF', 'Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else ['-flto']
+base_extra_compile_args = [] if os.name == 'nt' else ['-std=c99','-flto']
 if USE_SSE2:
     if os.name == 'nt':
         base_extra_compile_args += ['/wd4146', '/GL']
