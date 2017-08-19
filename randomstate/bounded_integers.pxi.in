@@ -77,6 +77,10 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
     cdef np.broadcast it
     cdef int buf_rem = 0
 
+    if size is not None:
+        if (np.prod(size) == 0):
+            return np.empty(size, dtype=np.{{nptype}})
+
     low = np.array(low, copy=False)
     high = np.array(high, copy=False)
     low_ndim = np.PyArray_NDIM(<np.ndarray>low)
@@ -129,10 +133,10 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
 
     it = np.PyArray_MultiIterNew3(low_arr, high_arr, out_arr)
     out_data = <{{utype}}_t *>np.PyArray_DATA(out_arr)
-    n = np.PyArray_SIZE(out_arr)
+    cnt = np.PyArray_SIZE(out_arr)
     mask = last_rng = 0
     with lock, nogil:
-        for i in range(n):
+        for i in range(cnt):
             low_v = (<{{nptype_up}}_t*>np.PyArray_MultiIter_DATA(it, 0))[0]
             high_v = (<{{nptype_up}}_t*>np.PyArray_MultiIter_DATA(it, 1))[0]
             rng = <{{utype}}_t>((high_v - 1) - low_v)
@@ -199,6 +203,10 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
     cdef {{nptype}}_t low_v, high_v
     cdef uint64_t rng, last_rng, val, mask, off, out_val
 
+    if size is not None:
+        if (np.prod(size) == 0):
+            return np.empty(size, dtype=np.{{nptype}})
+
     low = np.array(low, copy=False)
     high = np.array(high, copy=False)
     low_ndim = np.PyArray_NDIM(<np.ndarray>low)
@@ -238,9 +246,9 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
 
     highm1_arr = <np.ndarray>np.empty_like(high_arr, dtype=np.{{nptype}})
     highm1_data = <{{nptype}}_t *>np.PyArray_DATA(highm1_arr)
-    n = np.PyArray_SIZE(high_arr)
+    cnt = np.PyArray_SIZE(high_arr)
     flat = high_arr.flat
-    for i in range(n):
+    for i in range(cnt):
         closed_upper = int(flat[i]) - 1
         if closed_upper > {{ub}}:
             raise ValueError('high is out of bounds for {{nptype}}')
