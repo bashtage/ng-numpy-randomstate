@@ -12,6 +12,7 @@ _randint_type = {'bool': (0, 2),
 ctypedef np.npy_bool bool_t
 
 cdef inline uint64_t _gen_mask(uint64_t max_val) nogil:
+    """Mask generator for use in bounded random numbers"""
     # Smallest bit mask >= max
     cdef uint64_t mask = max_val
     mask |= mask >> 1
@@ -21,9 +22,11 @@ cdef inline uint64_t _gen_mask(uint64_t max_val) nogil:
     mask |= mask >> 16
     mask |= mask >> 32
     return mask
+
+
 {{
 py:
-bc_ctypes = (('uint32', 'uint32', 'uint64', 'NPY_UINT64', 0, 0, 0, '0X100000000ULL'),
+type_info = (('uint32', 'uint32', 'uint64', 'NPY_UINT64', 0, 0, 0, '0X100000000ULL'),
           ('uint16', 'uint16', 'uint32', 'NPY_UINT32', 1, 16, 0, '0X10000UL'),
           ('uint8', 'uint8', 'uint16', 'NPY_UINT16', 3, 8, 0, '0X100UL'),
           ('bool','bool', 'uint8', 'NPY_UINT8', 31, 1, 0, '0x2UL'),
@@ -31,43 +34,11 @@ bc_ctypes = (('uint32', 'uint32', 'uint64', 'NPY_UINT64', 0, 0, 0, '0X100000000U
           ('int16', 'uint16', 'uint32', 'NPY_INT32', 1, 16, '-0x8000LL', '0x8000LL' ),
           ('int8', 'uint8', 'uint16', 'NPY_INT16', 3, 8, '-0x80LL', '0x80LL' ),
 )}}
-{{for  nptype, utype, nptype_up, npctype, remaining, bitshift, lb, ub in bc_ctypes}}
+{{for  nptype, utype, nptype_up, npctype, remaining, bitshift, lb, ub in type_info}}
 {{ py: otype = nptype + '_' if nptype == 'bool' else nptype }}
-cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *state, object lock):
-    """
-    _rand_{{nptype}}(low, high, size, *state, lock)
 
-    Return random np.{{nptype}} integers between `low` and `high`, inclusive.
-
-    Return random integers from the "discrete uniform" distribution in the
-    closed interval [`low`, `high`).  If `high` is None (the default),
-    then results are from [0, `low`). On entry the arguments are presumed
-    to have been validated for size and order for the np.{{nptype}} type.
-
-    Parameters
-    ----------
-    low : int or array-like
-        Lowest (signed) integer to be drawn from the distribution (unless
-        ``high=None``, in which case this parameter is the *highest* such
-        integer).
-    high : int or array-like
-        If provided, the largest (signed) integer to be drawn from the
-        distribution (see above for behavior if ``high=None``).
-    size : int or tuple of ints
-        Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-        ``m * n * k`` samples are drawn.  Default is None, in which case a
-        single value is returned.
-    state : augmented random state
-        State to use in the core random number generators
-    lock : threading.Lock
-        Lock to prevent multiple using a single RandomState simultaneously
-
-    Returns
-    -------
-    out : python scalar or ndarray of np.{{nptype}}
-          `size`-shaped array of random integers from the appropriate
-          distribution, or a single such random int if `size` not provided.
-    """
+cdef object _rand_{{nptype}}_broadcast(np.ndarray low, np.ndarray high, object size, aug_state *state, object lock):
+    """Array path for smaller integer types"""
     cdef {{utype}}_t rng, last_rng, off, val, mask, out_val
     cdef uint32_t buf
     cdef {{utype}}_t *out_data
@@ -77,40 +48,6 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
     cdef np.broadcast it
     cdef int buf_rem = 0
 
-    if size is not None:
-        if (np.prod(size) == 0):
-            return np.empty(size, dtype=np.{{nptype}})
-
-    low = np.array(low, copy=False)
-    high = np.array(high, copy=False)
-    low_ndim = np.PyArray_NDIM(<np.ndarray>low)
-    high_ndim = np.PyArray_NDIM(<np.ndarray>high)
-    if ((low_ndim == 0 or (low_ndim==1 and low.size==1 and size is not None)) and
-            (high_ndim == 0 or (high_ndim==1 and high.size==1 and size is not None))):
-        low = int(low)
-        high = int(high)
-
-        if low < {{lb}}:
-            raise ValueError("low is out of bounds for {{nptype}}")
-        if high > {{ub}}:
-            raise ValueError("high is out of bounds for {{nptype}}")
-        if low >= high:
-            raise ValueError("low >= high")
-
-        high -= 1
-        rng = <{{utype}}_t>(high - low)
-        off = <{{utype}}_t>(<{{nptype}}_t>low)
-        if size is None:
-            with lock:
-                random_bounded_{{utype}}_fill(state, off, rng, 1, &out_val)
-            return np.{{otype}}(<{{nptype}}_t>out_val)
-        else:
-            out_arr = <np.ndarray>np.empty(size, np.{{nptype}})
-            cnt = np.PyArray_SIZE(out_arr)
-            out_data = <{{utype}}_t *>np.PyArray_DATA(out_arr)
-            with lock, nogil:
-                random_bounded_{{utype}}_fill(state, off, rng, cnt, out_data)
-            return out_arr
 
     # Array path
     low_arr = <np.ndarray>low
@@ -149,51 +86,18 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
             out_data[i] = random_buffered_bounded_{{utype}}(state, off, rng, mask, &buf_rem, &buf)
 
             np.PyArray_MultiIter_NEXT(it)
-
     return out_arr
 {{endfor}}
+
 {{
 py:
-big_bc_ctypes = (('uint64', 'uint64', 'NPY_UINT64', '0x0ULL', '0xFFFFFFFFFFFFFFFFULL'),
+big_type_info = (('uint64', 'uint64', 'NPY_UINT64', '0x0ULL', '0xFFFFFFFFFFFFFFFFULL'),
                  ('int64', 'uint64', 'NPY_INT64', '-0x8000000000000000LL', '0x7FFFFFFFFFFFFFFFLL' )
 )}}
-{{for  nptype, utype, npctype, lb, ub in big_bc_ctypes}}
+{{for  nptype, utype, npctype, lb, ub in big_type_info}}
 {{ py: otype = nptype}}
-cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *state, object lock):
-    """
-    _rand_{{nptype}}(low, high, size, *state, lock)
-
-    Return random np.{{nptype}} integers between `low` and `high`, inclusive.
-
-    Return random integers from the "discrete uniform" distribution in the
-    closed interval [`low`, `high`).  If `high` is None (the default),
-    then results are from [0, `low`). On entry the arguments are presumed
-    to have been validated for size and order for the np.{{nptype}} type.
-
-    Parameters
-    ----------
-    low : int or array-like
-        Lowest (signed) integer to be drawn from the distribution (unless
-        ``high=None``, in which case this parameter is the *highest* such
-        integer).
-    high : int or array-like
-        If provided, the largest (signed) integer to be drawn from the
-        distribution (see above for behavior if ``high=None``).
-    size : int or tuple of ints
-        Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
-        ``m * n * k`` samples are drawn.  Default is None, in which case a
-        single value is returned.
-    state : augmented random state
-        State to use in the core random number generators
-    lock : threading.Lock
-        Lock to prevent multiple using a single RandomState simultaneously
-
-    Returns
-    -------
-    out : python scalar or ndarray of np.{{nptype}}
-          `size`-shaped array of random integers from the appropriate
-          distribution, or a single such random int if `size` not provided.
-    """
+cdef object _rand_{{nptype}}_broadcast(object low, object high, object size, aug_state *state, object lock):
+    """Array path for 64-bit integer types"""
     cdef np.ndarray low_arr, high_arr, out_arr, highm1_arr
     cdef np.npy_intp i, cnt
     cdef np.broadcast it
@@ -202,41 +106,6 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
     cdef {{nptype}}_t *highm1_data
     cdef {{nptype}}_t low_v, high_v
     cdef uint64_t rng, last_rng, val, mask, off, out_val
-
-    if size is not None:
-        if (np.prod(size) == 0):
-            return np.empty(size, dtype=np.{{nptype}})
-
-    low = np.array(low, copy=False)
-    high = np.array(high, copy=False)
-    low_ndim = np.PyArray_NDIM(<np.ndarray>low)
-    high_ndim = np.PyArray_NDIM(<np.ndarray>high)
-    if ((low_ndim == 0 or (low_ndim==1 and low.size==1 and size is not None)) and
-            (high_ndim == 0 or (high_ndim==1 and high.size==1 and size is not None))):
-        low = int(low)
-        high = int(high)
-        high -= 1  # Use a closed interval
-
-        if low < {{lb}}:
-            raise ValueError("low is out of bounds for {{nptype}}")
-        if high > {{ub}}:
-            raise ValueError("high is out of bounds for {{nptype}}")
-        if low > high:
-            raise ValueError("low >= high")
-
-        rng = <{{utype}}_t>(high - low)
-        off = <{{utype}}_t>(<{{nptype}}_t>low)
-        if size is None:
-            with lock:
-                random_bounded_{{utype}}_fill(state, off, rng, 1, &out_val)
-            return np.{{otype}}(<{{nptype}}_t>out_val)
-        else:
-            out_arr = <np.ndarray>np.empty(size, np.{{nptype}})
-            cnt = np.PyArray_SIZE(out_arr)
-            out_data = <{{utype}}_t *>np.PyArray_DATA(out_arr)
-            with lock, nogil:
-                random_bounded_{{utype}}_fill(state, off, rng, cnt, out_data)
-            return out_arr
 
     low_arr = <np.ndarray>low
     high_arr = <np.ndarray>high
@@ -286,4 +155,95 @@ cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *st
             np.PyArray_MultiIter_NEXT(it)
 
     return out_arr
+{{endfor}}
+
+{{
+py:
+type_info = (('uint64', 'uint64', '0x0ULL', '0xFFFFFFFFFFFFFFFFULL'),
+             ('uint32', 'uint32', '0x0UL', '0XFFFFFFFFUL'),
+             ('uint16', 'uint16', '0x0UL', '0XFFFFUL'),
+             ('uint8', 'uint8', '0x0UL', '0XFFUL'),
+             ('bool', 'bool', '0x0UL', '0x1UL'),
+             ('int64', 'uint64', '-0x8000000000000000LL', '0x7FFFFFFFFFFFFFFFL'),
+             ('int32', 'uint32', '-0x80000000L', '0x7FFFFFFFL'),
+             ('int16', 'uint16', '-0x8000L', '0x7FFFL' ),
+             ('int8', 'uint8', '-0x80L', '0x7FL' )
+)}}
+{{for  nptype, utype, lb, ub in type_info}}
+{{ py: otype = nptype + '_' if nptype == 'bool' else nptype }}
+cdef object _rand_{{nptype}}(object low, object high, object size, aug_state *state, object lock):
+    """
+    _rand_{{nptype}}(low, high, size, *state, lock)
+
+    Return random np.{{nptype}} integers between `low` and `high`, inclusive.
+
+    Return random integers from the "discrete uniform" distribution in the
+    closed interval [`low`, `high`).  If `high` is None (the default),
+    then results are from [0, `low`). On entry the arguments are presumed
+    to have been validated for size and order for the np.{{nptype}} type.
+
+    Parameters
+    ----------
+    low : int or array-like
+        Lowest (signed) integer to be drawn from the distribution (unless
+        ``high=None``, in which case this parameter is the *highest* such
+        integer).
+    high : int or array-like
+        If provided, the largest (signed) integer to be drawn from the
+        distribution (see above for behavior if ``high=None``).
+    size : int or tuple of ints
+        Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+        ``m * n * k`` samples are drawn.  Default is None, in which case a
+        single value is returned.
+    state : augmented random state
+        State to use in the core random number generators
+    lock : threading.Lock
+        Lock to prevent multiple using a single RandomState simultaneously
+
+    Returns
+    -------
+    out : python scalar or ndarray of np.{{nptype}}
+          `size`-shaped array of random integers from the appropriate
+          distribution, or a single such random int if `size` not provided.
+    """
+    cdef np.ndarray out_arr, low_arr, high_arr
+    cdef {{utype}}_t rng, off, out_val
+    cdef {{utype}}_t *out_data
+    cdef np.npy_intp i, cnt
+
+    if size is not None:
+        if (np.prod(size) == 0):
+            return np.empty(size, dtype=np.{{nptype}})
+
+    low_arr = <np.ndarray>np.array(low, copy=False)
+    high_arr = <np.ndarray>np.array(high, copy=False)
+    low_ndim = np.PyArray_NDIM(low_arr)
+    high_ndim = np.PyArray_NDIM(high_arr)
+    if ((low_ndim == 0 or (low_ndim==1 and low_arr.size==1 and size is not None)) and
+            (high_ndim == 0 or (high_ndim==1 and high_arr.size==1 and size is not None))):
+        low = int(low_arr)
+        high = int(high_arr)
+        high -= 1
+
+        if low < {{lb}}:
+            raise ValueError("low is out of bounds for {{nptype}}")
+        if high > {{ub}}:
+            raise ValueError("high is out of bounds for {{nptype}}")
+        if low > high:  # -1 already subtracted, closed interval
+            raise ValueError("low >= high")
+
+        rng = <{{utype}}_t>(high - low)
+        off = <{{utype}}_t>(<{{nptype}}_t>low)
+        if size is None:
+            with lock:
+                random_bounded_{{utype}}_fill(state, off, rng, 1, &out_val)
+            return np.{{otype}}(<{{nptype}}_t>out_val)
+        else:
+            out_arr = <np.ndarray>np.empty(size, np.{{nptype}})
+            cnt = np.PyArray_SIZE(out_arr)
+            out_data = <{{utype}}_t *>np.PyArray_DATA(out_arr)
+            with lock, nogil:
+                random_bounded_{{utype}}_fill(state, off, rng, cnt, out_data)
+            return out_arr
+    return _rand_{{nptype}}_broadcast(low_arr, high_arr, size, state, lock)
 {{endfor}}
