@@ -1,14 +1,14 @@
 from __future__ import division, absolute_import, print_function
 
 import sys
-from numpy.testing import (TestCase, run_module_suite, assert_,
+from numpy.testing import (run_module_suite, assert_,
                            assert_array_equal, assert_raises)
 from numpy.compat import long
 import numpy as np
 from randomstate.prng.mt19937 import mt19937
 
 
-class TestRegression(TestCase):
+class TestRegression(object):
 
     def test_VonMises_range(self):
         # Make sure generated random variables are in [-pi, pi].
