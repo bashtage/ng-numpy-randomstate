@@ -4,12 +4,11 @@ import sys
 import warnings
 
 import numpy as np
+import randomstate as random
 from numpy.testing import (
     run_module_suite, assert_, assert_raises, assert_equal,
     assert_warns, assert_no_warnings, assert_array_equal,
     assert_array_almost_equal)
-
-import randomstate as random
 from randomstate.compat import suppress_warnings
 from randomstate.prng.mt19937 import mt19937
 
@@ -89,13 +88,11 @@ class TestMultinomial(object):
 
 
 class TestSetState(object):
-    
-    @classmethod
-    def setup_class(cls):
-        cls.seed = 1234567890
-        cls.prng = random.RandomState(cls.seed)
-        cls.state = cls.prng.get_state()
-        cls.legacy_state = cls.prng.get_state(legacy=True)  # Use legacy to get old NumPy state
+    def setup(self):
+        self.seed = 1234567890
+        self.prng = random.RandomState(self.seed)
+        self.state = self.prng.get_state()
+        self.legacy_state = self.prng.get_state(legacy=True)  # Use legacy to get old NumPy state
 
     def test_basic(self):
         old = self.prng.tomaxint(16)
@@ -105,7 +102,6 @@ class TestSetState(object):
 
     def test_gaussian_reset(self):
         # Make sure the cached every-other-Gaussian is reset.
-        self.prng.set_state(self.state)
         old = self.prng.standard_normal(size=3)
         self.prng.set_state(self.state)
         new = self.prng.standard_normal(size=3)
@@ -126,7 +122,6 @@ class TestSetState(object):
         # Make sure we can accept old state tuples that do not have the
         # cached Gaussian value.
         old_state = self.legacy_state[:-2]
-        self.prng.set_state(self.legacy_state)
         x1 = self.prng.standard_normal(size=16)
         self.prng.set_state(old_state)
         x2 = self.prng.standard_normal(size=16)
@@ -160,6 +155,11 @@ class TestRandint(object):
             assert_raises(ValueError, self.rfunc, ubnd, lbnd, dtype=dt)
             assert_raises(ValueError, self.rfunc, 1, 0, dtype=dt)
 
+            assert_raises(ValueError, self.rfunc, [lbnd - 1], ubnd, dtype=dt)
+            assert_raises(ValueError, self.rfunc, [lbnd], [ubnd + 1], dtype=dt)
+            assert_raises(ValueError, self.rfunc, [ubnd], [lbnd], dtype=dt)
+            assert_raises(ValueError, self.rfunc, 1, [0], dtype=dt)
+
     def test_bounds_checking_array(self):
         for dt in self.itype:
             lbnd = 0 if dt is bool else np.iinfo(dt).min
@@ -176,12 +176,15 @@ class TestRandint(object):
 
             tgt = ubnd - 1
             assert_equal(self.rfunc(tgt, tgt + 1, size=1000, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt], tgt + 1, size=1000, dtype=dt), tgt)
 
             tgt = lbnd
             assert_equal(self.rfunc(tgt, tgt + 1, size=1000, dtype=dt), tgt)
+            assert_equal(self.rfunc(tgt, [tgt + 1], size=1000, dtype=dt), tgt)
 
             tgt = (lbnd + ubnd) // 2
             assert_equal(self.rfunc(tgt, tgt + 1, size=1000, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt], [tgt + 1], size=1000, dtype=dt), tgt)
 
     def test_rng_zero_and_extremes_array(self):
         size = 1000
@@ -191,8 +194,8 @@ class TestRandint(object):
 
             tgt = ubnd - 1
             assert_equal(self.rfunc([tgt], [tgt + 1], size=size, dtype=dt), tgt)
-            assert_equal(self.rfunc([tgt] * size, [tgt + 1]  * size, dtype=dt), tgt)
-            assert_equal(self.rfunc([tgt] * size, [tgt + 1]  * size, size=size, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt] * size, [tgt + 1] * size, dtype=dt), tgt)
+            assert_equal(self.rfunc([tgt] * size, [tgt + 1] * size, size=size, dtype=dt), tgt)
 
             tgt = lbnd
             assert_equal(self.rfunc([tgt], [tgt + 1], size=size, dtype=dt), tgt)
@@ -226,29 +229,11 @@ class TestRandint(object):
             ubnd = 2 if dt is bool else np.iinfo(dt).max + 1
 
             try:
-                self.rfunc([lbnd], [ubnd], dtype=dt)
+                self.rfunc([lbnd] * 2, [ubnd], dtype=dt)
             except Exception as e:
                 raise AssertionError("No error should have been raised, "
                                      "but one was with the following "
                                      "message:\n\n%s" % str(e))
-
-    def test_scalar_array_equiv(self):
-        for dt in self.itype:
-            lbnd = 0 if dt is bool else np.iinfo(dt).min
-            ubnd = 2 if dt is bool else np.iinfo(dt).max + 1
-
-            size = 1000
-            mt19937.seed(1234)
-            scalar = self.rfunc(lbnd, ubnd, size=size, dtype=dt)
-
-            mt19937.seed(1234)
-            scalar_array = self.rfunc(lbnd, ubnd, size=size, dtype=dt)
-
-            mt19937.seed(1234)
-            array = self.rfunc([lbnd] * size, [ubnd] * size, size=size, dtype=dt)
-            assert_array_equal(scalar, scalar_array)
-            assert_array_equal(scalar, array)
-
 
     def test_in_bounds_fuzz(self):
         # Don't use fixed seed
@@ -264,6 +249,23 @@ class TestRandint(object):
 
         assert_(vals.max() < 2)
         assert_(vals.min() >= 0)
+
+    def test_scalar_array_equiv(self):
+        for dt in self.itype:
+            lbnd = 0 if dt is bool else np.iinfo(dt).min
+            ubnd = 2 if dt is bool else np.iinfo(dt).max + 1
+
+            size = 1000
+            mt19937.seed(1234)
+            scalar = self.rfunc(lbnd, ubnd, size=size, dtype=dt)
+
+            mt19937.seed(1234)
+            scalar_array = self.rfunc([lbnd], [ubnd], size=size, dtype=dt)
+
+            mt19937.seed(1234)
+            array = self.rfunc([lbnd] * size, [ubnd] * size, size=size, dtype=dt)
+            assert_array_equal(scalar, scalar_array)
+            assert_array_equal(scalar, array)
 
     def test_repeatability(self):
         import hashlib
@@ -301,7 +303,6 @@ class TestRandint(object):
     def test_repeatability_broadcasting(self):
 
         for dt in self.itype:
-
             lbnd = 0 if dt in (np.bool, bool, np.bool_) else np.iinfo(dt).min
             ubnd = 2 if dt in (np.bool, bool, np.bool_) else np.iinfo(dt).max + 1
 
@@ -361,7 +362,6 @@ class TestRandint(object):
             assert not hasattr(sample, 'dtype')
             assert_equal(type(sample), dt)
 
-
     def test_respect_dtype_array(self):
         # See gh-7203
         for dt in self.itype:
@@ -374,21 +374,21 @@ class TestRandint(object):
             sample = self.rfunc([lbnd] * 2, [ubnd] * 2, dtype=dt)
             assert_equal(sample.dtype, dt)
 
-    def test_empty(self):
+    def test_zero_size(self):
+        # See gh-7203
         for dt in self.itype:
             sample = self.rfunc(0, 0, (3, 0, 4), dtype=dt)
-            assert_equal(sample.shape, (3, 0, 4))
-            assert_equal(self.rfunc(0, -10, size=0, dtype=dt).shape, (0,))
-            assert_equal(sample.dtype, dt)
+            assert sample.shape == (3, 0, 4)
+            assert sample.dtype == dt
+            assert self.rfunc(0, -10, 0, dtype=dt).shape == (0,)
 
 
 class TestRandomDist(object):
     # Make sure the random distribution returns the correct value for a
     # given seed
 
-    @classmethod
-    def setup_class(cls):
-        cls.seed = 1234567890
+    def setup(self):
+        self.seed = 1234567890
 
     def test_rand(self):
         mt19937.seed(self.seed)
@@ -637,6 +637,11 @@ class TestRandomDist(object):
         assert_equal(mt19937.dirichlet(p, np.array((2, 2))).shape, (2, 2, 2))
 
         assert_raises(TypeError, mt19937.dirichlet, p, float(1))
+
+    def test_dirichlet_bad_alpha(self):
+        # gh-2089
+        alpha = np.array([5.4e-01, -1.0e-16])
+        assert_raises(ValueError, mt19937.dirichlet, alpha)
 
     def test_exponential(self):
         mt19937.seed(self.seed)
@@ -1046,9 +1051,8 @@ class TestRandomDist(object):
 class TestBroadcast(object):
     # tests that functions that broadcast behave
     # correctly when presented with non-scalar arguments
-    @classmethod
-    def setup_class(cls):
-        cls.seed = 123456789
+    def setup(self):
+        self.seed = 123456789
 
     def set_seed(self):
         random.seed(self.seed)
@@ -1603,9 +1607,8 @@ class TestBroadcast(object):
 class TestThread(object):
     # make sure each state produces the same sequence even in threads
 
-    @classmethod
-    def setup_class(cls):
-        cls.seeds = range(4)
+    def setup(self):
+        self.seeds = range(4)
 
     def check_function(self, function, sz):
         from threading import Thread
@@ -1650,12 +1653,11 @@ class TestThread(object):
 
 # See Issue #4263
 class TestSingleEltArrayInput(object):
-    @classmethod
-    def setup_class(cls):
-        cls.argOne = np.array([2])
-        cls.argTwo = np.array([3])
-        cls.argThree = np.array([4])
-        cls.tgtShape = (1,)
+    def setup(self):
+        self.argOne = np.array([2])
+        self.argTwo = np.array([3])
+        self.argThree = np.array([4])
+        self.tgtShape = (1,)
 
     def test_one_arg_funcs(self):
         funcs = (mt19937.exponential, mt19937.standard_gamma,
