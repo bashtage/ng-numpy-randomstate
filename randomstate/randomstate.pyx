@@ -88,7 +88,7 @@ cdef extern from "distributions.h":
     cdef double random_gauss_zig(aug_state* state) nogil
     cdef double random_gauss_zig_julia(aug_state* state) nogil
     cdef double random_standard_exponential(aug_state* state) nogil
-    cdef double random_standard_exponential_ziggurat(aug_state* state) nogil
+    cdef double random_standard_exponential_zig_double(aug_state* state) nogil
     cdef double random_standard_cauchy(aug_state* state) nogil
 
     cdef double random_exponential(aug_state *state, double scale) nogil
@@ -204,7 +204,6 @@ cdef class RandomState:
     cdef aug_state rng_state
     cdef object lock
     poisson_lam_max = POISSON_LAM_MAX
-    __MAXSIZE = <uint64_t>sys.maxsize
     cdef object __seed
     cdef object __stream
     cdef object __version
