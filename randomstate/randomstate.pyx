@@ -4926,3 +4926,275 @@ IF RS_RNG_JUMPABLE:
     jump = _rand.jump
 IF RS_RNG_ADVANCEABLE:
     advance = _rand.advance
+
+
+
+cdef class CyRandomState:
+    CLASS_DOCSTRING
+
+    cdef void *rng_loc
+    cdef binomial_t binomial_info
+    cdef aug_state rng_state
+    cdef object lock
+    poisson_lam_max = POISSON_LAM_MAX
+    cdef object __seed
+    cdef object __stream
+    cdef int __version
+
+    IF RS_RNG_SEED==1:
+        def __init__(self, seed=None):
+            self.rng_state.rng = <rng_t *>PyArray_malloc_aligned(sizeof(rng_t))
+            self.rng_state.binomial = &self.binomial_info
+            IF RS_RNG_MOD_NAME == 'dsfmt':
+                self.rng_state.buffered_uniforms = <double *>PyArray_malloc_aligned(2 * DSFMT_N * sizeof(double))
+            IF RS_RNG_MOD_NAME == 'sfmt':
+                self.rng_state.buffered_uint64 = <uint64_t *>PyArray_malloc_aligned(2 * SFMT_N * sizeof(uint64_t))
+            self.__version = 0
+
+            self.__seed = seed
+            self.__stream = None
+
+            self._reset_state_variables()
+            self.seed(seed)
+    ELSE:
+        def __init__(self, seed=None, stream=None):
+            self.rng_state.rng = <rng_t *>PyArray_malloc_aligned(sizeof(rng_t))
+            self.rng_state.binomial = &self.binomial_info
+            self.__version = 0
+
+            self.__seed = seed
+            self.__stream = stream
+
+            self._reset_state_variables()
+            self.seed(seed, stream)
+
+    IF RS_RNG_JUMPABLE:
+        cdef void jump(self, uint32_t iter = 1):
+            JUMP_DOCSTRING
+            
+            cdef Py_ssize_t i;
+            for i in range(iter):
+                jump_state(&self.rng_state)
+            self.rng_state.has_gauss = 0
+            self.rng_state.gauss = 0.0
+            self.rng_state.has_gauss_float = 0
+            self.rng_state.gauss_float = 0.0
+    
+    def __dealloc__(self):
+        PyArray_free_aligned(self.rng_state.rng)
+        IF RS_RNG_MOD_NAME == 'dsfmt':
+            PyArray_free_aligned(self.rng_state.buffered_uniforms)
+    
+    cdef void _reset_state_variables(self):
+        self.rng_state.gauss = 0.0
+        self.rng_state.gauss_float = 0.0
+        self.rng_state.has_gauss = 0
+        self.rng_state.has_gauss_float = 0
+        self.rng_state.has_uint32= 0
+        self.rng_state.uinteger = 0
+        self.rng_state.binomial.has_binomial = 0
+
+    IF RS_RNG_MOD_NAME == 'mt19937':
+        cdef seed(self, seed=None):
+            """
+            seed(seed=None)
+
+            Seed the generator.
+
+            This method is called when ``RandomState`` is initialized. It can be
+            called again to re-seed the generator. For details, see ``RandomState``.
+
+            Parameters
+            ----------
+            seed : int or array_like, optional
+                Seed for ``RandomState``.
+                Must be convertible to 32 bit unsigned integers.
+
+            See Also
+            --------
+            RandomState
+
+            """
+            cdef np.ndarray obj
+            try:
+                if seed is None:
+                    self.__seed = seed = _generate_seed(1)
+                    with self.lock:
+                        set_seed(&self.rng_state, seed)
+                else:
+                    if hasattr(seed, 'squeeze'):
+                        seed = seed.squeeze()
+                    idx = operator.index(seed)
+                    if idx > int(2**32 - 1) or idx < 0:
+                        raise ValueError("Seed must be between 0 and 2**32 - 1")
+                    with self.lock:
+                        set_seed(&self.rng_state, seed)
+            except TypeError:
+                obj = np.asarray(seed).astype(np.int64, casting='safe')
+                if ((obj > int(2**32 - 1)) | (obj < 0)).any():
+                    raise ValueError("Seed must be between 0 and 2**32 - 1")
+                obj = obj.astype(np.uint32, casting='unsafe', order='C')
+                with self.lock:
+                    set_seed_by_array(&self.rng_state,
+                                      <uint32_t*> obj.data,
+                                      np.PyArray_DIM(obj, 0))
+            self._reset_state_variables()
+
+    ELIF RS_RNG_SEED==1:
+        cdef seed(self, seed=None):
+            """
+            seed(seed=None)
+
+            Seed the generator.
+
+            This method is called when ``RandomState`` is initialized. It can be
+            called again to re-seed the generator. For details, see ``RandomState``.
+
+            Parameters
+            ----------
+            seed : int, optional
+                Seed for ``RandomState``.
+            
+            Raises
+            ------
+            ValueError
+                If seed values are out of range for the PRNG.
+            TypeError
+                If seed values are not integers.
+
+            Notes
+            -----
+            Acceptable range for seed depends on specifics of PRNG.  See
+            class documentation for details.
+
+            Seeds are hashed to produce the required number of bits.
+
+            See Also
+            --------
+            RandomState
+            """
+            if seed is None:
+                self.__seed = seed = _generate_seed(RS_SEED_NBYTES)
+                set_seed(&self.rng_state, seed)
+                self._reset_state_variables()
+                return
+
+            if hasattr(seed, 'squeeze'):
+                seed = seed.squeeze()
+            IF RS_SEED_ARRAY_BITS == 32:
+                seed = np.asarray(seed).astype(np.object, casting='safe')
+                if np.any((seed // 1) != seed):
+                    raise TypeError("Seed values must be integers between "
+                                    "0 and 4294967295 (2**32-1)")
+                if np.any((seed < int(0)) | (seed > int(2**32-1))):
+                    raise ValueError("Seed values must be integers between "
+                                    "0 and 4294967295 (2**32-1)")
+                seed = np.asarray(seed).astype(np.uint32, casting='unsafe')
+            ELSE:
+                seed = np.asarray(seed).astype(np.object, casting='safe')
+                if np.any((seed // 1) != seed):
+                    raise TypeError("Seed values must be integers between 0 and "
+                                    "18446744073709551616 (2**64-1)")
+                if np.any((seed < int(0)) | (seed > int(2**64-1))):
+                    raise ValueError("Seed values must be integers between 0 and "
+                                     "18446744073709551616 (2**64-1)")
+                seed = np.asarray(seed).astype(np.uint64, casting='unsafe')
+
+            if seed.ndim == 0:
+                IF RS_SEED_ARRAY_BITS == 32:
+                    seed = <uint32_t> seed
+                ELSE:
+                    seed = <uint64_t> seed
+                set_seed(&self.rng_state, seed)
+            else:
+                IF RS_SEED_ARRAY_BITS == 32:
+                    set_seed_by_array(&self.rng_state,
+                                      <uint32_t *>np.PyArray_DATA(seed),
+                                      <int>np.PyArray_DIM(seed, 0))
+                ELSE:
+                    set_seed_by_array(&self.rng_state,
+                                      <uint64_t *>np.PyArray_DATA(seed),
+                                      <int>np.PyArray_DIM(seed, 0))
+            self.__seed = seed
+            self._reset_state_variables()
+
+    ELSE:
+        cdef seed(self, seed=None, stream=None):
+            """
+            seed(seed=None, stream=None)
+
+            Seed the generator.
+
+            This method is called when ``RandomState`` is initialized. It can be
+            called again to re-seed the generator. For details, see ``RandomState``.
+
+            Parameters
+            ----------
+            seed : int, optional
+                Seed for ``RandomState``.
+            stream : int, optional
+                Generator stream to use
+
+            Raises
+            ------
+            ValueError
+                If seed values are out of range for the PRNG.
+            TypeError
+                If seed values are not scalar integers.
+
+            See Also
+            --------
+            RandomState
+            """
+            ub =  2 ** (32 * RS_SEED_NBYTES)
+            if seed is not None:
+                error_msg = 'seed must be a scalar integer 0<=seed<{0}'.format(ub)
+                _seed = np.asarray(seed, dtype=np.object)
+                if _seed.ndim > 0:
+                    raise TypeError(error_msg)
+                elif seed // 1 != seed:
+                    raise TypeError(error_msg)
+                elif seed < 0 or seed >= ub:
+                    raise ValueError(error_msg)
+            else:
+                self.__seed = seed = _generate_seed(RS_SEED_NBYTES)
+
+            if stream is not None:
+                error_msg = 'stream must be a scalar integer 0<=stream<{0}'.format(ub)
+                _stream= np.asarray(stream, dtype=np.object)
+                if _stream.ndim > 0:
+                    raise TypeError(error_msg)
+                elif stream // 1 != stream:
+                    raise TypeError(error_msg)
+                elif stream < 0 or stream >= ub:
+                    raise ValueError(error_msg)
+            else:
+                self.__stream = stream = 1
+
+            IF RS_RNG_MOD_NAME == 'pcg64':
+                IF RS_PCG128_EMULATED:
+                    set_seed(&self.rng_state,
+                             pcg128_from_pylong(seed),
+                             pcg128_from_pylong(stream))
+                ELSE:
+                    set_seed(&self.rng_state, seed, stream)
+            ELSE:
+                set_seed(&self.rng_state, <uint64_t>seed, <uint64_t>stream)
+            self._reset_state_variables()
+
+    cdef double standard_normal(self):
+        return random_gauss_zig(&self.rng_state)
+
+    cdef double standard_gamma(self, double shape):
+        return random_standard_gamma_zig_double(&self.rng_state, shape)
+
+    cdef double standard_exponential(self):
+        return random_standard_exponential_zig_double(&self.rng_state)
+
+    cdef double random_sample(self):
+        cdef double out
+        random_uniform_fill_double(&self.rng_state, 1, &out)
+        return out
+    
+    cdef uint64_t random_uinteger64(self):
+        return random_uint64(&self.rng_state)
