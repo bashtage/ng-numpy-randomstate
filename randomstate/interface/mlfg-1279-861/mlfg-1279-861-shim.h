@@ -24,21 +24,21 @@ typedef struct s_aug_state {
   uint64_t zig_random_int;
 } aug_state;
 
-NPY_INLINE uint32_t random_uint32(aug_state *state) {
+static NPY_INLINE uint32_t random_uint32(aug_state *state) {
   return (uint32_t)(mlfg_next(state->rng) >> 32);
 }
 
-NPY_INLINE uint64_t random_uint64(aug_state *state) {
+static NPY_INLINE uint64_t random_uint64(aug_state *state) {
   uint64_t out = mlfg_next(state->rng) & 0xffffffff00000000ULL;
   out |= mlfg_next(state->rng) >> 32;
   return out;
 }
 
-NPY_INLINE uint64_t random_raw_values(aug_state *state) {
+static NPY_INLINE uint64_t random_raw_values(aug_state *state) {
   return mlfg_next(state->rng) >> 1;
 }
 
-NPY_INLINE double random_double(aug_state *state) {
+static NPY_INLINE double random_double(aug_state *state) {
   uint64_t rn;
   rn = mlfg_next(state->rng);
   return (rn >> 11) * (1.0 / 9007199254740992.0);
