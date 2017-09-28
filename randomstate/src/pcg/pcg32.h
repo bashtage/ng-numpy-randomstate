@@ -25,7 +25,7 @@ typedef struct  {
 #define PCG_STATE_SETSEQ_64_INITIALIZER                                        \
     { 0x853c49e6748fea9bULL, 0xda3e39cb94b95bdbULL }
 
-inline uint32_t pcg_rotr_32(uint32_t value, unsigned int rot)
+static inline uint32_t pcg_rotr_32(uint32_t value, unsigned int rot)
 {
 #if PCG_USE_INLINE_ASM && __clang__ && (__x86_64__  || __i386__)
     asm ("rorl   %%cl, %0" : "=r" (value) : "0" (value), "c" (rot));
@@ -35,24 +35,24 @@ inline uint32_t pcg_rotr_32(uint32_t value, unsigned int rot)
 #endif
 }
 
-inline void pcg_setseq_64_step_r(pcg_state_setseq_64* rng)
+static inline void pcg_setseq_64_step_r(pcg_state_setseq_64* rng)
 {
     rng->state = rng->state * PCG_DEFAULT_MULTIPLIER_64 + rng->inc;
 }
 
-inline uint32_t pcg_output_xsl_rr_64_32(uint64_t state)
+static inline uint32_t pcg_output_xsl_rr_64_32(uint64_t state)
 {
     return pcg_rotr_32(((uint32_t)(state >> 32u)) ^ (uint32_t)state,
                        state >> 59u);
 }
 
-inline uint32_t pcg_output_xsh_rr_64_32(uint64_t state)
+static inline uint32_t pcg_output_xsh_rr_64_32(uint64_t state)
 {
     return pcg_rotr_32(((state >> 18u) ^ state) >> 27u, state >> 59u);
 }
 
 
-inline uint32_t
+static inline uint32_t
 pcg_setseq_64_xsh_rr_32_random_r(pcg_state_setseq_64* rng)
 {
     uint64_t oldstate = rng->state;
@@ -60,7 +60,7 @@ pcg_setseq_64_xsh_rr_32_random_r(pcg_state_setseq_64* rng)
     return pcg_output_xsh_rr_64_32(oldstate);
 }
 
-inline void pcg_setseq_64_srandom_r(pcg_state_setseq_64* rng,
+static inline void pcg_setseq_64_srandom_r(pcg_state_setseq_64* rng,
                                     uint64_t initstate, uint64_t initseq)
 {
     rng->state = 0U;
@@ -70,7 +70,7 @@ inline void pcg_setseq_64_srandom_r(pcg_state_setseq_64* rng,
     pcg_setseq_64_step_r(rng);
 }
 
-inline uint32_t
+static inline uint32_t
 pcg_setseq_64_xsl_rr_32_random_r(pcg_state_setseq_64* rng)
 {
     uint64_t oldstate = rng->state;
@@ -78,7 +78,7 @@ pcg_setseq_64_xsl_rr_32_random_r(pcg_state_setseq_64* rng)
     return pcg_output_xsl_rr_64_32(oldstate);
 }
 
-inline uint32_t
+static inline uint32_t
 pcg_setseq_64_xsl_rr_32_boundedrand_r(pcg_state_setseq_64* rng,
                                       uint32_t bound)
 {
@@ -95,7 +95,7 @@ extern uint64_t pcg_advance_lcg_64(uint64_t state, uint64_t delta,
 
 
 
-inline void pcg_setseq_64_advance_r(pcg_state_setseq_64* rng,
+static inline void pcg_setseq_64_advance_r(pcg_state_setseq_64* rng,
                                     uint64_t delta)
 {
     rng->state = pcg_advance_lcg_64(rng->state, delta,

@@ -21,7 +21,7 @@ void xorshift128_seed_by_array(xorshift128_state* state, uint64_t *seed_array, i
 
 void xorshift128_init_state(xorshift128_state* state, uint64_t seed, uint64_t inc);
 
-inline uint64_t xorshift128_next(xorshift128_state* state) {
+static inline uint64_t xorshift128_next(xorshift128_state* state) {
     uint64_t s1 = state->s[0];
     const uint64_t s0 = state->s[1];
     state->s[0] = s0;

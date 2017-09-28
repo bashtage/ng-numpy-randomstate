@@ -19,7 +19,7 @@ typedef struct s_mrg32k3a_state
     int loc;
 } mrg32k3a_state;
 
-inline uint32_t mrg32k3a_random(mrg32k3a_state* state)
+static inline uint32_t mrg32k3a_random(mrg32k3a_state* state)
 {
     int64_t p1 = 0;
     int64_t p2 = 0;

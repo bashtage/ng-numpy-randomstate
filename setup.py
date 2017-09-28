@@ -38,7 +38,9 @@ compile_rngs = rngs[:]
 
 extra_defs = [('_CRT_SECURE_NO_WARNINGS', '1')] if os.name == 'nt' else []
 extra_link_args = ['/LTCG', '/OPT:REF', 'Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []
-base_extra_compile_args = [] if os.name == 'nt' else ['-std=c99']
+# TODO: The unddefine is to handle a problem when building
+# TODO: manylinux1 on CentOS 5/GCC 4.8.2
+base_extra_compile_args = [] if os.name == 'nt' else ['-std=c99', '-U__GNUC_GNU_INLINE__']
 
 if USE_SSE2:
     if os.name == 'nt':

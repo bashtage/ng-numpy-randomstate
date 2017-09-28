@@ -30,7 +30,7 @@ void mlfg_init_state(mlfg_state *state, uint64_t seeds[K]);
 *  when making a 64 bit unsigned int, take the two upper
 *  32 bit segments.
 */
-inline uint64_t mlfg_next(mlfg_state* state)
+static inline uint64_t mlfg_next(mlfg_state* state)
 {
     state->pos++;
     state->lag_pos++;
