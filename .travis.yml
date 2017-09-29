@@ -34,7 +34,8 @@ before_install:
   - ./miniconda3.sh -b
   - export PATH=/home/travis/miniconda3/bin:$PATH
   - conda config --set always_yes true
-  - conda update --all --quiet
+  # Disable until fixed
+  # - conda update --all --quiet
   - PKGS="python=${PYTHON}"
   - PKGS="${PKGS} numpy"; if [ ${NUMPY} ]; then PKGS="${PKGS}=${NUMPY}"; fi
   - PKGS="${PKGS} Cython"; if [ ${CYTHON} ]; then PKGS="${PKGS}=${CYTHON}"; fi

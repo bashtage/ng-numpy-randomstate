@@ -26,20 +26,20 @@ typedef struct s_aug_state {
   uint32_t uinteger;
 } aug_state;
 
-inline uint32_t random_uint32(aug_state *state) {
+static inline uint32_t random_uint32(aug_state *state) {
   return mrg32k3a_random(state->rng);
 }
 
-inline uint64_t random_uint64(aug_state *state) {
+static inline uint64_t random_uint64(aug_state *state) {
   return (((uint64_t)mrg32k3a_random(state->rng) << 32) |
           mrg32k3a_random(state->rng));
 }
 
-inline uint64_t random_raw_values(aug_state *state) {
+static inline uint64_t random_raw_values(aug_state *state) {
   return (uint64_t)random_uint32(state);
 }
 
-inline double random_double(aug_state *state) {
+static inline double random_double(aug_state *state) {
   int32_t a = random_uint32(state) >> 5, b = random_uint32(state) >> 6;
   return (a * 67108864.0 + b) / 9007199254740992.0;
 }

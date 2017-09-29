@@ -23,7 +23,7 @@ typedef struct s_aug_state {
 
 } aug_state;
 
-inline uint32_t random_uint32(aug_state *state) {
+static inline uint32_t random_uint32(aug_state *state) {
   uint64_t temp;
   if (state->has_uint32) {
     state->has_uint32 = 0;
@@ -35,15 +35,15 @@ inline uint32_t random_uint32(aug_state *state) {
   return (uint32_t)(temp & 0xFFFFFFFFLL);
 }
 
-inline uint64_t random_uint64(aug_state *state) {
+static inline uint64_t random_uint64(aug_state *state) {
   return xorshift1024_next(state->rng);
 }
 
-inline uint64_t random_raw_values(aug_state *state) {
+static inline uint64_t random_raw_values(aug_state *state) {
   return random_uint64(state);
 }
 
-inline double random_double(aug_state *state) {
+static inline double random_double(aug_state *state) {
   return (random_uint64(state) >> 11) * (1.0 / 9007199254740992.0);
 }
 
