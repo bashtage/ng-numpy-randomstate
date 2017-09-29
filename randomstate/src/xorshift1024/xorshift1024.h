@@ -13,7 +13,7 @@ typedef struct s_xorshift1024_state
     int p;
 } xorshift1024_state;
 
-inline uint64_t xorshift1024_next(xorshift1024_state* state) {
+static inline uint64_t xorshift1024_next(xorshift1024_state* state) {
     const uint64_t s0 = state->s[state->p];
     uint64_t s1;
     state->p = (state->p + 1) & 15;

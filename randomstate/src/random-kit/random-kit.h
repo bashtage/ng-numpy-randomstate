@@ -31,7 +31,7 @@ extern void randomkit_seed(randomkit_state *state, uint32_t seed);
 extern void randomkit_gen(randomkit_state *state);
 
 /* Slightly optimized reference implementation of the Mersenne Twister */
-inline uint32_t randomkit_random(randomkit_state *state)
+static inline uint32_t randomkit_random(randomkit_state *state)
 {
     uint32_t y;
 

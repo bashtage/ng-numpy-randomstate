@@ -20,11 +20,11 @@ void xoroshiro128plus_seed_by_array(xoroshiro128plus_state* state, uint64_t *see
 
 void xoroshiro128plus_init_state(xoroshiro128plus_state* state, uint64_t seed, uint64_t inc);
 
-inline uint64_t rotl(const uint64_t x, int k) {
+static inline uint64_t rotl(const uint64_t x, int k) {
 	return (x << k) | (x >> (64 - k));
 }
 
-inline uint64_t xoroshiro128plus_next(xoroshiro128plus_state* state) {
+static inline uint64_t xoroshiro128plus_next(xoroshiro128plus_state* state) {
 	const uint64_t s0 = state->s[0];
 	uint64_t s1 = state->s[1];
 	const uint64_t result = s0 + s1;

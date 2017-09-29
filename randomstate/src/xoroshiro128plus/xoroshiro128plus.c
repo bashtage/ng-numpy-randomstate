@@ -3,7 +3,7 @@
 
 extern inline uint64_t xoroshiro128plus_next(xoroshiro128plus_state* state);
 
-inline uint64_t rotl(const uint64_t x, int k);
+extern inline uint64_t rotl(const uint64_t x, int k);
 
 void xoroshiro128plus_jump(xoroshiro128plus_state* state) {
 	static const uint64_t JUMP[] = { 0xbeac0467eba5facb, 0xd86b048b86aa9922 };
