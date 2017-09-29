@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.mt19937.noncentral_chisquare &#8212; randomstate 1.13.2+35.gc410b46 documentation</title>
+    <title>randomstate.prng.mt19937.noncentral_chisquare &#8212; randomstate 1.13.2+36.gd44cbc7 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.13.2+35.gc410b46',
+        VERSION:     '1.13.2+36.gd44cbc7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="randomstate.prng.mt19937.negative_binomial.html" title="randomstate.prng.mt19937.negative_binomial"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+35.gc410b46 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+36.gd44cbc7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mt19937.html" accesskey="U">MT19937 Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -155,8 +155,11 @@ the <span class="math">\(\chi^2\)</span> distribution.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>df</strong> (<em>int</em><em> or </em><em>array_like of ints</em>) – Degrees of freedom, should be &gt; 0 as of NumPy 1.10.0,
-should be &gt; 1 for earlier versions.</li>
+<li><strong>df</strong> (<em>float</em><em> or </em><em>array_like of floats</em>) – <p>Degrees of freedom, should be &gt; 0.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.10.0: </span>Earlier NumPy versions required dfnum &gt; 1.</p>
+</div>
+</li>
 <li><strong>nonc</strong> (<em>float</em><em> or </em><em>array_like of floats</em>) – Non-centrality, should be non-negative.</li>
 <li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
 <code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  If size is <code class="docutils literal"><span class="pre">None</span></code> (default),
@@ -265,7 +268,7 @@ distribution.</p>
         <li class="right" >
           <a href="randomstate.prng.mt19937.negative_binomial.html" title="randomstate.prng.mt19937.negative_binomial"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+35.gc410b46 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+36.gd44cbc7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../mt19937.html" >MT19937 Randomstate</a> &#187;</li> 
       </ul>
     </div>

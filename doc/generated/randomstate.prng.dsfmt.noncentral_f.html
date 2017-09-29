@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate.prng.dsfmt.noncentral_f &#8212; randomstate 1.13.2+35.gc410b46 documentation</title>
+    <title>randomstate.prng.dsfmt.noncentral_f &#8212; randomstate 1.13.2+36.gd44cbc7 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.13.2+35.gc410b46',
+        VERSION:     '1.13.2+36.gd44cbc7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="randomstate.prng.dsfmt.noncentral_chisquare.html" title="randomstate.prng.dsfmt.noncentral_chisquare"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+35.gc410b46 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+36.gd44cbc7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../dsfmt.html" accesskey="U">dSFMT Randomstate</a> &#187;</li> 
       </ul>
     </div>
@@ -157,9 +157,14 @@ freedom in denominator), where both parameters &gt; 1.
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dfnum</strong> (<em>int</em><em> or </em><em>array_like of ints</em>) – Parameter, should be &gt; 1.</li>
-<li><strong>dfden</strong> (<em>int</em><em> or </em><em>array_like of ints</em>) – Parameter, should be &gt; 1.</li>
-<li><strong>nonc</strong> (<em>float</em><em> or </em><em>array_like of floats</em>) – Parameter, should be &gt;= 0.</li>
+<li><strong>dfnum</strong> (<em>float</em><em> or </em><em>array_like of floats</em>) – <p>Numerator degrees of freedom, should be &gt; 0.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.14.0: </span>Earlier NumPy versions required dfnum &gt; 1.</p>
+</div>
+</li>
+<li><strong>dfden</strong> (<em>float</em><em> or </em><em>array_like of floats</em>) – Denominator degrees of freedom, should be &gt; 0.</li>
+<li><strong>nonc</strong> (<em>float</em><em> or </em><em>array_like of floats</em>) – Non-centrality parameter, the sum of the squares of the numerator
+means, should be &gt;= 0.</li>
 <li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
 <code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  If size is <code class="docutils literal"><span class="pre">None</span></code> (default),
 a single value is returned if <code class="docutils literal"><span class="pre">dfnum</span></code>, <code class="docutils literal"><span class="pre">dfden</span></code>, and <code class="docutils literal"><span class="pre">nonc</span></code>
@@ -253,7 +258,7 @@ distributions for comparison.</p>
         <li class="right" >
           <a href="randomstate.prng.dsfmt.noncentral_chisquare.html" title="randomstate.prng.dsfmt.noncentral_chisquare"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+35.gc410b46 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">randomstate 1.13.2+36.gd44cbc7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../dsfmt.html" >dSFMT Randomstate</a> &#187;</li> 
       </ul>
     </div>
