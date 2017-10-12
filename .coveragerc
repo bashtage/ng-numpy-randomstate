@@ -1,0 +1,25 @@
+# .coveragerc to control coverage.py
+[run]
+source = randomstate
+branch = True
+include = */randomstate/*
+omit =
+    */_version.py
+plugins = Cython.Coverage
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
+    except NotImplementedError
+    except AssertionError
+    # Ignore pass
+    pass
+include = */randomstate/*
+omit =
+    */_version.py
+ignore_errors = True
