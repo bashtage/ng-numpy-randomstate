@@ -17,13 +17,14 @@ matrix:
   - env:
     - PYTHON=2.7
     - NUMPY=1.9
-    - CYTHON=0.22
+    - CYTHON=0.25
   - env:
     - PYTHON=3.4
     - NUMPY=1.10
-    - CYTHON=0.24
+    - CYTHON=0.25
   - env:
     - PYTHON=3.5
+    - CYTHON=0.26
   - env:
     - PYTHON=3.6
     
@@ -43,14 +44,15 @@ before_install:
   - export BUILD_DIR=$PWD
   - conda create -n randomstate-test ${PKGS} pytest pip setuptools matplotlib pyyaml nose --quiet
   - source activate randomstate-test
-  - pip install tempita sphinx guzzle_sphinx_theme ipython -q
+  - pip install tempita sphinx guzzle_sphinx_theme ipython coverage coveralls pytest-cov codecov -q
+  - export CYTHON_COVERAGE=1
 
 install:
   - python setup.py develop
 
 script:
   - set -e
-  - pytest randomstate
+  - pytest --cov-config .coveragerc --cov=randomstate randomstate --cov-report xml --cov-report term
   - |
     if [ ${PYTHON} = 3.5 ]; then
       conda install -c conda-forge doctr
@@ -67,3 +69,6 @@ script:
       cd ${BUILD_DIR}/randomstate
       python performance.py;
     fi
+
+after_success:
+  codecov

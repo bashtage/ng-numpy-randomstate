@@ -14,6 +14,7 @@ from setuptools.dist import Distribution
 import versioneer
 
 DEVELOP = False
+CYTHON_COVERAGE = bool(os.environ.get('CYTHON_COVERAGE', False))
 
 try:
     import Cython.Tempita as tempita
@@ -37,6 +38,8 @@ rngs = ['RNG_DSFMT', 'RNG_MLFG_1279_861', 'RNG_MRG32K3A', 'RNG_MT19937',
 compile_rngs = rngs[:]
 
 extra_defs = [('_CRT_SECURE_NO_WARNINGS', '1')] if os.name == 'nt' else []
+extra_defs += [('CYTHON_TRACE_NOGIL','1')] if CYTHON_COVERAGE else []
+
 extra_link_args = ['/LTCG', '/OPT:REF', 'Advapi32.lib', 'Kernel32.lib'] if os.name == 'nt' else []
 # TODO: The unddefine is to handle a problem when building
 # TODO: manylinux1 on CentOS 5/GCC 4.8.2
@@ -242,7 +245,9 @@ else:
         with open(output_file_name, 'w') as output_file:
             output_file.write(template.substitute())
 
-ext_modules = cythonize(extensions, force=not DEVELOP, annotate=True)
+directives = {'linetrace': CYTHON_COVERAGE}
+ext_modules = cythonize(extensions, force=not DEVELOP, annotate=True,
+                        compiler_directives=directives)
 
 classifiers = ['Development Status :: 5 - Production/Stable',
                'Environment :: Console',
