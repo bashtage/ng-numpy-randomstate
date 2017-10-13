@@ -67,8 +67,11 @@ static NPY_INLINE double random_double(aug_state *state) {
 }
 
 static NPY_INLINE uint64_t random_raw_values(aug_state *state) {
+  uint64_t out;
   double d = random_double_from_buffer(state);
-  return *((uint64_t *)&d);
+
+  memcpy(&out, &d, sizeof(d));
+  return out;
 }
 
 extern void entropy_init(aug_state *state);
