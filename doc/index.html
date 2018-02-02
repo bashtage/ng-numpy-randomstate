@@ -153,8 +153,8 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [2]: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;bm&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">42.6 ms +- 203 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">9.97 ms +- 184 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">37.1 ms +- 570 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">9.26 ms +- 61 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_exponential</span>
@@ -162,8 +162,8 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [5]: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">56.5 ms +- 333 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">5.33 ms +- 95 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">47.8 ms +- 338 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">5.54 ms +- 87 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_gamma</span>
@@ -171,8 +171,8 @@ argument <code class="docutils literal"><span class="pre">method='zig'</span></c
 <span class="gp">In [8]: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">57.6 ms +- 637 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">28 ms +- 701 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">53.1 ms +- 1.06 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">27.2 ms +- 794 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -193,12 +193,12 @@ select distributions<ul>
 <span class="gp">In [11]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="gp">In [12]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
-<span class="gh">Out[12]: </span><span class="go">array([ 0.5488135 ,  0.71518937,  0.60276338])</span>
+<span class="gh">Out[12]: </span><span class="go">array([0.5488135 , 0.71518937, 0.60276338])</span>
 
 <span class="gp">In [13]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="gp">In [14]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">)</span>
-<span class="gh">Out[14]: </span><span class="go">array([ 0.54881346,  0.59284461,  0.71518934], dtype=float32)</span>
+<span class="gh">Out[14]: </span><span class="go">array([0.54881346, 0.5928446 , 0.71518934], dtype=float32)</span>
 </pre></div>
 </div>
 <ul>
@@ -223,10 +223,10 @@ PRNGs in parallel.</p>
 <span class="gp">In [18]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="gp">In [19]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">existing</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
-<span class="gh">Out[19]: </span><span class="go">array([ 0.5488135 ,  0.71518937])</span>
+<span class="gh">Out[19]: </span><span class="go">array([0.5488135 , 0.71518937])</span>
 
 <span class="gp">In [20]: </span><span class="k">print</span><span class="p">(</span><span class="n">existing</span><span class="p">)</span>
-<span class="go">                                           [ 0.5488135   0.71518937  0.          0.        ]</span>
+<span class="go">                                         [0.5488135  0.71518937 0.         0.        ]</span>
 </pre></div>
 </div>
 <ul class="simple">
