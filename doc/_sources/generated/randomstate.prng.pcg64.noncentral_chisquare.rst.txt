@@ -1,5 +1,5 @@
-randomstate\.prng\.pcg64\.noncentral\_chisquare
-===============================================
+randomstate.prng.pcg64.noncentral\_chisquare
+============================================
 
 .. currentmodule:: randomstate.prng.pcg64
 

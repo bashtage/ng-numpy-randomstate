@@ -1,5 +1,5 @@
-randomstate\.prng\.sfmt\.bytes
-==============================
+randomstate.prng.sfmt.bytes
+===========================
 
 .. currentmodule:: randomstate.prng.sfmt
 

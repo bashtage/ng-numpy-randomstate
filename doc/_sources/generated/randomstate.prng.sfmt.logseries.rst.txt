@@ -1,5 +1,5 @@
-randomstate\.prng\.sfmt\.logseries
-==================================
+randomstate.prng.sfmt.logseries
+===============================
 
 .. currentmodule:: randomstate.prng.sfmt
 

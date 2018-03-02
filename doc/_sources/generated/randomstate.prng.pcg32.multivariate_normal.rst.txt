@@ -1,5 +1,5 @@
-randomstate\.prng\.pcg32\.multivariate\_normal
-==============================================
+randomstate.prng.pcg32.multivariate\_normal
+===========================================
 
 .. currentmodule:: randomstate.prng.pcg32
 

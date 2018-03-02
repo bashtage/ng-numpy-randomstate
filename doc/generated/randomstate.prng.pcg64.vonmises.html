@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>randomstate.prng.pcg64.vonmises &#8212; randomstate 1.13.3+6.gd378c12 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '1.13.3+6.gd378c12',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -70,49 +61,19 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    ../index.html" class="text-logo">randomstate 1.13</a>
-        
-<div class="sidebar-block">
-  <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <ul>
-<li class="toctree-l1"><a class="reference internal" href="../parallel.html">Using in Parallel Applications</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../multithreading.html">Multithreaded Generation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../entropy.html">Reading System Entropy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../performance.html">Comparing Performance</a></li>
-</ul>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../mt19937.html">MT19937</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dsfmt.html">dSFMT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sfmt.html">SFMT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../xorshift128.html">XorShift128+</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../xoroshiro128plus.html">XoroShiro128+</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../xorshift1024.html">XorShift1024*</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../pcg32.html">PCG-32</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../pcg64.html">PCG-64</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../pcg64.html#random-generator">Random generator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pcg64.html#parallel-generation">Parallel generation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pcg64.html#simple-random-data">Simple random data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pcg64.html#permutations">Permutations</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../pcg64.html#distributions">Distributions</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../mlfg.html">MLFG</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../mrg32k3a.html">MRG32K3A</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../change-log.html">Change Log</a></li>
-</ul>
-
-    
-  </div>
-</div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="randomstate.prng.pcg64.uniform.html"
+                        title="previous chapter">randomstate.prng.pcg64.uniform</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="randomstate.prng.pcg64.wald.html"
+                        title="next chapter">randomstate.prng.pcg64.wald</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/generated/randomstate.prng.pcg64.vonmises.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -126,6 +87,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -161,10 +123,10 @@ distribution.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>mu</strong> (<em>float</em><em> or </em><em>array_like of floats</em>) – Mode (“center”) of the distribution.</li>
 <li><strong>kappa</strong> (<em>float</em><em> or </em><em>array_like of floats</em>) – Dispersion of the distribution, has to be &gt;=0.</li>
-<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
-<code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  If size is <code class="docutils literal"><span class="pre">None</span></code> (default),
-a single value is returned if <code class="docutils literal"><span class="pre">mu</span></code> and <code class="docutils literal"><span class="pre">kappa</span></code> are both scalars.
-Otherwise, <code class="docutils literal"><span class="pre">np.broadcast(mu,</span> <span class="pre">kappa).size</span></code> samples are drawn.</li>
+<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal notranslate"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  If size is <code class="docutils literal notranslate"><span class="pre">None</span></code> (default),
+a single value is returned if <code class="docutils literal notranslate"><span class="pre">mu</span></code> and <code class="docutils literal notranslate"><span class="pre">kappa</span></code> are both scalars.
+Otherwise, <code class="docutils literal notranslate"><span class="pre">np.broadcast(mu,</span> <span class="pre">kappa).size</span></code> samples are drawn.</li>
 </ul>
 </td>
 </tr>
@@ -179,16 +141,16 @@ Otherwise, <code class="docutils literal"><span class="pre">np.broadcast(mu,</sp
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><code class="xref py py-func docutils literal"><span class="pre">scipy.stats.vonmises()</span></code></dt>
+<dt><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.stats.vonmises()</span></code></dt>
 <dd>probability density function, distribution, or cumulative density function, etc.</dd>
 </dl>
 </div>
 <p class="rubric">Notes</p>
 <p>The probability density for the von Mises distribution is</p>
-<div class="math">
+<div class="math notranslate">
 \[p(x) = \frac{e^{\kappa cos(x-\mu)}}{2\pi I_0(\kappa)},\]</div>
-<p>where <span class="math">\(\mu\)</span> is the mode and <span class="math">\(\kappa\)</span> the dispersion,
-and <span class="math">\(I_0(\kappa)\)</span> is the modified Bessel function of order 0.</p>
+<p>where <span class="math notranslate">\(\mu\)</span> is the mode and <span class="math notranslate">\(\kappa\)</span> the dispersion,
+and <span class="math notranslate">\(I_0(\kappa)\)</span> is the modified Bessel function of order 0.</p>
 <p>The von Mises is named for Richard Edler von Mises, who was born in
 Austria-Hungary, in what is now the Ukraine.  He fled to the United
 States in 1939 and became a professor at Harvard.  He worked in
@@ -212,13 +174,13 @@ and Statistics”, New York: Academic Press, 1964.</td></tr>
 </table>
 <p class="rubric">Examples</p>
 <p>Draw samples from the distribution:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mu</span><span class="p">,</span> <span class="n">kappa</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">4.0</span> <span class="c1"># mean and dispersion</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mu</span><span class="p">,</span> <span class="n">kappa</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">4.0</span> <span class="c1"># mean and dispersion</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">vonmises</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Display the histogram of the samples, along with
 the probability density function:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.special</span> <span class="k">import</span> <span class="n">i0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>

@@ -1,5 +1,5 @@
-randomstate\.prng\.xorshift128\.standard\_cauchy
-================================================
+randomstate.prng.xorshift128.standard\_cauchy
+=============================================
 
 .. currentmodule:: randomstate.prng.xorshift128
 

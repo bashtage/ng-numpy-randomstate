@@ -1,5 +1,5 @@
-randomstate\.prng\.sfmt\.negative\_binomial
-===========================================
+randomstate.prng.sfmt.negative\_binomial
+========================================
 
 .. currentmodule:: randomstate.prng.sfmt
 

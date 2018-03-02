@@ -1,5 +1,5 @@
-randomstate\.prng\.dsfmt\.dirichlet
-===================================
+randomstate.prng.dsfmt.dirichlet
+================================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

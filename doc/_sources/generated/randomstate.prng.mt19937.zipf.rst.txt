@@ -1,5 +1,5 @@
-randomstate\.prng\.mt19937\.zipf
-================================
+randomstate.prng.mt19937.zipf
+=============================
 
 .. currentmodule:: randomstate.prng.mt19937
 

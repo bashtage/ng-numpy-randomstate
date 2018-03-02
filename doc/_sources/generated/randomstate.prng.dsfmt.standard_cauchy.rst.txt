@@ -1,5 +1,5 @@
-randomstate\.prng\.dsfmt\.standard\_cauchy
-==========================================
+randomstate.prng.dsfmt.standard\_cauchy
+=======================================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

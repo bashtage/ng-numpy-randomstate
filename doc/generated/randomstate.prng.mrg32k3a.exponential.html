@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>randomstate.prng.mrg32k3a.exponential &#8212; randomstate 1.13.3+6.gd378c12 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '1.13.3+6.gd378c12',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -70,49 +61,19 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    ../index.html" class="text-logo">randomstate 1.13</a>
-        
-<div class="sidebar-block">
-  <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <ul>
-<li class="toctree-l1"><a class="reference internal" href="../parallel.html">Using in Parallel Applications</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../multithreading.html">Multithreaded Generation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../entropy.html">Reading System Entropy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../performance.html">Comparing Performance</a></li>
-</ul>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../mt19937.html">MT19937</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dsfmt.html">dSFMT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sfmt.html">SFMT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../xorshift128.html">XorShift128+</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../xoroshiro128plus.html">XoroShiro128+</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../xorshift1024.html">XorShift1024*</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../pcg32.html">PCG-32</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../pcg64.html">PCG-64</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../mlfg.html">MLFG</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../mrg32k3a.html">MRG32K3A</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../mrg32k3a.html#random-generator">Random generator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mrg32k3a.html#parallel-generation">Parallel generation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mrg32k3a.html#simple-random-data">Simple random data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mrg32k3a.html#permutations">Permutations</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../mrg32k3a.html#distributions">Distributions</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../change-log.html">Change Log</a></li>
-</ul>
-
-    
-  </div>
-</div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="randomstate.prng.mrg32k3a.dirichlet.html"
+                        title="previous chapter">randomstate.prng.mrg32k3a.dirichlet</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="randomstate.prng.mrg32k3a.f.html"
+                        title="next chapter">randomstate.prng.mrg32k3a.f</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/generated/randomstate.prng.mrg32k3a.exponential.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -126,6 +87,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -149,10 +111,10 @@
 <code class="descclassname">randomstate.prng.mrg32k3a.</code><code class="descname">exponential</code><span class="sig-paren">(</span><em>scale=1.0</em>, <em>size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.mrg32k3a.exponential" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw samples from an exponential distribution.</p>
 <p>Its probability density function is</p>
-<div class="math">
+<div class="math notranslate">
 \[f(x; \frac{1}{\beta}) = \frac{1}{\beta} \exp(-\frac{x}{\beta}),\]</div>
-<p>for <code class="docutils literal"><span class="pre">x</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> and 0 elsewhere. <span class="math">\(\beta\)</span> is the scale parameter,
-which is the inverse of the rate parameter <span class="math">\(\lambda = 1/\beta\)</span>.
+<p>for <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> and 0 elsewhere. <span class="math notranslate">\(\beta\)</span> is the scale parameter,
+which is the inverse of the rate parameter <span class="math notranslate">\(\lambda = 1/\beta\)</span>.
 The rate parameter is an alternative, widely used parameterization
 of the exponential distribution <a class="footnote-reference" href="#id6" id="id1">[3]</a>.</p>
 <p>The exponential distribution is a continuous analogue of the
@@ -164,11 +126,11 @@ between page requests to Wikipedia <a class="footnote-reference" href="#id5" id=
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>scale</strong> (<em>float</em><em> or </em><em>array_like of floats</em>) – The scale parameter, <span class="math">\(\beta = 1/\lambda\)</span>.</li>
-<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
-<code class="docutils literal"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  If size is <code class="docutils literal"><span class="pre">None</span></code> (default),
-a single value is returned if <code class="docutils literal"><span class="pre">scale</span></code> is a scalar.  Otherwise,
-<code class="docutils literal"><span class="pre">np.array(scale).size</span></code> samples are drawn.</li>
+<li><strong>scale</strong> (<em>float</em><em> or </em><em>array_like of floats</em>) – The scale parameter, <span class="math notranslate">\(\beta = 1/\lambda\)</span>.</li>
+<li><strong>size</strong> (<em>int</em><em> or </em><em>tuple of ints</em><em>, </em><em>optional</em>) – Output shape.  If the given shape is, e.g., <code class="docutils literal notranslate"><span class="pre">(m,</span> <span class="pre">n,</span> <span class="pre">k)</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">m</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">*</span> <span class="pre">k</span></code> samples are drawn.  If size is <code class="docutils literal notranslate"><span class="pre">None</span></code> (default),
+a single value is returned if <code class="docutils literal notranslate"><span class="pre">scale</span></code> is a scalar.  Otherwise,
+<code class="docutils literal notranslate"><span class="pre">np.array(scale).size</span></code> samples are drawn.</li>
 </ul>
 </td>
 </tr>

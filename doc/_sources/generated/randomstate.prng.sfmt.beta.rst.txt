@@ -1,5 +1,5 @@
-randomstate\.prng\.sfmt\.beta
-=============================
+randomstate.prng.sfmt.beta
+==========================
 
 .. currentmodule:: randomstate.prng.sfmt
 

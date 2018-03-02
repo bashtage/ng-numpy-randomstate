@@ -1,5 +1,5 @@
-randomstate\.prng\.mt19937\.exponential
-=======================================
+randomstate.prng.mt19937.exponential
+====================================
 
 .. currentmodule:: randomstate.prng.mt19937
 

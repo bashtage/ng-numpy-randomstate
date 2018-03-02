@@ -1,5 +1,5 @@
-randomstate\.prng\.pcg64\.random\_uintegers
-===========================================
+randomstate.prng.pcg64.random\_uintegers
+========================================
 
 .. currentmodule:: randomstate.prng.pcg64
 

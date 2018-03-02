@@ -1,5 +1,5 @@
-randomstate\.prng\.sfmt\.noncentral\_f
-======================================
+randomstate.prng.sfmt.noncentral\_f
+===================================
 
 .. currentmodule:: randomstate.prng.sfmt
 

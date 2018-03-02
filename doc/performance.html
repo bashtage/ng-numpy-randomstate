@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>Performance &#8212; randomstate 1.13.3+6.gd378c12 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.13.3+6.gd378c12',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -69,46 +60,34 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    index.html" class="text-logo">randomstate 1.13</a>
-        
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="parallel.html">Using in Parallel Applications</a></li>
-<li class="toctree-l1"><a class="reference internal" href="multithreading.html">Multithreaded Generation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="entropy.html">Reading System Entropy</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Comparing Performance</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#recommendation">Recommendation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#timings">Timings</a></li>
+    <h2>Contents</h2>
+    <div class="sidebar-localtoc">
+      <ul>
+<li><a class="reference internal" href="#">Performance</a><ul>
+<li><a class="reference internal" href="#recommendation">Recommendation</a></li>
+<li><a class="reference internal" href="#timings">Timings</a></li>
 </ul>
 </li>
 </ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="mt19937.html">MT19937</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dsfmt.html">dSFMT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sfmt.html">SFMT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xorshift128.html">XorShift128+</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xoroshiro128plus.html">XoroShiro128+</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xorshift1024.html">XorShift1024*</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pcg32.html">PCG-32</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pcg64.html">PCG-64</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mlfg.html">MLFG</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mrg32k3a.html">MRG32K3A</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="change-log.html">Change Log</a></li>
-</ul>
 
-    
+    </div>
   </div>
 </div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="entropy.html"
+                        title="previous chapter">System Entropy</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mt19937.html"
+                        title="next chapter">MT19937 Randomstate</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/performance.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -122,6 +101,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -141,9 +121,9 @@
 <div class="section" id="recommendation">
 <h2>Recommendation<a class="headerlink" href="#recommendation" title="Permalink to this headline">¶</a></h2>
 <p>The recommended generator for single use is <cite>xoroshiro128+</cite>
-(<code class="xref py py-class docutils literal"><span class="pre">xoroshiro128plus</span></code>).  The recommended generator
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">xoroshiro128plus</span></code>).  The recommended generator
 for use in large-scale parallel applications is
-<cite>xorshift1024*</cite> (<code class="xref py py-class docutils literal"><span class="pre">xorshift1024</span></code>)
+<cite>xorshift1024*</cite> (<code class="xref py py-class docutils literal notranslate"><span class="pre">xorshift1024</span></code>)
 where the <cite>jump</cite> method is used to advance the state.</p>
 </div>
 <div class="section" id="timings">

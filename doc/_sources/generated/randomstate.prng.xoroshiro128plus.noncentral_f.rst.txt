@@ -1,5 +1,5 @@
-randomstate\.prng\.xoroshiro128plus\.noncentral\_f
-==================================================
+randomstate.prng.xoroshiro128plus.noncentral\_f
+===============================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

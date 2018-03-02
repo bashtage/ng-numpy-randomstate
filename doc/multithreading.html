@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>Multithreaded Generation &#8212; randomstate 1.13.3+6.gd378c12 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.13.3+6.gd378c12',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -69,42 +60,19 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    index.html" class="text-logo">randomstate 1.13</a>
-        
-<div class="sidebar-block">
-  <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="parallel.html">Using in Parallel Applications</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Multithreaded Generation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="entropy.html">Reading System Entropy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="performance.html">Comparing Performance</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="mt19937.html">MT19937</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dsfmt.html">dSFMT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sfmt.html">SFMT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xorshift128.html">XorShift128+</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xoroshiro128plus.html">XoroShiro128+</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xorshift1024.html">XorShift1024*</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pcg32.html">PCG-32</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pcg64.html">PCG-64</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mlfg.html">MLFG</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mrg32k3a.html">MRG32K3A</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="change-log.html">Change Log</a></li>
-</ul>
-
-    
-  </div>
-</div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="parallel.html"
+                        title="previous chapter">Parallel Random Number Generation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="entropy.html"
+                        title="next chapter">System Entropy</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/multithreading.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -118,6 +86,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -135,17 +104,17 @@
   <div class="section" id="multithreaded-generation">
 <h1>Multithreaded Generation<a class="headerlink" href="#multithreaded-generation" title="Permalink to this headline">¶</a></h1>
 <p>The four core distributions all allow existing arrays to be filled using the
-<code class="docutils literal"><span class="pre">out</span></code> keyword argument.  Existing arrays need to be contiguous and
+<code class="docutils literal notranslate"><span class="pre">out</span></code> keyword argument.  Existing arrays need to be contiguous and
 well-behaved (writable and aligned).  Under normal circumstances, arrays
-created using the common constructors such as <code class="docutils literal"><span class="pre">numpy.empty</span></code> will satisfy
+created using the common constructors such as <code class="docutils literal notranslate"><span class="pre">numpy.empty</span></code> will satisfy
 these requirements.</p>
-<p>This example makes use of Python 3 <code class="docutils literal"><span class="pre">futures</span></code> to fill an array using multiple
+<p>This example makes use of Python 3 <code class="docutils literal notranslate"><span class="pre">futures</span></code> to fill an array using multiple
 threads.  Threads are long-lived so that repeated calls do not require any
 additional overheads from thread creation. The underlying PRNG is xorshift2014
-which is fast, has a long period and supports using <code class="docutils literal"><span class="pre">jump</span></code> to advance the
+which is fast, has a long period and supports using <code class="docutils literal notranslate"><span class="pre">jump</span></code> to advance the
 state. The random numbers generated are reproducible in the sense that the
 same seed will produce the same outputs.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">randomstate</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">randomstate</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span>
 <span class="kn">import</span> <span class="nn">concurrent.futures</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -185,9 +154,9 @@ same seed will produce the same outputs.</p>
 </pre></div>
 </div>
 <p>The multithreaded random number generator can be used to fill an array.
-The <code class="docutils literal"><span class="pre">values</span></code> attributes shows the zero-value before the fill and the
+The <code class="docutils literal notranslate"><span class="pre">values</span></code> attributes shows the zero-value before the fill and the
 random value after.</p>
-<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="n">mrng</span> <span class="o">=</span> <span class="n">MultithreadedRNG</span><span class="p">(</span><span class="mi">10000000</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="n">mrng</span> <span class="o">=</span> <span class="n">MultithreadedRNG</span><span class="p">(</span><span class="mi">10000000</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="gp">In [2]: </span><span class="k">print</span><span class="p">(</span><span class="n">mrng</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 <span class="go">0.0</span>
@@ -200,25 +169,25 @@ random value after.</p>
 </div>
 <p>The time required to produce using multiple threads can be compared to
 the time required to generate using a single thread.</p>
-<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [5]: </span><span class="k">print</span><span class="p">(</span><span class="n">mrng</span><span class="o">.</span><span class="n">threads</span><span class="p">)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [5]: </span><span class="k">print</span><span class="p">(</span><span class="n">mrng</span><span class="o">.</span><span class="n">threads</span><span class="p">)</span>
 <span class="go">2</span>
 
 <span class="gp">In [6]: </span><span class="o">%</span><span class="k">timeit</span> mrng.fill()
-<span class="go">  79.7 ms +- 137 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">  82.7 ms +- 392 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <p>The single threaded call directly uses the PRNG.</p>
-<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">10000000</span><span class="p">)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">10000000</span><span class="p">)</span>
 
 <span class="gp">In [8]: </span><span class="o">%</span><span class="k">timeit</span> randomstate.prng.xorshift1024.standard_normal(out=values)
-<span class="go">123 ms +- 1.17 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">130 ms +- 2.46 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <p>The gains are substantial and the scaling is reasonable even for large that
 are only moderately large.  The gains are even larger when compared to a call
 that does not use an existing array due to array creation overhead.</p>
-<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [9]: </span><span class="o">%</span><span class="k">timeit</span> randomstate.prng.xorshift1024.standard_normal(10000000)
-<span class="go">138 ms +- 541 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [9]: </span><span class="o">%</span><span class="k">timeit</span> randomstate.prng.xorshift1024.standard_normal(10000000)
+<span class="go">145 ms +- 1.11 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 </div>

@@ -1,5 +1,5 @@
-randomstate\.prng\.xoroshiro128plus\.weibull
-============================================
+randomstate.prng.xoroshiro128plus.weibull
+=========================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

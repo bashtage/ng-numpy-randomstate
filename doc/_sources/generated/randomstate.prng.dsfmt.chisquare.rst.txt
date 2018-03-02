@@ -1,5 +1,5 @@
-randomstate\.prng\.dsfmt\.chisquare
-===================================
+randomstate.prng.dsfmt.chisquare
+================================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

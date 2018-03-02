@@ -562,6 +562,7 @@ doc/_static/css/bootstrap-theme.min.css
 doc/_static/css/bootstrap.min.css
 doc/_static/css/overrides.css
 doc/_static/doctools.js
+doc/_static/documentation_options.js
 doc/_static/down-pressed.png
 doc/_static/down.png
 doc/_static/file.png
@@ -647,7 +648,7 @@ doc/_static/fonts/source-serif-pro/WOFF/TTF/SourceSerifPro-Semibold.ttf.woff
 doc/_static/fonts/source-serif-pro/bower.json
 doc/_static/fonts/source-serif-pro/source-serif-pro.css
 doc/_static/guzzle.css
-doc/_static/jquery-3.1.0.js
+doc/_static/jquery-3.2.1.js
 doc/_static/jquery.js
 doc/_static/jquery.min.map
 doc/_static/js/bootstrap.js

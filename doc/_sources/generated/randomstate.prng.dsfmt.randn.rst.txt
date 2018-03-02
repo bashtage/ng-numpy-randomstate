@@ -1,5 +1,5 @@
-randomstate\.prng\.dsfmt\.randn
-===============================
+randomstate.prng.dsfmt.randn
+============================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

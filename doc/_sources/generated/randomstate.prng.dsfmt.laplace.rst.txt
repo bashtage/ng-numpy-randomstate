@@ -1,5 +1,5 @@
-randomstate\.prng\.dsfmt\.laplace
-=================================
+randomstate.prng.dsfmt.laplace
+==============================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

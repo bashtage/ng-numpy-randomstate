@@ -1,5 +1,5 @@
-randomstate\.prng\.sfmt\.pareto
-===============================
+randomstate.prng.sfmt.pareto
+============================
 
 .. currentmodule:: randomstate.prng.sfmt
 

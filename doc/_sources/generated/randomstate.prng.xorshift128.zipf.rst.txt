@@ -1,5 +1,5 @@
-randomstate\.prng\.xorshift128\.zipf
-====================================
+randomstate.prng.xorshift128.zipf
+=================================
 
 .. currentmodule:: randomstate.prng.xorshift128
 

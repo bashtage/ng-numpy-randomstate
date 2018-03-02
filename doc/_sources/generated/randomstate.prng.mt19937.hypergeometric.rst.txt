@@ -1,5 +1,5 @@
-randomstate\.prng\.mt19937\.hypergeometric
-==========================================
+randomstate.prng.mt19937.hypergeometric
+=======================================
 
 .. currentmodule:: randomstate.prng.mt19937
 

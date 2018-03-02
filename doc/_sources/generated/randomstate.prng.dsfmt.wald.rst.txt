@@ -1,5 +1,5 @@
-randomstate\.prng\.dsfmt\.wald
-==============================
+randomstate.prng.dsfmt.wald
+===========================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

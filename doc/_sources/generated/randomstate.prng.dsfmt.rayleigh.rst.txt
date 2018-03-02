@@ -1,5 +1,5 @@
-randomstate\.prng\.dsfmt\.rayleigh
-==================================
+randomstate.prng.dsfmt.rayleigh
+===============================
 
 .. currentmodule:: randomstate.prng.dsfmt
 

@@ -1,5 +1,5 @@
-randomstate\.prng\.xoroshiro128plus\.dirichlet
-==============================================
+randomstate.prng.xoroshiro128plus.dirichlet
+===========================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

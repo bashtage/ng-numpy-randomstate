@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>Parallel Random Number Generation &#8212; randomstate 1.13.3+6.gd378c12 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.13.3+6.gd378c12',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -69,46 +60,38 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    index.html" class="text-logo">randomstate 1.13</a>
-        
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Using in Parallel Applications</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#independent-streams">Independent Streams</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#jump-advance-the-prng-state">Jump/Advance the PRNG state</a></li>
+    <h2>Contents</h2>
+    <div class="sidebar-localtoc">
+      <ul>
+<li><a class="reference internal" href="#">Parallel Random Number Generation</a><ul>
+<li><a class="reference internal" href="#independent-streams">Independent Streams</a></li>
+<li><a class="reference internal" href="#jump-advance-the-prng-state">Jump/Advance the PRNG state</a><ul>
+<li><a class="reference internal" href="#jump">Jump</a></li>
+<li><a class="reference internal" href="#advance">Advance</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="multithreading.html">Multithreaded Generation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="entropy.html">Reading System Entropy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="performance.html">Comparing Performance</a></li>
 </ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="mt19937.html">MT19937</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dsfmt.html">dSFMT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sfmt.html">SFMT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xorshift128.html">XorShift128+</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xoroshiro128plus.html">XoroShiro128+</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xorshift1024.html">XorShift1024*</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pcg32.html">PCG-32</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pcg64.html">PCG-64</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mlfg.html">MLFG</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mrg32k3a.html">MRG32K3A</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="change-log.html">Change Log</a></li>
+</li>
 </ul>
 
-    
+    </div>
   </div>
 </div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">randomstate’s documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="multithreading.html"
+                        title="next chapter">Multithreaded Generation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/parallel.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -122,6 +105,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -143,12 +127,12 @@ repeatable pseudo-random numbers across multiple processes (local
 or distributed).</p>
 <div class="section" id="independent-streams">
 <span id="id1"></span><h2>Independent Streams<a class="headerlink" href="#independent-streams" title="Permalink to this headline">¶</a></h2>
-<p>Currently only <code class="docutils literal"><span class="pre">pcg32</span></code> and <code class="docutils literal"><span class="pre">pcg64</span></code> support independent streams, and,
-due to the limited period of <code class="docutils literal"><span class="pre">pcg32</span></code> (<span class="math">\(2^{64}\)</span>), only <code class="docutils literal"><span class="pre">pcg64</span></code>
+<p>Currently only <code class="docutils literal notranslate"><span class="pre">pcg32</span></code> and <code class="docutils literal notranslate"><span class="pre">pcg64</span></code> support independent streams, and,
+due to the limited period of <code class="docutils literal notranslate"><span class="pre">pcg32</span></code> (<span class="math notranslate">\(2^{64}\)</span>), only <code class="docutils literal notranslate"><span class="pre">pcg64</span></code>
 should be used.  This example shows how many streams can be created by
 passing in different index values in the second input while using the
 same seed in the first.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">randomstate.entropy</span> <span class="kn">import</span> <span class="n">random_entropy</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">randomstate.entropy</span> <span class="kn">import</span> <span class="n">random_entropy</span>
 <span class="kn">import</span> <span class="nn">randomstate.prng.pcg64</span> <span class="kn">as</span> <span class="nn">pcg64</span>
 
 <span class="n">entropy</span> <span class="o">=</span> <span class="n">random_entropy</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
@@ -162,11 +146,11 @@ same seed in the first.</p>
 <span id="jump-and-advance"></span><h2>Jump/Advance the PRNG state<a class="headerlink" href="#jump-advance-the-prng-state" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="jump">
 <h3>Jump<a class="headerlink" href="#jump" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal"><span class="pre">jump</span></code> advances the state of the PRNG <em>as-if</em> a large number of random
+<p><code class="docutils literal notranslate"><span class="pre">jump</span></code> advances the state of the PRNG <em>as-if</em> a large number of random
 numbers have been drawn.  The specific number of draws varies by PRNG, and
-ranges from <span class="math">\(2^{64}\)</span> to <span class="math">\(2^{512}\)</span>.  Additionally, the <em>as-if</em>
+ranges from <span class="math notranslate">\(2^{64}\)</span> to <span class="math notranslate">\(2^{512}\)</span>.  Additionally, the <em>as-if</em>
 draws also depend on the size of the default random number produced by the
-specific PRNG.  The PRNGs that support <code class="docutils literal"><span class="pre">jump</span></code>, along with the period of
+specific PRNG.  The PRNGs that support <code class="docutils literal notranslate"><span class="pre">jump</span></code>, along with the period of
 the PRNG, the size of the jump and the bits in the default unsigned random
 are listed below.</p>
 <table border="1" class="docutils">
@@ -185,34 +169,34 @@ are listed below.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>dsfmt</td>
-<td><span class="math">\(2^{19937}\)</span></td>
-<td><span class="math">\(2^{128}\)</span></td>
+<td><span class="math notranslate">\(2^{19937}\)</span></td>
+<td><span class="math notranslate">\(2^{128}\)</span></td>
 <td>53</td>
 </tr>
 <tr class="row-odd"><td>mrg32k3a</td>
-<td><span class="math">\(\approx 2^{191}\)</span></td>
-<td><span class="math">\(2^{127}\)</span></td>
+<td><span class="math notranslate">\(\approx 2^{191}\)</span></td>
+<td><span class="math notranslate">\(2^{127}\)</span></td>
 <td>32</td>
 </tr>
 <tr class="row-even"><td>xorshift128</td>
-<td><span class="math">\(2^{128}\)</span></td>
-<td><span class="math">\(2^{64}\)</span></td>
+<td><span class="math notranslate">\(2^{128}\)</span></td>
+<td><span class="math notranslate">\(2^{64}\)</span></td>
 <td>64</td>
 </tr>
 <tr class="row-odd"><td>xorshift1024</td>
-<td><span class="math">\(2^{1024}\)</span></td>
-<td><span class="math">\(2^{512}\)</span></td>
+<td><span class="math notranslate">\(2^{1024}\)</span></td>
+<td><span class="math notranslate">\(2^{512}\)</span></td>
 <td>64</td>
 </tr>
 <tr class="row-even"><td>mt19937</td>
-<td colspan="2"><span class="math">\(2^{19937}\)</span>        | <span class="math">\(2^{128}\)</span></td>
+<td colspan="2"><span class="math notranslate">\(2^{19937}\)</span>        | <span class="math notranslate">\(2^{128}\)</span></td>
 <td>32</td>
 </tr>
 </tbody>
 </table>
-<p><code class="docutils literal"><span class="pre">jump</span></code> can be used to produce long blocks which should be long enough to not
+<p><code class="docutils literal notranslate"><span class="pre">jump</span></code> can be used to produce long blocks which should be long enough to not
 overlap.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">randomstate.entropy</span> <span class="kn">import</span> <span class="n">random_entropy</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">randomstate.entropy</span> <span class="kn">import</span> <span class="n">random_entropy</span>
 <span class="kn">import</span> <span class="nn">randomstate.prng.xorshift1024</span> <span class="kn">as</span> <span class="nn">xorshift1024</span>
 
 <span class="n">entropy</span> <span class="o">=</span> <span class="n">random_entropy</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span>
@@ -228,10 +212,10 @@ overlap.</p>
 </div>
 <div class="section" id="advance">
 <h3>Advance<a class="headerlink" href="#advance" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal"><span class="pre">advance</span></code> can be used to jump the state an arbitrary number of steps, and so
-is a more general approach than <code class="docutils literal"><span class="pre">jump</span></code>.  Only <code class="docutils literal"><span class="pre">pcg32</span></code> and <code class="docutils literal"><span class="pre">pcg64</span></code>
-support <code class="docutils literal"><span class="pre">advance</span></code>, and since these also support independent streams, it is
-not usually necessary to use <code class="docutils literal"><span class="pre">advance</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">advance</span></code> can be used to jump the state an arbitrary number of steps, and so
+is a more general approach than <code class="docutils literal notranslate"><span class="pre">jump</span></code>.  Only <code class="docutils literal notranslate"><span class="pre">pcg32</span></code> and <code class="docutils literal notranslate"><span class="pre">pcg64</span></code>
+support <code class="docutils literal notranslate"><span class="pre">advance</span></code>, and since these also support independent streams, it is
+not usually necessary to use <code class="docutils literal notranslate"><span class="pre">advance</span></code>.</p>
 <p>Advancing a PRNG updates the underlying PRNG state as-if a given number of
 calls to the underlying PRNG have been made. In general there is not a
 one-to-one relationship between the number output random values from a
@@ -248,9 +232,9 @@ from a single draw of a 32-bit PRNG.</li>
 </ul>
 <p>Advancing the PRNG state resets any pre-computed random numbers. This is
 required to ensure exact reproducibility.</p>
-<p>This example uses <code class="docutils literal"><span class="pre">advance</span></code> to advance a <code class="docutils literal"><span class="pre">pcg64</span></code> generator 2 ** 127
+<p>This example uses <code class="docutils literal notranslate"><span class="pre">advance</span></code> to advance a <code class="docutils literal notranslate"><span class="pre">pcg64</span></code> generator 2 ** 127
 steps to set a sequence of random number generators.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">randomstate.prng.pcg64</span> <span class="kn">as</span> <span class="nn">pcg64</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">randomstate.prng.pcg64</span> <span class="kn">as</span> <span class="nn">pcg64</span>
 <span class="n">rs</span> <span class="o">=</span> <span class="n">pcg64</span><span class="o">.</span><span class="n">RandomState</span><span class="p">()</span>
 <span class="n">rs_gen</span> <span class="o">=</span> <span class="n">pcg64</span><span class="o">.</span><span class="n">RandomState</span><span class="p">()</span>
 <span class="n">rs_gen</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">rs</span><span class="o">.</span><span class="n">get_state</span><span class="p">())</span>

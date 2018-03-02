@@ -1,5 +1,5 @@
-randomstate\.prng\.mlfg\_1279\_861\.noncentral\_chisquare
-=========================================================
+randomstate.prng.mlfg\_1279\_861.noncentral\_chisquare
+======================================================
 
 .. currentmodule:: randomstate.prng.mlfg_1279_861
 

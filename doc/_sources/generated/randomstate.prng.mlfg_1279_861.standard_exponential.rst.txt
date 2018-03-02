@@ -1,5 +1,5 @@
-randomstate\.prng\.mlfg\_1279\_861\.standard\_exponential
-=========================================================
+randomstate.prng.mlfg\_1279\_861.standard\_exponential
+======================================================
 
 .. currentmodule:: randomstate.prng.mlfg_1279_861
 

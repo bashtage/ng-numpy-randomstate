@@ -1,5 +1,5 @@
-randomstate\.prng\.xorshift128\.triangular
-==========================================
+randomstate.prng.xorshift128.triangular
+=======================================
 
 .. currentmodule:: randomstate.prng.xorshift128
 

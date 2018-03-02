@@ -1,5 +1,5 @@
-randomstate\.prng\.sfmt\.random\_uintegers
-==========================================
+randomstate.prng.sfmt.random\_uintegers
+=======================================
 
 .. currentmodule:: randomstate.prng.sfmt
 

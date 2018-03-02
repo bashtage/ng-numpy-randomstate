@@ -1,5 +1,5 @@
-randomstate\.prng\.xoroshiro128plus\.gumbel
-===========================================
+randomstate.prng.xoroshiro128plus.gumbel
+========================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

@@ -1,5 +1,5 @@
-randomstate\.prng\.sfmt\.geometric
-==================================
+randomstate.prng.sfmt.geometric
+===============================
 
 .. currentmodule:: randomstate.prng.sfmt
 

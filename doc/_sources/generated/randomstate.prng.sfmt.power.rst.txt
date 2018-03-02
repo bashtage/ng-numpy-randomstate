@@ -1,5 +1,5 @@
-randomstate\.prng\.sfmt\.power
-==============================
+randomstate.prng.sfmt.power
+===========================
 
 .. currentmodule:: randomstate.prng.sfmt
 

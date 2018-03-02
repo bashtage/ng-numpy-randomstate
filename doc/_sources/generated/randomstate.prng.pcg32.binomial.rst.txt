@@ -1,5 +1,5 @@
-randomstate\.prng\.pcg32\.binomial
-==================================
+randomstate.prng.pcg32.binomial
+===============================
 
 .. currentmodule:: randomstate.prng.pcg32
 

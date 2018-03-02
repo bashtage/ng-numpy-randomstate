@@ -1,5 +1,5 @@
-randomstate\.prng\.xorshift1024\.bytes
-======================================
+randomstate.prng.xorshift1024.bytes
+===================================
 
 .. currentmodule:: randomstate.prng.xorshift1024
 

@@ -1,5 +1,5 @@
-randomstate\.prng\.pcg64\.weibull
-=================================
+randomstate.prng.pcg64.weibull
+==============================
 
 .. currentmodule:: randomstate.prng.pcg64
 

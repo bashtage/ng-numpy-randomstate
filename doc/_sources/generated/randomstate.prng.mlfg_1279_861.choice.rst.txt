@@ -1,5 +1,5 @@
-randomstate\.prng\.mlfg\_1279\_861\.choice
-==========================================
+randomstate.prng.mlfg\_1279\_861.choice
+=======================================
 
 .. currentmodule:: randomstate.prng.mlfg_1279_861
 

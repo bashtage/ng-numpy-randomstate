@@ -1,5 +1,5 @@
-randomstate\.prng\.xorshift1024\.seed
-=====================================
+randomstate.prng.xorshift1024.seed
+==================================
 
 .. currentmodule:: randomstate.prng.xorshift1024
 

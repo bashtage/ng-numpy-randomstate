@@ -1,5 +1,5 @@
-randomstate\.prng\.xorshift1024\.standard\_normal
-=================================================
+randomstate.prng.xorshift1024.standard\_normal
+==============================================
 
 .. currentmodule:: randomstate.prng.xorshift1024
 

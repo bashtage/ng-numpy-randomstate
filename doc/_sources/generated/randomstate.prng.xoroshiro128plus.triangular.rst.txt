@@ -1,5 +1,5 @@
-randomstate\.prng\.xoroshiro128plus\.triangular
-===============================================
+randomstate.prng.xoroshiro128plus.triangular
+============================================
 
 .. currentmodule:: randomstate.prng.xoroshiro128plus
 

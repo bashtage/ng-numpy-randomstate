@@ -1,5 +1,5 @@
-randomstate\.prng\.xorshift128\.set\_state
-==========================================
+randomstate.prng.xorshift128.set\_state
+=======================================
 
 .. currentmodule:: randomstate.prng.xorshift128
 

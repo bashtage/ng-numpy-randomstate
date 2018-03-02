@@ -1,5 +1,5 @@
-randomstate\.prng\.mlfg\_1279\_861\.weibull
-===========================================
+randomstate.prng.mlfg\_1279\_861.weibull
+========================================
 
 .. currentmodule:: randomstate.prng.mlfg_1279_861
 

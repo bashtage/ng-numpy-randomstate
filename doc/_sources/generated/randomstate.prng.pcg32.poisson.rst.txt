@@ -1,5 +1,5 @@
-randomstate\.prng\.pcg32\.poisson
-=================================
+randomstate.prng.pcg32.poisson
+==============================
 
 .. currentmodule:: randomstate.prng.pcg32
 

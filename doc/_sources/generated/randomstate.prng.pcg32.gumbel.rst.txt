@@ -1,5 +1,5 @@
-randomstate\.prng\.pcg32\.gumbel
-================================
+randomstate.prng.pcg32.gumbel
+=============================
 
 .. currentmodule:: randomstate.prng.pcg32
 

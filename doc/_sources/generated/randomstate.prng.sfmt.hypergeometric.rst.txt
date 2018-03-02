@@ -1,5 +1,5 @@
-randomstate\.prng\.sfmt\.hypergeometric
-=======================================
+randomstate.prng.sfmt.hypergeometric
+====================================
 
 .. currentmodule:: randomstate.prng.sfmt
 

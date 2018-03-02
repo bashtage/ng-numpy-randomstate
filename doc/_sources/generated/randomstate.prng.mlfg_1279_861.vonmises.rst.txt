@@ -1,5 +1,5 @@
-randomstate\.prng\.mlfg\_1279\_861\.vonmises
-============================================
+randomstate.prng.mlfg\_1279\_861.vonmises
+=========================================
 
 .. currentmodule:: randomstate.prng.mlfg_1279_861
 

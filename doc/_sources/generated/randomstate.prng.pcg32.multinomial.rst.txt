@@ -1,5 +1,5 @@
-randomstate\.prng\.pcg32\.multinomial
-=====================================
+randomstate.prng.pcg32.multinomial
+==================================
 
 .. currentmodule:: randomstate.prng.pcg32
 

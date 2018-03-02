@@ -1,5 +1,5 @@
-randomstate\.prng\.mt19937\.random\_integers
-============================================
+randomstate.prng.mt19937.random\_integers
+=========================================
 
 .. currentmodule:: randomstate.prng.mt19937
 

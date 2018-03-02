@@ -1,5 +1,5 @@
-randomstate\.prng\.dsfmt\.triangular
-====================================
+randomstate.prng.dsfmt.triangular
+=================================
 
 .. currentmodule:: randomstate.prng.dsfmt
 
