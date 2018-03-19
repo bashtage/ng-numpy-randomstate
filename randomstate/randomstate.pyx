@@ -22,6 +22,8 @@ from cpython cimport Py_INCREF, PyComplex_FromDoubles, PyComplex_RealAsDouble, \
 
 
 import randomstate
+from randomstate._deprecated import (DEPRECATION_MESSAGE, 
+                                     RandomStateDeprecationWarning)
 from binomial cimport binomial_t
 from randomstate.entropy import random_entropy
 

@@ -4,6 +4,27 @@
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/odc5c4ukhru5xicl/branch/master?svg=true)](https://ci.appveyor.com/project/bashtage/ng-numpy-randomstate/branch/master)
 [![PyPI version](https://badge.fury.io/py/randomstate.svg)](https://badge.fury.io/py/randomstate)
 
+# Future development in [randomgen](https://github.com/bashtage/randomgen)
+
+**End-of-life notification**
+
+This library was designed to bring alternative generators to the NumPy 
+infrastructure. It as been successful in advancing the conversation 
+for a future implementation of a new random number API in NumPy which 
+will allow new algorithms and/or generators. The next step
+in this process is to separate the basic (or core RNG) from the 
+functions that transform random bits into useful random numbers.
+This has been implemented in a successor project  **randomgen** 
+available on [GitHub](https://github.com/bashtage/randomgen) or
+[PyPi](https://pypi.org/project/randomstate/).
+
+[randomgen](https://github.com/bashtage/randomgen) has a slightly different API, so please see the  [randomgen documentation](https://bashtage.github.io/randomgen).
+
+
+-----------------------------------------------------------------------
+
+## Introduction
+
 This is a library and generic interface for alternative random 
 generators in Python and NumPy. 
 

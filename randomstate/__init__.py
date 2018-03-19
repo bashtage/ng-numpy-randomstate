@@ -59,6 +59,12 @@ New Functions
 """
 from __future__ import division, absolute_import, print_function
 
+import warnings
+
+from randomstate._deprecated import (DEPRECATION_MESSAGE,
+                                     RandomStateDeprecationWarning)
+warnings.warn(DEPRECATION_MESSAGE, RandomStateDeprecationWarning)
+
 from randomstate.prng.mt19937 import *
 from randomstate.entropy import random_entropy
 import randomstate.prng

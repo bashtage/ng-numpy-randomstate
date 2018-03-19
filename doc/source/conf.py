@@ -64,7 +64,7 @@ author = 'Kevin Sheppard'
 # built documents.
 #
 # The short X.Y version.
-version = '.'.join(map(str,LooseVersion(randomstate.__version__).version[:2]))
+version = '.'.join(map(str, LooseVersion(randomstate.__version__).version[:2]))
 # The full version, including alpha/beta/rc tags.
 release = randomstate.__version__
 
@@ -145,6 +145,9 @@ html_theme_options = {
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
+html_sidebars = {
+    '**': ['logo-text.html', 'globaltoc.html', 'searchbox.html']
+}
 #html_logo = None
 
 # The name of an image file (within the static path) to use as favicon of the
@@ -245,8 +248,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'randomstate.tex', 'randomstate Documentation',
-   'Kevin Sheppard', 'manual'),
+    (master_doc, 'randomstate.tex', 'randomstate Documentation',
+     'Kevin Sheppard', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -289,9 +292,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'randomstate', 'randomstate Documentation',
-   author, 'randomstate', 'NumPy-like random number generation supporting multiple core PRNG.',
-   'Random Numbers'),
+    (master_doc, 'randomstate', 'randomstate Documentation',
+     author, 'randomstate', 'NumPy-like random number generation supporting multiple core PRNG.',
+     'Random Numbers'),
 ]
 
 # Documents to append as an appendix to all manuals.
