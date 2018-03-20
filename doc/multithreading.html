@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Multithreaded Generation &#8212; randomstate 1.13.3+6.gd378c12 documentation</title>
+    <title>Multithreaded Generation &#8212; randomstate 1.13.3+7.g178708f documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.3+6.gd378c12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.3+7.g178708f documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -59,20 +59,40 @@
         <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
       </div>
   <div id="left-column">
-    <div class="sphinxsidebar">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="parallel.html"
-                        title="previous chapter">Parallel Random Number Generation</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="entropy.html"
-                        title="next chapter">System Entropy</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/multithreading.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
+    <div class="sphinxsidebar"><a href="
+    index.html" class="text-logo">randomstate 1.13</a>
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="parallel.html">Using in Parallel Applications</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Multithreaded Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entropy.html">Reading System Entropy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Comparing Performance</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mt19937.html">MT19937</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dsfmt.html">dSFMT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sfmt.html">SFMT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xorshift128.html">XorShift128+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xoroshiro128plus.html">XoroShiro128+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xorshift1024.html">XorShift1024*</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcg32.html">PCG-32</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcg64.html">PCG-64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlfg.html">MLFG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mrg32k3a.html">MRG32K3A</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="change-log.html">Change Log</a></li>
+</ul>
+
+    
+  </div>
+</div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -173,21 +193,21 @@ the time required to generate using a single thread.</p>
 <span class="go">2</span>
 
 <span class="gp">In [6]: </span><span class="o">%</span><span class="k">timeit</span> mrng.fill()
-<span class="go">  82.7 ms +- 392 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">  83 ms +- 358 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <p>The single threaded call directly uses the PRNG.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">10000000</span><span class="p">)</span>
 
 <span class="gp">In [8]: </span><span class="o">%</span><span class="k">timeit</span> randomstate.prng.xorshift1024.standard_normal(out=values)
-<span class="go">130 ms +- 2.46 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">130 ms +- 2.03 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <p>The gains are substantial and the scaling is reasonable even for large that
 are only moderately large.  The gains are even larger when compared to a call
 that does not use an existing array due to array creation overhead.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [9]: </span><span class="o">%</span><span class="k">timeit</span> randomstate.prng.xorshift1024.standard_normal(10000000)
-<span class="go">145 ms +- 1.11 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">152 ms +- 8.59 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 </div>
@@ -225,7 +245,7 @@ that does not use an existing array due to array creation overhead.</p>
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.3+6.gd378c12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">randomstate 1.13.3+7.g178708f documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

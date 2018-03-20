@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>randomstate’s documentation &#8212; randomstate 1.13.3+6.gd378c12 documentation</title>
+    <title>randomstate’s documentation &#8212; randomstate 1.13.3+7.g178708f documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="_static/documentation_options.js"></script>
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.3+6.gd378c12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.3+7.g178708f documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -55,39 +55,40 @@
         <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
       </div>
   <div id="left-column">
-    <div class="sphinxsidebar">
+    <div class="sphinxsidebar"><a href="
+    #" class="text-logo">randomstate 1.13</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Contents</h2>
-    <div class="sidebar-localtoc">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
       <ul>
-<li><a class="reference internal" href="#">randomstate’s documentation</a><ul>
-<li><a class="reference internal" href="#what-s-new-or-different">What’s New or Different</a></li>
-<li><a class="reference internal" href="#parallel-generation">Parallel Generation</a></li>
-<li><a class="reference internal" href="#supported-generators">Supported Generators</a><ul>
-<li><a class="reference internal" href="#new-features">New Features</a></li>
-<li><a class="reference internal" href="#individual-pseudo-random-number-generators">Individual Pseudo Random Number Generators</a></li>
-<li><a class="reference internal" href="#changes">Changes</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallel.html">Using in Parallel Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multithreading.html">Multithreaded Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entropy.html">Reading System Entropy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Comparing Performance</a></li>
 </ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mt19937.html">MT19937</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dsfmt.html">dSFMT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sfmt.html">SFMT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xorshift128.html">XorShift128+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xoroshiro128plus.html">XoroShiro128+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xorshift1024.html">XorShift1024*</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcg32.html">PCG-32</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcg64.html">PCG-64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlfg.html">MLFG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mrg32k3a.html">MRG32K3A</a></li>
 </ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="change-log.html">Change Log</a></li>
 </ul>
 
-    </div>
+    
   </div>
 </div>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="parallel.html"
-                        title="next chapter">Parallel Random Number Generation</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -118,6 +119,19 @@
             
   <div class="section" id="randomstate-s-documentation">
 <h1>randomstate’s documentation<a class="headerlink" href="#randomstate-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p><strong>End-of-life notification</strong></p>
+<p>This library was designed to bring alternative generators to the NumPy
+infrastructure. It as been successful in advancing the conversation
+for a future implementation of a new random number API in NumPy which
+will allow new algorithms and/or generators. The next step
+in this process is to separate the basic (or core RNG) from the
+functions that transform random bits into useful random numbers.
+This has been implemented in a successor project  <strong>randomgen</strong>
+available on <a class="reference external" href="https://github.com/bashtage/randomgen">GitHub</a> or <a class="reference external" href="https://pypi.org/project/randomstate/">PyPi</a>.</p>
+<p class="last"><a class="reference external" href="https://github.com/bashtage/randomgen">randomgen</a> has a slightly different API, so please see the  <a class="reference external" href="https://bashtage.github.io/randomgen">randomgen documentation</a>.</p>
+</div>
 <p>This package contains drop-in replacements for the NumPy RandomState object
 that change the core random number generator.</p>
 <div class="section" id="what-s-new-or-different">
@@ -141,8 +155,8 @@ argument <code class="docutils literal notranslate"><span class="pre">method='zi
 <span class="gp">In [2]: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;bm&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">41.3 ms +- 464 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">10 ms +- 110 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">47.3 ms +- 3.19 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">10.6 ms +- 231 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_exponential</span>
@@ -150,8 +164,8 @@ argument <code class="docutils literal notranslate"><span class="pre">method='zi
 <span class="gp">In [5]: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">53.3 ms +- 360 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">6.01 ms +- 123 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">63.7 ms +- 5.94 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">7.06 ms +- 953 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_gamma</span>
@@ -159,8 +173,8 @@ argument <code class="docutils literal notranslate"><span class="pre">method='zi
 <span class="gp">In [8]: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">59.2 ms +- 443 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">29.7 ms +- 765 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">60.8 ms +- 3.34 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">33.5 ms +- 5.27 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -431,7 +445,7 @@ performance than more modern generators.</li>
         <li class="right" >
           <a href="parallel.html" title="Parallel Random Number Generation"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.3+6.gd378c12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">randomstate 1.13.3+7.g178708f documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">
