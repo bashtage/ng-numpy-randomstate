@@ -1,8 +1,3 @@
-randomstate
-===========
-
-|Travis Build Status| |Appveyor Build Status| |PyPI version|
-
 Future development in `randomgen <https://github.com/bashtage/randomgen>`__
 ===========================================================================
 
@@ -16,13 +11,18 @@ to separate the basic (or core RNG) from the functions that transform
 random bits into useful random numbers. This has been implemented in a
 successor project **randomgen** available on
 `GitHub <https://github.com/bashtage/randomgen>`__ or
-`PyPi <https://pypi.org/project/randomstate/>`__.
+`PyPi <https://pypi.org/project/randomgen/>`__.
 
 `randomgen <https://github.com/bashtage/randomgen>`__ has a slightly
 different API, so please see the `randomgen
 documentation <https://bashtage.github.io/randomgen>`__.
 
 --------------
+
+randomstate
+===========
+
+|Travis Build Status| |Appveyor Build Status| |PyPI version|
 
 Introduction
 ------------

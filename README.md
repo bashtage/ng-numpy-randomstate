@@ -1,9 +1,3 @@
-# randomstate
-
-[![Travis Build Status](https://travis-ci.org/bashtage/ng-numpy-randomstate.svg?branch=master)](https://travis-ci.org/bashtage/ng-numpy-randomstate) 
-[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/odc5c4ukhru5xicl/branch/master?svg=true)](https://ci.appveyor.com/project/bashtage/ng-numpy-randomstate/branch/master)
-[![PyPI version](https://badge.fury.io/py/randomstate.svg)](https://badge.fury.io/py/randomstate)
-
 # Future development in [randomgen](https://github.com/bashtage/randomgen)
 
 **End-of-life notification**
@@ -16,12 +10,17 @@ in this process is to separate the basic (or core RNG) from the
 functions that transform random bits into useful random numbers.
 This has been implemented in a successor project  **randomgen** 
 available on [GitHub](https://github.com/bashtage/randomgen) or
-[PyPi](https://pypi.org/project/randomstate/).
+[PyPi](https://pypi.org/project/randomgen/).
 
 [randomgen](https://github.com/bashtage/randomgen) has a slightly different API, so please see the  [randomgen documentation](https://bashtage.github.io/randomgen).
 
-
 -----------------------------------------------------------------------
+
+# randomstate
+
+[![Travis Build Status](https://travis-ci.org/bashtage/ng-numpy-randomstate.svg?branch=master)](https://travis-ci.org/bashtage/ng-numpy-randomstate) 
+[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/odc5c4ukhru5xicl/branch/master?svg=true)](https://ci.appveyor.com/project/bashtage/ng-numpy-randomstate/branch/master)
+[![PyPI version](https://badge.fury.io/py/randomstate.svg)](https://badge.fury.io/py/randomstate)
 
 ## Introduction
 
