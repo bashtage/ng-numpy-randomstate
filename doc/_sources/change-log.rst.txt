@@ -3,6 +3,10 @@
 Change Log
 ==========
 
+Version 1.14.0
+--------------
+* Added deprecation notices and details of randomgen
+
 Version 1.13.3
 --------------
 * Build Linux wheel using manylinux1
