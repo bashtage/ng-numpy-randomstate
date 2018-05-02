@@ -138,7 +138,7 @@
 <code class="descclassname">randomstate.prng.sfmt.</code><code class="descname">random_sample</code><span class="sig-paren">(</span><em>size=None</em>, <em>dtype='d'</em>, <em>out=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.sfmt.random_sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return random floats in the half-open interval [0.0, 1.0).</p>
 <p>Results are from the “continuous uniform” distribution over the
-stated interval.  To sample <span class="math notranslate">\(Unif[a, b), b &gt; a\)</span> multiply
+stated interval.  To sample <span class="math notranslate nohighlight">\(Unif[a, b), b &gt; a\)</span> multiply
 the output of <cite>random_sample</cite> by <cite>(b-a)</cite> and add <cite>a</cite>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">random_sample</span><span class="p">()</span> <span class="o">+</span> <span class="n">a</span>
 </pre></div>

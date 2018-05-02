@@ -137,7 +137,7 @@
 <em class="property">class </em><code class="descclassname">randomstate.prng.mrg32k3a.</code><code class="descname">RandomState</code><span class="sig-paren">(</span><em>seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#randomstate.prng.mrg32k3a.RandomState" title="Permalink to this definition">¶</a></dt>
 <dd><p>Container for L’Ecuyer MRG32K3A pseudo-random number generator.</p>
 <p>MRG32K3A is a 32-bit implementation of L’Ecuyer’s combined multiple
-recursive generator <a class="footnote-reference" href="#id4" id="id1">[1]</a>, <a class="footnote-reference" href="#id5" id="id2">[2]</a>. MRG32K3A has a period of <span class="math notranslate">\(2^{191}\)</span>,
+recursive generator <a class="footnote-reference" href="#id4" id="id1">[1]</a>, <a class="footnote-reference" href="#id5" id="id2">[2]</a>. MRG32K3A has a period of <span class="math notranslate nohighlight">\(2^{191}\)</span>,
 supports jumping ahead and is suitable for parallel applications.</p>
 <p><code class="docutils literal notranslate"><span class="pre">mrg32k3a.RandomState</span></code> exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the
@@ -169,12 +169,12 @@ unavailable, a 64-bit hash of the time and process ID is used.</td>
 <p class="rubric">Notes</p>
 <p>The state of the MRG32KA PRNG is represented by 6 64-bit integers.</p>
 <p>This implementation is integer based and produces integers in the interval
-<span class="math notranslate">\([0, 2^{32}-209+1]\)</span>.  These are treated as if they 32-bit random
+<span class="math notranslate nohighlight">\([0, 2^{32}-209+1]\)</span>.  These are treated as if they 32-bit random
 integers.</p>
 <p><strong>Parallel Features</strong></p>
 <p><code class="docutils literal notranslate"><span class="pre">mrg32k3a.RandomState</span></code> can be used in parallel applications by
 calling the method <code class="docutils literal notranslate"><span class="pre">jump</span></code> which advances the state as-if
-<span class="math notranslate">\(2^{127}\)</span> random numbers have been generated <a class="footnote-reference" href="#id6" id="id3">[3]</a>. This
+<span class="math notranslate nohighlight">\(2^{127}\)</span> random numbers have been generated <a class="footnote-reference" href="#id6" id="id3">[3]</a>. This
 allows the original sequence to be split so that distinct segments can be used
 in each worker process. All generators should be initialized with the same
 seed to ensure that the segments come from the same sequence.</p>

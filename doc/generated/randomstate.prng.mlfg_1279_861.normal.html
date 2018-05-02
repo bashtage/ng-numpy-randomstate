@@ -177,15 +177,15 @@ method.  ‘zig’ uses the much faster Ziggurat method of Marsaglia and Tsang.<
 </div>
 <p class="rubric">Notes</p>
 <p>The probability density for the Gaussian distribution is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[p(x) = \frac{1}{\sqrt{ 2 \pi \sigma^2 }}
 e^{ - \frac{ (x - \mu)^2 } {2 \sigma^2} },\]</div>
-<p>where <span class="math notranslate">\(\mu\)</span> is the mean and <span class="math notranslate">\(\sigma\)</span> the standard
-deviation. The square of the standard deviation, <span class="math notranslate">\(\sigma^2\)</span>,
+<p>where <span class="math notranslate nohighlight">\(\mu\)</span> is the mean and <span class="math notranslate nohighlight">\(\sigma\)</span> the standard
+deviation. The square of the standard deviation, <span class="math notranslate nohighlight">\(\sigma^2\)</span>,
 is called the variance.</p>
 <p>The function has its peak at the mean, and its “spread” increases with
 the standard deviation (the function reaches 0.607 times its maximum at
-<span class="math notranslate">\(x + \sigma\)</span> and <span class="math notranslate">\(x - \sigma\)</span> <a class="footnote-reference" href="#id5" id="id3">[2]</a>).  This implies that
+<span class="math notranslate nohighlight">\(x + \sigma\)</span> and <span class="math notranslate nohighlight">\(x - \sigma\)</span> <a class="footnote-reference" href="#id5" id="id3">[2]</a>).  This implies that
 <cite>numpy.random.normal</cite> is more likely to return samples lying close to
 the mean, rather than those far away.</p>
 <p class="rubric">References</p>

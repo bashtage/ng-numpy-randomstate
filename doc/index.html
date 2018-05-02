@@ -155,8 +155,8 @@ argument <code class="docutils literal notranslate"><span class="pre">method='zi
 <span class="gp">In [2]: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;bm&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">42.4 ms +- 110 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">9.63 ms +- 50.4 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">41.6 ms +- 522 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">10.6 ms +- 197 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_exponential</span>
@@ -164,8 +164,8 @@ argument <code class="docutils literal notranslate"><span class="pre">method='zi
 <span class="gp">In [5]: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">56.2 ms +- 343 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">5.2 ms +- 31.5 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">53.2 ms +- 460 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">6.24 ms +- 201 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_gamma</span>
@@ -173,8 +173,8 @@ argument <code class="docutils literal notranslate"><span class="pre">method='zi
 <span class="gp">In [8]: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">56.8 ms +- 334 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">27.2 ms +- 193 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">61.4 ms +- 740 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">30.1 ms +- 596 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -272,7 +272,7 @@ about these PRNGs is available at the
 <li>PCG-32 and PCG-64 - Fast generators that support many parallel streams and
 can be advanced by an arbitrary amount. See the documentation for
 <a class="reference internal" href="generated/randomstate.prng.pcg64.advance.html#randomstate.prng.pcg64.advance" title="randomstate.prng.pcg64.advance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">randomstate.prng.pcg64.advance()</span></code></a>.  PCG-32 only as a period of
-<span class="math notranslate">\(2^{64}\)</span> while PCG-64 has a period of <span class="math notranslate">\(2^{128}\)</span>. See the
+<span class="math notranslate nohighlight">\(2^{64}\)</span> while PCG-64 has a period of <span class="math notranslate nohighlight">\(2^{128}\)</span>. See the
 <a class="reference external" href="http://www.pcg-random.org/">PCG author’s page</a> for more details about this class of PRNG.</li>
 <li>Multiplicative Lagged Fibonacci Generator MLFG(1279, 861, *) - A directly
 implemented multiplicative lagged Fibonacci generator with a very large

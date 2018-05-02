@@ -178,7 +178,7 @@ number of probability distributions to choose from.</p>
 </div>
 <p><strong>Parallel Features</strong></p>
 <p><code class="docutils literal notranslate"><span class="pre">sfmt.RandomState</span></code> can be used in parallel applications by
-calling the method <code class="docutils literal notranslate"><span class="pre">jump</span></code> which advances the state as-if <span class="math notranslate">\(2^{128}\)</span>
+calling the method <code class="docutils literal notranslate"><span class="pre">jump</span></code> which advances the state as-if <span class="math notranslate nohighlight">\(2^{128}\)</span>
 random numbers have been generated <a class="footnote-reference" href="#id4" id="id2">[2]</a>. This allows the original sequence to
 be split so that distinct segments can be used in each worker process.  All
 generators should be initialized with the same seed to ensure that the

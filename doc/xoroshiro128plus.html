@@ -140,8 +140,8 @@
 Sebastiano Vigna.  It is a 64-bit PRNG that uses a carefully handcrafted
 shift/rotate-based linear transformation.  This change both improves speed and
 statistical quality of the PRNG <a class="footnote-reference" href="#id2" id="id1">[1]</a>. xoroshiro128plus+ has a period of
-<span class="math notranslate">\(2^{128} - 1\)</span> and supports jumping the sequence in increments of
-<span class="math notranslate">\(2^{64}\)</span>, which allows  multiple non-overlapping sequences to be
+<span class="math notranslate nohighlight">\(2^{128} - 1\)</span> and supports jumping the sequence in increments of
+<span class="math notranslate nohighlight">\(2^{64}\)</span>, which allows  multiple non-overlapping sequences to be
 generated.</p>
 <p><code class="docutils literal notranslate"><span class="pre">xoroshiro128plus.RandomState</span></code> exposes a number of methods for generating random
 numbers drawn from a variety of probability distributions. In addition to the
@@ -172,11 +172,11 @@ unavailable, a 64-bit hash of the time and process ID is used.</td>
 </table>
 <p class="rubric">Notes</p>
 <p>See xorshift1024 for an related PRNG implementation with a larger
-period  (<span class="math notranslate">\(2^{1024} - 1\)</span>) and jump size (<span class="math notranslate">\(2^{512} - 1\)</span>).</p>
+period  (<span class="math notranslate nohighlight">\(2^{1024} - 1\)</span>) and jump size (<span class="math notranslate nohighlight">\(2^{512} - 1\)</span>).</p>
 <p><strong>Parallel Features</strong></p>
 <p><code class="docutils literal notranslate"><span class="pre">xoroshiro128plus.RandomState</span></code> can be used in parallel applications by
 calling the method <code class="docutils literal notranslate"><span class="pre">jump</span></code> which advances the state as-if
-<span class="math notranslate">\(2^{64}\)</span> random numbers have been generated. This
+<span class="math notranslate nohighlight">\(2^{64}\)</span> random numbers have been generated. This
 allow the original sequence to be split so that distinct segments can be used
 in each worker process. All generators should be initialized with the same
 seed to ensure that the segments come from the same sequence.</p>

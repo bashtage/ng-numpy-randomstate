@@ -133,7 +133,7 @@ or distributed).</p>
 <div class="section" id="independent-streams">
 <span id="id1"></span><h2>Independent Streams<a class="headerlink" href="#independent-streams" title="Permalink to this headline">¶</a></h2>
 <p>Currently only <code class="docutils literal notranslate"><span class="pre">pcg32</span></code> and <code class="docutils literal notranslate"><span class="pre">pcg64</span></code> support independent streams, and,
-due to the limited period of <code class="docutils literal notranslate"><span class="pre">pcg32</span></code> (<span class="math notranslate">\(2^{64}\)</span>), only <code class="docutils literal notranslate"><span class="pre">pcg64</span></code>
+due to the limited period of <code class="docutils literal notranslate"><span class="pre">pcg32</span></code> (<span class="math notranslate nohighlight">\(2^{64}\)</span>), only <code class="docutils literal notranslate"><span class="pre">pcg64</span></code>
 should be used.  This example shows how many streams can be created by
 passing in different index values in the second input while using the
 same seed in the first.</p>
@@ -153,7 +153,7 @@ same seed in the first.</p>
 <h3>Jump<a class="headerlink" href="#jump" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">jump</span></code> advances the state of the PRNG <em>as-if</em> a large number of random
 numbers have been drawn.  The specific number of draws varies by PRNG, and
-ranges from <span class="math notranslate">\(2^{64}\)</span> to <span class="math notranslate">\(2^{512}\)</span>.  Additionally, the <em>as-if</em>
+ranges from <span class="math notranslate nohighlight">\(2^{64}\)</span> to <span class="math notranslate nohighlight">\(2^{512}\)</span>.  Additionally, the <em>as-if</em>
 draws also depend on the size of the default random number produced by the
 specific PRNG.  The PRNGs that support <code class="docutils literal notranslate"><span class="pre">jump</span></code>, along with the period of
 the PRNG, the size of the jump and the bits in the default unsigned random
@@ -174,27 +174,27 @@ are listed below.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>dsfmt</td>
-<td><span class="math notranslate">\(2^{19937}\)</span></td>
-<td><span class="math notranslate">\(2^{128}\)</span></td>
+<td><span class="math notranslate nohighlight">\(2^{19937}\)</span></td>
+<td><span class="math notranslate nohighlight">\(2^{128}\)</span></td>
 <td>53</td>
 </tr>
 <tr class="row-odd"><td>mrg32k3a</td>
-<td><span class="math notranslate">\(\approx 2^{191}\)</span></td>
-<td><span class="math notranslate">\(2^{127}\)</span></td>
+<td><span class="math notranslate nohighlight">\(\approx 2^{191}\)</span></td>
+<td><span class="math notranslate nohighlight">\(2^{127}\)</span></td>
 <td>32</td>
 </tr>
 <tr class="row-even"><td>xorshift128</td>
-<td><span class="math notranslate">\(2^{128}\)</span></td>
-<td><span class="math notranslate">\(2^{64}\)</span></td>
+<td><span class="math notranslate nohighlight">\(2^{128}\)</span></td>
+<td><span class="math notranslate nohighlight">\(2^{64}\)</span></td>
 <td>64</td>
 </tr>
 <tr class="row-odd"><td>xorshift1024</td>
-<td><span class="math notranslate">\(2^{1024}\)</span></td>
-<td><span class="math notranslate">\(2^{512}\)</span></td>
+<td><span class="math notranslate nohighlight">\(2^{1024}\)</span></td>
+<td><span class="math notranslate nohighlight">\(2^{512}\)</span></td>
 <td>64</td>
 </tr>
 <tr class="row-even"><td>mt19937</td>
-<td colspan="2"><span class="math notranslate">\(2^{19937}\)</span>        | <span class="math notranslate">\(2^{128}\)</span></td>
+<td colspan="2"><span class="math notranslate nohighlight">\(2^{19937}\)</span>        | <span class="math notranslate nohighlight">\(2^{128}\)</span></td>
 <td>32</td>
 </tr>
 </tbody>
