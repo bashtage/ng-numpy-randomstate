@@ -155,8 +155,8 @@ argument <code class="docutils literal notranslate"><span class="pre">method='zi
 <span class="gp">In [2]: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;bm&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">42.8 ms +- 530 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">10.4 ms +- 118 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">44 ms +- 283 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">10.4 ms +- 180 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_exponential</span>
@@ -164,8 +164,8 @@ argument <code class="docutils literal notranslate"><span class="pre">method='zi
 <span class="gp">In [5]: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">59.2 ms +- 439 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">5.55 ms +- 180 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">58.6 ms +- 894 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">5.73 ms +- 125 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_gamma</span>
@@ -173,8 +173,8 @@ argument <code class="docutils literal notranslate"><span class="pre">method='zi
 <span class="gp">In [8]: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">61.2 ms +- 1.59 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">29.3 ms +- 1.48 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">63.8 ms +- 1.96 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">33.5 ms +- 1.38 ms per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <ul class="simple">
