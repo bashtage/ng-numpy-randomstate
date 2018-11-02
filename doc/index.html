@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Parallel Random Number Generation" href="parallel.html" />
@@ -155,26 +155,26 @@ argument <code class="docutils literal notranslate"><span class="pre">method='zi
 <span class="gp">In [2]: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;bm&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_normal(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">43 ms +- 150 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">9.8 ms +- 34 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">42.9 ms +- 169 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">9.71 ms +- 32.4 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [4]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_exponential</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [3]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_exponential</span>
 
-<span class="gp">In [5]: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;inv&#39;)
+<span class="gp">In [4]: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_exponential(1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">56.6 ms +- 273 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">5.27 ms +- 23.6 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
+<span class="go">55.9 ms +- 141 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">5.17 ms +- 22.9 us per loop (mean +- std. dev. of 7 runs, 100 loops each)</span>
 </pre></div>
 </div>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_gamma</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [5]: </span><span class="kn">from</span> <span class="nn">randomstate.prng.xoroshiro128plus</span> <span class="kn">import</span> <span class="n">standard_gamma</span>
 
-<span class="gp">In [8]: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;inv&#39;)
+<span class="gp">In [6]: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;inv&#39;)
 <span class="gp">   ...: </span><span class="o">%</span><span class="k">timeit</span> standard_gamma(3.0, 1000000, method=&#39;zig&#39;)
 <span class="gp">   ...: </span>
-<span class="go">57.6 ms +- 236 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
-<span class="go">27.5 ms +- 299 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">59.2 ms +- 168 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
+<span class="go">28.1 ms +- 136 us per loop (mean +- std. dev. of 7 runs, 10 loops each)</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -190,17 +190,17 @@ select distributions<ul>
 </ul>
 </li>
 </ul>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [10]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
 
-<span class="gp">In [11]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">In [8]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="gp">In [12]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
-<span class="gh">Out[12]: </span><span class="go">array([0.5488135 , 0.71518937, 0.60276338])</span>
+<span class="gp">In [9]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+<span class="gh">Out[9]: </span><span class="go">array([0.5488135 , 0.71518937, 0.60276338])</span>
 
-<span class="gp">In [13]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">In [10]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="gp">In [14]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">)</span>
-<span class="gh">Out[14]: </span><span class="go">array([0.54881346, 0.5928446 , 0.71518934], dtype=float32)</span>
+<span class="gp">In [11]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">)</span>
+<span class="gh">Out[11]: </span><span class="go">array([0.54881346, 0.5928446 , 0.71518934], dtype=float32)</span>
 </pre></div>
 </div>
 <ul>
@@ -216,18 +216,18 @@ select distributions</p>
 PRNGs in parallel.</p>
 </li>
 </ul>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [15]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [12]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
-<span class="gp">In [16]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
+<span class="gp">In [13]: </span><span class="kn">import</span> <span class="nn">randomstate</span> <span class="kn">as</span> <span class="nn">rs</span>
 
-<span class="gp">In [17]: </span><span class="n">existing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">In [14]: </span><span class="n">existing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 
-<span class="gp">In [18]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">In [15]: </span><span class="n">rs</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="gp">In [19]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">existing</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
-<span class="gh">Out[19]: </span><span class="go">array([0.5488135 , 0.71518937])</span>
+<span class="gp">In [16]: </span><span class="n">rs</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">existing</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+<span class="gh">Out[16]: </span><span class="go">array([0.5488135 , 0.71518937])</span>
 
-<span class="gp">In [20]: </span><span class="k">print</span><span class="p">(</span><span class="n">existing</span><span class="p">)</span>
+<span class="gp">In [17]: </span><span class="k">print</span><span class="p">(</span><span class="n">existing</span><span class="p">)</span>
 <span class="go">                                         [0.5488135  0.71518937 0.         0.        ]</span>
 </pre></div>
 </div>
